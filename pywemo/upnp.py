@@ -44,7 +44,7 @@ def discover_devices(max_devices=None, timeout=DISCOVER_TIMEOUT):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        sock.sendto(SSDP_REQUEST, (SSDP_ADDR, SSDP_PORT))
+        sock.sendto(SSDP_REQUEST.encode("ascii"), (SSDP_ADDR, SSDP_PORT))
 
         sock.setblocking(0)
 
@@ -54,12 +54,12 @@ def discover_devices(max_devices=None, timeout=DISCOVER_TIMEOUT):
             seconds_left = timeout - time_diff.seconds
 
             if seconds_left <= 0:
-                return devices.values()
+                return list(devices.values())
 
             ready = select.select([sock], [], [], seconds_left)[0]
 
             if ready:
-                response = sock.recv(1024)
+                response = sock.recv(1024).decode("ascii")
 
                 found_location = found_ua = found_usn = None
 
@@ -114,4 +114,4 @@ def discover_devices(max_devices=None, timeout=DISCOVER_TIMEOUT):
     finally:
         sock.close()
 
-    return devices.values()
+    return list(devices.values())

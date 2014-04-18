@@ -1,5 +1,5 @@
 import logging
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 import requests
 
@@ -54,15 +54,15 @@ class Device(object):
             raise UnknownService(name)
 
     def list_services(self):
-        return self.services.keys()
+        return list(self.services.keys())
 
     def explain(self):
-        for name, svc in self.services.iteritems():
-            print name
-            print '-' * len(name)
-            for aname, action in svc.actions.iteritems():
-                print "  %s(%s)" % (aname, ', '.join(action.args))
-            print
+        for name, svc in self.services.items():
+            print(name)
+            print('-' * len(name))
+            for aname, action in svc.actions.items():
+                print("  %s(%s)" % (aname, ', '.join(action.args)))
+            print()
 
     @property
     def model(self):
@@ -79,7 +79,7 @@ class Device(object):
 
 def test():
     device = Device("http://10.42.1.102:49152/setup.xml")
-    print device.get_service('basicevent').SetBinaryState(BinaryState=1)
+    print(device.get_service('basicevent').SetBinaryState(BinaryState=1))
 
 
 if __name__ == "__main__":

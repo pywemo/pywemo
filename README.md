@@ -1,6 +1,6 @@
 pyWeMo
 ======
-Lightweight Python module to discover and control WeMo devices.
+Lightweight Python 3 module to discover and control WeMo devices.
 
 This is a stripped down version of the Python API for WeMo devices [ouimeaux](https://github.com/iancmcc/ouimeaux). It is stripped down because in my opinion it had a bunch of unnecessary dependencies and functionality.
 
