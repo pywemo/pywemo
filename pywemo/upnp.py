@@ -6,10 +6,13 @@ import socket
 import logging
 import datetime as dt
 
+import requests
+
 from .ouimeaux_device.insight import Insight
 from .ouimeaux_device.lightswitch import LightSwitch
 from .ouimeaux_device.motion import Motion
 from .ouimeaux_device.switch import Switch
+from .ouimeaux_device.api.xsd import device as deviceParser
 
 DISCOVER_TIMEOUT = 10
 
@@ -90,19 +93,11 @@ def discover_devices(max_devices=None, timeout=DISCOVER_TIMEOUT):
                    found_ua == "redsonic" and \
                    found_location not in devices:
 
-                    if found_usn.startswith('uuid:Socket'):
-                        cls = Switch
-                    elif found_usn.startswith('uuid:Lightswitch'):
-                        cls = LightSwitch
-                    elif found_usn.startswith('uuid:Insight'):
-                        cls = Insight
-                    elif found_usn.startswith('uuid:Sensor'):
-                        cls = Motion
-                    else:
-                        cls = None
+                    device = device_from_uuid_and_location(found_usn,
+                                                           found_location)
 
-                    if cls:
-                        devices[found_location] = cls(found_location)
+                    if device:
+                        devices[found_location] = device
 
                         if max_devices and len(devices) == max_devices:
                             break
@@ -115,3 +110,32 @@ def discover_devices(max_devices=None, timeout=DISCOVER_TIMEOUT):
         sock.close()
 
     return list(devices.values())
+
+
+def device_from_uuid_and_location(uuid, location):
+    """ Tries to determine which device it is based on the uuid. """
+    if uuid.startswith('uuid:Socket'):
+        return Switch(location)
+    elif uuid.startswith('uuid:Lightswitch'):
+        return LightSwitch(location)
+    elif uuid.startswith('uuid:Insight'):
+        return Insight(location)
+    elif uuid.startswith('uuid:Sensor'):
+        return Motion(location)
+    else:
+        return None
+
+
+def device_from_host(host):
+    """ Returns object representing WeMo device running at host, else None. """
+    xml_url = "http://{}:49153/setup.xml".format(host)
+
+    try:
+        xml = requests.get(xml_url)
+
+        uuid = deviceParser.parseString(xml.content).device.UDN
+
+        return device_from_uuid_and_location(uuid, xml_url)
+
+    except Exception:  # pylint: disable=broad-except
+        return None
