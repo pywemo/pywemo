@@ -19,7 +19,7 @@ class Device(object):
         base_url = url.rsplit('/', 1)[0]
         self.host = urlparse(url).hostname
         #self.port = urlparse(url).port
-        xml = requests.get(url)
+        xml = requests.get(url, timeout=10)
         self._config = deviceParser.parseString(xml.content).device
         sl = self._config.serviceList
         self.services = {}

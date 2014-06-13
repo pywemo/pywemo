@@ -131,7 +131,7 @@ def device_from_host(host):
     xml_url = "http://{}:49153/setup.xml".format(host)
 
     try:
-        xml = requests.get(xml_url)
+        xml = requests.get(xml_url, timeout=10)
 
         uuid = deviceParser.parseString(xml.content).device.UDN
 

@@ -45,7 +45,7 @@ class Action(object):
             service=self.serviceType,
             args=arglist
         )
-        response = requests.post(self.controlURL, body.strip(), headers=self.headers)
+        response = requests.post(self.controlURL, body.strip(), headers=self.headers, timeout=10)
         d = {}
         for r in et.fromstring(response.content).getchildren()[0].getchildren()[0].getchildren():
             d[r.tag] = r.text
@@ -64,7 +64,7 @@ class Service(object):
         self._base_url = base_url.rstrip('/')
         self._config = service
         url = '%s/%s' % (base_url, service.get_SCPDURL().strip('/'))
-        xml = requests.get(url)
+        xml = requests.get(url, timeout=10)
         self.actions = {}
         self._svc_config = serviceParser.parseString(xml.content).actionList
         for action in self._svc_config.get_action():
