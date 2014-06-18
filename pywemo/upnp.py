@@ -30,7 +30,7 @@ SSDP_REQUEST = 'M-SEARCH * HTTP/1.1\r\n' + \
 
 
 # pylint: disable=too-many-locals, too-many-branches
-def discover_devices(max_devices=None, timeout=DISCOVER_TIMEOUT):
+def discover_devices(max_devices=None, port=54321, timeout=DISCOVER_TIMEOUT):
     """
     Sends a message over the network to discover Chromecasts and returns
     a list of found IP addresses.
@@ -46,6 +46,8 @@ def discover_devices(max_devices=None, timeout=DISCOVER_TIMEOUT):
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+        sock.bind(('', port))
 
         sock.sendto(SSDP_REQUEST.encode("ascii"), (SSDP_ADDR, SSDP_PORT))
 
