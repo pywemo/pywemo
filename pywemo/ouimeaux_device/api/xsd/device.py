@@ -1578,8 +1578,8 @@ def parse(inFileName):
 
 
 def parseString(inString):
-    from io import StringIO
-    doc = parsexml_(StringIO(inString.decode("UTF-8")))
+    from io import BytesIO
+    doc = parsexml_(BytesIO(inString))
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
