@@ -1,4 +1,5 @@
 import logging
+import time
 
 try:
   from urllib.parse import urlparse
@@ -9,7 +10,6 @@ import requests
 
 from .api.service import Service
 from .api.xsd import device as deviceParser
-
 
 log = logging.getLogger(__name__)
 
@@ -29,10 +29,47 @@ class Device(object):
         self.services = {}
         for svc in sl.service:
             svcname = svc.get_serviceType().split(':')[-2]
-            service = Service(svc, base_url)
+            service = Service(self, svc, base_url)
             service.eventSubURL = base_url + svc.get_eventSubURL()
             self.services[svcname] = service
             setattr(self, svcname, service)
+
+    def reconnect_with_device(self):
+        """
+        Wemos tend to change their port number from time to time.
+        Whenever requests throws an error, we will try to find the device again
+        on the network and update this device. """
+
+        # Put here to avoid circular dependency
+        from pywemo.discovery import discover_devices
+
+        log.info("Trying to reconnect with {}".format(self.name))
+        # We will try to find it 5 times, each time we wait a bigger interval
+        try_no = 0
+
+        while True:
+            found = discover_devices(self._config.get_UDN(), 1)
+
+            if found:
+                log.info("Found it again, updating local values")
+
+                self.__dict__ = found[0].__dict__
+                return
+
+            wait_time = try_no * 5
+
+            log.info(
+                "Not found in try {}. Trying again in {} seconds".format(
+                    try_no, wait_time))
+
+            if try_no == 5:
+                log.error(
+                    "Unable to reconnect with device in 5 tries. Stopping.")
+                return
+
+            time.sleep(wait_time)
+
+            try_no += 1
 
     def _update_state(self, value):
         self._state = int(value)
