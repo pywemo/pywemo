@@ -1,0 +1,8 @@
+[MASTER]
+ignore=ouimeaux_device
+reports=no
+
+disable=locally-disabled
+
+[EXCEPTIONS]
+overgeneral-exceptions=Exception
