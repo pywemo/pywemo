@@ -41,7 +41,7 @@ class Device(object):
         on the network and update this device. """
 
         # Put here to avoid circular dependency
-        from pywemo.discovery import discover_devices
+        from ..discovery import discover_devices
 
         log.info("Trying to reconnect with {}".format(self.name))
         # We will try to find it 5 times, each time we wait a bigger interval
