@@ -18,7 +18,9 @@ def discover_devices(st=None, max_devices=None):
     for entry in ssdp_entries:
         st = entry.st
 
-        if st.startswith('uuid:Socket'):
+        if st is None:
+            continue
+        elif st.startswith('uuid:Socket'):
             wemos.append(Switch(entry.location))
         elif st.startswith('uuid:Lightswitch'):
             wemos.append(LightSwitch(entry.location))
