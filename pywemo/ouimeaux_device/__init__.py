@@ -71,22 +71,19 @@ class Device(object):
 
             try_no += 1
 
-    def _update_state(self, value):
-        self._state = int(value)
-
     def get_state(self, force_update=False):
         """
         Returns 0 if off and 1 if on.
         """
         if force_update or self._state is None:
-            return int(self.basicevent.GetBinaryState()['BinaryState'])
-        return self._state
+            state = self.basicevent.GetBinaryState() or {}
 
-    def __getstate__(self):
-        odict = self.__dict__.copy() # copy the dict since we change it
-        if 'register_listener' in odict:
-            del odict['register_listener']
-        return odict
+            try:
+                self._state = int(state.get('BinaryState', 0))
+            except ValueError:
+                self._state = 0
+
+        return self._state
 
     def get_service(self, name):
         try:
@@ -116,13 +113,3 @@ class Device(object):
     @property
     def serialnumber(self):
         return self._config.get_serialNumber()
-
-
-def test():
-    device = Device("http://10.42.1.102:49152/setup.xml")
-    print(device.get_service('basicevent').SetBinaryState(BinaryState=1))
-
-
-if __name__ == "__main__":
-    test()
-
