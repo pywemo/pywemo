@@ -13,7 +13,8 @@ import requests
 
 from .util import etree_to_dict
 
-DISCOVER_TIMEOUT = SSDP_MX = 5
+SSDP_MX = 5
+DISCOVER_TIMEOUT = 2 * SSDP_MX
 
 RESPONSE_REGEX = re.compile(r'\n(.*)\: (.*)\r')
 
