@@ -9,3 +9,5 @@ from .ouimeaux_device.motion import Motion
 from .ouimeaux_device.switch import Switch
 
 from .upnp import discover_devices, device_from_host
+
+from .subscribe import SubscriptionRegistry
