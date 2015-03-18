@@ -30,14 +30,16 @@ def get_ip_address():
 
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
-  def do_GET(self):
+  def do_NOTIFY(self):
     LOG.info("Got wemo event")
     outer = self.server.outer
     device = outer._devices.get(self.client_address)
     if device is not None:
-      data = environ['wsgi.input'].read()
+      content_len = int(self.headers.getheader('content-length', 0))
+      data = self.rfile.read(content_len)
       # trim garbage from end, if any
       data = data.split("\n\n")[0]
+      LOG.info(data)
       doc = cElementTree.fromstring(data)
       for propnode in doc.findall('./{0}property'.format(NS)):
         for property_ in propnode.getchildren():
@@ -74,7 +76,7 @@ class SubscriptionRegistry(object):
     # state
     device.register_listener = functools.partial(self.on, device, 'BinaryState')
     self._devices[device.host] = device
-    self._sched.enter(0, 0, self._resubscribe_internal, [url])
+    self._sched.enter(0, 0, self._resubscribe, [device.basicevent.eventSubURL])
 
   def _resubscribe(self, url, sid=None):
     headers = {'TIMEOUT': 300}
