@@ -31,15 +31,18 @@ def get_ip_address():
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
   def do_NOTIFY(self):
-    LOG.info("Got wemo event")
+    sender_ip, _ = self.client_address
+    LOG.info("Got wemo event from %s", sender_ip)
     outer = self.server.outer
-    device = outer._devices.get(self.client_address)
+    device = outer._devices.get(sender_ip)
+
+    content_len = int(self.headers.getheader('content-length', 0))
+    data = self.rfile.read(content_len)
+    LOG.info(data)
+
     if device is not None:
-      content_len = int(self.headers.getheader('content-length', 0))
-      data = self.rfile.read(content_len)
       # trim garbage from end, if any
       data = data.split("\n\n")[0]
-      LOG.info(data)
       doc = cElementTree.fromstring(data)
       for propnode in doc.findall('./{0}property'.format(NS)):
         for property_ in propnode.getchildren():
@@ -60,10 +63,17 @@ class SubscriptionRegistry(object):
   def __init__(self):
     self._devices = {}
     self._callbacks = collections.defaultdict(list)
-    self._sched = sched.scheduler(time.time, time.sleep)
     self._exiting = False
-    self._http_thread = None
+
     self._event_thread = None
+    self._event_thread_cond = threading.Condition()
+    self._events = {}
+    def sleep(secs):
+      with self._event_thread_cond:
+        self._event_thread_cond.wait(secs)
+    self._sched = sched.scheduler(time.time, sleep)
+
+    self._http_thread = None
     self._httpd = None
 
   def register(self, device):
@@ -71,12 +81,16 @@ class SubscriptionRegistry(object):
       LOG.error("Received an invalid device: %r", device)
       return
 
-    LOG.info("Subscribing to basic events from %r", device)
+    LOG.info("Subscribing to basic events from %r", device.host)
     # Provide a function to register a callback when the device changes
     # state
     device.register_listener = functools.partial(self.on, device, 'BinaryState')
     self._devices[device.host] = device
-    self._sched.enter(0, 0, self._resubscribe, [device.basicevent.eventSubURL])
+
+    url = device.basicevent.eventSubURL
+    with self._event_thread_cond:
+      self._events[url] = self._sched.enter(0, 0, self._resubscribe, [url])
+      self._event_thread_cond.notify()
 
   def _resubscribe(self, url, sid=None):
     headers = {'TIMEOUT': 300}
@@ -99,7 +113,9 @@ class SubscriptionRegistry(object):
     timeout = int(response.headers.get('timeout', '1801').replace(
         'Second-', ''))
     sid = response.headers.get('sid', sid)
-    self._sched.enter(int(timeout * 0.75), 0, self._resubscribe, [url, sid])
+
+    with self._event_thread_cond:
+      self._events[url] = self._sched.enter(int(timeout * 0.75), 0, self._resubscribe, [url, sid])
 
   def _event(self, device, type_, value):
     for type__, callback in self._callbacks.get(device, ()):
@@ -121,9 +137,24 @@ class SubscriptionRegistry(object):
     self._event_thread.start()
 
   def stop(self):
-    self._exiting = True
     self._httpd.shutdown()
-    self._sched.enter(0, 0, lambda: None, [])
+
+    with self._event_thread_cond:
+      self._exiting = True
+
+      # Remove any pending events
+      for event in self._events.itervalues():
+        try:
+          self._sched.cancel(event)
+        except ValueError:
+          # event might execute and be removed from queue
+          # concurrently.  Safe to ignore
+          pass
+
+      # Wake up event thread if its sleeping
+      self._event_thread_cond.notify()
+
+  def join(self):
     self._http_thread.join()
     self._event_thread.join()
 
@@ -136,6 +167,7 @@ class SubscriptionRegistry(object):
 
   def _run_event_loop(self):
     while not self._exiting:
-      if self._sched.empty():
-        time.sleep(10)
+      with self._event_thread_cond:
+        while not self._exiting and self._sched.empty():
+          self._event_thread_cond.wait(10)
       self._sched.run()
