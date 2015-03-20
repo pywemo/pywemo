@@ -30,4 +30,3 @@ class Switch(Device):
 
     def __repr__(self):
         return '<WeMo Switch "{name}">'.format(name=self.name)
-
