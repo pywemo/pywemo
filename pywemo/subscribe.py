@@ -32,15 +32,14 @@ def get_ip_address():
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
   def do_NOTIFY(self):
     sender_ip, _ = self.client_address
-    LOG.info("Got wemo event from %s", sender_ip)
     outer = self.server.outer
     device = outer._devices.get(sender_ip)
-
     content_len = int(self.headers.getheader('content-length', 0))
     data = self.rfile.read(content_len)
-    LOG.info(data)
 
-    if device is not None:
+    if device is None:
+      LOG.error('Got event for unregistered device %s', sender_ip)
+    else:
       # trim garbage from end, if any
       data = data.split("\n\n")[0]
       doc = cElementTree.fromstring(data)
@@ -55,6 +54,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     self.send_header('Connection', 'close')
     self.end_headers()
     self.wfile.write(SUCCESS)
+
+  def log_message(self, format, *args):
+    LOG.info(format, *args)
 
 
 class SubscriptionRegistry(object):
@@ -118,9 +120,10 @@ class SubscriptionRegistry(object):
       self._events[url] = self._sched.enter(int(timeout * 0.75), 0, self._resubscribe, [url, sid])
 
   def _event(self, device, type_, value):
+    LOG.info("Got wemo event from %s, %s = %s", device.host, type_, value)
     for type__, callback in self._callbacks.get(device, ()):
       if type_ == type__:
-        callback(value)
+        callback(device, value)
 
   def on(self, device, type_, callback):
     self._callbacks[device].append((type_, callback))
