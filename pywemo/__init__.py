@@ -9,3 +9,4 @@ from .ouimeaux_device.motion import Motion
 from .ouimeaux_device.switch import Switch
 
 from .discovery import discover_devices
+from .subscribe import SubscriptionRegistry
