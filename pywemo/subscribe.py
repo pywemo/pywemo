@@ -1,5 +1,4 @@
 """Module to listen for wemo events."""
-import BaseHTTPServer
 import collections
 import functools
 import logging
@@ -9,6 +8,11 @@ import time
 import threading
 
 from xml.etree import cElementTree
+
+try:
+    import BaseHTTPServer
+except ImportError:
+    import http.server as BaseHTTPServer
 
 import requests
 
