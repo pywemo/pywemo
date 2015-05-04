@@ -13,12 +13,17 @@ import requests
 
 from .util import etree_to_dict
 
-SSDP_MX = 5
-DISCOVER_TIMEOUT = 2 * SSDP_MX
+DISCOVER_TIMEOUT = SSDP_MX = 5
 
 RESPONSE_REGEX = re.compile(r'\n(.*)\: (.*)\r')
 
 MIN_TIME_BETWEEN_SCANS = timedelta(seconds=59)
+
+# Devices and services
+ST_ALL = "ssdp:all"
+
+# Devices only, some devices will only respond to this query
+ST_ROOTDEVICE = "upnp:rootdevice"
 
 
 class SSDP(object):
@@ -31,10 +36,10 @@ class SSDP(object):
         self.last_scan = None
         self._lock = threading.RLock()
 
-    # pylint: disable=no-self-use
-    def stop(self):
-        """ Clears the description cache. """
-        _setup_entry_description_cache()
+    def scan(self):
+        """ Scan the network. """
+        with self._lock:
+            self.update()
 
     def all(self):
         """
@@ -75,8 +80,11 @@ class SSDP(object):
 
                 self.remove_expired()
 
-                self.entries.extend(entry for entry in scan()
-                                    if entry not in self.entries)
+                # Wemo does not respond to a query for all devices+services
+                # but only to a query for just root devices.
+                self.entries.extend(
+                    entry for entry in scan() + scan(ST_ROOTDEVICE)
+                    if entry not in self.entries)
 
                 self.last_scan = datetime.now()
 
@@ -87,13 +95,9 @@ class SSDP(object):
                             if not entry.is_expired]
 
 
-def _setup_entry_description_cache():
-    """ Resets the entry description cache. """
-    UPNPEntry.DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
-
-
 class UPNPEntry(object):
     """ Found uPnP entry. """
+    DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
 
     def __init__(self, values):
         self.values = values
@@ -128,8 +132,24 @@ class UPNPEntry(object):
         url = self.values.get('location', '_NO_LOCATION')
 
         if url not in UPNPEntry.DESCRIPTION_CACHE:
-            tree = ElementTree.fromstring(requests.get(url).text)
-            UPNPEntry.DESCRIPTION_CACHE[url] = etree_to_dict(tree)['root']
+            try:
+                xml = requests.get(url).text
+
+                tree = ElementTree.fromstring(xml)
+
+                UPNPEntry.DESCRIPTION_CACHE[url] = \
+                    etree_to_dict(tree).get('root', {})
+            except requests.RequestException:
+                logging.getLogger(__name__).exception(
+                    "Error fetching description at {}".format(url))
+
+                UPNPEntry.DESCRIPTION_CACHE[url] = {}
+
+            except (requests.RequestException, ElementTree.ParseError):
+                logging.getLogger(__name__).exception(
+                    "Found malformed XML at {}: {}".format(url, xml))
+
+                UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
         return UPNPEntry.DESCRIPTION_CACHE[url]
 
@@ -161,9 +181,6 @@ class UPNPEntry(object):
             self.values.get('st', ''), self.values.get('location', ''))
 
 
-_setup_entry_description_cache()
-
-
 # pylint: disable=invalid-name
 def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None):
     """
@@ -172,7 +189,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None):
     Inspired by Crimsdings
     https://github.com/crimsdings/ChromeCast/blob/master/cc_discovery.py
     """
-    ssdp_st = st or "ssdp:all"
+    ssdp_st = st or ST_ALL
     ssdp_target = ("239.255.255.250", 1900)
     ssdp_request = "\r\n".join([
         'M-SEARCH * HTTP/1.1',
@@ -218,7 +235,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None):
 
     except socket.error:
         logging.getLogger(__name__).exception(
-            "Socket error while discovering Chromecasts")
+            "Socket error while discovering SSDP devices")
 
     finally:
         sock.close()

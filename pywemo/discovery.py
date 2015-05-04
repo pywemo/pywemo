@@ -13,13 +13,15 @@ from .ouimeaux_device.api.xsd import device as deviceParser
 
 def discover_devices(st=None, max_devices=None):
     """ Finds WeMo devices on the local network. """
+    st = st or ssdp.ST_ROOTDEVICE
     ssdp_entries = ssdp.scan(st, max_entries=max_devices)
 
     wemos = []
 
     for entry in ssdp_entries:
-        if entry.st is not None:
-            device = device_from_uuid_and_location(entry.st, entry.location)
+        if entry.match_device_description(
+                {'manufacturer': 'Belkin International Inc.'}):
+            device = device_from_description(entry.location)
 
             if device is not None:
                 wemos.append(device)
