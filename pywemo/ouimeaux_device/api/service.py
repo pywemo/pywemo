@@ -75,6 +75,8 @@ class Service(object):
         self._config = service
         url = '%s/%s' % (base_url, service.get_SCPDURL().strip('/'))
         xml = requests.get(url, timeout=10)
+        if xml.status_code != 200:
+          return
         self.actions = {}
         self._svc_config = serviceParser.parseString(xml.content).actionList
         for action in self._svc_config.get_action():
