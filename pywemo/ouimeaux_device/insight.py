@@ -31,7 +31,8 @@ class Insight(Switch):
                 'ontotal': int(ontotal),
                 'todaymw': int(float(todaymw)),
                 'totalmw': int(float(totalmw)),
-                'currentpower': int(float(currentmw))}
+                'currentpower': int(float(currentmw)),
+                'powerthreshold': int(float(powerthreshold))}
 
     @property
     def today_kwh(self):
@@ -43,6 +44,13 @@ class Insight(Switch):
         Returns the current power usage in mW.
         """
         return self.insight_params['currentpower']
+
+    @property
+    def threshold_power(self):
+        """
+        Returns the threshold power. Above this the device is on, below it is standby.
+        """
+        return self.insight_params['powerthreshold']
 
     @property
     def today_on_time(self):
