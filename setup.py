@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pywemo',
-      version='0.1',
+      version='0.1.1',
       description='Access WeMo switches using their SOAP API',
       url='http://github.com/balloob/pywemo',
       author='Paulus Schoutsen',
