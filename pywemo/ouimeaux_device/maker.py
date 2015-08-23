@@ -1,5 +1,5 @@
 from datetime import datetime
-from . import Device
+from .switch import Switch
 from xml.etree import cElementTree as et
 
 
@@ -7,7 +7,7 @@ class Maker(Device):
 
     def __repr__(self):
         return '<WeMo Maker "{name}">'.format(name=self.name)
-        
+
     def set_state(self, state):
         """
         Set the state of this device to on or off.
@@ -48,11 +48,11 @@ class Maker(Device):
     @property
     def sensor_state(self):
         return self.maker_attribs['sensorstate']
-        
+
     @property
     def switch_mode(self):
     	return self.maker_attribs['switchmode']
-    
+
     @property
     def has_sensor(self):
     	return self.maker_attribs['hassensor']
