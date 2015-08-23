@@ -1,31 +1,13 @@
 from datetime import datetime
+from . import Device
 from .switch import Switch
 from xml.etree import cElementTree as et
 
 
-class Maker(Device):
+class Maker(Switch):
 
     def __repr__(self):
         return '<WeMo Maker "{name}">'.format(name=self.name)
-
-    def set_state(self, state):
-        """
-        Set the state of this device to on or off.
-        """
-        self.basicevent.SetBinaryState(BinaryState=int(state))
-        self._state = int(state)
-
-    def off(self):
-        """
-        Turn this device off. If already off, will return "Error".
-        """
-        return self.set_state(0)
-
-    def on(self):
-        """
-        Turn this device on. If already on, will return "Error".
-        """
-        return self.set_state(1)
 
     @property
     def maker_attribs(self):
