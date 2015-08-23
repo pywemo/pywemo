@@ -8,6 +8,7 @@ from .ouimeaux_device.insight import Insight
 from .ouimeaux_device.lightswitch import LightSwitch
 from .ouimeaux_device.motion import Motion
 from .ouimeaux_device.switch import Switch
+from .ouimeaux_device.maker import Maker
 from .ouimeaux_device.api.xsd import device as deviceParser
 
 
@@ -52,5 +53,7 @@ def device_from_uuid_and_location(uuid, location):
         return Insight(location)
     elif uuid.startswith('uuid:Sensor'):
         return Motion(location)
+    elif uuid.startswith('uuid:Maker'):
+        return Maker(location)
     else:
         return None
