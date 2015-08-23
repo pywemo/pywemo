@@ -1,5 +1,5 @@
 from datetime import datetime
-from ouimeaux.device import Device
+from . import Device
 from xml.etree import cElementTree as et
 
 
