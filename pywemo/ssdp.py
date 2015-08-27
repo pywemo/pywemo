@@ -135,10 +135,16 @@ class UPNPEntry(object):
             try:
                 xml = requests.get(url).text
 
-                tree = ElementTree.fromstring(xml)
+                tree = None
+                if len(xml) > 0:
+                    tree = ElementTree.fromstring(xml)
 
-                UPNPEntry.DESCRIPTION_CACHE[url] = \
-                    etree_to_dict(tree).get('root', {})
+                if tree:
+                    UPNPEntry.DESCRIPTION_CACHE[url] = \
+                        etree_to_dict(tree).get('root', {})
+                else:
+                    UPNPEntry.DESCRIPTION_CACHE[url] = None
+
             except requests.RequestException:
                 logging.getLogger(__name__).exception(
                     "Error fetching description at {}".format(url))
@@ -158,6 +164,10 @@ class UPNPEntry(object):
         Fetches description and matches against it.
         values should only contain lowercase keys.
         """
+
+        if self.description is None:
+            return False
+
         device = self.description.get('device')
 
         if device is None:
