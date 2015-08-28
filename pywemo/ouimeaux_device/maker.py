@@ -46,6 +46,15 @@ class Maker(Switch):
 
         return self._state
 
+    def set_state(self, state):
+        """
+        Set the state of this device to on or off.
+        """
+        # The Maker has a momentary mode - so it's not safe to assume the state is what you just set
+        # so re-read it from the device
+        self.basicevent.SetBinaryState(BinaryState=int(state))
+        self.get_state(True)
+
     @property
     def sensor_state(self):
         return self.maker_params['sensorstate']
