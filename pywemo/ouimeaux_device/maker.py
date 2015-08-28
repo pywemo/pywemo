@@ -10,7 +10,7 @@ class Maker(Switch):
         return '<WeMo Maker "{name}">'.format(name=self.name)
 
     @property
-    def maker_attribs(self):
+    def maker_params(self):
         makerresp = self.deviceevent.GetAttributes().get('attributeList')
         makerresp = "<attributes>" + makerresp + "</attributes>"
         makerresp = makerresp.replace("&gt;",">")
@@ -29,12 +29,12 @@ class Maker(Switch):
 
     @property
     def sensor_state(self):
-        return self.maker_attribs['sensorstate']
+        return self.maker_params['sensorstate']
 
     @property
     def switch_mode(self):
-    	return self.maker_attribs['switchmode']
+    	return self.maker_params['switchmode']
 
     @property
     def has_sensor(self):
-    	return self.maker_attribs['hassensor']
+    	return self.maker_params['hassensor']
