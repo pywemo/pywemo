@@ -107,6 +107,10 @@ class Device(object):
         return self._config.get_modelDescription()
 
     @property
+    def model_name(self):
+        return self._config.get_modelName()
+
+    @property
     def name(self):
         return self._config.get_friendlyName()
 
