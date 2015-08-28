@@ -67,3 +67,13 @@ class Insight(Switch):
     @property
     def today_standby_time(self):
         return self.insight_params['ontoday']
+
+    @property
+    def get_standby_state(self):
+        state = self.insight_params['state']
+        if state == '0':
+            return 'off'
+        if state == '1':
+            return 'on'
+        else:
+            return 'standby'
