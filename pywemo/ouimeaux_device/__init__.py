@@ -22,6 +22,7 @@ class Device(object):
         self._state = None
         base_url = url.rsplit('/', 1)[0]
         self.host = urlparse(url).hostname
+        self.retrying = False
         #self.port = urlparse(url).port
         xml = requests.get(url, timeout=10)
         self._config = deviceParser.parseString(xml.content).device
@@ -43,6 +44,11 @@ class Device(object):
         # Put here to avoid circular dependency
         from ..discovery import discover_devices
 
+        # Avoid retrying from multiple threads
+        if self.retrying:
+           return
+
+        self.retrying = True
         log.info("Trying to reconnect with {}".format(self.name))
         # We will try to find it 5 times, each time we wait a bigger interval
         try_no = 0
@@ -51,20 +57,22 @@ class Device(object):
             found = discover_devices(self._config.get_UDN(), 1)
 
             if found:
-                log.info("Found it again, updating local values")
+                log.info("Found {} again, updating local values".format(self.name))
 
                 self.__dict__ = found[0].__dict__
+                self.retrying = False
                 return
 
             wait_time = try_no * 5
 
             log.info(
-                "Not found in try {}. Trying again in {} seconds".format(
-                    try_no, wait_time))
+                "{} Not found in try {}. Trying again in {} seconds".format(
+                    self.name, try_no, wait_time))
 
             if try_no == 5:
                 log.error(
-                    "Unable to reconnect with device in 5 tries. Stopping.")
+                    "Unable to reconnect with {} in 5 tries. Stopping.".format(self.name))
+                self.retrying = False
                 return
 
             time.sleep(wait_time)
