@@ -192,7 +192,7 @@ class UPNPEntry(object):
 
 
 # pylint: disable=invalid-name
-def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None):
+def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
     """
     Sends a message over the network to discover upnp devices.
 
@@ -236,8 +236,11 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None):
                 response = sock.recv(1024).decode("ascii")
 
                 entry = UPNPEntry.from_response(response)
+                mac = entry.description.get('device').get('macAddress')
 
-                if (st is None or entry.st == st) and entry not in entries:
+                if ((st is None or entry.st == st) and
+                   (match_mac is None or mac == match_mac) and
+                   entry not in entries):
                     entries.append(entry)
 
                     if max_entries and len(entries) == max_entries:

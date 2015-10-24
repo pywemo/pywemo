@@ -18,12 +18,13 @@ class UnknownService(Exception): pass
 
 
 class Device(object):
-    def __init__(self, url):
+    def __init__(self, url, mac):
         self._state = None
         base_url = url.rsplit('/', 1)[0]
         self.host = urlparse(url).hostname
         self.retrying = False
         #self.port = urlparse(url).port
+        self.mac = mac
         xml = requests.get(url, timeout=10)
         self._config = deviceParser.parseString(xml.content).device
         sl = self._config.serviceList
@@ -54,7 +55,7 @@ class Device(object):
         try_no = 0
 
         while True:
-            found = discover_devices(self._config.get_UDN(), 1)
+            found = discover_devices(None, 1, self.mac)
 
             if found:
                 log.info("Found {} again, updating local values".format(self.name))
