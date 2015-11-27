@@ -236,7 +236,8 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
                 response = sock.recv(1024).decode("ascii")
 
                 entry = UPNPEntry.from_response(response)
-                mac = entry.description.get('device').get('macAddress')
+                device = entry.description.get('device')
+                mac = None if device is None else device.get('macAddress')
 
                 if ((st is None or entry.st == st) and
                    (match_mac is None or mac == match_mac) and
