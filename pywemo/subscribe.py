@@ -35,7 +35,6 @@ def get_ip_address():
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
   def do_NOTIFY(self):
-    print("RequestHandler called")
     sender_ip, _ = self.client_address
     outer = self.server.outer
     device = outer._devices.get(sender_ip)
@@ -58,7 +57,6 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     self.send_header('Connection', 'close')
     self.end_headers()
     self.wfile.write(SUCCESS.encode())
-    print("RequestHandler ended")
 
   def log_message(self, format, *args):
     LOG.info(format, *args)
@@ -125,8 +123,7 @@ class SubscriptionRegistry(object):
       self._events[url] = self._sched.enter(int(timeout * 0.75), 0, self._resubscribe, [url, sid])
 
   def _event(self, device, type_, value):
-    LOG.info("Got wemo event from %s, %s = %s", device.host, type_, value)
-    print("Got wemo event from %s, %s = %s", device.host, type_, value)
+    LOG.info("Got wemo event from %s(%s), %s = %s", device.name, device.host, type_, value)
     for type__, callback in self._callbacks.get(device, ()):
       if type_ == type__:
         callback(device, value)
