@@ -98,6 +98,7 @@ class SubscriptionRegistry(object):
       self._event_thread_cond.notify()
 
   def _resubscribe(self, url, sid=None):
+    LOG.info("Wemo resubscribe for %s", url)
     headers = {'TIMEOUT': 300}
     if sid is not None:
       headers['SID'] = sid
