@@ -44,7 +44,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       LOG.error('Got event for unregistered device %s', sender_ip)
     else:
       # trim garbage from end, if any
-      data = data.decode().split("\n\n")[0]
+      data = data.decode("UTF-8").split("\n\n")[0]
       doc = cElementTree.fromstring(data)
       for propnode in doc.findall('./{0}property'.format(NS)):
         for property_ in propnode.getchildren():
@@ -56,7 +56,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     self.send_header('Content-Length', len(SUCCESS))
     self.send_header('Connection', 'close')
     self.end_headers()
-    self.wfile.write(SUCCESS.encode())
+    self.wfile.write(SUCCESS.encode("UTF-8"))
 
   def log_message(self, format, *args):
     LOG.info(format, *args)
@@ -125,12 +125,12 @@ class SubscriptionRegistry(object):
 
   def _event(self, device, type_, value):
     LOG.info("Got wemo event from %s(%s), %s = %s", device.name, device.host, type_, value)
-    for type__, callback in self._callbacks.get(device, ()):
-      if type_ == type__:
+    for type_filter, callback in self._callbacks.get(device, ()):
+      if type_filter is None or type_ == type_filter:
         callback(device, value)
 
-  def on(self, device, type_, callback):
-    self._callbacks[device].append((type_, callback))
+  def on(self, device, type_filter, callback):
+    self._callbacks[device].append((type_filter, callback))
 
   def start(self):
     self._http_thread = threading.Thread(target=self._run_http_server,
