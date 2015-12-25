@@ -38,14 +38,13 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     sender_ip, _ = self.client_address
     outer = self.server.outer
     device = outer._devices.get(sender_ip)
-    content_len = int(self.headers.getheader('content-length', 0))
+    content_len = int(self.headers.get('content-length', 0))
     data = self.rfile.read(content_len)
-
     if device is None:
       LOG.error('Got event for unregistered device %s', sender_ip)
     else:
       # trim garbage from end, if any
-      data = data.split("\n\n")[0]
+      data = data.decode("UTF-8").split("\n\n")[0]
       doc = cElementTree.fromstring(data)
       for propnode in doc.findall('./{0}property'.format(NS)):
         for property_ in propnode.getchildren():
@@ -57,7 +56,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     self.send_header('Content-Length', len(SUCCESS))
     self.send_header('Connection', 'close')
     self.end_headers()
-    self.wfile.write(SUCCESS)
+    self.wfile.write(SUCCESS.encode("UTF-8"))
 
   def log_message(self, format, *args):
     LOG.info(format, *args)
@@ -99,6 +98,7 @@ class SubscriptionRegistry(object):
       self._event_thread_cond.notify()
 
   def _resubscribe(self, url, sid=None):
+    LOG.info("Wemo resubscribe for %s", url)
     headers = {'TIMEOUT': 300}
     if sid is not None:
       headers['SID'] = sid
@@ -124,13 +124,13 @@ class SubscriptionRegistry(object):
       self._events[url] = self._sched.enter(int(timeout * 0.75), 0, self._resubscribe, [url, sid])
 
   def _event(self, device, type_, value):
-    LOG.info("Got wemo event from %s, %s = %s", device.host, type_, value)
-    for type__, callback in self._callbacks.get(device, ()):
-      if type_ == type__:
+    LOG.info("Got wemo event from %s(%s), %s = %s", device.name, device.host, type_, value)
+    for type_filter, callback in self._callbacks.get(device, ()):
+      if type_filter is None or type_ == type_filter:
         callback(device, value)
 
-  def on(self, device, type_, callback):
-    self._callbacks[device].append((type_, callback))
+  def on(self, device, type_filter, callback):
+    self._callbacks[device].append((type_filter, callback))
 
   def start(self):
     self._http_thread = threading.Thread(target=self._run_http_server,
@@ -150,7 +150,7 @@ class SubscriptionRegistry(object):
       self._exiting = True
 
       # Remove any pending events
-      for event in self._events.itervalues():
+      for event in self._events.values():
         try:
           self._sched.cancel(event)
         except ValueError:
