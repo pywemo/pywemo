@@ -18,10 +18,7 @@ class Bridge(Device):
         endDeviceList = et.fromstring(endDevices.get('DeviceLists'))
 
         for light in endDeviceList.iter('DeviceInfo'):
-            if self.light_name(light) in self.Lights:
-                pass
-            else:
-                self.Lights[self.light_name(light)] = light
+            self.Lights[self.light_name(light)] = light
         return self.Lights
 
     def bridge_get_groups(self):
@@ -30,10 +27,7 @@ class Bridge(Device):
         endDeviceList = et.fromstring(endDevices.get('DeviceLists'))
 
         for group in endDeviceList.iter('GroupInfo'):
-            if self.group_name(group) in self.Groups:
-                pass
-            else:
-                self.Groups[self.group_name(group)] = group
+            self.Groups[self.group_name(group)] = group
         return self.Groups
 
     def light_attributes(self, light):
