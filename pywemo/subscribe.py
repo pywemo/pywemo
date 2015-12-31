@@ -20,6 +20,7 @@ LOG = logging.getLogger(__name__)
 NS = "{urn:schemas-upnp-org:event-1-0}"
 SUCCESS = '<html><body><h1>200 OK</h1></body></html>'
 PORT = 8989
+SUBSCRIPTION_RETRY = 60
 
 
 def get_ip_address():
@@ -108,23 +109,31 @@ class SubscriptionRegistry(object):
           "CALLBACK": '<http://%s:%d>' % (host, PORT),
           "NT": "upnp:event"
       })
-    response = requests.request(method="SUBSCRIBE", url=url,
-                                headers=headers)
-    if response.status_code == 412 and sid:
-      # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
-      # start over.
-      requests.request(method='UNSUBSCRIBE', url=url,
-                         headers={'SID': sid})
-      return self._resubscribe(url)
-    timeout = int(response.headers.get('timeout', '1801').replace(
-        'Second-', ''))
-    sid = response.headers.get('sid', sid)
+    try:
+      response = requests.request(method="SUBSCRIBE", url=url,
+                                  headers=headers)
+      if response.status_code == 412 and sid:
+        # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
+        # start over.
+        requests.request(method='UNSUBSCRIBE', url=url,
+                           headers={'SID': sid})
+        return self._resubscribe(url)
+      timeout = int(response.headers.get('timeout', '1801').replace(
+          'Second-', ''))
+      sid = response.headers.get('sid', sid)
+      with self._event_thread_cond:
+        LOG.info("Wemo resubscribe in %ss", int(timeout * 0.75))
+        self._events[url] = self._sched.enter(int(timeout * 0.75), 0, self._resubscribe, [url, sid])
+    except requests.exceptions.RequestException:
+      LOG.warning("Wemo resubscribe error for %s, will retry in %ss", url, SUBSCRIPTION_RETRY)
+      with self._event_thread_cond:
+        self._events[url] = self._sched.enter(SUBSCRIPTION_RETRY, 0, self._resubscribe, [url, sid])
 
-    with self._event_thread_cond:
-      self._events[url] = self._sched.enter(int(timeout * 0.75), 0, self._resubscribe, [url, sid])
 
   def _event(self, device, type_, value):
-    LOG.info("Got wemo event from %s(%s), %s = %s", device.name, device.host, type_, value)
+    # Useful for debugging - but too much info for normal
+    # LOG.info("Got wemo event from %s(%s), %s = %s", device.name, device.host, type_, value)
+    LOG.info("Got wemo event from %s(%s)", device.name, device.host)
     for type_filter, callback in self._callbacks.get(device, ()):
       if type_filter is None or type_ == type_filter:
         callback(device, value)
