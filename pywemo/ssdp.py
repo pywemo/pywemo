@@ -133,7 +133,7 @@ class UPNPEntry(object):
 
         if url not in UPNPEntry.DESCRIPTION_CACHE:
             try:
-                xml = requests.get(url).text
+                xml = requests.get(url, timeout=10).text
 
                 tree = None
                 if len(xml) > 0:
@@ -146,13 +146,13 @@ class UPNPEntry(object):
                     UPNPEntry.DESCRIPTION_CACHE[url] = None
 
             except requests.RequestException:
-                logging.getLogger(__name__).exception(
+                logging.getLogger(__name__).error(
                     "Error fetching description at {}".format(url))
 
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
             except (requests.RequestException, ElementTree.ParseError):
-                logging.getLogger(__name__).exception(
+                logging.getLogger(__name__).error(
                     "Found malformed XML at {}: {}".format(url, xml))
 
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}

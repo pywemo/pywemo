@@ -1,6 +1,5 @@
 """Module to listen for wemo events."""
 import collections
-import functools
 import logging
 import sched
 import socket
@@ -42,7 +41,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     content_len = int(self.headers.get('content-length', 0))
     data = self.rfile.read(content_len)
     if device is None:
-      LOG.error('Got event for unregistered device %s', sender_ip)
+      LOG.error('Received event for unregistered device %s', sender_ip)
     else:
       # trim garbage from end, if any
       data = data.decode("UTF-8").split("\n\n")[0]
@@ -60,7 +59,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     self.wfile.write(SUCCESS.encode("UTF-8"))
 
   def log_message(self, format, *args):
-    LOG.info(format, *args)
+    return
 
 
 class SubscriptionRegistry(object):
@@ -74,6 +73,7 @@ class SubscriptionRegistry(object):
     self._event_thread = None
     self._event_thread_cond = threading.Condition()
     self._events = {}
+
     def sleep(secs):
       with self._event_thread_cond:
         self._event_thread_cond.wait(secs)
@@ -84,22 +84,19 @@ class SubscriptionRegistry(object):
 
   def register(self, device):
     if not device:
-      LOG.error("Received an invalid device: %r", device)
+      LOG.error("Called with an invalid device: %r", device)
       return
 
-    LOG.info("Subscribing to basic events from %r", device.host)
-    # Provide a function to register a callback when the device changes
-    # state
-    device.register_listener = functools.partial(self.on, device, 'BinaryState')
+    LOG.info("Subscribing to events from %r", device)
     self._devices[device.host] = device
 
-    url = device.basicevent.eventSubURL
     with self._event_thread_cond:
-      self._events[url] = self._sched.enter(0, 0, self._resubscribe, [url])
+      self._events[device.serialnumber] = (
+          self._sched.enter(0, 0, self._resubscribe, [device]))
       self._event_thread_cond.notify()
 
-  def _resubscribe(self, url, sid=None):
-    LOG.info("Wemo resubscribe for %s", url)
+  def _resubscribe(self, device, sid=None, retry=0):
+    LOG.info("Resubscribe for %s", device)
     headers = {'TIMEOUT': 300}
     if sid is not None:
       headers['SID'] = sid
@@ -110,30 +107,37 @@ class SubscriptionRegistry(object):
           "NT": "upnp:event"
       })
     try:
+      url = device.basicevent.eventSubURL
       response = requests.request(method="SUBSCRIBE", url=url,
                                   headers=headers)
       if response.status_code == 412 and sid:
         # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
         # start over.
-        requests.request(method='UNSUBSCRIBE', url=url,
-                           headers={'SID': sid})
-        return self._resubscribe(url)
+        requests.request(
+            method='UNSUBSCRIBE', url=url, headers={'SID': sid})
+        return self._resubscribe(device)
       timeout = int(response.headers.get('timeout', '1801').replace(
           'Second-', ''))
       sid = response.headers.get('sid', sid)
       with self._event_thread_cond:
-        LOG.info("Wemo resubscribe in %ss", int(timeout * 0.75))
-        self._events[url] = self._sched.enter(int(timeout * 0.75), 0, self._resubscribe, [url, sid])
+        self._events[device.serialnumber] = (
+            self._sched.enter(int(timeout * 0.75),
+                              0, self._resubscribe, [device, sid]))
     except requests.exceptions.RequestException:
-      LOG.warning("Wemo resubscribe error for %s, will retry in %ss", url, SUBSCRIPTION_RETRY)
+      LOG.warning(
+          "Resubscribe error for %s, will retry in %ss",
+          device, SUBSCRIPTION_RETRY)
+      retry += 1
+      if retry > 1:
+        # If this wan't a one off try rediscovery in case device has changed
+        device.reconnect_with_device()
       with self._event_thread_cond:
-        self._events[url] = self._sched.enter(SUBSCRIPTION_RETRY, 0, self._resubscribe, [url, sid])
-
+        self._events[device.serialnumber] = (
+            self._sched.enter(SUBSCRIPTION_RETRY,
+                              0, self._resubscribe, [device, sid, retry]))
 
   def _event(self, device, type_, value):
-    # Useful for debugging - but too much info for normal
-    # LOG.info("Got wemo event from %s(%s), %s = %s", device.name, device.host, type_, value)
-    LOG.info("Got wemo event from %s(%s)", device.name, device.host)
+    LOG.info("Received event from %s(%s)", device, device.host)
     for type_filter, callback in self._callbacks.get(device, ()):
       if type_filter is None or type_ == type_filter:
         callback(device, value)
@@ -178,7 +182,7 @@ class SubscriptionRegistry(object):
     self._httpd = BaseHTTPServer.HTTPServer(('', PORT), RequestHandler)
     self._httpd.allow_reuse_address = True
     self._httpd.outer = self
-    LOG.info("Wemo listening on port %d", PORT)
+    LOG.info("Listening on port %d", PORT)
     self._httpd.serve_forever()
 
   def _run_event_loop(self):
