@@ -1,6 +1,5 @@
 """Module to listen for wemo events."""
 import collections
-import functools
 import logging
 import sched
 import socket
@@ -74,6 +73,7 @@ class SubscriptionRegistry(object):
     self._event_thread = None
     self._event_thread_cond = threading.Condition()
     self._events = {}
+
     def sleep(secs):
       with self._event_thread_cond:
         self._event_thread_cond.wait(secs)
@@ -91,10 +91,11 @@ class SubscriptionRegistry(object):
     self._devices[device.host] = device
 
     with self._event_thread_cond:
-      self._events[device.serialnumber] = self._sched.enter(0, 0, self._resubscribe, [device])
+      self._events[device.serialnumber] = (
+          self._sched.enter(0, 0, self._resubscribe, [device]))
       self._event_thread_cond.notify()
 
-  def _resubscribe(self, device, sid=None, retry = 0):
+  def _resubscribe(self, device, sid=None, retry=0):
     LOG.info("Resubscribe for %s", device)
     headers = {'TIMEOUT': 300}
     if sid is not None:
@@ -112,23 +113,28 @@ class SubscriptionRegistry(object):
       if response.status_code == 412 and sid:
         # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
         # start over.
-        requests.request(method='UNSUBSCRIBE', url=url,
-                           headers={'SID': sid})
+        requests.request(
+            method='UNSUBSCRIBE', url=url, headers={'SID': sid})
         return self._resubscribe(device)
       timeout = int(response.headers.get('timeout', '1801').replace(
           'Second-', ''))
       sid = response.headers.get('sid', sid)
       with self._event_thread_cond:
-        self._events[device.serialnumber] = self._sched.enter(int(timeout * 0.75), 0, self._resubscribe, [device, sid])
+        self._events[device.serialnumber] = (
+            self._sched.enter(int(timeout * 0.75),
+                              0, self._resubscribe, [device, sid]))
     except requests.exceptions.RequestException:
-      LOG.warning("Resubscribe error for %s, will retry in %ss", device, SUBSCRIPTION_RETRY)
+      LOG.warning(
+          "Resubscribe error for %s, will retry in %ss",
+          device, SUBSCRIPTION_RETRY)
       retry += 1
       if retry > 1:
         # If this wan't a one off try rediscovery in case device has changed
         device.reconnect_with_device()
       with self._event_thread_cond:
-        self._events[device.serialnumber] = self._sched.enter(SUBSCRIPTION_RETRY, 0, self._resubscribe, [device, sid, retry])
-
+        self._events[device.serialnumber] = (
+            self._sched.enter(SUBSCRIPTION_RETRY,
+                              0, self._resubscribe, [device, sid, retry]))
 
   def _event(self, device, type_, value):
     LOG.info("Received event from %s(%s)", device, device.host)
