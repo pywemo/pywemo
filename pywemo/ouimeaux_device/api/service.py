@@ -46,20 +46,24 @@ class Action(object):
             service=self.serviceType,
             args=arglist
         )
-        try:
-            response = requests.post(
-                self.controlURL, body.strip(),
-                headers=self.headers, timeout=10)
-        except requests.exceptions.RequestException:
-            log.error(
-                "Error communicating with {}.".format(self._device.name))
-            self._device.reconnect_with_device()
-            return
+        for attempt in range(3):
+            try:
+                response = requests.post(
+                    self.controlURL, body.strip(),
+                    headers=self.headers, timeout=10)
+                d = {}
+                for r in et.fromstring(response.content).getchildren()[0].getchildren()[0].getchildren():
+                    d[r.tag] = r.text
+                return d
+            except requests.exceptions.RequestException:
+                log.warning(
+                    "Error communicating with {}, retry {}".format(
+                        self._device.name, attempt))
+                self._device.reconnect_with_device()
 
-        d = {}
-        for r in et.fromstring(response.content).getchildren()[0].getchildren()[0].getchildren():
-            d[r.tag] = r.text
-        return d
+        log.error(
+            "Error communicating with {}. Giving up".format(self._device.name))
+        return
 
     def __repr__(self):
         return "<Action %s(%s)>" % (self.name, ", ".join(self.args))
@@ -76,7 +80,7 @@ class Service(object):
         url = '%s/%s' % (base_url, service.get_SCPDURL().strip('/'))
         xml = requests.get(url, timeout=10)
         if xml.status_code != 200:
-          return
+            return
         self.actions = {}
         self._svc_config = serviceParser.parseString(xml.content).actionList
         for action in self._svc_config.get_action():
