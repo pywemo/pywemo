@@ -13,6 +13,29 @@ from .api.xsd import device as deviceParser
 
 log = logging.getLogger(__name__)
 
+PROBE_PORTS = (45152, 49153, 49154)
+
+
+def probe_wemo(host):
+    """Probe a host for the current port.
+
+    This probes a host for known-to-be-possible ports and
+    returns the one currently in use. If no port is discovered
+    then it returns None.
+    """
+    for port in PROBE_PORTS:
+        try:
+            r = requests.get('http://%s:%i/setup.xml' % (host, port),
+                             timeout=10)
+            if 'WeMo' in r.text:
+              return port
+        except requests.exceptions.Timeout:
+            # Timeout means it's not worth trying other ports
+            return None
+        except requests.exceptions.ConnectionError:
+            pass
+    return None
+
 
 class UnknownService(Exception): pass
 
@@ -36,7 +59,7 @@ class Device(object):
             self.services[svcname] = service
             setattr(self, svcname, service)
 
-    def reconnect_with_device(self):
+    def _reconnect_with_device_by_discovery(self):
         """
         Wemos tend to change their port number from time to time.
         Whenever requests throws an error, we will try to find the device again
@@ -79,6 +102,21 @@ class Device(object):
             time.sleep(wait_time)
 
             try_no += 1
+
+    def _reconnect_with_device_by_probing(self):
+        port = probe_wemo(self.host)
+        if port is None:
+            log.error('Unable to re-probe wemo at {}'.format(self.host))
+            return False
+        log.info('Reconnected to wemo at {} on port {}'.format(
+            self.host, port))
+        url = 'http://{}:{}/setup.xml'.format(self.host, port)
+        self.__dict__ = self.__class__(url, None).__dict__
+        return True
+
+    def reconnect_with_device(self):
+        if not self._reconnect_with_device_by_probing() and self.mac:
+            self._reconnect_with_device_by_discovery()
 
     def get_state(self, force_update=False):
         """
