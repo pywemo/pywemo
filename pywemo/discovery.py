@@ -4,6 +4,7 @@ Module to discover WeMo devices.
 import requests
 
 from . import ssdp
+from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.insight import Insight
 from .ouimeaux_device.lightswitch import LightSwitch
 from .ouimeaux_device.motion import Motion
@@ -56,5 +57,7 @@ def device_from_uuid_and_location(uuid, mac, location):
         return Motion(location, mac)
     elif uuid.startswith('uuid:Maker'):
         return Maker(location, mac)
+    elif uuid.startswith('uuid:Bridge'):
+        return Bridge(location, mac)
     else:
         return None
