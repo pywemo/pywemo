@@ -18,8 +18,11 @@ import requests
 LOG = logging.getLogger(__name__)
 NS = "{urn:schemas-upnp-org:event-1-0}"
 SUCCESS = '<html><body><h1>200 OK</h1></body></html>'
-PORT = 8989
 SUBSCRIPTION_RETRY = 60
+
+
+class SubscriptionRegistryFailed(Exception):
+    pass
 
 
 def get_ip_address():
@@ -103,7 +106,7 @@ class SubscriptionRegistry(object):
     else:
       host = get_ip_address()
       headers.update({
-          "CALLBACK": '<http://%s:%d>' % (host, PORT),
+          "CALLBACK": '<http://%s:%d>' % (host, self._port),
           "NT": "upnp:event"
       })
     try:
@@ -145,7 +148,21 @@ class SubscriptionRegistry(object):
   def on(self, device, type_filter, callback):
     self._callbacks[device].append((type_filter, callback))
 
+  def _find_port(self):
+    for i in range(0, 128):
+      port = 8989 + i
+      try:
+        self._httpd = BaseHTTPServer.HTTPServer(('', port), RequestHandler)
+        self._port = port
+        break
+      except (OSError, socket.error):
+        continue
+
   def start(self):
+    self._port = None
+    self._find_port()
+    if self._port is None:
+      raise SubscriptionRegistryFailed('Unable to bind a port for listening')
     self._http_thread = threading.Thread(target=self._run_http_server,
                                          name='Wemo HTTP Thread')
     self._http_thread.deamon = True
@@ -179,10 +196,9 @@ class SubscriptionRegistry(object):
     self._event_thread.join()
 
   def _run_http_server(self):
-    self._httpd = BaseHTTPServer.HTTPServer(('', PORT), RequestHandler)
     self._httpd.allow_reuse_address = True
     self._httpd.outer = self
-    LOG.info("Listening on port %d", PORT)
+    LOG.info("Listening on port %d", self._port)
     self._httpd.serve_forever()
 
   def _run_event_loop(self):
