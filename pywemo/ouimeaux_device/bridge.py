@@ -179,11 +179,27 @@ class Light(LinkedDevice):
     def turn_on(self, level=None, transition=0):
         T = limit(int(transition * 10), 0, 65535)
 
-        if level is not None and 'levelcontrol' in self.capabilities:
+
+        if level == 0 and 'sleepfader' in self.capabilities:
+            return self.sleepfader(transition)
+
+        elif level is not None and 'levelcontrol' in self.capabilities:
+            # Work around fw bugs. When we set a new brightness level but
+            # the bulb is off, it first turns on at the old brightness and
+            # then fades to the new setting. So we have to force the saved
+            # brightness to 0 first. Second problem is that when we turn a
+            # bulb on with levelcontrol the onoff state doesn't update.
+            is_on = self.get_state(force_update=True)['onoff'] != 0
+            if not is_on:
+                self._setdevicestatus(levelcontrol=(1, 0))
+                self._setdevicestatus(onoff=ON)
+
             level = limit(int(level), 0, 255)
             return self._setdevicestatus(levelcontrol=(level, T))
+
         elif level == 0:
             return self._setdevicestatus(onoff=OFF)
+
         else:
             return self._setdevicestatus(onoff=ON)
 
