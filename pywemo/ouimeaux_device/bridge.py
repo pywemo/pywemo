@@ -141,10 +141,10 @@ class LinkedDevice(object):
             state['color_xy'] = colorx, colory
         return state
 
-    def turn_on(self, *kwargs):
+    def turn_on(self, **kwargs):
         return self._setdevicestatus(onoff=ON)
 
-    def turn_off(self):
+    def turn_off(self, **kwargs):
         return self._setdevicestatus(onoff=OFF)
 
     def toggle(self):
@@ -179,29 +179,38 @@ class Light(LinkedDevice):
     def turn_on(self, level=None, transition=0):
         T = limit(int(transition * 10), 0, 65535)
 
+        if level == 0:
+            return self.turn_off(transition)
 
-        if level == 0 and 'sleepfader' in self.capabilities:
-            return self.sleepfader(transition)
+        elif 'levelcontrol' in self.capabilities:
+            # Work around observed fw bugs.
+            # - When we set a new brightness level but the bulb is off, it
+            #   first turns on at the old brightness and then fades to the new
+            #   setting. So we have to force the saved brightness to 0 first.
+            # - When we turn a bulb on with levelcontrol the onoff state
+            #   doesn't update.
+            # - After turning off a bulb with sleepfader, it fails to turn back
+            #   on unless the brightness is re-set with levelcontrol.
+            self.get_state(force_update=True)
+            if level is None:
+                level = self.state['level']
 
-        elif level is not None and 'levelcontrol' in self.capabilities:
-            # Work around fw bugs. When we set a new brightness level but
-            # the bulb is off, it first turns on at the old brightness and
-            # then fades to the new setting. So we have to force the saved
-            # brightness to 0 first. Second problem is that when we turn a
-            # bulb on with levelcontrol the onoff state doesn't update.
-            is_on = self.get_state(force_update=True)['onoff'] != 0
-            if not is_on:
-                self._setdevicestatus(levelcontrol=(1, 0))
-                self._setdevicestatus(onoff=ON)
+            if self.state['onoff'] == 0:
+                self._setdevicestatus(levelcontrol=(0, 0), onoff=ON)
 
             level = limit(int(level), 0, 255)
             return self._setdevicestatus(levelcontrol=(level, T))
-
-        elif level == 0:
-            return self._setdevicestatus(onoff=OFF)
-
         else:
             return self._setdevicestatus(onoff=ON)
+
+    def turn_off(self, transition=0):
+        if transition and 'sleepfader' in self.capabilities:
+            # Sleepfader control did not turn off bulb when fadetime was 0
+            T = limit(int(transition * 10), 1, 65535)
+            reference = int(time.time())
+            return self._setdevicestatus(sleepfader=(T, reference))
+        else:
+            return self._setdevicestatus(onoff=OFF)
 
     def set_temperature(self, kelvin=2700, mireds=None, transition=0):
         T = limit(int(transition * 10), 0, 65535)
@@ -224,11 +233,6 @@ class Light(LinkedDevice):
 
     def stop_ramp(self):
         return self._setdevicestatus(levelcontrol_stop='')
-
-    def sleepfader(self, fadetime):
-        fadetime = limit(int(fadetime * 10), 0, 65535)
-        reference = int(time.time())
-        return self._setdevicestatus(sleepfader=(fadetime, reference))
 
 
 class Group(LinkedDevice):
