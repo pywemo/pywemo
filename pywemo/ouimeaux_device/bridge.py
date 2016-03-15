@@ -36,33 +36,38 @@ class Bridge(Device):
 
     def __init__(self, *args, **kwargs):
         super(Bridge, self).__init__(*args, **kwargs)
-        self.get_state(force_update=True)
+        self.bridge_update()
 
     def __repr__(self):
         return '<WeMo Bridge "{name}", Lights: {l}, Groups: {g}>'.format(
             name=self.name, l=len(self.Lights), g=len(self.Groups))
 
-    def get_state(self, force_update=False):
-        if force_update or not self.Lights:
-            UDN = self.basicevent.GetMacAddr().get('PluginUDN')
-            endDevices = self.bridge.GetEndDevices(
-                DevUDN=UDN, ReqListType='PAIRED_LIST')
-            endDeviceList = et.fromstring(endDevices.get('DeviceLists'))
+    def bridge_update(self):
+        UDN = self.basicevent.GetMacAddr().get('PluginUDN')
+        endDevices = self.bridge.GetEndDevices(
+            DevUDN=UDN, ReqListType='PAIRED_LIST')
+        endDeviceList = et.fromstring(endDevices.get('DeviceLists'))
 
-            for light in endDeviceList.iter('DeviceInfo'):
-                uniqueID = light.find('DeviceID').text
-                if uniqueID in self.Lights:
-                    self.Lights[uniqueID].update(light)
-                else:
-                    self.Lights[uniqueID] = Light(self, light)
+        for light in endDeviceList.iter('DeviceInfo'):
+            uniqueID = light.find('DeviceID').text
+            if uniqueID in self.Lights:
+                self.Lights[uniqueID]._update_state(light)
+            else:
+                self.Lights[uniqueID] = Light(self, light)
 
-            for group in endDeviceList.iter('GroupInfo'):
-                uniqueID = group.find('GroupID').text
-                if uniqueID in self.Groups:
-                    self.Groups[uniqueID].update(group)
-                else:
-                    self.Groups[uniqueID] = Group(self, group)
+        for group in endDeviceList.iter('GroupInfo'):
+            uniqueID = group.find('GroupID').text
+            if uniqueID in self.Groups:
+                self.Groups[uniqueID]._update_state(group)
+            else:
+                self.Groups[uniqueID] = Group(self, group)
+
         return self.Lights, self.Groups
+
+    def bridge_getdevicestatus(self, deviceid):
+        statusList = self.bridge.GetDeviceStatus(DeviceIDs=deviceid)
+        deviceStatusList = et.fromstring(statusList.get('DeviceStatusList'))
+        return deviceStatusList.find('DeviceStatus')
 
     def bridge_setdevicestatus(self, isgroup, deviceid, capids, values):
         req = et.Element('DeviceStatus')
@@ -81,17 +86,51 @@ class Bridge(Device):
 class LinkedDevice(object):
     def __init__(self, bridge, info):
         self.bridge = bridge
+        self.state = {}
         self.capabilities = []
-        self._states = []
-        self.update(info)
-
-    def update(self, info):
-        self.info = info
+        self._values = []
+        self._update_state(info)
 
     def get_state(self, force_update=False):
         if force_update:
-            self.bridge.get_state(force_update=True)
+            status = self.bridge.bridge_getdevicestatus(self.uniqueID)
+            self._update_state(status)
         return self.state
+
+    def _update_state(self, status):
+        """Subclasses should parse status into self.capabilities and
+        self._values and then call this to populate self.state"""
+        status = {}
+        for capability, value in zip(self.capabilities, self._values):
+            if not value:
+                value = None
+            elif ':' in value:
+                value = tuple(int(v) for v in value.split(':'))
+            else:
+                value = int(value)
+            status[capability] = value
+
+        # unreachable devices have empty strings for all capability values
+        if status['onoff'] is None:
+            self.state['available'] = False
+            self.state['onoff'] = 0
+            return
+
+        self.state['available'] = True
+        self.state['onoff'] = status['onoff']
+
+        if 'levelcontrol' in status:
+            self.state['level'] = status['levelcontrol'][0]
+
+        if 'colortemperature' in status:
+            temperature = status['colortemperature'][0]
+            self.state['temperature_mireds'] = temperature
+            self.state['temperature_kelvin'] = int(1000000 / temperature)
+
+        if 'colorcontrol' in status:
+            colorx, colory = status['colorcontrol'][:2]
+            colorx, colory = colorx / 65535., colory / 65535.
+            self.state['color_xy'] = colorx, colory
 
     def _setdevicestatus(self, **kwargs):
         isgroup = 'YES' if isinstance(self, Group) else 'NO'
@@ -108,39 +147,6 @@ class LinkedDevice(object):
         return self.bridge.bridge_setdevicestatus(
             isgroup, self.uniqueID, capids, values)
 
-    def _getdevicestatus(self):
-        status = {}
-        for capability, state in zip(self.capabilities, self._states):
-            if not state:
-                state = None
-            elif ':' in state:
-                state = tuple(int(v) for v in state.split(':'))
-            else:
-                state = int(state)
-            status[capability] = state
-        return status
-
-    @property
-    def state(self):
-        status = self._getdevicestatus()
-
-        state = {}
-        state['onoff'] = status['onoff']
-
-        if 'levelcontrol' in status:
-            state['level'] = status['levelcontrol'][0]
-
-        if 'colortemperature' in status:
-            temperature = status['colortemperature'][0]
-            state['temperature_mireds'] = temperature
-            state['temperature_kelvin'] = int(1000000 / temperature)
-
-        if 'colorcontrol' in status:
-            colorx, colory = status['colorcontrol'][:2]
-            colorx, colory = colorx / 65535., colory / 65535.
-            state['color_xy'] = colorx, colory
-        return state
-
     def turn_on(self, **kwargs):
         return self._setdevicestatus(onoff=ON)
 
@@ -154,24 +160,31 @@ class LinkedDevice(object):
 class Light(LinkedDevice):
     def __init__(self, bridge, info):
         super(Light, self).__init__(bridge, info)
-        self.devIndex = info.find('DeviceIndex').text
-        self.uniqueID = info.find('DeviceID').text
-        self.iconvalue = info.find('IconVersion').text
-        self.firmware = info.find('FirmwareVersion').text
-        self.manufacturer = info.find('Manufacturer').text
-        self.model = info.find('ModelCode').text
-        self.certified = info.find('WeMoCertified').text
+        self.devIndex = info.findtext('DeviceIndex')
+        self.uniqueID = info.findtext('DeviceID')
+        self.iconvalue = info.findtext('IconVersion')
+        self.firmware = info.findtext('FirmwareVersion')
+        self.manufacturer = info.findtext('Manufacturer')
+        self.model = info.findtext('ModelCode')
+        self.certified = info.findtext('WeMoCertified')
 
         self.temperature_range, self.gamut = get_profiles(self.model)
 
-    def update(self, info):
-        self.info = info
-        self.name = info.find('FriendlyName').text
+    def _update_state(self, status):
+        if status.tag == 'DeviceInfo':
+            self.name = status.findtext('FriendlyName')
+
+        capabilities = (status.findtext('CapabilityIDs') or
+                        status.findtext('CapabilityID'))
+        currentstate = (status.findtext('CurrentState') or
+                        status.findtext('CapabilityValue'))
+
         self.capabilities = [
             CAPABILITY_ID2NAME.get(c, c)
-            for c in info.find('CapabilityIDs').text.split(',')
+            for c in capabilities.split(',')
         ]
-        self._states = info.find('CurrentState').text.split(',')
+        self._values = currentstate.split(',')
+        super(Light, self)._update_state(status)
 
     def __repr__(self):
         return '<LIGHT "{name}">'.format(name=self.name)
@@ -238,15 +251,23 @@ class Light(LinkedDevice):
 class Group(LinkedDevice):
     def __init__(self, bridge, info):
         super(Group, self).__init__(bridge, info)
-        self.uniqueID = info.find('GroupID').text
+        self.uniqueID = info.findtext('GroupID')
 
-    def update(self, info):
-        self.name = info.find('GroupName').text
+    def _update_state(self, status):
+        if status.tag == 'GroupInfo':
+            self.name = status.findtext('GroupName')
+
+        capabilities = (status.findtext('GroupCapabilityIDs') or
+                        status.findtext('CapabilityID'))
+        currentstate = (status.findtext('GroupCapabilityValues') or
+                        status.findtext('CapabilityValue'))
+
         self.capabilities = [
             CAPABILITY_ID2NAME.get(c, c)
-            for c in info.find('GroupCapabilityIDs').text.split(',')
+            for c in capabilities.split(',')
         ]
-        self._states = info.find('GroupCapabilityValues').text.split(',')
+        self._values = currentstate.split(',')
+        super(Group, self)._update_state(status)
 
     def __repr__(self):
         return '<GROUP "{name}">'.format(name=self.name)
