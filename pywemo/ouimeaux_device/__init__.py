@@ -30,8 +30,7 @@ def probe_wemo(host):
             if 'WeMo' in r.text:
               return port
         except requests.exceptions.Timeout:
-            # Timeout means it's not worth trying other ports
-            return None
+            continue
         except requests.exceptions.ConnectionError:
             pass
     return None
