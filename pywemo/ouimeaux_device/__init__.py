@@ -29,7 +29,18 @@ def probe_wemo(host):
                              timeout=10)
             if 'WeMo' in r.text:
               return port
+        except requests.exceptions.ConnectTimeout:
+            # If we timed out connecting, then the wemo is gone,
+            # no point in trying further.
+            log.debug('Timed out connecting to %s on port %i, '
+                      'wemo is offline', host, port)
+            break
         except requests.exceptions.Timeout:
+            # Apparently sometimes wemos get into a wedged state where
+            # they still accept connections on an old port, but do not
+            # respond. If that happens, we should keep searching.
+            log.debug('No response from %s on port %i, continuing',
+                      host, port)
             continue
         except requests.exceptions.ConnectionError:
             pass
