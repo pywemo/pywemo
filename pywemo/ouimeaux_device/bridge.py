@@ -188,11 +188,24 @@ class Light(LinkedDevice):
     def __repr__(self):
         return '<LIGHT "{name}">'.format(name=self.name)
 
-    def turn_on(self, level=None, transition=0):
+    def turn_on(self, level=None, transition=0,
+                temp_mireds=None, color_xy=None, force_update=True):
         T = limit(int(transition * 10), 0, 65535)
 
+        cmd_args = {}
+
+        if temp_mireds is not None and 'colortemperature' in self.capabilities:
+            mireds = limit(int(temp_mireds), *self.temperature_range)
+            cmd_args['colortemperature'] = (mireds, T)
+
+        if color_xy is not None and 'colortemperature' in self.capabilities:
+            color_xy = limit_to_gamut(color_xy, self.gamut)
+            colorx = limit(int(color_xy[0] * 65535), 0, 65535)
+            colory = limit(int(color_xy[1] * 65535), 0, 65535)
+            cmd_args['colorcontrol'] = (colorx, colory, T)
+
         if level == 0:
-            return self.turn_off(transition)
+            self.turn_off(transition)
 
         elif 'levelcontrol' in self.capabilities:
             # Work around observed fw bugs.
@@ -203,7 +216,7 @@ class Light(LinkedDevice):
             #   doesn't update.
             # - After turning off a bulb with sleepfader, it fails to turn back
             #   on unless the brightness is re-set with levelcontrol.
-            self.get_state(force_update=True)
+            self.get_state(force_update=force_update)
             if level is None:
                 level = self.state['level']
 
@@ -211,9 +224,11 @@ class Light(LinkedDevice):
                 self._setdevicestatus(levelcontrol=(0, 0), onoff=ON)
 
             level = limit(int(level), 0, 255)
-            return self._setdevicestatus(levelcontrol=(level, T))
+            cmd_args['levelcontrol'] = (level, T)
         else:
-            return self._setdevicestatus(onoff=ON)
+            cmd_args['onoff'] = ON
+
+        return self._setdevicestatus(**cmd_args)
 
     def turn_off(self, transition=0):
         if transition and 'sleepfader' in self.capabilities:
