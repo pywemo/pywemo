@@ -93,8 +93,7 @@ class LinkedDevice(object):
 
     def get_state(self, force_update=False):
         if force_update:
-            status = self.bridge.bridge_getdevicestatus(self.uniqueID)
-            self._update_state(status)
+            self.bridge.bridge_update()
         return self.state
 
     def _update_state(self, status):
