@@ -90,6 +90,7 @@ class LinkedDevice(object):
         self.capabilities = []
         self._values = []
         self._update_state(info)
+        self._last_err = None
 
     def get_state(self, force_update=False):
         if force_update:
@@ -143,8 +144,9 @@ class LinkedDevice(object):
                 val = (val,)
             values.append(':'.join(str(v) for v in val))
 
-        return self.bridge.bridge_setdevicestatus(
+        self._last_err = self.bridge.bridge_setdevicestatus(
             isgroup, self.uniqueID, capids, values)
+        return self
 
     def turn_on(self, **kwargs):
         return self._setdevicestatus(onoff=ON)
@@ -168,6 +170,15 @@ class Light(LinkedDevice):
         self.certified = info.findtext('WeMoCertified')
 
         self.temperature_range, self.gamut = get_profiles(self.model)
+        self._pending = {}
+
+    def _queuedevicestatus(self, queue=False, **kwargs):
+        if kwargs:
+            self._pending.update(kwargs)
+        if not queue:
+            self._setdevicestatus(**self._pending)
+            self._pending = {}
+        return self
 
     def _update_state(self, status):
         if status.tag == 'DeviceInfo':
@@ -188,7 +199,7 @@ class Light(LinkedDevice):
     def __repr__(self):
         return '<LIGHT "{name}">'.format(name=self.name)
 
-    def turn_on(self, level=None, transition=0):
+    def turn_on(self, level=None, transition=0, force_update=False):
         T = limit(int(transition * 10), 0, 65535)
 
         if level == 0:
@@ -203,7 +214,7 @@ class Light(LinkedDevice):
             #   doesn't update.
             # - After turning off a bulb with sleepfader, it fails to turn back
             #   on unless the brightness is re-set with levelcontrol.
-            self.get_state(force_update=True)
+            self.get_state(force_update=force_update)
             if level is None:
                 level = self.state['level']
 
@@ -211,37 +222,40 @@ class Light(LinkedDevice):
                 self._setdevicestatus(levelcontrol=(0, 0), onoff=ON)
 
             level = limit(int(level), 0, 255)
-            return self._setdevicestatus(levelcontrol=(level, T))
+            return self._queuedevicestatus(levelcontrol=(level, T))
         else:
-            return self._setdevicestatus(onoff=ON)
+            return self._queuedevicestatus(onoff=ON)
 
     def turn_off(self, transition=0):
         if transition and 'sleepfader' in self.capabilities:
             # Sleepfader control did not turn off bulb when fadetime was 0
             T = limit(int(transition * 10), 1, 65535)
             reference = int(time.time())
-            return self._setdevicestatus(sleepfader=(T, reference))
+            return self._queuedevicestatus(sleepfader=(T, reference))
         else:
-            return self._setdevicestatus(onoff=OFF)
+            return self._queuedevicestatus(onoff=OFF)
 
-    def set_temperature(self, kelvin=2700, mireds=None, transition=0):
+    def set_temperature(self, kelvin=2700, mireds=None,
+                        transition=0, delay=True):
         T = limit(int(transition * 10), 0, 65535)
         if mireds is None:
             mireds = 1000000 / kelvin
         mireds = limit(int(mireds), *self.temperature_range)
-        return self._setdevicestatus(colortemperature=(mireds, T))
+        return self._queuedevicestatus(
+            colortemperature=(mireds, T), queue=delay)
 
-    def set_color(self, colorxy, transition=0):
+    def set_color(self, colorxy, transition=0, delay=True):
         T = limit(int(transition * 10), 0, 65535)
         colorxy = limit_to_gamut(colorxy, self.gamut)
         colorx = limit(int(colorxy[0] * 65535), 0, 65535)
         colory = limit(int(colorxy[1] * 65535), 0, 65535)
-        return self._setdevicestatus(colorcontrol=(colorx, colory, T))
+        return self._queuedevicestatus(
+            colorcontrol=(colorx, colory, T), queue=delay)
 
     def start_ramp(self, up, rate):
         updown = '1' if up else '0'
         rate = limit(int(rate), 0, 255)
-        return self._setdevicestatus(levelcontrol_move=(updown, rate))
+        return self._queuedevicestatus(levelcontrol_move=(updown, rate))
 
     def stop_ramp(self):
         return self._setdevicestatus(levelcontrol_stop='')
