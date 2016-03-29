@@ -219,13 +219,6 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
     start = calc_now()
 
     try:
-        """
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
-        sock.bind(('192.168.4.134', 8012))
-        sock.sendto(ssdp_request, ssdp_target)
-        """
 		
         for addr in interface_addresses():
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
