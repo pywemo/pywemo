@@ -133,7 +133,7 @@ class UPNPEntry(object):
 
         if url not in UPNPEntry.DESCRIPTION_CACHE:
             try:
-                xml = requests.get(url, timeout=10).text
+                xml = requests.get(url).text
 
                 tree = None
                 if len(xml) > 0:
@@ -146,13 +146,13 @@ class UPNPEntry(object):
                     UPNPEntry.DESCRIPTION_CACHE[url] = None
 
             except requests.RequestException:
-                logging.getLogger(__name__).error(
+                logging.getLogger(__name__).exception(
                     "Error fetching description at {}".format(url))
 
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
             except (requests.RequestException, ElementTree.ParseError):
-                logging.getLogger(__name__).error(
+                logging.getLogger(__name__).exception(
                     "Found malformed XML at {}: {}".format(url, xml))
 
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
@@ -190,6 +190,10 @@ class UPNPEntry(object):
         return "<UPNPEntry {} - {}>".format(
             self.values.get('st', ''), self.values.get('location', ''))
 
+def interface_addresses(family=socket.AF_INET):
+    for fam, _, _, _, sockaddr in socket.getaddrinfo('', None):
+        if family == fam:
+            yield sockaddr[0]
 
 # pylint: disable=invalid-name
 def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
@@ -215,40 +219,47 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
     start = calc_now()
 
     try:
+        """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+        sock.bind(('192.168.4.134', 8012))
         sock.sendto(ssdp_request, ssdp_target)
+        """
+		
+        for addr in interface_addresses():
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.bind((addr, 0))
 
-        sock.setblocking(0)
+            sock.sendto(ssdp_request, ssdp_target)
 
-        while True:
-            time_diff = calc_now() - start
+            sock.setblocking(0)
 
-            # pylint: disable=maybe-no-member
-            seconds_left = timeout - time_diff.seconds
+            while True:
+                time_diff = calc_now() - start
 
-            if seconds_left <= 0:
-                return entries
+                # pylint: disable=maybe-no-member
+                seconds_left = timeout - time_diff.seconds
 
-            ready = select.select([sock], [], [], seconds_left)[0]
+                if seconds_left <= 0:
+                    return entries
 
-            if ready:
-                response = sock.recv(1024).decode("ascii")
+                ready = select.select([sock], [], [], seconds_left)[0]
 
-                entry = UPNPEntry.from_response(response)
-                if entry.description is not None:
-                    device = entry.description.get('device', {})
-                    mac = device.get('macAddress')
-                else:
-                    mac = None
+                if ready:
+                    response = sock.recv(1024).decode("ascii")
 
-                if ((st is None or entry.st == st) and
-                   (match_mac is None or mac == match_mac) and
-                   entry not in entries):
-                    entries.append(entry)
+                    entry = UPNPEntry.from_response(response)
+                    device = entry.description.get('device')
+                    mac = None if device is None else device.get('macAddress')
 
-                    if max_entries and len(entries) == max_entries:
-                        return entries
+                    if ((st is None or entry.st == st) and
+                       (match_mac is None or mac == match_mac) and
+                       entry not in entries):
+                        entries.append(entry)
+
+                        if max_entries and len(entries) == max_entries:
+                            return entries
 
     except socket.error:
         logging.getLogger(__name__).exception(
@@ -257,7 +268,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
     finally:
         sock.close()
 
-    return entries
+        return entries
 
 
 if __name__ == "__main__":
