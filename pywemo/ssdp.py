@@ -190,6 +190,10 @@ class UPNPEntry(object):
         return "<UPNPEntry {} - {}>".format(
             self.values.get('st', ''), self.values.get('location', ''))
 
+def interface_addresses(family=socket.AF_INET):
+    for fam, _, _, _, sockaddr in socket.getaddrinfo('', None):
+        if family == fam:
+            yield sockaddr[0]
 
 # pylint: disable=invalid-name
 def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
@@ -215,40 +219,41 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
     start = calc_now()
 
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        for addr in interface_addresses():
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock.bind((addr, 0))
+            sock.sendto(ssdp_request, ssdp_target)
 
-        sock.sendto(ssdp_request, ssdp_target)
+            sock.setblocking(0)
 
-        sock.setblocking(0)
+            while True:
+                time_diff = calc_now() - start
 
-        while True:
-            time_diff = calc_now() - start
+                # pylint: disable=maybe-no-member
+                seconds_left = timeout - time_diff.seconds
 
-            # pylint: disable=maybe-no-member
-            seconds_left = timeout - time_diff.seconds
+                if seconds_left <= 0:
+                    return entries
 
-            if seconds_left <= 0:
-                return entries
+                ready = select.select([sock], [], [], seconds_left)[0]
 
-            ready = select.select([sock], [], [], seconds_left)[0]
+                if ready:
+                    response = sock.recv(1024).decode("ascii")
 
-            if ready:
-                response = sock.recv(1024).decode("ascii")
+                    entry = UPNPEntry.from_response(response)
+                    if entry.description is not None:
+                        device = entry.description.get('device', {})
+                        mac = device.get('macAddress')
+                    else:
+                        mac = None
 
-                entry = UPNPEntry.from_response(response)
-                if entry.description is not None:
-                    device = entry.description.get('device', {})
-                    mac = device.get('macAddress')
-                else:
-                    mac = None
+                    if ((st is None or entry.st == st) and
+                       (match_mac is None or mac == match_mac) and
+                       entry not in entries):
+                        entries.append(entry)
 
-                if ((st is None or entry.st == st) and
-                   (match_mac is None or mac == match_mac) and
-                   entry not in entries):
-                    entries.append(entry)
-
-                    if max_entries and len(entries) == max_entries:
-                        return entries
+                        if max_entries and len(entries) == max_entries:
+                            return entries
 
     except socket.error:
         logging.getLogger(__name__).exception(
