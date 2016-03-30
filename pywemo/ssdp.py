@@ -216,6 +216,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind((socket.gethostbyname(socket.gethostname()),0))
 
         sock.sendto(ssdp_request, ssdp_target)
 
