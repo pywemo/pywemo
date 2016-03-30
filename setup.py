@@ -7,6 +7,6 @@ setup(name='pywemo',
       author='Greg Dowling',
       author_email='mail@gregdowling.com',
       license='MIT',
-      install_requires=['requests>=2.0'],
+      install_requires=['requests>=2.0', 'six>=1.10.0'],
       packages=find_packages(),
       zip_safe=True)
