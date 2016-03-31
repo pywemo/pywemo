@@ -1,4 +1,5 @@
 from collections import defaultdict
+import netifaces
 
 
 # Taken from http://stackoverflow.com/a/10077069
@@ -24,3 +25,12 @@ def etree_to_dict(t):
         else:
             d[tag_name] = text
     return d
+
+
+def interface_addresses(family=netifaces.AF_INET):
+    """Returns local address of any network associated with a local interface
+    that has broadcast (and probably multicast) capability."""
+    return [addr['addr']
+            for i in netifaces.interfaces()
+            for addr in netifaces.ifaddresses(i).get(family) or []
+            if 'broadcast' in addr]

@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ElementTree
 
 import requests
 
-from .util import etree_to_dict
+from .util import etree_to_dict, interface_addresses
 
 DISCOVER_TIMEOUT = SSDP_MX = 5
 
@@ -214,14 +214,17 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
     calc_now = datetime.now
     start = calc_now()
 
+    sockets = []
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        for addr in interface_addresses():
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sockets.append(s)
 
-        sock.sendto(ssdp_request, ssdp_target)
+            s.bind((addr, 0))
+            s.sendto(ssdp_request, ssdp_target)
+            s.setblocking(0)
 
-        sock.setblocking(0)
-
-        while True:
+        while sockets:
             time_diff = calc_now() - start
 
             # pylint: disable=maybe-no-member
@@ -230,9 +233,9 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
             if seconds_left <= 0:
                 return entries
 
-            ready = select.select([sock], [], [], seconds_left)[0]
+            ready = select.select(sockets, [], [], seconds_left)[0]
 
-            if ready:
+            for sock in ready:
                 response = sock.recv(1024).decode("ascii")
 
                 entry = UPNPEntry.from_response(response)
@@ -255,7 +258,8 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
             "Socket error while discovering SSDP devices")
 
     finally:
-        sock.close()
+        for s in sockets:
+            s.close()
 
     return entries
 
