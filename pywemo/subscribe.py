@@ -190,6 +190,9 @@ class SubscriptionRegistry(object):
 
       # Wake up event thread if its sleeping
       self._event_thread_cond.notify()
+    self.join()
+    LOG.info(
+      "Terminated threads")
 
   def join(self):
     self._http_thread.join()
