@@ -122,12 +122,12 @@ class LinkedDevice(object):
         if 'levelcontrol' in status:
             self.state['level'] = status['levelcontrol'][0]
 
-        if 'colortemperature' in status:
+        if status.get('colortemperature') is not None:
             temperature = status['colortemperature'][0]
             self.state['temperature_mireds'] = temperature
             self.state['temperature_kelvin'] = int(1000000 / temperature)
 
-        if 'colorcontrol' in status:
+        if status.get('colorcontrol') is not None:
             colorx, colory = status['colorcontrol'][:2]
             colorx, colory = colorx / 65535., colory / 65535.
             self.state['color_xy'] = colorx, colory
