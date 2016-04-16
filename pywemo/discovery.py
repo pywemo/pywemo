@@ -34,15 +34,9 @@ def discover_devices(st=None, max_devices=None, match_mac=None):
 
 def device_from_description(description_url, mac):
     """ Returns object representing WeMo device running at host, else None. """
-    try:
-        xml = requests.get(description_url, timeout=10)
-
-        uuid = deviceParser.parseString(xml.content).device.UDN
-
-        return device_from_uuid_and_location(uuid, mac, description_url)
-
-    except Exception:  # pylint: disable=broad-except
-        return None
+    xml = requests.get(description_url, timeout=10)
+    uuid = deviceParser.parseString(xml.content).device.UDN
+    return device_from_uuid_and_location(uuid, mac, description_url)
 
 
 def device_from_uuid_and_location(uuid, mac, location):

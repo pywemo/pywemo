@@ -119,7 +119,7 @@ class LinkedDevice(object):
         self.state['available'] = True
         self.state['onoff'] = status['onoff']
 
-        if 'levelcontrol' in status:
+        if status.get('levelcontrol') is not None:
             self.state['level'] = status['levelcontrol'][0]
 
         if status.get('colortemperature') is not None:
