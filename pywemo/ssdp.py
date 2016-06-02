@@ -236,7 +236,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
             ready = select.select(sockets, [], [], seconds_left)[0]
 
             for sock in ready:
-                response = sock.recv(1024).decode("ascii")
+                response = sock.recv(1024).decode("UTF-8")
 
                 entry = UPNPEntry.from_response(response)
                 if entry.description is not None:
