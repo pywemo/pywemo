@@ -100,7 +100,7 @@ class SubscriptionRegistry(object):
 
   def _resubscribe(self, device, sid=None, retry=0):
     LOG.info("Resubscribe for %s", device)
-    headers = {'TIMEOUT': 300}
+    headers = {'TIMEOUT': '300'}
     if sid is not None:
       headers['SID'] = sid
     else:
@@ -126,10 +126,10 @@ class SubscriptionRegistry(object):
         self._events[device.serialnumber] = (
             self._sched.enter(int(timeout * 0.75),
                               0, self._resubscribe, [device, sid]))
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as ex:
       LOG.warning(
-          "Resubscribe error for %s, will retry in %ss",
-          device, SUBSCRIPTION_RETRY)
+          "Resubscribe error for %s (%s), will retry in %ss",
+          device, ex, SUBSCRIPTION_RETRY)
       retry += 1
       if retry > 1:
         # If this wan't a one off try rediscovery in case device has changed
