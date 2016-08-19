@@ -79,7 +79,7 @@ class Bridge(Device):
         buf = six.BytesIO()
         et.ElementTree(req).write(buf, encoding='utf-8',
                                   xml_declaration=True)
-        sendState = html_escape(str(buf.getvalue()), quote=True)
+        sendState = html_escape(buf.getvalue().decode(), quote=True)
         return self.bridge.SetDeviceStatus(DeviceStatusList=sendState)
 
 
