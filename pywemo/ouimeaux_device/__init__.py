@@ -2,9 +2,9 @@ import logging
 import time
 
 try:
-  from urllib.parse import urlparse
+    from urllib.parse import urlparse
 except ImportError:
-  from urlparse import urlparse
+    from urlparse import urlparse
 
 import requests
 
@@ -13,7 +13,8 @@ from .api.xsd import device as deviceParser
 
 log = logging.getLogger(__name__)
 
-PROBE_PORTS = (49152, 49153, 49154)
+# Start with the most commonly used port
+PROBE_PORTS = (49153, 49152, 49154)
 
 
 def probe_wemo(host):
@@ -28,7 +29,7 @@ def probe_wemo(host):
             r = requests.get('http://%s:%i/setup.xml' % (host, port),
                              timeout=10)
             if 'WeMo' in r.text:
-              return port
+                return port
         except requests.exceptions.ConnectTimeout:
             # If we timed out connecting, then the wemo is gone,
             # no point in trying further.
@@ -47,7 +48,8 @@ def probe_wemo(host):
     return None
 
 
-class UnknownService(Exception): pass
+class UnknownService(Exception):
+    pass
 
 
 class Device(object):
@@ -56,7 +58,6 @@ class Device(object):
         base_url = url.rsplit('/', 1)[0]
         self.host = urlparse(url).hostname
         self.retrying = False
-        #self.port = urlparse(url).port
         self.mac = mac
         xml = requests.get(url, timeout=10)
         self._config = deviceParser.parseString(xml.content).device
@@ -80,7 +81,7 @@ class Device(object):
 
         # Avoid retrying from multiple threads
         if self.retrying:
-           return
+            return
 
         self.retrying = True
         log.info("Trying to reconnect with {}".format(self.name))
@@ -91,7 +92,8 @@ class Device(object):
             found = discover_devices(None, 1, self.mac)
 
             if found:
-                log.info("Found {} again, updating local values".format(self.name))
+                log.info("Found {} again, updating local values".
+                         format(self.name))
 
                 self.__dict__ = found[0].__dict__
                 self.retrying = False
@@ -105,7 +107,8 @@ class Device(object):
 
             if try_no == 5:
                 log.error(
-                    "Unable to reconnect with {} in 5 tries. Stopping.".format(self.name))
+                    "Unable to reconnect with {} in 5 tries. Stopping.".
+                    format(self.name))
                 self.retrying = False
                 return
 
