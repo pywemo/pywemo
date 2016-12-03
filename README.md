@@ -6,7 +6,7 @@ This is a stripped down version of the Python API for WeMo devices [ouimeaux](ht
 
 Dependencies
 ------------
-pyWeMo depends on Python package requests.
+pyWeMo depends on Python packages requests, netifaces and six.
 
 How to use
 ----------
