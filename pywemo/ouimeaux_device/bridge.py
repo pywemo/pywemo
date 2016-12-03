@@ -215,8 +215,11 @@ class Light(LinkedDevice):
             # - After turning off a bulb with sleepfader, it fails to turn back
             #   on unless the brightness is re-set with levelcontrol.
             self.get_state(force_update=force_update)
+            # A freshly power cycled bridge has no record of the bulb
+            # brightness, so default to full on if the client didn't request
+            # a level and we have no record
             if level is None:
-                level = self.state['level']
+                level = self.state.get("level", 255)
 
             if self.state['onoff'] == 0:
                 self._setdevicestatus(levelcontrol=(0, 0), onoff=ON)
