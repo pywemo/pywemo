@@ -32,6 +32,8 @@ On some networks discovery doesn't work reliably, in that case if you can find t
     >> device = pywemo.discovery.device_from_description(url, None)
     >> print(device)
     <WeMo Insight "AC Insight">
+    
+Please note that you need to use ip addresses as shown above, rather than hostnames, otherwise the scbscription update logic won't work.
 
 License
 -------
