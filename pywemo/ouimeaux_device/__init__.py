@@ -28,7 +28,7 @@ def probe_wemo(host):
         try:
             r = requests.get('http://%s:%i/setup.xml' % (host, port),
                              timeout=10)
-            if 'WeMo' in r.text:
+            if ('WeMo' in r.text) or ('Belkin' in r.text):
                 return port
         except requests.exceptions.ConnectTimeout:
             # If we timed out connecting, then the wemo is gone,
