@@ -25,10 +25,10 @@ class SubscriptionRegistryFailed(Exception):
     pass
 
 
-def get_ip_address():
+def get_ip_address(host='1.2.3.4'):
   sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
   try:
-    sock.connect(('1.2.3.4', 9))
+    sock.connect((host, 9))
     return sock.getsockname()[0]
   except socket.error:
     return None
@@ -104,7 +104,7 @@ class SubscriptionRegistry(object):
     if sid is not None:
       headers['SID'] = sid
     else:
-      host = get_ip_address()
+      host = get_ip_address(host=device.host)
       headers.update({
           "CALLBACK": '<http://%s:%d>' % (host, self._port),
           "NT": "upnp:event"
