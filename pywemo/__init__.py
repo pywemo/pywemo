@@ -8,6 +8,7 @@ from .ouimeaux_device.lightswitch import LightSwitch
 from .ouimeaux_device.motion import Motion
 from .ouimeaux_device.switch import Switch
 from .ouimeaux_device.maker import Maker
+from .ouimeaux_device.coffeemaker import CoffeeMaker
 from .ouimeaux_device.bridge import Bridge
 
 from .discovery import discover_devices
