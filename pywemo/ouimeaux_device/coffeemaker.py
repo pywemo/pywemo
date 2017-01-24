@@ -70,12 +70,14 @@ class CoffeeMaker(Switch):
         """
         resp = self.deviceevent.GetAttributes().get('attributeList')
         self._attributes = attributeXmlToDict(resp)
+        self._state = self.mode
 
     def subscription_callback(self, xmlBlob):
         """
         Handle reports from device
         """
         self._attributes.update(attributeXmlToDict(xmlBlob))
+        self._state = self.mode
 
     @property
     def mode(self):
@@ -93,7 +95,6 @@ class CoffeeMaker(Switch):
         # so use mode instead.
         if force_update or self._state is None:
             self.update_attributes()
-            self._state = self.mode
 
         # Consider the Coffee Maker to be "on" if it's currently brewing.
         return int(self._state == CoffeeMakerMode.Brewing)
