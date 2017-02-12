@@ -111,7 +111,7 @@ class LinkedDevice(object):
             status[capability] = value
 
         # unreachable devices have empty strings for all capability values
-        if status['onoff'] is None:
+        if status.get('onoff') is None:
             self.state['available'] = False
             self.state['onoff'] = 0
             return
@@ -189,11 +189,13 @@ class Light(LinkedDevice):
         currentstate = (status.findtext('CurrentState') or
                         status.findtext('CapabilityValue'))
 
-        self.capabilities = [
-            CAPABILITY_ID2NAME.get(c, c)
-            for c in capabilities.split(',')
-        ]
-        self._values = currentstate.split(',')
+        if capabilities is not None:
+            self.capabilities = [
+                CAPABILITY_ID2NAME.get(c, c)
+                for c in capabilities.split(',')
+            ]
+        if currentstate is not None:
+            self._values = currentstate.split(',')
         super(Light, self)._update_state(status)
 
     def __repr__(self):
@@ -278,11 +280,13 @@ class Group(LinkedDevice):
         currentstate = (status.findtext('GroupCapabilityValues') or
                         status.findtext('CapabilityValue'))
 
-        self.capabilities = [
-            CAPABILITY_ID2NAME.get(c, c)
-            for c in capabilities.split(',')
-        ]
-        self._values = currentstate.split(',')
+        if capabilities is not None:
+            self.capabilities = [
+                CAPABILITY_ID2NAME.get(c, c)
+                for c in capabilities.split(',')
+            ]
+        if currentstate is not None:
+            self._values = currentstate.split(',')
         super(Group, self)._update_state(status)
 
     def __repr__(self):
