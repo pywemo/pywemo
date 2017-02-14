@@ -111,7 +111,8 @@ class SubscriptionRegistry(object):
       })
     try:
       url = device.basicevent.eventSubURL
-      if hasattr(device, 'insight'): # HACK: Insight updates instead of basicevent
+      # An 'insight' sub when available take precedence over a 'basicevent' sub
+      if hasattr(device, 'insight'):
             url = device.insight.eventSubURL
       response = requests.request(method="SUBSCRIBE", url=url,
                                   headers=headers)
@@ -120,7 +121,7 @@ class SubscriptionRegistry(object):
         # start over.
         requests.request(
             method='UNSUBSCRIBE', url=url, headers={'SID': sid})
-        return self._resubscribe(device) # FIXME: refactor to allow multiple subscriptions for both basicevent and insight
+        return self._resubscribe(device)
       timeout = int(response.headers.get('timeout', '1801').replace(
           'Second-', ''))
       sid = response.headers.get('sid', sid)
