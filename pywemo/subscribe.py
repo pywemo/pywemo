@@ -143,7 +143,7 @@ class SubscriptionRegistry(object):
                               0, self._resubscribe, [device, sid, retry]))
 
   def _event(self, device, type_, value):
-    LOG.info("Received event from %s(%s)", device, device.host)
+    LOG.info("Received event from %s(%s) - %s %s", device, device.host, type_, value)
     for type_filter, callback in self._callbacks.get(device, ()):
       if type_filter is None or type_ == type_filter:
         callback(device, value)
