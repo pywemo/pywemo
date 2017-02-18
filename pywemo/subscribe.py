@@ -111,6 +111,9 @@ class SubscriptionRegistry(object):
       })
     try:
       url = device.basicevent.eventSubURL
+      # An 'insight' sub when available take precedence over a 'basicevent' sub
+      if hasattr(device, 'insight'):
+            url = device.insight.eventSubURL
       response = requests.request(method="SUBSCRIBE", url=url,
                                   headers=headers)
       if response.status_code == 412 and sid:
