@@ -217,12 +217,15 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
     sockets = []
     try:
         for addr in interface_addresses():
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            sockets.append(s)
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                sockets.append(s)
+                s.bind((addr, 0))
+                s.sendto(ssdp_request, ssdp_target)
+                s.setblocking(0)
+            except socket.error:
+                pass
 
-            s.bind((addr, 0))
-            s.sendto(ssdp_request, ssdp_target)
-            s.setblocking(0)
 
         while sockets:
             time_diff = calc_now() - start
