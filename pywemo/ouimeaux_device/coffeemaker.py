@@ -76,8 +76,12 @@ class CoffeeMaker(Switch):
         """
         Handle reports from device
         """
-        self._attributes.update(attributeXmlToDict(xmlBlob))
-        self._state = self.mode
+        if _type == "attributeList":
+            self._attributes.update(attributeXmlToDict(xmlBlob))
+            self._state = self.mode
+            return True
+
+        return Switch.update_insight_params(self, _type, _params)
 
     @property
     def mode(self):
