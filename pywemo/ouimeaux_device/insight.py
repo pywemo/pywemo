@@ -1,16 +1,28 @@
+import logging
 from datetime import datetime
-
 from .switch import Switch
+
+LOG = logging.getLogger(__name__)
 
 
 class Insight(Switch):
+    def __init__(self, *args, **kwargs):
+        Switch.__init__(self, *args, **kwargs)
+        self.insight_params = {}
 
     def __repr__(self):
         return '<WeMo Insight "{name}">'.format(name=self.name)
 
-    @property
-    def insight_params(self):
+    def update_insight_params(self):
         params = self.insight.GetInsightParams().get('InsightParams')
+        self.insight_params = self.parse_insight_params(params)
+
+    def subscription_update(self, _type, _params):
+        LOG.debug("subscription_update %s %s", _type, _params)
+        if _type == "InsightParams":
+            self.insight_params = self.parse_insight_params(_params)
+
+    def parse_insight_params(self, params):
         (
             state,  # 0 if off, 1 if on, 8 if on but load is off
             lastchange,
@@ -33,6 +45,12 @@ class Insight(Switch):
                 'totalmw': int(float(totalmw)),
                 'currentpower': int(float(currentmw)),
                 'powerthreshold': int(float(powerthreshold))}
+
+    def get_state(self, force_update=False):
+        if force_update or self._state is None:
+            self.update_insight_params()
+
+        return Switch.get_state(self, force_update)
 
     @property
     def today_kwh(self):

@@ -72,7 +72,7 @@ class CoffeeMaker(Switch):
         self._attributes = attributeXmlToDict(resp)
         self._state = self.mode
 
-    def subscription_callback(self, xmlBlob):
+    def subscription_update(self, _type, xmlBlob):
         """
         Handle reports from device
         """
