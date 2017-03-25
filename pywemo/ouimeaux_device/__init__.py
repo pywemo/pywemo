@@ -145,6 +145,9 @@ class Device(object):
 
         return self._state
 
+    def subscription_update(self, _type, _param):
+        return False
+
     def get_service(self, name):
         try:
             return self.services[name]

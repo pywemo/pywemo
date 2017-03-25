@@ -21,6 +21,8 @@ class Insight(Switch):
         LOG.debug("subscription_update %s %s", _type, _params)
         if _type == "InsightParams":
             self.insight_params = self.parse_insight_params(_params)
+            return True
+        return Switch.subscription_update(self, _type, _params)
 
     def parse_insight_params(self, params):
         (
