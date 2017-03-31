@@ -105,7 +105,7 @@ class LinkedDevice(object):
             if not value:
                 value = None
             elif ':' in value:
-                value = tuple(int(v) for v in value.split(':'))
+                value = tuple(int(float(v)) for v in value.split(':'))
             else:
                 value = int(value)
             status[capability] = value
