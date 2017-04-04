@@ -105,9 +105,9 @@ class LinkedDevice(object):
             if not value:
                 value = None
             elif ':' in value:
-                value = tuple(int(v) for v in value.split(':'))
+                value = tuple(int(round(float(v))) for v in value.split(':'))
             else:
-                value = int(value)
+                value = int(round(float(value)))
             status[capability] = value
 
         # unreachable devices have empty strings for all capability values
