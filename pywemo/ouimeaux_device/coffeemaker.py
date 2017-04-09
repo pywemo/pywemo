@@ -72,16 +72,16 @@ class CoffeeMaker(Switch):
         self._attributes = attributeXmlToDict(resp)
         self._state = self.mode
 
-    def subscription_update(self, _type, xmlBlob):
+    def subscription_update(self, _type, _params):
         """
         Handle reports from device
         """
         if _type == "attributeList":
-            self._attributes.update(attributeXmlToDict(xmlBlob))
+            self._attributes.update(attributeXmlToDict(_params))
             self._state = self.mode
             return True
 
-        return Switch.update_insight_params(self, _type, _params)
+        return Switch.subscription_update(self, _type, _params)
 
     @property
     def mode(self):
