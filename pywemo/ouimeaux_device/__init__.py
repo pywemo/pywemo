@@ -55,6 +55,7 @@ class UnknownService(Exception):
 class Device(object):
     def __init__(self, url, mac):
         self._state = None
+        self.basic_state_params = {}
         base_url = url.rsplit('/', 1)[0]
         self.host = urlparse(url).hostname
         self.retrying = False
@@ -130,6 +131,36 @@ class Device(object):
     def reconnect_with_device(self):
         if not self._reconnect_with_device_by_probing() and self.mac:
             self._reconnect_with_device_by_discovery()
+
+    def parse_basic_state(self, params):
+        # BinaryState
+        # 1|1492338954|0|922|14195|1209600|0|940670|15213709|227088884
+        (
+            state,  # 0 if off, 1 if on,
+            _x1,
+            _x2,
+            _x3,
+            _x4,
+            _x5,
+            _x6,
+            _x7,
+            _x8,
+            _x9
+        ) = params.split('|')
+        return {'state': state}
+
+    def update_binary_state(self):
+        self.basic_state_params = self.basicevent.GetBinaryState()
+
+    def subscription_update(self, _type, _params):
+        LOG.debug("subscription_update %s %s", _type, _params)
+        if _type == "BinaryState":
+            try:
+                self._state = int(self.parse_basic_state(_params).get("state"))
+            except ValueError:
+                self._state = 0
+            return True
+        return False
 
     def get_state(self, force_update=False):
         """

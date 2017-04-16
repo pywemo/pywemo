@@ -110,25 +110,12 @@ class SubscriptionRegistry(object):
           "NT": "upnp:event"
       })
     try:
-      url = device.basicevent.eventSubURL
-      # An 'insight' sub when available take precedence over a 'basicevent' sub
+      # Basic events
+      self._url_resubscribe(device, headers, sid, device.basicevent.eventSubURL)
+      # Insight events
       if hasattr(device, 'insight'):
-            url = device.insight.eventSubURL
-      response = requests.request(method="SUBSCRIBE", url=url,
-                                  headers=headers)
-      if response.status_code == 412 and sid:
-        # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
-        # start over.
-        requests.request(
-            method='UNSUBSCRIBE', url=url, headers={'SID': sid})
-        return self._resubscribe(device)
-      timeout = int(response.headers.get('timeout', '1801').replace(
-          'Second-', ''))
-      sid = response.headers.get('sid', sid)
-      with self._event_thread_cond:
-        self._events[device.serialnumber] = (
-            self._sched.enter(int(timeout * 0.75),
-                              0, self._resubscribe, [device, sid]))
+        self._url_resubscribe(device, headers, sid, device.insight.eventSubURL)
+
     except requests.exceptions.RequestException as ex:
       LOG.warning(
           "Resubscribe error for %s (%s), will retry in %ss",
@@ -141,6 +128,24 @@ class SubscriptionRegistry(object):
         self._events[device.serialnumber] = (
             self._sched.enter(SUBSCRIPTION_RETRY,
                               0, self._resubscribe, [device, sid, retry]))
+
+  def _url_resubscribe(self, device, hd, sid, url):
+    headers = hd.copy();
+    response = requests.request(method="SUBSCRIBE", url=url,
+                                headers=headers)
+    if response.status_code == 412 and sid:
+      # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
+      # start over.
+      requests.request(
+          method='UNSUBSCRIBE', url=url, headers={'SID': sid})
+      return self._resubscribe(device)
+    timeout = int(response.headers.get('timeout', '1801').replace(
+        'Second-', ''))
+    sid = response.headers.get('sid', sid)
+    with self._event_thread_cond:
+      self._events[device.serialnumber] = (
+          self._sched.enter(int(timeout * 0.75),
+                            0, self._resubscribe, [device, sid]))
 
   def _event(self, device, type_, value):
     LOG.info("Received event from %s(%s) - %s %s", device, device.host, type_, value)
