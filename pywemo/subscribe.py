@@ -114,9 +114,9 @@ class SubscriptionRegistry(object):
             self._url_resubscribe(device, headers, sid,
                                   device.basicevent.eventSubURL)
             # Insight events
-            if hasattr(device, 'insight'):
-                self._url_resubscribe(
-                    device, headers, sid, device.insight.eventSubURL)
+            # if hasattr(device, 'insight'):
+            #     self._url_resubscribe(
+            #         device, headers, sid, device.insight.eventSubURL)
 
         except requests.exceptions.RequestException as ex:
             LOG.warning(
