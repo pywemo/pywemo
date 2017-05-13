@@ -146,7 +146,7 @@ class UPNPEntry(object):
                     UPNPEntry.DESCRIPTION_CACHE[url] = None
 
             except requests.RequestException:
-                logging.getLogger(__name__).error(
+                logging.getLogger(__name__).warning(
                     "Error fetching description at {}".format(url))
 
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
