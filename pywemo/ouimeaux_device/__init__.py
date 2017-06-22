@@ -14,10 +14,10 @@ from .api.xsd import device as deviceParser
 log = logging.getLogger(__name__)
 
 # Start with the most commonly used port
-PROBE_PORTS = (49153, 49152, 49154)
+PROBE_PORTS = (49153, 49152, 49154, 49155, 49156, 49157, 49158, 49159)
 
 
-def probe_wemo(host):
+def probe_wemo(host, description=None):
     """Probe a host for the current port.
 
     This probes a host for known-to-be-possible ports and
@@ -28,6 +28,17 @@ def probe_wemo(host):
         try:
             r = requests.get('http://%s:%i/setup.xml' % (host, port),
                              timeout=10)
+            if description is not None:
+                # for devices that listen on multiple ports try and 
+                # match the device description.
+                # there is a possiblity this will get things wrong.
+                # in order to cover all the cases we would need to
+                # parse the xml and match on an exact filed content,
+                # having ports named the same would go wrong also.
+                if description not in r.text:
+                    log.debug('port %s does not match our device %s',
+                             port, description)
+                    continue
             if ('WeMo' in r.text) or ('Belkin' in r.text):
                 return port
         except requests.exceptions.ConnectTimeout:
@@ -118,7 +129,7 @@ class Device(object):
             try_no += 1
 
     def _reconnect_with_device_by_probing(self):
-        port = probe_wemo(self.host)
+        port = probe_wemo(self.host, self.name)
         if port is None:
             log.error('Unable to re-probe wemo at {}'.format(self.host))
             return False
