@@ -42,7 +42,9 @@ def device_from_description(description_url, mac):
 
 def device_from_uuid_and_location(uuid, mac, location):
     """ Tries to determine which device it is based on the uuid. """
-    if uuid.startswith('uuid:Socket'):
+    if uuid is None:
+        return None
+    elif uuid.startswith('uuid:Socket'):
         return Switch(location, mac)
     elif uuid.startswith('uuid:Lightswitch'):
         return LightSwitch(location, mac)
