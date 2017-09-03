@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='pywemo',
-      version='0.4.19',
+      version='0.4.20',
       description='Access WeMo switches using their SOAP API',
       url='http://github.com/pavoni/pywemo',
       author='Greg Dowling',
