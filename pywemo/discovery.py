@@ -7,6 +7,7 @@ from . import ssdp
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.insight import Insight
 from .ouimeaux_device.lightswitch import LightSwitch
+from .ouimeaux_device.dimmer import Dimmer
 from .ouimeaux_device.motion import Motion
 from .ouimeaux_device.switch import Switch
 from .ouimeaux_device.maker import Maker
@@ -48,6 +49,8 @@ def device_from_uuid_and_location(uuid, mac, location):
         return Switch(location, mac)
     elif uuid.startswith('uuid:Lightswitch'):
         return LightSwitch(location, mac)
+    elif uuid.startswith('uuid:Dimmer'):
+        return Dimmer(location, mac)
     elif uuid.startswith('uuid:Insight'):
         return Insight(location, mac)
     elif uuid.startswith('uuid:Sensor'):
