@@ -35,11 +35,5 @@ class Dimmer(Device):
         self.basicevent.SetBinaryState(brightness=int(brightness))
         self._brightness = int(brightness)
 
-    def fifty(self):
-        """
-        Set the dimmer to 50%.
-        """
-        return self.set_brightness(50)
-
     def __repr__(self):
         return '<WeMo Dimmer "{name}">'.format(name=self.name)
