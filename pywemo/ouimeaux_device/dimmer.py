@@ -28,18 +28,18 @@ class Dimmer(Device):
         """
         return self.set_state(not self.get_state())
 		
-    def set_dimmer(self, dimmer):
+    def set_brightness(self, brightness):
         """
-        Set the dimmer of this device to on or off.
+        Set the brightness of this device to an integer between 1-100.
         """
-        self.basicevent.SetBinaryState(brightness=int(dimmer))
-        self._dimmer = int(dimmer)
+        self.basicevent.SetBinaryState(brightness=int(brightness))
+        self._brightness = int(brightness)
 
     def fifty(self):
         """
         Set the dimmer to 50%.
         """
-        return self.set_dimmer(50)
+        return self.set_brightness(50)
 
     def __repr__(self):
         return '<WeMo Dimmer "{name}">'.format(name=self.name)
