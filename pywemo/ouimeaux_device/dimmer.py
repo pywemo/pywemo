@@ -3,14 +3,20 @@ from .switch import Switch
 class Dimmer(Switch):
     def __init__(self, *args, **kwargs):
         Switch.__init__(self, *args, **kwargs)
-        self._brightness = {}
+        self._brightness = None
 
-    def get_brightness(self):
+    def get_brightness(self, force_update=False):
         """
-        Get brightness from device
+        Get Brightness From Device
         """
-        brightness = self.basicevent.GetBinaryState().get('brightness')
+        if force_update or self._brightness is None:
+            try:
+                brightness = self.basicevent.GetBinaryState().get('brightness')
+            except ValueError:
+                brightness = 0
+
         self._brightness = brightness
+        return self._brightness
 
     def set_brightness(self, brightness):
         """
@@ -23,10 +29,13 @@ class Dimmer(Switch):
                 self.off()
         else:
             if self.get_state() == 0:
-                    self.on()
+                self.on()
 
         self.basicevent.SetBinaryState(brightness=int(brightness))
         self._brightness = int(brightness)
+
+    def subscription_update(self, _type, _param):
+        return False
 
     def __repr__(self):
         return '<WeMo Dimmer "{name}">'.format(name=self.name)
