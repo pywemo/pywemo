@@ -14,8 +14,8 @@ class Dimmer(Switch):
                 brightness = self.basicevent.GetBinaryState().get('brightness')
             except ValueError:
                 brightness = 0
-            self._brightness = brightness
 
+        self._brightness = brightness
         return self._brightness
 
     def set_brightness(self, brightness):
