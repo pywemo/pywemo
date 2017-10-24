@@ -9,6 +9,7 @@ class Dimmer(Switch):
         """
         Get Brightness From Device
         """
+        global brightness
         if force_update or self._brightness is None:
             try:
                 brightness = self.basicevent.GetBinaryState().get('brightness')
