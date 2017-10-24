@@ -14,8 +14,8 @@ class Dimmer(Switch):
                 brightness = self.basicevent.GetBinaryState().get('brightness')
             except ValueError:
                 brightness = 0
+            self._brightness = brightness
 
-        self._brightness = brightness
         return self._brightness
 
     def set_brightness(self, brightness):
@@ -33,9 +33,6 @@ class Dimmer(Switch):
 
         self.basicevent.SetBinaryState(brightness=int(brightness))
         self._brightness = int(brightness)
-
-    def subscription_update(self, _type, _param):
-        return False
 
     def __repr__(self):
         return '<WeMo Dimmer "{name}">'.format(name=self.name)
