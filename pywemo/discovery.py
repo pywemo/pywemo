@@ -12,6 +12,7 @@ from .ouimeaux_device.motion import Motion
 from .ouimeaux_device.switch import Switch
 from .ouimeaux_device.maker import Maker
 from .ouimeaux_device.coffeemaker import CoffeeMaker
+from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.api.xsd import device as deviceParser
 
 
@@ -61,5 +62,7 @@ def device_from_uuid_and_location(uuid, mac, location):
         return Bridge(location, mac)
     elif uuid.startswith('uuid:CoffeeMaker'):
         return CoffeeMaker(location, mac)
+    elif uuid.startswith('uuid:Humidifier'):
+        return Humidifier(location, mac)
     else:
         return None
