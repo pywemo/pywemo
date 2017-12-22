@@ -31,26 +31,22 @@ FAN_MODE_NAMES = {
     FanMode.Low: "Low",
     FanMode.Medium: "Medium",
     FanMode.High: "High",
-    FanMode.Maximum: "Maximum",
+    FanMode.Maximum: "Maximum"
 }
 
-DESIRED_HUMIDITY = IntEnum(
-    value='desired_humidity',
-    names=[
-        ('45', 0),
-        ('50', 1),
-        ('55', 2),
-        ('60', 3),
-        ('100', 4), # "Always On" mode
-    ]
-)
+class DesiredHumidity(IntEnum):
+    FortyFivePercent = 0
+    FiftyPercent = 1
+    FiftyFivePercent = 2
+    SixtyPercent = 3
+    OneHundredPercent = 4 # "Always On" Mode
 
 DESIRED_HUMIDITY_NAMES = {
-    DESIRED_HUMIDITY['45']: "45",
-    DESIRED_HUMIDITY['50']: "50",
-    DESIRED_HUMIDITY['55']: "55",
-    DESIRED_HUMIDITY['60']: "60",
-    DESIRED_HUMIDITY['100']: "100",
+    DesiredHumidity.FortyFivePercent: "45",
+    DesiredHumidity.FiftyPercent: "50",
+    DesiredHumidity.FiftyFivePercent: "55",
+    DesiredHumidity.SixtyPercent: "60",
+    DesiredHumidity.OneHundredPercent: "100"
 }
 
 class WaterLevel(IntEnum):
