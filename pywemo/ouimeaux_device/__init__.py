@@ -19,15 +19,24 @@ log = logging.getLogger(__name__)
 # Start with the most commonly used port
 PROBE_PORTS = (49153, 49152, 49154, 49151, 49155)
 
+def probe_device(device):
+    """Probe a device for available port.
 
-def probe_wemo(host):
+    This is an extension for probe_wemo, also probing current port.
+    """
+    ports = PROBE_PORTS
+    if not device.port in ports
+        ports = (device.port,) + ports
+    return probe_wemo(device.host, ports)
+
+def probe_wemo(host, ports=PROBE_PORTS):
     """Probe a host for the current port.
 
     This probes a host for known-to-be-possible ports and
     returns the one currently in use. If no port is discovered
     then it returns None.
     """
-    for port in PROBE_PORTS:
+    for port in ports:
         try:
             r = requests.get('http://%s:%i/setup.xml' % (host, port),
                              timeout=10)
@@ -60,7 +69,9 @@ class Device(object):
         self._state = None
         self.basic_state_params = {}
         base_url = url.rsplit('/', 1)[0]
-        self.host = urlparse(url).hostname
+        parsed_url = urlparse(url)
+        self.host = parsed_url.hostname
+        self.port = parsed_url.port
         self.retrying = False
         self.mac = mac
         xml = requests.get(url, timeout=10)
@@ -121,13 +132,14 @@ class Device(object):
             try_no += 1
 
     def _reconnect_with_device_by_probing(self):
-        port = probe_wemo(self.host)
+        port = probe_device(self)
         if port is None:
             log.error('Unable to re-probe wemo at {}'.format(self.host))
             return False
         log.info('Reconnected to wemo at {} on port {}'.format(
             self.host, port))
-        url = 'http://{}:{}/setup.xml'.format(self.host, port)
+        self.port = port
+        url = 'http://{}:{}/setup.xml'.format(self.host, self.port)
         self.__dict__ = self.__class__(url, None).__dict__
         return True
 
