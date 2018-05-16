@@ -25,7 +25,7 @@ def probe_device(device):
     This is an extension for probe_wemo, also probing current port.
     """
     ports = PROBE_PORTS
-    if not device.port in ports
+    if not device.port in ports:
         ports = (device.port,) + ports
     return probe_wemo(device.host, ports)
 
