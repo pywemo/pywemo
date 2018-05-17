@@ -19,15 +19,6 @@ log = logging.getLogger(__name__)
 # Start with the most commonly used port
 PROBE_PORTS = (49153, 49152, 49154, 49151, 49155)
 
-def probe_device(device):
-    """Probe a device for available port.
-
-    This is an extension for probe_wemo, also probing current port.
-    """
-    ports = PROBE_PORTS
-    if not device.port in ports:
-        ports = (device.port,) + ports
-    return probe_wemo(device.host, ports)
 
 def probe_wemo(host, ports=PROBE_PORTS):
     """Probe a host for the current port.
@@ -58,6 +49,19 @@ def probe_wemo(host, ports=PROBE_PORTS):
         except ConnectionError:
             pass
     return None
+
+
+def probe_device(device):
+    """Probe a device for available port.
+
+    This is an extension for probe_wemo, also probing current port.
+    """
+    ports = list(PROBE_PORTS)
+    if device.port in ports:
+        ports.remove(device.port)
+    ports.insert(0, device.port)
+
+    return probe_wemo(device.host, ports)
 
 
 class UnknownService(Exception):
