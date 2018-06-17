@@ -44,8 +44,12 @@ class Bridge(Device):
 
     def bridge_update(self):
         UDN = self.basicevent.GetMacAddr().get('PluginUDN')
-        endDevices = self.bridge.GetEndDevices(
-            DevUDN=UDN, ReqListType='PAIRED_LIST')
+        if hasattr(self.bridge,'GetEndDevicesWithStatus'):
+            endDevices = self.bridge.GetEndDevicesWithStatus(
+                DevUDN=UDN, ReqListType='PAIRED_LIST')
+        else:
+            endDevices = self.bridge.GetEndDevices(
+                DevUDN=UDN, ReqListType='PAIRED_LIST')
         endDeviceList = et.fromstring(endDevices.get('DeviceLists'))
 
         for light in endDeviceList.iter('DeviceInfo'):
