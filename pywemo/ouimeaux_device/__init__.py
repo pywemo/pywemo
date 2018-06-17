@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 PROBE_PORTS = (49153, 49152, 49154, 49151, 49155)
 
 
-def probe_wemo(host, ports=PROBE_PORTS):
+def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=10):
     """Probe a host for the current port.
 
     This probes a host for known-to-be-possible ports and
@@ -30,7 +30,7 @@ def probe_wemo(host, ports=PROBE_PORTS):
     for port in ports:
         try:
             r = requests.get('http://%s:%i/setup.xml' % (host, port),
-                             timeout=10)
+                             timeout=probe_timeout)
             if ('WeMo' in r.text) or ('Belkin' in r.text):
                 return port
         except ConnectTimeout:
