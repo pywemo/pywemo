@@ -1,6 +1,7 @@
 """
 Module to discover WeMo devices.
 """
+import logging
 import requests
 
 from . import ssdp
@@ -14,6 +15,8 @@ from .ouimeaux_device.maker import Maker
 from .ouimeaux_device.coffeemaker import CoffeeMaker
 from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.api.xsd import device as deviceParser
+
+LOG = logging.getLogger(__name__)
 
 
 def discover_devices(st=None, max_devices=None, match_mac=None):
@@ -39,6 +42,15 @@ def device_from_description(description_url, mac):
     """ Returns object representing WeMo device running at host, else None. """
     xml = requests.get(description_url, timeout=10)
     uuid = deviceParser.parseString(xml.content).device.UDN
+
+    if mac is None:
+        try:
+            mac = deviceParser.parseString(xml.content).device.macAddress
+        except:
+            LOG.debug(
+                'No MAC address was supplied, and discovery is unable to find device MAC in setup xml at: %s.'
+                , description_url)
+
     return device_from_uuid_and_location(uuid, mac, description_url)
 
 

@@ -44,6 +44,7 @@
       <xs:element name="modelURL" type="xs:string" minOccurs="0" maxOccurs="1" />
       <xs:element name="serialNumber" type="xs:string" minOccurs="0" maxOccurs="1" />
       <xs:element name="UDN" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="macAddress" type="xs:string" minOccurs="0" maxOccurs="1" />
       <xs:element name="UPC" type="xs:string" minOccurs="0" maxOccurs="1" />
       <xs:element name="iconList" type="IconListType" minOccurs="0" maxOccurs="1" />
       <xs:element name="serviceList" type="ServiceListType" minOccurs="0" maxOccurs="1" />
