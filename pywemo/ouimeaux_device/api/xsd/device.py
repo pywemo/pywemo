@@ -718,7 +718,7 @@ class SpecVersionType(GeneratedsSuper):
 class DeviceType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, deviceType=None, friendlyName=None, manufacturer=None, manufacturerURL=None, modelDescription=None, modelName=None, modelNumber=None, modelURL=None, serialNumber=None, UDN=None, UPC=None, iconList=None, serviceList=None, deviceList=None, presentationURL=None, anytypeobjs_=None):
+    def __init__(self, deviceType=None, friendlyName=None, manufacturer=None, manufacturerURL=None, modelDescription=None, modelName=None, modelNumber=None, modelURL=None, serialNumber=None, UDN=None, macAddress=None, UPC=None, iconList=None, serviceList=None, deviceList=None, presentationURL=None, anytypeobjs_=None):
         self.deviceType = deviceType
         self.friendlyName = friendlyName
         self.manufacturer = manufacturer
@@ -729,6 +729,7 @@ class DeviceType(GeneratedsSuper):
         self.modelURL = modelURL
         self.serialNumber = serialNumber
         self.UDN = UDN
+        self.macAddress = macAddress
         self.UPC = UPC
         self.iconList = iconList
         self.serviceList = serviceList
@@ -764,6 +765,8 @@ class DeviceType(GeneratedsSuper):
     def set_serialNumber(self, serialNumber): self.serialNumber = serialNumber
     def get_UDN(self): return self.UDN
     def set_UDN(self, UDN): self.UDN = UDN
+    def get_macAddress(self): return self.macAddress
+    def set_macAddress(self, macAddress): self.macAddress = macAddress
     def get_UPC(self): return self.UPC
     def set_UPC(self, UPC): self.UPC = UPC
     def get_iconList(self): return self.iconList
@@ -831,6 +834,9 @@ class DeviceType(GeneratedsSuper):
         if self.UDN is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sUDN>%s</%sUDN>%s' % (namespace_, self.gds_format_string(quote_xml(self.UDN).encode(ExternalEncoding), input_name='UDN'), namespace_, eol_))
+        if self.macAddress is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%smacAddress>%s</%smacAddress>%s' % (namespace_, self.gds_format_string(quote_xml(self.macAddress).encode(ExternalEncoding), input_name='macAddress'), namespace_, eol_))
         if self.UPC is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sUPC>%s</%sUPC>%s' % (namespace_, self.gds_format_string(quote_xml(self.UPC).encode(ExternalEncoding), input_name='UPC'), namespace_, eol_))
@@ -857,6 +863,7 @@ class DeviceType(GeneratedsSuper):
             self.modelURL is not None or
             self.serialNumber is not None or
             self.UDN is not None or
+            self.macAddress is not None or
             self.UPC is not None or
             self.iconList is not None or
             self.serviceList is not None or
@@ -905,6 +912,9 @@ class DeviceType(GeneratedsSuper):
         if self.UDN is not None:
             showIndent(outfile, level)
             outfile.write('UDN=%s,\n' % quote_python(self.UDN).encode(ExternalEncoding))
+        if self.macAddress is not None:
+            showIndent(outfile, level)
+            outfile.write('macAddress=%s,\n' % quote_python(self.macAddress).encode(ExternalEncoding))
         if self.UPC is not None:
             showIndent(outfile, level)
             outfile.write('UPC=%s,\n' % quote_python(self.UPC).encode(ExternalEncoding))
@@ -985,6 +995,10 @@ class DeviceType(GeneratedsSuper):
             UDN_ = child_.text
             UDN_ = self.gds_validate_string(UDN_, node, 'UDN')
             self.UDN = UDN_
+        elif nodeName_ == 'macAddress':
+            macAddress_ = child_.text
+            macAddress_ = self.gds_validate_string(macAddress_, node, 'macAddress')
+            self.macAddress = macAddress_
         elif nodeName_ == 'UPC':
             UPC_ = child_.text
             UPC_ = self.gds_validate_string(UPC_, node, 'UPC')
