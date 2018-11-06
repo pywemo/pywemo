@@ -150,7 +150,7 @@ class Device(object):
         return True
 
     def reconnect_with_device(self):
-        if not self._reconnect_with_device_by_probing():
+        if not self._reconnect_with_device_by_probing() and (self.mac or self.serialnumber):
             self._reconnect_with_device_by_discovery()
 
     def parse_basic_state(self, params):
