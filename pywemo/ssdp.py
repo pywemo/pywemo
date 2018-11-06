@@ -192,7 +192,7 @@ class UPNPEntry(object):
 
 
 # pylint: disable=invalid-name
-def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
+def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, match_serial=None):
     """
     Sends a message over the network to discover upnp devices.
 
@@ -245,12 +245,15 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None):
                 if entry.description is not None:
                     device = entry.description.get('device', {})
                     mac = device.get('macAddress')
+                    serial = device.get('serialNumber')
                 else:
                     mac = None
+                    serial = None
 
                 if ((st is None or entry.st == st) and
-                   (match_mac is None or mac == match_mac) and
-                   entry not in entries):
+                        (match_mac is None or mac == match_mac) and
+                        (match_serial is None or serial == match_serial) and
+                        entry not in entries):
                     entries.append(entry)
 
                     if max_entries and len(entries) == max_entries:
