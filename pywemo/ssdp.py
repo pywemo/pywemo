@@ -251,8 +251,8 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                     serial = None
 
                 if ((st is None or entry.st == st) and
-                        (match_mac is None or mac == match_mac) and
-                        (match_serial is None or serial == match_serial) and
+                        ((match_mac is None or mac == match_mac) or
+                        (match_serial is None or serial == match_serial)) and
                         entry not in entries):
                     entries.append(entry)
 
