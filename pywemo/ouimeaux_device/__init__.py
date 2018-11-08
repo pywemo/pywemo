@@ -14,7 +14,7 @@ from requests import Timeout
 from .api.service import Service
 from .api.xsd import device as deviceParser
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 # Start with the most commonly used port
 PROBE_PORTS = (49153, 49152, 49154, 49151, 49155)
@@ -36,14 +36,14 @@ def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=10):
         except ConnectTimeout:
             # If we timed out connecting, then the wemo is gone,
             # no point in trying further.
-            log.debug('Timed out connecting to %s on port %i, '
+            LOG.debug('Timed out connecting to %s on port %i, '
                       'wemo is offline', host, port)
             break
         except Timeout:
             # Apparently sometimes wemos get into a wedged state where
             # they still accept connections on an old port, but do not
             # respond. If that happens, we should keep searching.
-            log.debug('No response from %s on port %i, continuing',
+            LOG.debug('No response from %s on port %i, continuing',
                       host, port)
             continue
         except ConnectionError:
@@ -103,15 +103,17 @@ class Device(object):
             return
 
         self.retrying = True
-        log.info("Trying to reconnect with {}".format(self.name))
+        LOG.info("Trying to reconnect with {}".format(self.name))
         # We will try to find it 5 times, each time we wait a bigger interval
         try_no = 0
 
         while True:
-            found = discover_devices(None, 1, self.mac)
+            found = discover_devices(st=None, max_devices=1,
+                                     match_mac=self.mac,
+                                     match_serial=self.serialnumber)
 
             if found:
-                log.info("Found {} again, updating local values".
+                LOG.info("Found {} again, updating local values".
                          format(self.name))
 
                 self.__dict__ = found[0].__dict__
@@ -120,12 +122,12 @@ class Device(object):
 
             wait_time = try_no * 5
 
-            log.info(
+            LOG.info(
                 "{} Not found in try {}. Trying again in {} seconds".format(
                     self.name, try_no, wait_time))
 
             if try_no == 5:
-                log.error(
+                LOG.error(
                     "Unable to reconnect with {} in 5 tries. Stopping.".
                     format(self.name))
                 self.retrying = False
@@ -138,9 +140,9 @@ class Device(object):
     def _reconnect_with_device_by_probing(self):
         port = probe_device(self)
         if port is None:
-            log.error('Unable to re-probe wemo at {}'.format(self.host))
+            LOG.error('Unable to re-probe wemo at {}'.format(self.host))
             return False
-        log.info('Reconnected to wemo at {} on port {}'.format(
+        LOG.info('Reconnected to wemo at {} on port {}'.format(
             self.host, port))
         self.port = port
         url = 'http://{}:{}/setup.xml'.format(self.host, self.port)
@@ -148,7 +150,7 @@ class Device(object):
         return True
 
     def reconnect_with_device(self):
-        if not self._reconnect_with_device_by_probing() and self.mac:
+        if not self._reconnect_with_device_by_probing() and (self.mac or self.serialnumber):
             self._reconnect_with_device_by_discovery()
 
     def parse_basic_state(self, params):

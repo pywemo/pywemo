@@ -19,10 +19,11 @@ from .ouimeaux_device.api.xsd import device as deviceParser
 LOG = logging.getLogger(__name__)
 
 
-def discover_devices(st=None, max_devices=None, match_mac=None):
+def discover_devices(st=None, max_devices=None, match_mac=None, match_serial=None):
     """ Finds WeMo devices on the local network. """
     st = st or ssdp.ST_ROOTDEVICE
-    ssdp_entries = ssdp.scan(st, max_entries=max_devices, match_mac=match_mac)
+    ssdp_entries = ssdp.scan(st, max_entries=max_devices,
+                             match_mac=match_mac, match_serial=match_serial)
 
     wemos = []
 
@@ -48,7 +49,7 @@ def device_from_description(description_url, mac):
             mac = deviceParser.parseString(xml.content).device.macAddress
         except:
             LOG.debug(
-                'No MAC address was supplied, and discovery is unable to find device MAC in setup xml at: %s.'
+                'No MAC address was supplied or found in setup xml at: %s.'
                 , description_url)
 
     return device_from_uuid_and_location(uuid, mac, description_url)
