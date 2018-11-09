@@ -251,16 +251,16 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                     serial = None
 
                 # Search for devices
-                if st:
-                    if st == entry.st:
+                if st is not None or match_mac is not None or match_serial is not None:
+                    if st is not None and st == entry.st:
                         entries.append(entry)
-                elif match_mac:
-                    if match_mac == mac:
+
+                    if entry not in entries and match_mac is not None and match_mac == mac:
                         entries.append(entry)
-                elif match_serial:
-                    if match_serial == serial:
+
+                    if entry not in entries and match_serial is not None and match_serial == serial:
                         entries.append(entry)
-                else:
+                elif entry not in entries:
                     entries.append(entry)
 
                 # Return if we've found the max number of devices
