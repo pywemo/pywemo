@@ -250,14 +250,22 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                     mac = None
                     serial = None
 
-                if ((st is None or entry.st == st) and
-                        ((match_mac is None or mac == match_mac) or
-                        (match_serial is None or serial == match_serial)) and
-                        entry not in entries):
+                # Search for devices
+                if st is not None or match_mac is not None or match_serial is not None:
+                    if st is not None and st == entry.st:
+                        entries.append(entry)
+
+                    if entry not in entries and match_mac is not None and match_mac == mac:
+                        entries.append(entry)
+
+                    if entry not in entries and match_serial is not None and match_serial == serial:
+                        entries.append(entry)
+                elif entry not in entries:
                     entries.append(entry)
 
-                    if max_entries and len(entries) == max_entries:
-                        return entries
+                # Return if we've found the max number of devices
+                if max_entries and len(entries) == max_entries:
+                    return entries
 
     except socket.error:
         logging.getLogger(__name__).exception(
