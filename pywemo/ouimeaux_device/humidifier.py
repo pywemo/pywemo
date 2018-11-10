@@ -61,6 +61,8 @@ WATER_LEVEL_NAMES = {
     WaterLevel.Good: "Good",
 }
 
+FILTER_LIFE_MAX = 60480
+
 def attribute_xml_to_dict(xml_blob):
     """
     Returns attribute values as a dict of key value pairs.
@@ -305,7 +307,7 @@ class Humidifier(Switch):
         # Send the attribute list to the device
         self.deviceevent.SetAttributes(attributeList= \
             quote_xml("<attribute><name>FilterLife</name><value>" + \
-                "60480</value></attribute>"))
+                str(FILTER_LIFE_MAX) + "</value></attribute>"))
 
         # Refresh the device state
         self.get_state(True)
