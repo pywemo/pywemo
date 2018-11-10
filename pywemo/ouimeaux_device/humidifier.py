@@ -2,11 +2,12 @@
 Representation of a WeMo Humidifier device
 """
 
-from .switch import Switch
 from xml.etree import cElementTree as et
-from pywemo.ouimeaux_device.api.xsd.device import quote_xml
-
 import sys
+from pywemo.ouimeaux_device.api.xsd.device import quote_xml
+from .switch import Switch
+
+
 if sys.version_info[0] < 3:
     class IntEnum(object):
         pass
@@ -59,6 +60,8 @@ WATER_LEVEL_NAMES = {
     WaterLevel.Low: "Low",
     WaterLevel.Good: "Good",
 }
+
+FILTER_LIFE_MAX = 60480
 
 def attribute_xml_to_dict(xml_blob):
     """
@@ -292,6 +295,19 @@ class Humidifier(Switch):
                 str(int(fan_mode)) + "</value></attribute>" + \
                 "<attribute><name>DesiredHumidity</name><value>" + \
                 str(int(desired_humidity)) + "</value></attribute>"))
+
+        # Refresh the device state
+        self.get_state(True)
+
+    def reset_filter_life(self):
+        """
+        Resets the filter life (call this when you install a new filter).
+        """
+
+        # Send the attribute list to the device
+        self.deviceevent.SetAttributes(attributeList= \
+            quote_xml("<attribute><name>FilterLife</name><value>" + \
+                str(FILTER_LIFE_MAX) + "</value></attribute>"))
 
         # Refresh the device state
         self.get_state(True)
