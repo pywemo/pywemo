@@ -72,8 +72,9 @@ class Device(object):
     def __init__(self, url, mac):
         self._state = None
         self.basic_state_params = {}
-        base_url = url.rsplit('/', 1)[0]
-        parsed_url = urlparse(url)
+        self.url = url
+        base_url = self.url.rsplit('/', 1)[0]
+        parsed_url = urlparse(self.url)
         self.host = parsed_url.hostname
         self.port = parsed_url.port
         self.retrying = False
@@ -103,7 +104,7 @@ class Device(object):
             return
 
         self.retrying = True
-        LOG.info("Trying to reconnect with {}".format(self.name))
+        LOG.info("Trying to reconnect with %s",self.name)
         # We will try to find it 5 times, each time we wait a bigger interval
         try_no = 0
 
@@ -113,23 +114,40 @@ class Device(object):
                                      match_serial=self.serialnumber)
 
             if found:
-                LOG.info("Found {} again, updating local values".
-                         format(self.name))
+                LOG.info("Found %s again at %s:%s, updating local values",
+                         self.name, self.host, self.port)
 
-                self.__dict__ = found[0].__dict__
+                self.url = found[0].url
+                base_url = self.url.rsplit('/', 1)[0]
+                parsed_url = urlparse(self.url)
+                self.host = parsed_url.hostname
+                self.port = parsed_url.port
+                xml = requests.get(self.url, timeout=10)
+                self._config = deviceParser.parseString(xml.content).device
+                sl = self._config.serviceList
+                self.services = {}
+
+                for svc in sl.service:
+                    svcname = svc.get_serviceType().split(':')[-2]
+                    service = Service(self, svc, base_url)
+                    service.eventSubURL = base_url + svc.get_eventSubURL()
+                    self.services[svcname] = service
+                    setattr(self, svcname, service)
+
                 self.retrying = False
+
                 return
 
             wait_time = try_no * 5
 
             LOG.info(
-                "{} Not found in try {}. Trying again in {} seconds".format(
-                    self.name, try_no, wait_time))
+                "%s Not found in try %s. Trying again in %s seconds",
+                self.name, try_no, wait_time)
 
             if try_no == 5:
                 LOG.error(
-                    "Unable to reconnect with {} in 5 tries. Stopping.".
-                    format(self.name))
+                    "Unable to reconnect with %s in 5 tries. Stopping.",
+                    self.name)
                 self.retrying = False
                 return
 
@@ -139,14 +157,37 @@ class Device(object):
 
     def _reconnect_with_device_by_probing(self):
         port = probe_device(self)
+
         if port is None:
-            LOG.error('Unable to re-probe wemo at {}'.format(self.host))
+            LOG.error('Unable to re-probe wemo at %s',self.host)
             return False
-        LOG.info('Reconnected to wemo at {} on port {}'.format(
-            self.host, port))
+
+        LOG.info('Reconnected to wemo at %s on port %s',
+                 self.host, port)
+
         self.port = port
+
         url = 'http://{}:{}/setup.xml'.format(self.host, self.port)
-        self.__dict__ = self.__class__(url, None).__dict__
+
+        self.url = url
+        base_url = self.url.rsplit('/', 1)[0]
+        parsed_url = urlparse(self.url)
+        self.host = parsed_url.hostname
+        self.port = parsed_url.port
+        xml = requests.get(self.url, timeout=10)
+        self._config = deviceParser.parseString(xml.content).device
+        sl = self._config.serviceList
+        self.services = {}
+
+        for svc in sl.service:
+            svcname = svc.get_serviceType().split(':')[-2]
+            service = Service(self, svc, base_url)
+            service.eventSubURL = base_url + svc.get_eventSubURL()
+            self.services[svcname] = service
+            setattr(self, svcname, service)
+
+        self.retrying = False
+
         return True
 
     def reconnect_with_device(self):
