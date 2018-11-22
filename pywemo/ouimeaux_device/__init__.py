@@ -17,7 +17,7 @@ from .api.xsd import device as deviceParser
 LOG = logging.getLogger(__name__)
 
 # Start with the most commonly used port
-PROBE_PORTS = (49151, 49152, 49153, 49154, 49155, 49156, 49157, 49158, 49159)
+PROBE_PORTS = (49153, 49152, 49154, 49151, 49155, 49156, 49157, 49158, 49159)
 
 
 def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=10):
