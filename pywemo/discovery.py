@@ -21,7 +21,7 @@ LOG = logging.getLogger(__name__)
 
 def discover_devices(st=None, max_devices=None, match_mac=None, match_serial=None):
     """ Finds WeMo devices on the local network. """
-    st = st or ssdp.ST_ROOTDEVICE
+    st = st or ssdp.ST
     ssdp_entries = ssdp.scan(st, max_entries=max_devices,
                              match_mac=match_mac, match_serial=match_serial)
 

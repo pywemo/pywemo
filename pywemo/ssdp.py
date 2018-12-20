@@ -8,23 +8,19 @@ import logging
 from datetime import datetime, timedelta
 import threading
 import xml.etree.ElementTree as ElementTree
-
+import time
 import requests
 
 from .util import etree_to_dict, interface_addresses
 
-DISCOVER_TIMEOUT = SSDP_MX = 5
+DISCOVER_TIMEOUT = 5
 
 RESPONSE_REGEX = re.compile(r'\n(.*)\: (.*)\r')
 
 MIN_TIME_BETWEEN_SCANS = timedelta(seconds=59)
 
-# Devices and services
-ST_ALL = "ssdp:all"
-
-# Devices only, some devices will only respond to this query
-ST_ROOTDEVICE = "upnp:rootdevice"
-
+# Wemo specific urn:
+ST = "urn:Belkin:service:basicevent:1"
 
 class SSDP(object):
     """
@@ -83,7 +79,7 @@ class SSDP(object):
                 # Wemo does not respond to a query for all devices+services
                 # but only to a query for just root devices.
                 self.entries.extend(
-                    entry for entry in scan() + scan(ST_ROOTDEVICE)
+                    entry for entry in scan() + scan(ST)
                     if entry not in self.entries)
 
                 self.last_scan = datetime.now()
@@ -191,6 +187,43 @@ class UPNPEntry(object):
             self.values.get('st', ''), self.values.get('location', ''))
 
 
+def build_ssdp_request(st, ssdp_mx):
+    ssdp_st = st or ST
+    return "\r\n".join([
+        'M-SEARCH * HTTP/1.1',
+        'ST: {}'.format(ssdp_st),
+        'MX: {:d}'.format(ssdp_mx),
+        'MAN: "ssdp:discover"',
+        'HOST: 239.255.255.250:1900',
+        '', '']).encode('ascii')
+
+
+def entry_in_entries(entry, entries):
+    if entry.description is not None:
+        device = entry.description.get('device', {})
+        mac = device.get('macAddress')
+        serial = device.get('serialNumber')
+    else:
+        mac = None
+        serial = None
+    # If we don't have a mac or serial, let's just compare objects instead:
+    if mac == None and serial == None:
+        return entry in entries
+    for e in entries:
+        if e.description is not None:
+            e_device = e.description.get('device', {})
+            e_mac = e_device.get('macAddress')
+            e_serial = e_device.get('serialNumber')
+        else:
+            e_mac = None
+            e_serial = None
+        if e_mac == mac and \
+           e_serial == serial and \
+           e.st == entry.st:
+            return True
+    return False
+
+
 # pylint: disable=invalid-name
 def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, match_serial=None):
     """
@@ -199,15 +232,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
     Inspired by Crimsdings
     https://github.com/crimsdings/ChromeCast/blob/master/cc_discovery.py
     """
-    ssdp_st = st or ST_ALL
     ssdp_target = ("239.255.255.250", 1900)
-    ssdp_request = "\r\n".join([
-        'M-SEARCH * HTTP/1.1',
-        'HOST: 239.255.255.250:1900',
-        'MAN: "ssdp:discover"',
-        'MX: {:d}'.format(SSDP_MX),
-        'ST: {}'.format(ssdp_st),
-        '', '']).encode('ascii')
 
     entries = []
 
@@ -221,6 +246,11 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 sockets.append(s)
                 s.bind((addr, 0))
+                # Send 2 separate ssdp requests to mimic wemo app behavior:
+                ssdp_request = build_ssdp_request(st, ssdp_mx=1)
+                s.sendto(ssdp_request, ssdp_target)
+                time.sleep(0.5)
+                ssdp_request = build_ssdp_request(st, ssdp_mx=2)
                 s.sendto(ssdp_request, ssdp_target)
                 s.setblocking(0)
             except socket.error:
@@ -252,7 +282,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
 
                 # Search for devices
                 if st is not None or match_mac is not None or match_serial is not None:
-                    if entry not in entries:
+                    if not entry_in_entries(entry, entries):
                         if match_mac is not None:
                             if match_mac == mac:
                                 entries.append(entry)
@@ -262,7 +292,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                         elif st is not None:
                             if st == entry.st:
                                 entries.append(entry)
-                elif entry not in entries:
+                elif not entry_in_entries(entry, entries):
                     entries.append(entry)
 
                 # Return if we've found the max number of devices
