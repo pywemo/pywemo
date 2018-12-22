@@ -198,16 +198,9 @@ def build_ssdp_request(st, ssdp_mx):
         '', '']).encode('ascii')
 
 
-def entry_in_entries(entry, entries):
-    if entry.description is not None:
-        device = entry.description.get('device', {})
-        mac = device.get('macAddress')
-        serial = device.get('serialNumber')
-    else:
-        mac = None
-        serial = None
+def entry_in_entries(entry, entries, mac, serial):
     # If we don't have a mac or serial, let's just compare objects instead:
-    if mac == None and serial == None:
+    if mac is None and serial is None:
         return entry in entries
     for e in entries:
         if e.description is not None:
@@ -282,7 +275,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
 
                 # Search for devices
                 if st is not None or match_mac is not None or match_serial is not None:
-                    if not entry_in_entries(entry, entries):
+                    if not entry_in_entries(entry, entries, mac, serial):
                         if match_mac is not None:
                             if match_mac == mac:
                                 entries.append(entry)
@@ -292,7 +285,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                         elif st is not None:
                             if st == entry.st:
                                 entries.append(entry)
-                elif not entry_in_entries(entry, entries):
+                elif not entry_in_entries(entry, entries, mac, serial):
                     entries.append(entry)
 
                 # Return if we've found the max number of devices
