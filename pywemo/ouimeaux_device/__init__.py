@@ -1,3 +1,7 @@
+"""
+Base WeMo Device class
+"""
+
 import logging
 import time
 
@@ -7,9 +11,9 @@ except ImportError:
     from urlparse import urlparse
 
 import requests
-from requests import ConnectTimeout
-from requests import ConnectionError
-from requests import Timeout
+#from requests import ConnectTimeout
+#from requests import ConnectionError
+#from requests import Timeout
 
 from .api.service import Service
 from .api.xsd import device as deviceParser
@@ -33,20 +37,20 @@ def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=10):
                              timeout=probe_timeout)
             if ('WeMo' in r.text) or ('Belkin' in r.text):
                 return port
-        except ConnectTimeout:
+        except requests.ConnectTimeout:
             # If we timed out connecting, then the wemo is gone,
             # no point in trying further.
             LOG.debug('Timed out connecting to %s on port %i, '
                       'wemo is offline', host, port)
             break
-        except Timeout:
+        except requests.Timeout:
             # Apparently sometimes wemos get into a wedged state where
             # they still accept connections on an old port, but do not
             # respond. If that happens, we should keep searching.
             LOG.debug('No response from %s on port %i, continuing',
                       host, port)
             continue
-        except ConnectionError:
+        except requests.ConnectionError:
             pass
     return None
 
@@ -103,7 +107,7 @@ class Device(object):
             return
 
         self.retrying = True
-        LOG.info("Trying to reconnect with {}".format(self.name))
+        LOG.info("Trying to reconnect with %s", self.name)
         # We will try to find it 5 times, each time we wait a bigger interval
         try_no = 0
 
@@ -113,8 +117,7 @@ class Device(object):
                                      match_serial=self.serialnumber)
 
             if found:
-                LOG.info("Found {} again, updating local values".
-                         format(self.name))
+                LOG.info("Found %s again, updating local values", self.name)
 
                 self.__dict__ = found[0].__dict__
                 self.retrying = False
@@ -123,8 +126,8 @@ class Device(object):
             wait_time = try_no * 5
 
             LOG.info(
-                "{} Not found in try {}. Trying again in {} seconds".format(
-                    self.name, try_no, wait_time))
+                "%s Not found in try %i. Trying again in %i seconds",
+                self.name, try_no, wait_time)
 
             if try_no == 5:
                 LOG.error(
@@ -196,9 +199,6 @@ class Device(object):
                 self._state = 0
 
         return self._state
-
-    def subscription_update(self, _type, _param):
-        return False
 
     def get_service(self, name):
         try:
