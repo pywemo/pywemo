@@ -7,7 +7,7 @@ import socket
 import logging
 from datetime import datetime, timedelta
 import threading
-import xml.etree.ElementTree as ElementTree
+import xml.etree.ElementTree as xmlElementTree
 
 import requests
 
@@ -136,8 +136,8 @@ class UPNPEntry(object):
                 xml = requests.get(url, timeout=10).text
 
                 tree = None
-                if len(xml) > 0:
-                    tree = ElementTree.fromstring(xml)
+                if xml:
+                    tree = xmlElementTree.fromstring(xml)
 
                 if tree:
                     UPNPEntry.DESCRIPTION_CACHE[url] = \
@@ -147,13 +147,13 @@ class UPNPEntry(object):
 
             except requests.RequestException:
                 logging.getLogger(__name__).warning(
-                    "Error fetching description at {}".format(url))
+                    "Error fetching description at %s", url)
 
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
-            except (requests.RequestException, ElementTree.ParseError):
-                logging.getLogger(__name__).error(
-                    "Found malformed XML at {}: {}".format(url, xml))
+            except xmlElementTree.ParseError:
+                logging.getLogger(__name__).warning(
+                    "Found malformed XML at %s: %s", url, xml)
 
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
@@ -251,16 +251,39 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                     serial = None
 
                 # Search for devices
-                if st is not None or match_mac is not None or match_serial is not None:
-                    if st is not None and st == entry.st:
-                        entries.append(entry)
+                logging.getLogger(__name__).debug(
+                    "Searching for device (%s): st = %s | entry.st = %s | "
+                    "match_mac = %s | mac = %s | match_serial = %s | "
+                    "serial = %s", entry.location, st, entry.st, match_mac, mac,
+                    match_serial, serial)
 
-                    if entry not in entries and match_mac is not None and match_mac == mac:
-                        entries.append(entry)
+                found = False
 
-                    if entry not in entries and match_serial is not None and match_serial == serial:
-                        entries.append(entry)
-                elif entry not in entries:
+                # Checks for specific conditions
+                if st is None and match_mac is None and match_serial is None:
+                    found = True
+                else:
+                    if st is not None:
+                        if st == entry.st and not (
+                                match_mac is not None or match_serial is not None):
+                            found = True
+
+                    if match_mac is not None:
+                        if match_mac == mac:
+                            found = True
+
+                    if match_serial is not None:
+                        if match_serial == serial:
+                            found = True
+
+                # Add any found entries to the array
+                if found and entry not in entries:
+                    logging.getLogger(__name__).debug(
+                        "Search found device (%s): st = %s | entry.st = %s | "
+                        "match_mac = %s | mac = %s | match_serial = %s | "
+                        "serial = %s", entry.location, st, entry.st, match_mac, mac,
+                        match_serial, serial)
+
                     entries.append(entry)
 
                 # Return if we've found the max number of devices
