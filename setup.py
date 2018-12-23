@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(name='pywemo',
       version='0.4.34',
-      description='Access WeMo switches using their SOAP API',
+      description='Lightweight Python module to discover and control WeMo devices',
       url='http://github.com/pavoni/pywemo',
       author='Greg Dowling',
       author_email='mail@gregdowling.com',
