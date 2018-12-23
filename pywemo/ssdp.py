@@ -79,8 +79,6 @@ class SSDP:
 
                 self.remove_expired()
 
-                # Wemo does not respond to a query for all devices+services
-                # but only to a query for just root devices.
                 self.entries.extend(
                     entry for entry in scan() + scan(ST)
                     if entry not in self.entries)
@@ -207,6 +205,7 @@ def entry_in_entries(entry, entries, mac, serial):
     # If we don't have a mac or serial, let's just compare objects instead:
     if mac is None and serial is None:
         return entry in entries
+
     for e in entries:
         if e.description is not None:
             e_device = e.description.get('device', {})
@@ -217,6 +216,7 @@ def entry_in_entries(entry, entries, mac, serial):
             e_serial = None
         if e_mac == mac and e_serial == serial and e.st == entry.st:
             return True
+
     return False
 
 # pylint: disable=invalid-name
