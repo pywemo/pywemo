@@ -3,7 +3,6 @@ Module that implements SSDP protocol
 """
 import logging
 import re
-import requests
 import select
 import socket
 import threading
@@ -11,6 +10,8 @@ import time
 
 from datetime import datetime, timedelta
 import xml.etree.ElementTree as ElementTree
+
+import requests
 
 from .util import etree_to_dict, interface_addresses
 
@@ -24,7 +25,7 @@ MIN_TIME_BETWEEN_SCANS = timedelta(seconds=59)
 ST = "urn:Belkin:service:basicevent:1"
 
 
-class SSDP(object):
+class SSDP:
     """
     Controls the scanning of uPnP devices and services and caches output.
     """
@@ -134,24 +135,25 @@ class UPNPEntry(object):
                 xml = requests.get(url, timeout=10).text
 
                 tree = None
-                if len(xml) > 0:
+                if xml is not None:
                     tree = ElementTree.fromstring(xml)
 
                 if tree:
                     UPNPEntry.DESCRIPTION_CACHE[url] = \
                         etree_to_dict(tree).get('root', {})
                 else:
-                    UPNPEntry.DESCRIPTION_CACHE[url] = None
+                    UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
             except requests.RequestException:
                 logging.getLogger(__name__).warning(
-                    "Error fetching description at {}".format(url))
+                    "Error fetching description at %s", url)
 
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
             except (requests.RequestException, ElementTree.ParseError):
-                pass
-
+                # There used to be a log message here to record an error about
+                # malformed XML, but this only happens on non-WeMo devices
+                # and can be safely ignored.
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
         return UPNPEntry.DESCRIPTION_CACHE[url]
@@ -189,6 +191,7 @@ class UPNPEntry(object):
 
 
 def build_ssdp_request(st, ssdp_mx):
+    """Builds the standard request to send during SSDP discovery."""
     ssdp_st = st or ST
     return "\r\n".join([
         'M-SEARCH * HTTP/1.1',
@@ -199,6 +202,8 @@ def build_ssdp_request(st, ssdp_mx):
         '', '']).encode('ascii')
 
 def entry_in_entries(entry, entries, mac, serial):
+    """Utility function to check if a device entry is in a list of
+       device entries."""
     # If we don't have a mac or serial, let's just compare objects instead:
     if mac is None and serial is None:
         return entry in entries
@@ -210,9 +215,7 @@ def entry_in_entries(entry, entries, mac, serial):
         else:
             e_mac = None
             e_serial = None
-        if e_mac == mac and \
-           e_serial == serial and \
-           e.st == entry.st:
+        if e_mac == mac and e_serial == serial and e.st == entry.st:
             return True
     return False
 
@@ -244,10 +247,10 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                 s.sendto(ssdp_request, ssdp_target)
 
                 time.sleep(0.5)
-                
+
                 ssdp_request = build_ssdp_request(st, ssdp_mx=2)
                 s.sendto(ssdp_request, ssdp_target)
-                
+
                 s.setblocking(0)
             except socket.error:
                 pass
