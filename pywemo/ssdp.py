@@ -10,7 +10,7 @@ import time
 
 from datetime import datetime, timedelta
 import xml.etree.ElementTree as ElementTree
-
+import time
 import requests
 
 from .util import etree_to_dict, interface_addresses
@@ -23,7 +23,6 @@ MIN_TIME_BETWEEN_SCANS = timedelta(seconds=59)
 
 # Wemo specific urn:
 ST = "urn:Belkin:service:basicevent:1"
-
 
 class SSDP:
     """
@@ -197,6 +196,7 @@ def build_ssdp_request(st, ssdp_mx):
         'HOST: 239.255.255.250:1900',
         '', '']).encode('ascii')
 
+
 def entry_in_entries(entry, entries, mac, serial):
     """Utility function to check if a device entry is in a list of
        device entries."""
@@ -212,6 +212,7 @@ def entry_in_entries(entry, entries, mac, serial):
         else:
             e_mac = None
             e_serial = None
+
         if e_mac == mac and e_serial == serial and e.st == entry.st:
             return True
 
