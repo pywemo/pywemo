@@ -124,9 +124,10 @@ class SubscriptionRegistry(object):
                 device, ex, SUBSCRIPTION_RETRY)
             retry += 1
             if retry > 1:
-                # If this wan't a one off try rediscovery in case device has
+                # If this wasn't a one off, try rediscovery in case device has
                 # changed
-                device.reconnect_with_device()
+                if device.rediscovery_enabled:
+                    device.reconnect_with_device()
             with self._event_thread_cond:
                 self._events[device.serialnumber] = (
                     self._sched.enter(SUBSCRIPTION_RETRY,

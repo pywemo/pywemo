@@ -1,5 +1,10 @@
+"""
+Base WeMo Device class
+"""
+
 import logging
 import time
+import traceback
 
 try:
     from urllib.parse import urlparse
@@ -7,9 +12,9 @@ except ImportError:
     from urlparse import urlparse
 
 import requests
-from requests import ConnectTimeout
-from requests import ConnectionError
-from requests import Timeout
+#from requests import ConnectTimeout
+#from requests import ConnectionError
+#from requests import Timeout
 
 from .api.service import Service
 from .api.xsd import device as deviceParser
@@ -29,24 +34,24 @@ def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=10):
     """
     for port in ports:
         try:
-            r = requests.get('http://%s:%i/setup.xml' % (host, port),
-                             timeout=probe_timeout)
-            if ('WeMo' in r.text) or ('Belkin' in r.text):
+            response = requests.get('http://%s:%i/setup.xml' % (host, port),
+                                    timeout=probe_timeout)
+            if ('WeMo' in response.text) or ('Belkin' in response.text):
                 return port
-        except ConnectTimeout:
+        except requests.ConnectTimeout:
             # If we timed out connecting, then the wemo is gone,
             # no point in trying further.
             LOG.debug('Timed out connecting to %s on port %i, '
                       'wemo is offline', host, port)
             break
-        except Timeout:
+        except requests.Timeout:
             # Apparently sometimes wemos get into a wedged state where
             # they still accept connections on an old port, but do not
             # respond. If that happens, we should keep searching.
             LOG.debug('No response from %s on port %i, continuing',
                       host, port)
             continue
-        except ConnectionError:
+        except requests.ConnectionError:
             pass
     return None
 
@@ -71,23 +76,30 @@ class UnknownService(Exception):
 class Device(object):
     def __init__(self, url, mac):
         self._state = None
-        self.basic_state_params = {}
-        base_url = url.rsplit('/', 1)[0]
-        parsed_url = urlparse(url)
-        self.host = parsed_url.hostname
-        self.port = parsed_url.port
-        self.retrying = False
+        self._rediscovery_enabled = True
+        self._config = None
+        self._basic_state_params = {}
+        self._services = {}
         self.mac = mac
-        xml = requests.get(url, timeout=10)
+        self.url = url
+        self.rediscovery_pending = False
+
+        # Get device config (one time only)
+        xml = requests.get(self.url, timeout=10)
         self._config = deviceParser.parseString(xml.content).device
-        sl = self._config.serviceList
-        self.services = {}
-        for svc in sl.service:
-            svcname = svc.get_serviceType().split(':')[-2]
-            service = Service(self, svc, base_url)
-            service.eventSubURL = base_url + svc.get_eventSubURL()
-            self.services[svcname] = service
-            setattr(self, svcname, service)
+
+        # Setup device services (one time only)
+        service_list = self._config.serviceList
+        for service in service_list.service:
+            service_name = service.get_serviceType().split(':')[-2]
+            service_instance = Service(self, service)
+            self._services[service_name] = service_instance
+            setattr(self, service_name, service_instance)
+
+    def update_config(self, device):
+        """ Updates the cached device configuration data"""
+        self.url = device.url
+        LOG.debug("%s device configuration updated. New URL: %s", self.name, self.url)
 
     def _reconnect_with_device_by_discovery(self):
         """
@@ -103,7 +115,8 @@ class Device(object):
             return
 
         self.retrying = True
-        LOG.info("Trying to reconnect with {}".format(self.name))
+
+        LOG.info("Trying to reconnect with %s", self.name)
         # We will try to find it 5 times, each time we wait a bigger interval
         try_no = 0
 
@@ -113,45 +126,67 @@ class Device(object):
                                      match_serial=self.serialnumber)
 
             if found:
-                LOG.info("Found {} again, updating local values".
-                         format(self.name))
+                LOG.info("Found %s again at %s:%s, updating local values...",
+                         self.name, found[0].host, found[0].port)
 
-                self.__dict__ = found[0].__dict__
-                self.retrying = False
-                return
+                return found[0]
 
             wait_time = try_no * 5
 
             LOG.info(
-                "{} Not found in try {}. Trying again in {} seconds".format(
-                    self.name, try_no, wait_time))
+                "%s Not found in try %i. Trying again in %i seconds",
+                self.name, try_no, wait_time)
 
             if try_no == 5:
                 LOG.error(
-                    "Unable to reconnect with {} in 5 tries. Stopping.".
-                    format(self.name))
-                self.retrying = False
-                return
+                    "Unable to reconnect with %s in 5 tries. Stopping.",
+                    self.name)
+                return None
 
             time.sleep(wait_time)
 
             try_no += 1
 
     def _reconnect_with_device_by_probing(self):
+        from ..discovery import device_from_description
+
         port = probe_device(self)
+
         if port is None:
-            LOG.error('Unable to re-probe wemo at {}'.format(self.host))
+            LOG.error('Unable to re-probe wemo at %s', self.host)
             return False
-        LOG.info('Reconnected to wemo at {} on port {}'.format(
-            self.host, port))
-        self.port = port
-        url = 'http://{}:{}/setup.xml'.format(self.host, self.port)
-        self.__dict__ = self.__class__(url, None).__dict__
-        return True
+
+        LOG.info('Reconnecting to wemo at %s on port %s...',
+                 self.host, port)
+
+        url = 'http://{}:{}/setup.xml'.format(self.host, port)
+        device = device_from_description(url, None)
+
+        return device
 
     def reconnect_with_device(self):
-        if not self._reconnect_with_device_by_probing() and (self.mac or self.serialnumber):
-            self._reconnect_with_device_by_discovery()
+        ret_val = None
+
+        if self.rediscovery_enabled and not self.rediscovery_pending:
+            try:
+                self.rediscovery_pending = True
+
+                LOG.debug("Attempting to rediscover wemo at %s by probing for a new port...", self.host)
+                device = self._reconnect_with_device_by_probing()
+
+                if not device and (self.mac or self.serialnumber):
+                    LOG.debug("Attempting to rediscover wemo at %s by ssdp discovery...", self.host)
+                    device = self._reconnect_with_device_by_discovery()
+
+                if not device:
+                    self.update_config(device)
+#                    ret_val = device.url
+            except Exception as err:
+                LOG.error('Error while rediscovering wemo at %s: %s', self.url, traceback.format_exc())
+            finally:
+                self.rediscovery_pending = False
+
+        return ret_val
 
     def parse_basic_state(self, params):
         # BinaryState
@@ -171,7 +206,7 @@ class Device(object):
         return {'state': state}
 
     def update_binary_state(self):
-        self.basic_state_params = self.basicevent.GetBinaryState()
+        self._basic_state_params = self.basicevent.GetBinaryState()
 
     def subscription_update(self, _type, _params):
         LOG.debug("subscription_update %s %s", _type, _params)
@@ -197,25 +232,40 @@ class Device(object):
 
         return self._state
 
-    def subscription_update(self, _type, _param):
-        return False
-
     def get_service(self, name):
         try:
-            return self.services[name]
+            return self._services[name]
         except KeyError:
             raise UnknownService(name)
 
     def list_services(self):
-        return list(self.services.keys())
+        return list(self._services.keys())
 
     def explain(self):
-        for name, svc in self.services.items():
+        for name, svc in self._services.items():
             print(name)
             print('-' * len(name))
             for aname, action in svc.actions.items():
                 print("  %s(%s)" % (aname, ', '.join(action.args)))
             print()
+
+    def disable_rediscovery(self):
+        self._rediscovery_enabled = False
+        LOG.debug("Rediscovery disabled for wemo at: %s", self.url)
+
+
+    def enable_rediscovery(self):
+        self._rediscovery_enabled = True
+        LOG.debug("Rediscovery enabled for wemo at: %s", self.url)
+
+    @property
+    def _parsed_url(self):
+        return urlparse(self.url)
+
+    @property
+    def event_sub_url(self):
+        event_sub_url = self.base_url + self._config.serviceList.service[0].get_eventSubURL()
+        return event_sub_url
 
     @property
     def model(self):
@@ -232,3 +282,19 @@ class Device(object):
     @property
     def serialnumber(self):
         return self._config.get_serialNumber()
+
+    @property
+    def rediscovery_enabled(self):
+        return self._rediscovery_enabled
+
+    @property
+    def base_url(self):
+        return self.url.rsplit('/', 1)[0]
+
+    @property
+    def host(self):
+        return self._parsed_url.hostname
+
+    @property
+    def port(self):
+        return self._parsed_url.port

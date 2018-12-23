@@ -1,12 +1,14 @@
 """
 Module that implements SSDP protocol
 """
+import logging
 import re
 import select
 import socket
-import logging
-from datetime import datetime, timedelta
 import threading
+import time
+
+from datetime import datetime, timedelta
 import xml.etree.ElementTree as ElementTree
 import time
 import requests
@@ -22,7 +24,7 @@ MIN_TIME_BETWEEN_SCANS = timedelta(seconds=59)
 # Wemo specific urn:
 ST = "urn:Belkin:service:basicevent:1"
 
-class SSDP(object):
+class SSDP:
     """
     Controls the scanning of uPnP devices and services and caches output.
     """
@@ -76,8 +78,6 @@ class SSDP(object):
 
                 self.remove_expired()
 
-                # Wemo does not respond to a query for all devices+services
-                # but only to a query for just root devices.
                 self.entries.extend(
                     entry for entry in scan() + scan(ST)
                     if entry not in self.entries)
@@ -132,25 +132,23 @@ class UPNPEntry(object):
                 xml = requests.get(url, timeout=10).text
 
                 tree = None
-                if len(xml) > 0:
+
+                if xml is not None:
                     tree = ElementTree.fromstring(xml)
 
                 if tree:
                     UPNPEntry.DESCRIPTION_CACHE[url] = \
                         etree_to_dict(tree).get('root', {})
                 else:
-                    UPNPEntry.DESCRIPTION_CACHE[url] = None
-
+                    UPNPEntry.DESCRIPTION_CACHE[url] = {}
             except requests.RequestException:
                 logging.getLogger(__name__).warning(
-                    "Error fetching description at {}".format(url))
-
+                    "Error fetching description at %s", url)
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
-
-            except (requests.RequestException, ElementTree.ParseError):
-                logging.getLogger(__name__).error(
-                    "Found malformed XML at {}: {}".format(url, xml))
-
+            except (ElementTree.ParseError):
+                # There used to be a log message here to record an error about
+                # malformed XML, but this only happens on non-WeMo devices
+                # and can be safely ignored.
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
         return UPNPEntry.DESCRIPTION_CACHE[url]
@@ -188,6 +186,7 @@ class UPNPEntry(object):
 
 
 def build_ssdp_request(st, ssdp_mx):
+    """Builds the standard request to send during SSDP discovery."""
     ssdp_st = st or ST
     return "\r\n".join([
         'M-SEARCH * HTTP/1.1',
@@ -199,9 +198,12 @@ def build_ssdp_request(st, ssdp_mx):
 
 
 def entry_in_entries(entry, entries, mac, serial):
+    """Utility function to check if a device entry is in a list of
+       device entries."""
     # If we don't have a mac or serial, let's just compare objects instead:
     if mac is None and serial is None:
         return entry in entries
+
     for e in entries:
         if e.description is not None:
             e_device = e.description.get('device', {})
@@ -210,12 +212,11 @@ def entry_in_entries(entry, entries, mac, serial):
         else:
             e_mac = None
             e_serial = None
-        if e_mac == mac and \
-           e_serial == serial and \
-           e.st == entry.st:
-            return True
-    return False
 
+        if e_mac == mac and e_serial == serial and e.st == entry.st:
+            return True
+
+    return False
 
 # pylint: disable=invalid-name
 def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, match_serial=None):
@@ -239,16 +240,19 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 sockets.append(s)
                 s.bind((addr, 0))
+
                 # Send 2 separate ssdp requests to mimic wemo app behavior:
                 ssdp_request = build_ssdp_request(st, ssdp_mx=1)
                 s.sendto(ssdp_request, ssdp_target)
+
                 time.sleep(0.5)
+
                 ssdp_request = build_ssdp_request(st, ssdp_mx=2)
                 s.sendto(ssdp_request, ssdp_target)
+
                 s.setblocking(0)
             except socket.error:
                 pass
-
 
         while sockets:
             time_diff = calc_now() - start
@@ -289,13 +293,12 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                     entries.append(entry)
 
                 # Return if we've found the max number of devices
-                if max_entries and len(entries) == max_entries:
-                    return entries
-
+                if max_entries:
+                    if len(entries) == max_entries:
+                        return entries
     except socket.error:
         logging.getLogger(__name__).exception(
             "Socket error while discovering SSDP devices")
-
     finally:
         for s in sockets:
             s.close()
