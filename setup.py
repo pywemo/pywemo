@@ -1,13 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(name='pywemo',
-<<<<<<< HEAD
       version='0.4.34',
       description='Lightweight Python module to discover and control WeMo devices',
-=======
-      version='0.4.33',
-      description='Access WeMo switches using their SOAP API',
->>>>>>> parent of 328366e... Merge branch 'rediscovery' into master
       url='http://github.com/pavoni/pywemo',
       author='Greg Dowling',
       author_email='mail@gregdowling.com',
