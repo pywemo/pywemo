@@ -31,7 +31,6 @@ def is_same_side(p1, p2, a, b):
     cross_vab_ap2 = vector_ab[0] * vector_ap2[1] - vector_ab[1] * vector_ap2[0]
     return (cross_vab_ap1 * cross_vab_ap2) >= 0
 
-
 # pylint: disable=invalid-name
 def closest_point(p, a, b):
     """Test if points p1 and p2 lie on the same side of line a-b."""
@@ -41,7 +40,6 @@ def closest_point(p, a, b):
     dot_ab_ab = sum(x * y for x, y in zip(vector_ab, vector_ab))
     t = max(0.0, min(dot_ap_ab / dot_ab_ab, 1.0))
     return a[0] + vector_ab[0] * t, a[1] + vector_ab[1] * t
-
 
 # pylint: disable=invalid-name
 def limit_to_gamut(xy, gamut):
