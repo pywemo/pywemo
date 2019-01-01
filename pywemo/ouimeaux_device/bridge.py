@@ -27,7 +27,7 @@ TOGGLE = 2
 
 
 def limit(value, min_val, max_val):
-    """Returns value clipped to the range [min_val, max_val]"""
+    """Return value clipped to the range [min_val, max_val]."""
     return max(min_val, min(value, max_val))
 
 
@@ -44,8 +44,8 @@ class Bridge(Device):
 
     def __repr__(self):
         """Return a string representation of the device."""
-        return '<WeMo Bridge "{name}", Lights: {l}, Groups: {g}>'.format(
-            name=self.name, l=len(self.Lights), g=len(self.Groups))
+        return '<WeMo Bridge "{name}", Lights: {lights}, Groups: {groups}>'.format(
+            name=self.name, lights=len(self.Lights), groups=len(self.Groups))
 
     def bridge_update(self):
         """Get updated status information for the bridge and its lights."""
@@ -196,6 +196,7 @@ class Light(LinkedDevice):
     def __init__(self, bridge, info):
         """Create a Light device."""
         super(Light, self).__init__(bridge, info)
+
         self.device_index = info.findtext('DeviceIndex')
         self.unique_id = info.findtext('DeviceID')
         self.iconvalue = info.findtext('IconVersion')
@@ -214,6 +215,7 @@ class Light(LinkedDevice):
         if not queue:
             self._setdevicestatus(**self._pending)
             self._pending = {}
+
         return self
 
     def update_state(self, status):
@@ -233,6 +235,7 @@ class Light(LinkedDevice):
             ]
         if currentstate is not None:
             self._values = currentstate.split(',')
+
         super(Light, self).update_state(status)
 
     def __repr__(self):
@@ -265,9 +268,10 @@ class Light(LinkedDevice):
                 self._setdevicestatus(levelcontrol=(0, 0), onoff=ON)
 
             level = limit(int(level), 0, 255)
-            return self._queuedevicestatus(levelcontrol=(level, transition_time))
-        else:
-            return self._queuedevicestatus(onoff=ON)
+            return self._queuedevicestatus(levelcontrol=(level,
+                                                         transition_time))
+
+        return self._queuedevicestatus(onoff=ON)
 
     def turn_off(self, transition=0):
         """Turn off the light."""
@@ -275,9 +279,10 @@ class Light(LinkedDevice):
             # Sleepfader control did not turn off bulb when fadetime was 0
             transition_time = limit(int(transition * 10), 1, 65535)
             reference = int(time.time())
-            return self._queuedevicestatus(sleepfader=(transition_time, reference))
-        else:
-            return self._queuedevicestatus(onoff=OFF)
+            return self._queuedevicestatus(sleepfader=(transition_time,
+                                                       reference))
+
+        return self._queuedevicestatus(onoff=OFF)
 
     def set_temperature(self, kelvin=2700, mireds=None,
                         transition=0, delay=True):
@@ -318,6 +323,7 @@ class Group(LinkedDevice):
         self.unique_id = info.findtext('GroupID')
 
     def update_state(self, status):
+        """Update the device state."""
         if status.tag == 'GroupInfo':
             self.name = status.findtext('GroupName')
 
@@ -336,4 +342,5 @@ class Group(LinkedDevice):
         super(Group, self).update_state(status)
 
     def __repr__(self):
+        """Return a string representation of the device."""
         return '<GROUP "{name}">'.format(name=self.name)
