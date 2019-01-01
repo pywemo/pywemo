@@ -1,4 +1,4 @@
-pyWeMo
+pyWeMo |Build Status|
 ======
 Lightweight Python 2 and Python 3 module to discover and control WeMo devices.
 
@@ -38,3 +38,6 @@ Please note that you need to use ip addresses as shown above, rather than hostna
 License
 -------
 The code in pywemo/ouimeaux_device is written and copyright by Ian McCracken and released under the BSD license. The rest is released under the MIT license.
+
+.. |Build Status| image:: https://travis-ci.org/pavoni/pywemo.svg?branch=master
+   :target: https://travis-ci.org/pavoni/pywemo
