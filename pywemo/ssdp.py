@@ -25,7 +25,7 @@ class SSDP:
     """Controls the scanning of uPnP devices and services and caches output."""
 
     def __init__(self):
-       """Create SSDP object."""
+        """Create SSDP object."""
         self.entries = []
         self.last_scan = None
         self._lock = threading.RLock()
