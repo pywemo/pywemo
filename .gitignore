@@ -1,3 +1,25 @@
+# Hide sublime text stuff
+*.sublime-project
+*.sublime-workspace
+
+# Hide some OS X stuff
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Thumbnails
+._*
+
+# IntelliJ IDEA
+.idea
+*.iml
+
+# pytest
+.pytest_cache
+.cache
+
+# GITHUB Proposed Python stuff:
 *.py[cod]
 
 # C extensions
@@ -9,6 +31,7 @@
 dist
 build
 eggs
+.eggs
 parts
 bin
 var
@@ -17,15 +40,16 @@ develop-eggs
 .installed.cfg
 lib
 lib64
-__pycache__
 
-# Installer logs
+# Logs
+*.log
 pip-log.txt
 
 # Unit test / coverage reports
 .coverage
 .tox
 nosetests.xml
+htmlcov/
 
 # Translations
 *.mo
@@ -34,3 +58,50 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+.python-version
+
+# emacs auto backups
+*~
+*#
+*.orig
+
+# venv stuff
+pyvenv.cfg
+pip-selfcheck.json
+venv
+.venv
+Pipfile*
+share/*
+
+# vimmy stuff
+*.swp
+*.swo
+
+ctags.tmp
+
+# vagrant stuff
+virtualization/vagrant/setup_done
+virtualization/vagrant/.vagrant
+virtualization/vagrant/config
+
+# Visual Studio Code
+.vscode
+
+# Built docs
+docs/build
+
+# Windows Explorer
+desktop.ini
+/home-assistant.pyproj
+/home-assistant.sln
+/.vs/*
+
+# mypy
+/.mypy_cache/*
+
+# Secrets
+.lokalise_token
+
+# monkeytype
+monkeytype.sqlite3
