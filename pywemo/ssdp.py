@@ -315,7 +315,6 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
 
 
 if __name__ == "__main__":
-    """Run a scan if this script is called directly."""
     from pprint import pprint
 
     pprint("Scanning UPNP..")
