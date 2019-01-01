@@ -135,7 +135,7 @@ class UPNPEntry(object):
                 if xml is not None:
                     tree = ElementTree.fromstring(xml)
 
-                if tree:
+                if tree is not None:
                     UPNPEntry.DESCRIPTION_CACHE[url] = \
                         etree_to_dict(tree).get('root', {})
                 else:
