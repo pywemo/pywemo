@@ -22,10 +22,13 @@ SUBSCRIPTION_RETRY = 60
 
 
 class SubscriptionRegistryFailed(Exception):
+    """General exceptions related to the subscription registry."""
+
     pass
 
 
 def get_ip_address(host='1.2.3.4'):
+    """Return IP from hostname or IP."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         sock.connect((host, 9))
@@ -37,10 +40,14 @@ def get_ip_address(host='1.2.3.4'):
 
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    """Handles subscription responses received from devices."""
+
+    # pylint: disable=invalid-name
     def do_NOTIFY(self):
+        """Handle subscription responses received from devices."""
         sender_ip, _ = self.client_address
         outer = self.server.outer
-        device = outer._devices.get(sender_ip)
+        device = outer.devices.get(sender_ip)
         content_len = int(self.headers.get('content-length', 0))
         data = self.rfile.read(content_len)
         if device is None:
@@ -52,7 +59,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             for propnode in doc.findall('./{0}property'.format(NS)):
                 for property_ in propnode.getchildren():
                     text = property_.text
-                    outer._event(device, property_.tag, text)
+                    outer.event(device, property_.tag, text)
 
         self.send_response(200)
         self.send_header('Content-Type', 'text/html')
@@ -61,15 +68,18 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(SUCCESS.encode("UTF-8"))
 
+    # pylint: disable=redefined-builtin
     def log_message(self, format, *args):
+        """Disable error logging."""
         return
 
 
-class SubscriptionRegistry(object):
+class SubscriptionRegistry:
     """Class for subscribing to wemo events."""
 
     def __init__(self):
-        self._devices = {}
+        """Create the subscription registry object."""
+        self.devices = {}
         self._callbacks = collections.defaultdict(list)
         self._exiting = False
 
@@ -84,14 +94,16 @@ class SubscriptionRegistry(object):
 
         self._http_thread = None
         self._httpd = None
+        self._port = None
 
     def register(self, device):
+        """Register a device for subscription updates."""
         if not device:
             LOG.error("Called with an invalid device: %r", device)
             return
 
         LOG.info("Subscribing to events from %r", device)
-        self._devices[device.host] = device
+        self.devices[device.host] = device
 
         with self._event_thread_cond:
             self._events[device.serialnumber] = (
@@ -130,12 +142,13 @@ class SubscriptionRegistry(object):
             with self._event_thread_cond:
                 self._events[device.serialnumber] = (
                     self._sched.enter(SUBSCRIPTION_RETRY,
-                                      0, self._resubscribe, [device, sid, retry]))
+                                      0, self._resubscribe,
+                                      [device, sid, retry]))
 
-    def _url_resubscribe(self, device, hd, sid, url):
-        headers = hd.copy()
+    def _url_resubscribe(self, device, headers, sid, url):
+        request_headers = headers.copy()
         response = requests.request(method="SUBSCRIBE", url=url,
-                                    headers=headers)
+                                    headers=request_headers)
         if response.status_code == 412 and sid:
             # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
             # start over.
@@ -150,17 +163,21 @@ class SubscriptionRegistry(object):
                 self._sched.enter(int(timeout * 0.75),
                                   0, self._resubscribe, [device, sid]))
 
-    def _event(self, device, type_, value):
+    def event(self, device, type_, value):
+        """Execute the callback for a received event."""
         LOG.info("Received event from %s(%s) - %s %s",
                  device, device.host, type_, value)
         for type_filter, callback in self._callbacks.get(device, ()):
             if type_filter is None or type_ == type_filter:
                 callback(device, type_, value)
 
+    # pylint: disable=invalid-name
     def on(self, device, type_filter, callback):
+        """Add an event callback for a device."""
         self._callbacks[device].append((type_filter, callback))
 
     def _find_port(self):
+        """Find a valid open port to run the HTTP server on."""
         for i in range(0, 128):
             port = 8989 + i
             try:
@@ -172,6 +189,7 @@ class SubscriptionRegistry(object):
                 continue
 
     def start(self):
+        """Start the subscription registry."""
         self._port = None
         self._find_port()
         if self._port is None:
@@ -188,6 +206,7 @@ class SubscriptionRegistry(object):
         self._event_thread.start()
 
     def stop(self):
+        """Shutdown the HTTP server."""
         self._httpd.shutdown()
 
         with self._event_thread_cond:
@@ -209,16 +228,19 @@ class SubscriptionRegistry(object):
             "Terminated threads")
 
     def join(self):
+        """Block until the HTTP server and event threads have terminated."""
         self._http_thread.join()
         self._event_thread.join()
 
     def _run_http_server(self):
+        """Start the HTTP server."""
         self._httpd.allow_reuse_address = True
         self._httpd.outer = self
         LOG.info("Listening on port %d", self._port)
         self._httpd.serve_forever()
 
     def _run_event_loop(self):
+        """Run the event thread loop."""
         while not self._exiting:
             with self._event_thread_cond:
                 while not self._exiting and self._sched.empty():
