@@ -14,10 +14,12 @@ if sys.version_info[0] < 3:
 else:
     from enum import IntEnum
 
+
 # These enums were derived from the
 # Humidifier.deviceevent.GetAttributeList()
 # service call.
-# Thus these names/values were not chosen randomly and the numbers have meaning.
+# Thus these names/values were not chosen randomly
+# and the numbers have meaning.
 class FanMode(IntEnum):
     """Enum to map WeMo FanModes to human-readable strings."""
 
@@ -37,6 +39,7 @@ FAN_MODE_NAMES = {
     FanMode.Maximum: "Maximum"
 }
 
+
 class DesiredHumidity(IntEnum):
     """Enum to map WeMo DesiredHumidity to human-readable strings."""
 
@@ -54,6 +57,7 @@ DESIRED_HUMIDITY_NAMES = {
     DesiredHumidity.OneHundredPercent: "100"
 }
 
+
 class WaterLevel(IntEnum):
     """Enum to map WeMo WaterLevel to human-readable strings."""
 
@@ -68,6 +72,7 @@ WATER_LEVEL_NAMES = {
 }
 
 FILTER_LIFE_MAX = 60480
+
 
 def attribute_xml_to_dict(xml_blob):
     """Return attribute values as a dict of key value pairs."""
@@ -110,8 +115,9 @@ def attribute_xml_to_dict(xml_blob):
                 pass
         elif attribute[0].text == "FilterLife":
             try:
-                result["filter_life"] = float(round((float(attribute[1].text) \
-                    / float(60480)) * float(100), 2))
+                result["filter_life"] = float(round((float(attribute[1].text)
+                                                     / float(60480))
+                                                    * float(100), 2))
             except ValueError:
                 pass
         elif attribute[0].text == "ExpiredFilterTime":
