@@ -22,7 +22,7 @@ MIN_TIME_BETWEEN_SCANS = timedelta(seconds=59)
 ST = "urn:Belkin:service:basicevent:1"
 
 class SSDP:
-   """Controls the scanning of uPnP devices and services and caches output."""
+    """Controls the scanning of uPnP devices and services and caches output."""
 
     def __init__(self):
        """Create SSDP object."""
