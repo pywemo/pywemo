@@ -36,7 +36,7 @@ class Maker(Switch):
 
     def get_state(self, force_update=False):
         """Return 0 if off and 1 if on."""
-        # The base implementation using GetBinaryState doesn't 
+        # The base implementation using GetBinaryState doesn't
         # work for the Maker (always returns 0),
         # so pull the switch state from the atrributes instead
         if force_update or self._state is None:
