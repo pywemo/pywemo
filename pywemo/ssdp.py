@@ -92,6 +92,7 @@ class SSDP:
 
 class UPNPEntry:
     """Found uPnP entry."""
+
     DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
 
     def __init__(self, values):
