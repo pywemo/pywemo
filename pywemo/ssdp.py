@@ -33,7 +33,7 @@ class SSDP:
     def scan(self):
         """Scan the network."""
         with self._lock:
-        self.update()
+            self.update()
 
     def all(self):
         """
