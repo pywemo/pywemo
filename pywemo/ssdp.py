@@ -48,7 +48,7 @@ class SSDP:
 
     # pylint: disable=invalid-name
     def find_by_st(self, st):
-       """Return a list of entries that match the ST."""
+        """Return a list of entries that match the ST."""
         with self._lock:
             self.update()
 
@@ -56,12 +56,12 @@ class SSDP:
                     if entry.st == st]
 
     def find_by_device_description(self, values):
-       """
+        """
         Return a list of entries that match the description.
 
         Pass in a dict with values to match against the device tag in the
         description.
-       """
+        """
         with self._lock:
             self.update()
 
@@ -69,7 +69,7 @@ class SSDP:
                     if entry.match_device_description(values)]
 
     def update(self, force_update=False):
-       """Scan for new uPnP devices and services."""
+        """Scan for new uPnP devices and services."""
         with self._lock:
             if self.last_scan is None or force_update or \
                datetime.now()-self.last_scan > MIN_TIME_BETWEEN_SCANS:
@@ -83,14 +83,14 @@ class SSDP:
                 self.last_scan = datetime.now()
 
     def remove_expired(self):
-       """Filter out expired entries."""
+        """Filter out expired entries."""
         with self._lock:
             self.entries = [entry for entry in self.entries
                             if not entry.is_expired]
 
 
 class UPNPEntry:
-   """Found uPnP entry."""
+    """Found uPnP entry."""
     DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
 
     def __init__(self, values):
@@ -107,23 +107,23 @@ class UPNPEntry:
 
     @property
     def is_expired(self):
-       """Return whether the entry is expired or not."""
+        """Return whether the entry is expired or not."""
         return self.expires is not None and datetime.now() > self.expires
 
     # pylint: disable=invalid-name
     @property
     def st(self):
-       """Return ST value."""
+        """Return ST value."""
         return self.values.get('st')
 
     @property
     def location(self):
-       """Return location value."""
+        """Return location value."""
         return self.values.get('location')
 
     @property
     def description(self):
-       """Return the description from the uPnP entry."""
+        """Return the description from the uPnP entry."""
         url = self.values.get('location', '_NO_LOCATION')
 
         if url not in UPNPEntry.DESCRIPTION_CACHE:
@@ -155,11 +155,11 @@ class UPNPEntry:
         return UPNPEntry.DESCRIPTION_CACHE[url]
 
     def match_device_description(self, values):
-       """
+        """
         Fetch description and match against it.
 
         Values should only contain lowercase keys.
-       """
+        """
 
         if self.description is None:
             return False
@@ -174,7 +174,7 @@ class UPNPEntry:
 
     @classmethod
     def from_response(cls, response):
-       """Create a uPnP entry from a response."""
+        """Create a uPnP entry from a response."""
         return UPNPEntry({key.lower(): item for key, item
                           in RESPONSE_REGEX.findall(response)})
 
@@ -190,7 +190,7 @@ class UPNPEntry:
 
 
 def build_ssdp_request(ssdp_st, ssdp_mx):
-   """Build the standard request to send during SSDP discovery."""
+    """Build the standard request to send during SSDP discovery."""
     ssdp_st = ssdp_st or ST
     return "\r\n".join([
         'M-SEARCH * HTTP/1.1',
@@ -202,7 +202,7 @@ def build_ssdp_request(ssdp_st, ssdp_mx):
 
 
 def entry_in_entries(entry, entries, mac, serial):
-   """Check if a device entry is in a list of device entries."""
+    """Check if a device entry is in a list of device entries."""
     # If we don't have a mac or serial, let's just compare objects instead:
     if mac is None and serial is None:
         return entry in entries
