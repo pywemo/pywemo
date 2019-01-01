@@ -31,16 +31,16 @@ class SSDP:
         self._lock = threading.RLock()
 
     def scan(self):
-       """Scan the network."""
+        """Scan the network."""
         with self._lock:
-            self.update()
+        self.update()
 
     def all(self):
-       """
+        """
         Return all found entries.
         
         Will scan for entries if not scanned recently.        
-       """
+        """
         with self._lock:
             self.update()
 
