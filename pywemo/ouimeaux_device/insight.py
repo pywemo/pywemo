@@ -33,7 +33,7 @@ class Insight(Switch):
         return Switch.subscription_update(self, _type, _params)
 
     def parse_insight_params(self, params):
-        """ Parse the Insight parameters."""
+        """Parse the Insight parameters."""
         (
             state,  # 0 if off, 1 if on, 8 if on but load is off
             lastchange,
@@ -52,13 +52,14 @@ class Insight(Switch):
                 'onfor': int(onfor),
                 'ontoday': int(ontoday),
                 'ontotal': int(ontotal),
-                'timeperiod':int(timeperiod),
+                'timeperiod': int(timeperiod),
                 'todaymw': int(float(todaymw)),
                 'totalmw': int(float(totalmw)),
                 'currentpower': int(float(currentmw)),
                 'powerthreshold': int(float(powerthreshold))}
 
     def get_state(self, force_update=False):
+        """Return the device state."""
         if force_update or self._state is None:
             self.update_insight_params()
 
