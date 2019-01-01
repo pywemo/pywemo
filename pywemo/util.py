@@ -19,7 +19,8 @@ def etree_to_dict(tree):
         tree_dict = {
             tag_name: {
                 key: value[0] if len(value) == 1
-                     else value for key, value in default_dict.items()}}
+                     else value for key, value in
+                default_dict.items()}}
     if tree.attrib:
         tree_dict[tag_name].update(('@' + key, value)
                                    for key, value in tree.attrib.items())
