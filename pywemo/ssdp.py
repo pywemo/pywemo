@@ -38,8 +38,8 @@ class SSDP:
     def all(self):
         """
         Return all found entries.
-        
-        Will scan for entries if not scanned recently.        
+
+        Will scan for entries if not scanned recently.
         """
         with self._lock:
             self.update()
@@ -310,7 +310,6 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
 
 
 if __name__ == "__main__":
-    """Run a scan if this script is called directly."""
     from pprint import pprint
 
     pprint("Scanning UPNP..")
