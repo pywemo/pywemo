@@ -30,7 +30,6 @@ class CoffeeMakerMode(IntEnum):
     CleaningSoaking = 7
     BrewFailCarafeRemoved = 8
 
-
 MODE_NAMES = {
     CoffeeMakerMode.Refill: "Refill",
     CoffeeMakerMode.PlaceCarafe: "PlaceCarafe",
@@ -66,7 +65,6 @@ def attribute_xml_to_dict(xml_blob):
 
 class CoffeeMaker(Switch):
     """Representation of a WeMo CofeeMaker device."""
-
     def __init__(self, *args, **kwargs):
         """Create a WeMo CoffeeMaker device."""
         Switch.__init__(self, *args, **kwargs)

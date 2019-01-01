@@ -54,7 +54,7 @@ class Insight(Switch):
                 'onfor': int(onfor),
                 'ontoday': int(ontoday),
                 'ontotal': int(ontotal),
-                'timeperiod':int(timeperiod),
+                'timeperiod': int(timeperiod),
                 'todaymw': int(float(todaymw)),
                 'totalmw': int(float(totalmw)),
                 'currentpower': int(float(currentmw)),
