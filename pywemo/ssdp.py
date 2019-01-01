@@ -57,12 +57,12 @@ class SSDP:
                     if entry.st == st]
 
     def find_by_device_description(self, values):
-        """
+       """
         Return a list of entries that match the description.
 
         Pass in a dict with values to match against the device tag in the
         description.
-        """
+       """
         with self._lock:
             self.update()
 
@@ -315,6 +315,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
 
 
 if __name__ == "__main__":
+    """Run a scan if this script is called directly."""
     from pprint import pprint
 
     pprint("Scanning UPNP..")
