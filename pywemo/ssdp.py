@@ -132,7 +132,6 @@ class UPNPEntry(object):
                 xml = requests.get(url, timeout=10).text
 
                 tree = None
-
                 if xml is not None:
                     tree = ElementTree.fromstring(xml)
 
@@ -141,11 +140,14 @@ class UPNPEntry(object):
                         etree_to_dict(tree).get('root', {})
                 else:
                     UPNPEntry.DESCRIPTION_CACHE[url] = {}
+
             except requests.RequestException:
                 logging.getLogger(__name__).warning(
                     "Error fetching description at %s", url)
+
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
-            except (ElementTree.ParseError):
+
+            except (requests.RequestException, ElementTree.ParseError):
                 # There used to be a log message here to record an error about
                 # malformed XML, but this only happens on non-WeMo devices
                 # and can be safely ignored.
