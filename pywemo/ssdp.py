@@ -21,6 +21,7 @@ MIN_TIME_BETWEEN_SCANS = timedelta(seconds=59)
 # Wemo specific urn:
 ST = "urn:Belkin:service:basicevent:1"
 
+
 class SSDP:
     """Controls the scanning of uPnP devices and services and caches output."""
 
@@ -221,8 +222,10 @@ def entry_in_entries(entry, entries, mac, serial):
 
     return False
 
+
 # pylint: disable=invalid-name,too-many-nested-blocks
-def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, match_serial=None):
+def scan(st=None, timeout=DISCOVER_TIMEOUT,
+         max_entries=None, match_mac=None, match_serial=None):
     """
     Send a message over the network to discover upnp devices.
 
@@ -269,7 +272,8 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
             ready = select.select(sockets, [], [], seconds_left)[0]
 
             for sock in ready:
-                response = response = sock.recv(1024).decode("UTF-8", "replace")
+                response = response =
+                    sock.recv(1024).decode("UTF-8", "replace")
 
                 entry = UPNPEntry.from_response(response)
                 if entry.description is not None:
@@ -281,7 +285,9 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
                     serial = None
 
                 # Search for devices
-                if st is not None or match_mac is not None or match_serial is not None:
+                if st is not None or
+                    match_mac is not None or
+                    match_serial is not None:
                     if not entry_in_entries(entry, entries, mac, serial):
                         if match_mac is not None:
                             if match_mac == mac:
