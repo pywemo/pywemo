@@ -46,8 +46,8 @@ def device_from_description(description_url, mac):
 
     if device_mac is None:
         LOG.debug(
-            'No MAC address was supplied or found in setup xml at: %s.'
-            , description_url)
+            'No MAC address was supplied or found in setup xml at: %s.',
+            description_url)
 
     return device_from_uuid_and_location(uuid, device_mac, description_url)
 
