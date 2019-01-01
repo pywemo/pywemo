@@ -91,6 +91,7 @@ class SSDP:
 
 class UPNPEntry:
     """Found uPnP entry."""
+
     DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
 
     def __init__(self, values):
@@ -160,7 +161,6 @@ class UPNPEntry:
 
         Values should only contain lowercase keys.
         """
-
         if self.description is None:
             return False
 
@@ -184,7 +184,7 @@ class UPNPEntry:
                 self.values == other.values)
 
     def __repr__(self):
-        """String representation of the object."""
+        """Return the string representation of the object."""
         return "<UPNPEntry {} - {}>".format(
             self.values.get('st', ''), self.values.get('location', ''))
 
