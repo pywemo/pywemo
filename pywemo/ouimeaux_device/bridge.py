@@ -27,7 +27,7 @@ TOGGLE = 2
 
 
 def limit(value, min_val, max_val):
-    """Return value clipped to the range [min_val, max_val]."""
+    """Return a value clipped to the range [min_val, max_val]."""
     return max(min_val, min(value, max_val))
 
 
