@@ -245,6 +245,7 @@ class Light(LinkedDevice):
             ]
         if currentstate is not None:
             self._values = currentstate.split(',')
+
         super(Light, self).update_state(status)
 
     def __repr__(self):
