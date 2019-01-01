@@ -57,12 +57,12 @@ class SSDP:
                     if entry.st == st]
 
     def find_by_device_description(self, values):
-       """
+        """
         Return a list of entries that match the description.
 
         Pass in a dict with values to match against the device tag in the
         description.
-       """
+        """
         with self._lock:
             self.update()
 
@@ -92,7 +92,6 @@ class SSDP:
 
 class UPNPEntry:
     """Found uPnP entry."""
-
     DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
 
     def __init__(self, values):
