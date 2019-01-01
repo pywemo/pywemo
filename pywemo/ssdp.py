@@ -284,9 +284,15 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
                     serial = None
 
                 # Search for devices
+<<<<<<< HEAD
                 if (st is not None or
                         match_mac is not None or
                         match_serial is not None):
+=======
+                if (st is not None or 
+                    match_mac is not None or 
+                    match_serial is not None):
+>>>>>>> Linting fixes
                     if not entry_in_entries(entry, entries, mac, serial):
                         if match_mac is not None:
                             if match_mac == mac:
