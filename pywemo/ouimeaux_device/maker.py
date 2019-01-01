@@ -7,7 +7,7 @@ class Maker(Switch):
     """Representation of a WeMo Maker device."""
 
     def __repr__(self):
-        """String representation of the device."""
+        """Return a string representation of the device."""
         return '<WeMo Maker "{name}">'.format(name=self.name)
 
     @property
@@ -36,8 +36,9 @@ class Maker(Switch):
 
     def get_state(self, force_update=False):
         """Return 0 if off and 1 if on."""
-        # The base implementation using GetBinaryState doesn't for for Maker (always returns 0).
-        # So pull the switch state from the atrributes instead
+        # The base implementation using GetBinaryState doesn't 
+        # work for the Maker (always returns 0),
+        # so pull the switch state from the atrributes instead
         if force_update or self._state is None:
             params = self.maker_params or {}
             try:
@@ -49,8 +50,8 @@ class Maker(Switch):
 
     def set_state(self, state):
         """Set the state of this device to on or off."""
-        # The Maker has a momentary mode - so it's not safe to assume the state is what you just set
-        # so re-read it from the device
+        # The Maker has a momentary mode - so it's not safe to assume
+        # the state is what you just set, so re-read it from the device
 
         # pylint: disable=maybe-no-member
         self.basicevent.SetBinaryState(BinaryState=int(state))

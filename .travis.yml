@@ -11,12 +11,6 @@ matrix:
     - python: "3.5.3"
       env: TOXENV=pylint
 
-  allow_failures:
-    - python: "3.5.3"
-      env: TOXENV=lint
-    - python: "3.5.3"
-      env: TOXENV=pylint
-
 cache:
   directories:
     - $HOME/.cache/pip
