@@ -44,8 +44,10 @@ class Bridge(Device):
 
     def __repr__(self):
         """Return a string representation of the device."""
-        return '<WeMo Bridge "{name}", Lights: {lights}, Groups: {groups}>'.format(
-            name=self.name, lights=len(self.Lights), groups=len(self.Groups))
+        return ('<WeMo Bridge "{name}", Lights: {lights}, ' +
+                'Groups: {groups}>').format(
+                    name=self.name, lights=len(self.Lights),
+                    groups=len(self.Groups))
 
     def bridge_update(self):
         """Get updated status information for the bridge and its lights."""
