@@ -30,6 +30,7 @@ class CoffeeMakerMode(IntEnum):
     CleaningSoaking = 7
     BrewFailCarafeRemoved = 8
 
+
 MODE_NAMES = {
     CoffeeMakerMode.Refill: "Refill",
     CoffeeMakerMode.PlaceCarafe: "PlaceCarafe",
