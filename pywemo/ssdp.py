@@ -9,8 +9,7 @@ import threading
 import time
 
 from datetime import datetime, timedelta
-import xml.etree.ElementTree as ElementTree
-import time
+import xml.etree.ElementTree as XMLElementTree
 import requests
 
 from .util import etree_to_dict, interface_addresses
@@ -91,7 +90,7 @@ class SSDP:
                             if not entry.is_expired]
 
 
-class UPNPEntry(object):
+class UPNPEntry:
     """ Found uPnP entry. """
     DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
 
@@ -133,7 +132,7 @@ class UPNPEntry(object):
 
                 tree = None
                 if xml is not None:
-                    tree = ElementTree.fromstring(xml)
+                    tree = XMLElementTree.fromstring(xml)
 
                 if tree is not None:
                     UPNPEntry.DESCRIPTION_CACHE[url] = \
@@ -147,7 +146,7 @@ class UPNPEntry(object):
 
                 UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
-            except (requests.RequestException, ElementTree.ParseError):
+            except XMLElementTree.ParseError:
                 # There used to be a log message here to record an error about
                 # malformed XML, but this only happens on non-WeMo devices
                 # and can be safely ignored.
@@ -187,9 +186,9 @@ class UPNPEntry(object):
             self.values.get('st', ''), self.values.get('location', ''))
 
 
-def build_ssdp_request(st, ssdp_mx):
+def build_ssdp_request(ssdp_st, ssdp_mx):
     """Builds the standard request to send during SSDP discovery."""
-    ssdp_st = st or ST
+    ssdp_st = ssdp_st or ST
     return "\r\n".join([
         'M-SEARCH * HTTP/1.1',
         'ST: {}'.format(ssdp_st),
@@ -206,21 +205,21 @@ def entry_in_entries(entry, entries, mac, serial):
     if mac is None and serial is None:
         return entry in entries
 
-    for e in entries:
-        if e.description is not None:
-            e_device = e.description.get('device', {})
+    for item in entries:
+        if item.description is not None:
+            e_device = item.description.get('device', {})
             e_mac = e_device.get('macAddress')
             e_serial = e_device.get('serialNumber')
         else:
             e_mac = None
             e_serial = None
 
-        if e_mac == mac and e_serial == serial and e.st == entry.st:
+        if e_mac == mac and e_serial == serial and item.st == entry.st:
             return True
 
     return False
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,too-many-nested-blocks
 def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, match_serial=None):
     """
     Sends a message over the network to discover upnp devices.
