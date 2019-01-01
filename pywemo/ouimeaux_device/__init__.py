@@ -9,9 +9,6 @@ except ImportError:
     from urlparse import urlparse
 
 import requests
-#from requests import ConnectTimeout
-#from requests import ConnectionError
-#from requests import Timeout
 
 from .api.service import Service
 from .api.xsd import device as deviceParser
@@ -125,7 +122,7 @@ class Device(object):
             if found:
                 LOG.info("Found %s again, updating local values", self.name)
 
-                #pylint: disable=attribute-defined-outside-init
+                # pylint: disable=attribute-defined-outside-init
                 self.__dict__ = found[0].__dict__
                 self.retrying = False
 
@@ -162,13 +159,13 @@ class Device(object):
         self.port = port
         url = 'http://{}:{}/setup.xml'.format(self.host, self.port)
 
-        #pylint: disable=attribute-defined-outside-init
+        # pylint: disable=attribute-defined-outside-init
         self.__dict__ = self.__class__(url, None).__dict__
 
         return True
 
     def reconnect_with_device(self):
-        """Re-probe and then scan network to rediscover a disconnected device."""
+        """Re-probe & scan network to rediscover a disconnected device."""
         if (not self._reconnect_with_device_by_probing() and
                 (self.mac or self.serialnumber)):
             self._reconnect_with_device_by_discovery()
@@ -194,7 +191,7 @@ class Device(object):
 
     def update_binary_state(self):
         """Update the cached copy of the basic state response."""
-        #pylint: disable=maybe-no-member
+        # pylint: disable=maybe-no-member
         self.basic_state_params = self.basicevent.GetBinaryState()
 
     def subscription_update(self, _type, _params):
@@ -211,7 +208,7 @@ class Device(object):
     def get_state(self, force_update=False):
         """Return 0 if off and 1 if on."""
         if force_update or self._state is None:
-            #pylint: disable=maybe-no-member
+            # pylint: disable=maybe-no-member
             state = self.basicevent.GetBinaryState() or {}
 
             try:
