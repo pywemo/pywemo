@@ -20,7 +20,6 @@ else:
 class CoffeeMakerMode(IntEnum):
     """Enum to map WeMo modes to human-readable strings."""
 
-
     Refill = 0  # reservoir empty and carafe not in place
     PlaceCarafe = 1  # reservoir has water but carafe not present
     RefillWater = 2  # carafe present but reservoir is empty
@@ -30,6 +29,7 @@ class CoffeeMakerMode(IntEnum):
     CleaningBrewing = 6
     CleaningSoaking = 7
     BrewFailCarafeRemoved = 8
+
 
 MODE_NAMES = {
     CoffeeMakerMode.Refill: "Refill",
@@ -53,7 +53,8 @@ def attribute_xml_to_dict(xml_blob):
     attributes = et.fromstring(xml_blob)
     for attribute in attributes:
         # The coffee maker might also send unrelated xml blobs, e.g.:
-        # <ruleID>coffee-brewed</ruleID><ruleMsg><![CDATA[Coffee's ready!]]></ruleMsg>
+        # <ruleID>coffee-brewed</ruleID>
+        # <ruleMsg><![CDATA[Coffee's ready!]]></ruleMsg>
         # so be sure to check the length of attribute
         if len(attribute) >= 2:
             try:
