@@ -1,0 +1,25 @@
+sudo: false
+addons:
+  apt:
+    packages:
+      - libudev-dev
+matrix:
+  fast_finish: true
+  include:
+    - python: "3.5.3"
+      env: TOXENV=lint
+    - python: "3.5.3"
+      env: TOXENV=pylint
+
+  allow_failures:
+    - python: "3.5.3"
+      env: TOXENV=lint
+    - python: "3.5.3"
+      env: TOXENV=pylint
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+install: pip install -U tox
+language: python
+script: travis_wait 30 tox --develop
