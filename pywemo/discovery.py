@@ -17,7 +17,8 @@ from .ouimeaux_device.api.xsd import device as deviceParser
 LOG = logging.getLogger(__name__)
 
 
-def discover_devices(ssdp_st=None, max_devices=None, match_mac=None, match_serial=None):
+def discover_devices(ssdp_st=None, max_devices=None,
+                     match_mac=None, match_serial=None):
     """Find WeMo devices on the local network."""
     ssdp_st = ssdp_st or ssdp.ST
     ssdp_entries = ssdp.scan(ssdp_st, max_entries=max_devices,

@@ -18,9 +18,12 @@ def etree_to_dict(tree):
                 default_dict[key].append(value)
         tree_dict = {
             tag_name: {
-                key: value[0] if len(value) == 1 else value for key, value in default_dict.items()}}
+                key: value[0]
+                     if len(value) == 1
+                     else value for key, value in default_dict.items()}}
     if tree.attrib:
-        tree_dict[tag_name].update(('@' + key, value) for key, value in tree.attrib.items())
+        tree_dict[tag_name].update(('@' + key, value)
+                                   for key, value in tree.attrib.items())
     if tree.text:
         text = tree.textree.strip()
         if children or tree.attrib:

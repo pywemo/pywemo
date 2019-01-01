@@ -1,6 +1,4 @@
-"""
-Base WeMo Device class
-"""
+"""Base WeMo Device class."""
 
 import logging
 import time
@@ -25,7 +23,8 @@ PROBE_PORTS = (49153, 49152, 49154, 49151, 49155, 49156, 49157, 49158, 49159)
 
 
 def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=10):
-    """Probe a host for the current port.
+    """
+    Probe a host for the current port.
 
     This probes a host for known-to-be-possible ports and
     returns the one currently in use. If no port is discovered
@@ -33,9 +32,9 @@ def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=10):
     """
     for port in ports:
         try:
-            r = requests.get('http://%s:%i/setup.xml' % (host, port),
-                             timeout=probe_timeout)
-            if ('WeMo' in r.text) or ('Belkin' in r.text):
+            response = requests.get('http://%s:%i/setup.xml' % (host, port),
+                                    timeout=probe_timeout)
+            if ('WeMo' in response.text) or ('Belkin' in response.text):
                 return port
         except requests.ConnectTimeout:
             # If we timed out connecting, then the wemo is gone,
@@ -69,11 +68,16 @@ def probe_device(device):
 
 
 class UnknownService(Exception):
+    """Exception raised when a non-existent service is called."""
+
     pass
 
 
 class Device(object):
+    """Base object for WeMo devices."""
+
     def __init__(self, url, mac):
+        """Create a WeMo device."""
         self._state = None
         self.basic_state_params = {}
         base_url = url.rsplit('/', 1)[0]
@@ -84,9 +88,9 @@ class Device(object):
         self.mac = mac
         xml = requests.get(url, timeout=10)
         self._config = deviceParser.parseString(xml.content).device
-        sl = self._config.serviceList
+        service_list = self._config.serviceList
         self.services = {}
-        for svc in sl.service:
+        for svc in service_list.service:
             svcname = svc.get_serviceType().split(':')[-2]
             service = Service(self, svc, base_url)
             service.eventSubURL = base_url + svc.get_eventSubURL()
@@ -95,10 +99,12 @@ class Device(object):
 
     def _reconnect_with_device_by_discovery(self):
         """
+        Scan network to find the device again.
+
         Wemos tend to change their port number from time to time.
         Whenever requests throws an error, we will try to find the device again
-        on the network and update this device. """
-
+        on the network and update this device.
+        """
         # Put here to avoid circular dependency
         from ..discovery import discover_devices
 
@@ -112,15 +118,17 @@ class Device(object):
         try_no = 0
 
         while True:
-            found = discover_devices(st=None, max_devices=1,
+            found = discover_devices(ssdp_st=None, max_devices=1,
                                      match_mac=self.mac,
                                      match_serial=self.serialnumber)
 
             if found:
                 LOG.info("Found %s again, updating local values", self.name)
 
+                #pylint: disable=attribute-defined-outside-init
                 self.__dict__ = found[0].__dict__
                 self.retrying = False
+
                 return
 
             wait_time = try_no * 5
@@ -131,9 +139,10 @@ class Device(object):
 
             if try_no == 5:
                 LOG.error(
-                    "Unable to reconnect with {} in 5 tries. Stopping.".
-                    format(self.name))
+                    "Unable to reconnect with %s in 5 tries. Stopping.",
+                    self.name)
                 self.retrying = False
+
                 return
 
             time.sleep(wait_time)
@@ -142,21 +151,30 @@ class Device(object):
 
     def _reconnect_with_device_by_probing(self):
         port = probe_device(self)
+
         if port is None:
-            LOG.error('Unable to re-probe wemo at {}'.format(self.host))
+            LOG.error('Unable to re-probe wemo at %s', self.host)
             return False
-        LOG.info('Reconnected to wemo at {} on port {}'.format(
-            self.host, port))
+
+        LOG.info('Reconnected to wemo at %s on port %i',
+                 self.host, port)
+
         self.port = port
         url = 'http://{}:{}/setup.xml'.format(self.host, self.port)
+
+        #pylint: disable=attribute-defined-outside-init
         self.__dict__ = self.__class__(url, None).__dict__
+
         return True
 
     def reconnect_with_device(self):
-        if not self._reconnect_with_device_by_probing() and (self.mac or self.serialnumber):
+        """Re-probe and then scan network to rediscover a disconnected device."""
+        if (not self._reconnect_with_device_by_probing() and
+                (self.mac or self.serialnumber)):
             self._reconnect_with_device_by_discovery()
 
     def parse_basic_state(self, params):
+        """Parse the basic state response from the device."""
         # BinaryState
         # 1|1492338954|0|922|14195|1209600|0|940670|15213709|227088884
         (
@@ -171,12 +189,16 @@ class Device(object):
             _x8,
             _x9
         ) = params.split('|')
+
         return {'state': state}
 
     def update_binary_state(self):
+        """Update the cached copy of the basic state response."""
+        #pylint: disable=maybe-no-member
         self.basic_state_params = self.basicevent.GetBinaryState()
 
     def subscription_update(self, _type, _params):
+        """Update device state based on subscription event."""
         LOG.debug("subscription_update %s %s", _type, _params)
         if _type == "BinaryState":
             try:
@@ -187,10 +209,9 @@ class Device(object):
         return False
 
     def get_state(self, force_update=False):
-        """
-        Returns 0 if off and 1 if on.
-        """
+        """Return 0 if off and 1 if on."""
         if force_update or self._state is None:
+            #pylint: disable=maybe-no-member
             state = self.basicevent.GetBinaryState() or {}
 
             try:
@@ -201,15 +222,18 @@ class Device(object):
         return self._state
 
     def get_service(self, name):
+        """Get service object by name."""
         try:
             return self.services[name]
         except KeyError:
             raise UnknownService(name)
 
     def list_services(self):
+        """Return list of services."""
         return list(self.services.keys())
 
     def explain(self):
+        """Print information about the device and its actions."""
         for name, svc in self.services.items():
             print(name)
             print('-' * len(name))
@@ -219,16 +243,20 @@ class Device(object):
 
     @property
     def model(self):
+        """Return the model description of the device."""
         return self._config.get_modelDescription()
 
     @property
     def model_name(self):
+        """Return the model name of the device."""
         return self._config.get_modelName()
 
     @property
     def name(self):
+        """Return the name of the device."""
         return self._config.get_friendlyName()
 
     @property
     def serialnumber(self):
+        """Return the serial number of the device."""
         return self._config.get_serialNumber()
