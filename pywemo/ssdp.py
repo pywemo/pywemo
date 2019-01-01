@@ -1,6 +1,4 @@
-"""
-Module that implements SSDP protocol
-"""
+"""Module that implements SSDP protocol."""
 import logging
 import re
 import select
@@ -24,25 +22,25 @@ MIN_TIME_BETWEEN_SCANS = timedelta(seconds=59)
 ST = "urn:Belkin:service:basicevent:1"
 
 class SSDP:
-    """
-    Controls the scanning of uPnP devices and services and caches output.
-    """
+   """Controls the scanning of uPnP devices and services and caches output."""
 
     def __init__(self):
+       """Create SSDP object."""
         self.entries = []
         self.last_scan = None
         self._lock = threading.RLock()
 
     def scan(self):
-        """ Scan the network. """
+       """Scan the network."""
         with self._lock:
             self.update()
 
     def all(self):
-        """
-        Returns all found entries.
-        Will scan for entries if not scanned recently.
-        """
+       """
+        Return all found entries.
+        
+        Will scan for entries if not scanned recently.        
+       """
         with self._lock:
             self.update()
 
@@ -50,7 +48,7 @@ class SSDP:
 
     # pylint: disable=invalid-name
     def find_by_st(self, st):
-        """ Return a list of entries that match the ST. """
+       """Return a list of entries that match the ST."""
         with self._lock:
             self.update()
 
@@ -58,11 +56,12 @@ class SSDP:
                     if entry.st == st]
 
     def find_by_device_description(self, values):
-        """
+       """
         Return a list of entries that match the description.
+
         Pass in a dict with values to match against the device tag in the
         description.
-        """
+       """
         with self._lock:
             self.update()
 
@@ -70,7 +69,7 @@ class SSDP:
                     if entry.match_device_description(values)]
 
     def update(self, force_update=False):
-        """ Scans for new uPnP devices and services. """
+       """Scan for new uPnP devices and services."""
         with self._lock:
             if self.last_scan is None or force_update or \
                datetime.now()-self.last_scan > MIN_TIME_BETWEEN_SCANS:
@@ -84,17 +83,18 @@ class SSDP:
                 self.last_scan = datetime.now()
 
     def remove_expired(self):
-        """ Filter out expired entries. """
+       """Filter out expired entries."""
         with self._lock:
             self.entries = [entry for entry in self.entries
                             if not entry.is_expired]
 
 
 class UPNPEntry:
-    """ Found uPnP entry. """
+   """Found uPnP entry."""
     DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
 
     def __init__(self, values):
+        """Create a UPNPEntry object."""
         self.values = values
         self.created = datetime.now()
 
@@ -107,23 +107,23 @@ class UPNPEntry:
 
     @property
     def is_expired(self):
-        """ Returns if the entry is expired or not. """
+       """Return whether the entry is expired or not."""
         return self.expires is not None and datetime.now() > self.expires
 
     # pylint: disable=invalid-name
     @property
     def st(self):
-        """ Returns ST value. """
+       """Return ST value."""
         return self.values.get('st')
 
     @property
     def location(self):
-        """ Return Location value. """
+       """Return location value."""
         return self.values.get('location')
 
     @property
     def description(self):
-        """ Returns the description from the uPnP entry. """
+       """Return the description from the uPnP entry."""
         url = self.values.get('location', '_NO_LOCATION')
 
         if url not in UPNPEntry.DESCRIPTION_CACHE:
@@ -155,10 +155,11 @@ class UPNPEntry:
         return UPNPEntry.DESCRIPTION_CACHE[url]
 
     def match_device_description(self, values):
-        """
-        Fetches description and matches against it.
-        values should only contain lowercase keys.
-        """
+       """
+        Fetch description and match against it.
+
+        Values should only contain lowercase keys.
+       """
 
         if self.description is None:
             return False
@@ -173,21 +174,23 @@ class UPNPEntry:
 
     @classmethod
     def from_response(cls, response):
-        """ Creates a uPnP entry from a response. """
+       """Create a uPnP entry from a response."""
         return UPNPEntry({key.lower(): item for key, item
                           in RESPONSE_REGEX.findall(response)})
 
     def __eq__(self, other):
+        """Equality operator."""
         return (self.__class__ == other.__class__ and
                 self.values == other.values)
 
     def __repr__(self):
+        """String representation of the object."""
         return "<UPNPEntry {} - {}>".format(
             self.values.get('st', ''), self.values.get('location', ''))
 
 
 def build_ssdp_request(ssdp_st, ssdp_mx):
-    """Builds the standard request to send during SSDP discovery."""
+   """Build the standard request to send during SSDP discovery."""
     ssdp_st = ssdp_st or ST
     return "\r\n".join([
         'M-SEARCH * HTTP/1.1',
@@ -199,8 +202,7 @@ def build_ssdp_request(ssdp_st, ssdp_mx):
 
 
 def entry_in_entries(entry, entries, mac, serial):
-    """Utility function to check if a device entry is in a list of
-       device entries."""
+   """Check if a device entry is in a list of device entries."""
     # If we don't have a mac or serial, let's just compare objects instead:
     if mac is None and serial is None:
         return entry in entries
@@ -222,7 +224,7 @@ def entry_in_entries(entry, entries, mac, serial):
 # pylint: disable=invalid-name,too-many-nested-blocks
 def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, match_serial=None):
     """
-    Sends a message over the network to discover upnp devices.
+    Send a message over the network to discover upnp devices.
 
     Inspired by Crimsdings
     https://github.com/crimsdings/ChromeCast/blob/master/cc_discovery.py
@@ -308,6 +310,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_mac=None, ma
 
 
 if __name__ == "__main__":
+    """Run a scan if this script is called directly."""
     from pprint import pprint
 
     pprint("Scanning UPNP..")

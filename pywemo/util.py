@@ -5,7 +5,7 @@ import netifaces
 
 # Taken from http://stackoverflow.com/a/10077069
 def etree_to_dict(tree):
-    """Splits a tree into a dict."""
+    """Split a tree into a dict."""
     # strip namespace
     tag_name = tree.tag[tree.tag.find("}")+1:]
 
@@ -33,7 +33,9 @@ def etree_to_dict(tree):
 
 def interface_addresses(family=netifaces.AF_INET):
     """
-    Returns local address of any network associated with a local interface
+    Return local address for broadcast/multicast.
+
+    Return local address of any network associated with a local interface
     that has broadcast (and probably multicast) capability.
     """
     return [addr['addr']
