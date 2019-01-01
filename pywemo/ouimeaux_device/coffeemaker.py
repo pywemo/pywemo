@@ -5,19 +5,25 @@ from pywemo.ouimeaux_device.api.xsd.device import quote_xml
 from .switch import Switch
 
 if sys.version_info[0] < 3:
-    class IntEnum(object):
+    class IntEnum:
         """Enum class."""
+
         pass
 else:
     from enum import IntEnum
 
-# These enums were derived from the CoffeeMaker.deviceevent.GetAttributeList() service call
-# Thus these names/values were not chosen randomly and the numbers have meaning.
+
+# These enums were derived from the
+# CoffeeMaker.deviceevent.GetAttributeList() service call
+# Thus these names/values were not chosen randomly
+# and the numbers have meaning.
 class CoffeeMakerMode(IntEnum):
     """Enum to map WeMo modes to human-readable strings."""
-    Refill = 0 # reservoir empty and carafe not in place
-    PlaceCarafe = 1 # reservoir has water but carafe not present
-    RefillWater = 2 # carafe present but reservoir is empty
+
+
+    Refill = 0  # reservoir empty and carafe not in place
+    PlaceCarafe = 1  # reservoir has water but carafe not present
+    RefillWater = 2  # carafe present but reservoir is empty
     Ready = 3
     Brewing = 4
     Brewed = 5
@@ -59,11 +65,14 @@ def attribute_xml_to_dict(xml_blob):
 
 class CoffeeMaker(Switch):
     """Representation of a WeMo CofeeMaker device."""
+
     def __init__(self, *args, **kwargs):
+        """Create a WeMo CoffeeMaker device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
 
     def __repr__(self):
+        """Return a string representation of the device."""
         return '<WeMo CoffeeMaker "{name}">'.format(name=self.name)
 
     def update_attributes(self):
@@ -74,7 +83,7 @@ class CoffeeMaker(Switch):
         self._state = self.mode
 
     def subscription_update(self, _type, _params):
-        """Handle reports from device"""
+        """Handle reports from device."""
         if _type == "attributeList":
             self._attributes.update(attribute_xml_to_dict(_params))
             self._state = self.mode
