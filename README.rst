@@ -11,6 +11,8 @@ pyWeMo depends on Python packages requests, netifaces and six.
 How to use
 ----------
 
+.. code:: python
+
     >> import pywemo
 
     >> devices = pywemo.discover_devices()
@@ -23,6 +25,8 @@ How to use
 If discovery doesn't work on your network
 ----------
 On some networks discovery doesn't work reliably, in that case if you can find the ip address of your Wemo device you can use the following code.
+
+.. code:: python
 
     >> import pywemo
     
