@@ -23,12 +23,13 @@ else:
 class FanMode(IntEnum):
     """Enum to map WeMo FanModes to human-readable strings."""
 
-    Off = 0 # Fan and device turned off
+    Off = 0  # Fan and device turned off
     Minimum = 1
     Low = 2
     Medium = 3
     High = 4
     Maximum = 5
+
 
 FAN_MODE_NAMES = {
     FanMode.Off: "Off",
@@ -47,7 +48,8 @@ class DesiredHumidity(IntEnum):
     FiftyPercent = 1
     FiftyFivePercent = 2
     SixtyPercent = 3
-    OneHundredPercent = 4 # "Always On" Mode
+    OneHundredPercent = 4  # "Always On" Mode
+
 
 DESIRED_HUMIDITY_NAMES = {
     DesiredHumidity.FortyFivePercent: "45",
@@ -64,6 +66,7 @@ class WaterLevel(IntEnum):
     Empty = 0
     Low = 1
     Good = 2
+
 
 WATER_LEVEL_NAMES = {
     WaterLevel.Empty: "Empty",
@@ -168,9 +171,9 @@ class Humidifier(Switch):
     @property
     def fan_mode_string(self):
         """
-        Returns the FanMode setting as a string.
+        Return the FanMode setting as a string.
 
-		(Off, Low, Medium, High, Maximum).
+        (Off, Low, Medium, High, Maximum).
         """
         return FAN_MODE_NAMES.get(self.fan_mode, "Unknown")
 
