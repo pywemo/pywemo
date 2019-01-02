@@ -148,6 +148,7 @@ class Device(object):
             try_no += 1
 
     def _reconnect_with_device_by_probing(self):
+        """Attempt to reconnect to the device on the existing port."""
         port = probe_device(self)
 
         if port is None:
@@ -171,6 +172,10 @@ class Device(object):
             if (not self._reconnect_with_device_by_probing() and
                     (self.mac or self.serialnumber)):
                 self._reconnect_with_device_by_discovery()
+        else:
+            LOG.warning("Rediscovery was requested for device %s, "
+                        "but rediscovery is disabled. Ignoring request.",
+                        self.name)
 
     def parse_basic_state(self, params):
         """Parse the basic state response from the device."""
