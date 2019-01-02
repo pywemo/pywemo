@@ -1,12 +1,15 @@
 """Representation of a WeMo Bridge (Link) device."""
 import time
 from xml.etree import cElementTree as et
-from six.moves import html_escape
 import six
+
+six.add_move(six.MovedAttribute('html_escape', 'cgi', 'html', 'escape'))
+
+# pylint: disable=wrong-import-position
+from six.moves import html_escape
 from . import Device
 from ..color import get_profiles, limit_to_gamut
 
-six.add_move(six.MovedAttribute('html_escape', 'cgi', 'html', 'escape'))
 
 CAPABILITY_ID2NAME = dict((
     ('10006', "onoff"),
@@ -54,28 +57,28 @@ class Bridge(Device):
         # pylint: disable=maybe-no-member
         plugin_udn = self.basicevent.GetMacAddr().get('PluginUDN')
 
-        if hasattr(self.bridge, 'Getend_devicesWithStatus'):
-            end_devices = self.bridge.Getend_devicesWithStatus(
+        if hasattr(self.bridge, 'GetEndDevicesWithStatus'):
+            end_devices = self.bridge.GetEndDevicesWithStatus(
                 DevUDN=plugin_udn, ReqListType='PAIRED_LIST')
         else:
-            end_devices = self.bridge.Getend_devices(
+            end_devices = self.bridge.GetEndDevices(
                 DevUDN=plugin_udn, ReqListType='PAIRED_LIST')
 
         end_device_list = et.fromstring(end_devices.get('DeviceLists'))
 
         for light in end_device_list.iter('DeviceInfo'):
-            unique_id = light.find('DeviceID').text
-            if unique_id in self.Lights:
-                self.Lights[unique_id].update_state(light)
+            uniqueID = light.find('DeviceID').text  # pylint: disable=invalid-name
+            if uniqueID in self.Lights:
+                self.Lights[uniqueID].update_state(light)
             else:
-                self.Lights[unique_id] = Light(self, light)
+                self.Lights[uniqueID] = Light(self, light)
 
         for group in end_device_list.iter('GroupInfo'):
-            unique_id = group.find('GroupID').text
-            if unique_id in self.Groups:
-                self.Groups[unique_id].update_state(group)
+            uniqueID = group.find('GroupID').text  # pylint: disable=invalid-name
+            if uniqueID in self.Groups:
+                self.Groups[uniqueID].update_state(group)
             else:
-                self.Groups[unique_id] = Group(self, group)
+                self.Groups[uniqueID] = Group(self, group)
 
         return self.Lights, self.Groups
 
@@ -176,7 +179,7 @@ class LinkedDevice:
 
         # pylint: disable=maybe-no-member
         self._last_err = self.bridge.bridge_setdevicestatus(
-            isgroup, self.unique_id, capids, values)
+            isgroup, self.uniqueID, capids, values)
         return self
 
     def turn_on(self, level=None, transition=0, force_update=False):
@@ -200,7 +203,7 @@ class Light(LinkedDevice):
         super(Light, self).__init__(bridge, info)
 
         self.device_index = info.findtext('DeviceIndex')
-        self.unique_id = info.findtext('DeviceID')
+        self.uniqueID = info.findtext('DeviceID')  # pylint: disable=invalid-name
         self.iconvalue = info.findtext('IconVersion')
         self.firmware = info.findtext('FirmwareVersion')
         self.manufacturer = info.findtext('Manufacturer')
@@ -322,7 +325,7 @@ class Group(LinkedDevice):
     def __init__(self, bridge, info):
         """Create a Group device."""
         super(Group, self).__init__(bridge, info)
-        self.unique_id = info.findtext('GroupID')
+        self.uniqueID = info.findtext('GroupID')  # pylint: disable=invalid-name
 
     def update_state(self, status):
         """Update the device state."""

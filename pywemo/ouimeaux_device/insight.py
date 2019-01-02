@@ -14,6 +14,8 @@ class Insight(Switch):
         Switch.__init__(self, *args, **kwargs)
         self.insight_params = {}
 
+        self.update_insight_params()
+
     def __repr__(self):
         """Return a string representation of the device."""
         return '<WeMo Insight "{name}">'.format(name=self.name)
@@ -40,7 +42,7 @@ class Insight(Switch):
             onfor,  # seconds
             ontoday,  # seconds
             ontotal,  # seconds
-            timeperiod,  # The period over which averages are calculated
+            timeperiod,  # pylint: disable=unused-variable
             _x,  # This one is always 19 for me; what is it?
             currentmw,
             todaymw,
@@ -52,7 +54,6 @@ class Insight(Switch):
                 'onfor': int(onfor),
                 'ontoday': int(ontoday),
                 'ontotal': int(ontotal),
-                'timeperiod': int(timeperiod),
                 'todaymw': int(float(todaymw)),
                 'totalmw': int(float(totalmw)),
                 'currentpower': int(float(currentmw)),
