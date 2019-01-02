@@ -11,7 +11,6 @@ from . import Device  # noqa E402
 from ..color import get_profiles, limit_to_gamut  # noqa E402
 
 
-six.add_move(six.MovedAttribute('html_escape', 'cgi', 'html', 'escape'))
 
 CAPABILITY_ID2NAME = dict((
     ('10006', "onoff"),
@@ -74,7 +73,7 @@ class Bridge(Device):
             if uniqueID in self.Lights:
                 self.Lights[uniqueID].update_state(light)
             else:
-                self.Lights[unique_id] = Light(self, light)
+                self.Lights[uniqueID] = Light(self, light)
 
         for group in end_device_list.iter('GroupInfo'):
             # pylint: disable=invalid-name
@@ -82,7 +81,7 @@ class Bridge(Device):
             if uniqueID in self.Groups:
                 self.Groups[uniqueID].update_state(group)
             else:
-                self.Groups[unique_id] = Group(self, group)
+                self.Groups[uniqueID] = Group(self, group)
 
         return self.Lights, self.Groups
 
@@ -183,7 +182,7 @@ class LinkedDevice:
 
         # pylint: disable=maybe-no-member
         self._last_err = self.bridge.bridge_setdevicestatus(
-            isgroup, self.unique_id, capids, values)
+            isgroup, self.uniqueID, capids, values)
         return self
 
     def turn_on(self, level=None, transition=0, force_update=False):
