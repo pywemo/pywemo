@@ -120,6 +120,8 @@ class LinkedDevice:
         self._values = []
         self.update_state(info)
         self._last_err = None
+        self.mac = self.bridge.mac
+        self.serialnumber = self.bridge.serialnumber
 
     def get_state(self, force_update=False):
         """Return the status of the device."""

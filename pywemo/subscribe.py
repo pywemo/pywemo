@@ -51,7 +51,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         data = self.rfile.read(content_len)
         if device is None:
-            LOG.error('Received event for unregistered device %s', sender_ip)
+            LOG.warning('Received event for unregistered device %s', sender_ip)
         else:
             # trim garbage from end, if any
             data = data.decode("UTF-8").split("\n\n")[0]
