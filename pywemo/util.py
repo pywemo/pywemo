@@ -25,7 +25,7 @@ def etree_to_dict(tree):
         tree_dict[tag_name].update(('@' + key, value)
                                    for key, value in tree.attrib.items())
     if tree.text:
-        text = tree.textree.strip()
+        text = tree.text.strip()
         if children or tree.attrib:
             if text:
                 tree_dict[tag_name]['#text'] = text
