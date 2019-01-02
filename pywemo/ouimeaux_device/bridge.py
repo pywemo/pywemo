@@ -11,7 +11,6 @@ from . import Device  # noqa E402
 from ..color import get_profiles, limit_to_gamut  # noqa E402
 
 
-
 CAPABILITY_ID2NAME = dict((
     ('10006', "onoff"),
     ('10008', "levelcontrol"),
