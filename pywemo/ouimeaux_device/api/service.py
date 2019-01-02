@@ -85,7 +85,7 @@ class Service:
         """Create an instance of a Service."""
         self._base_url = base_url.rstrip('/')
         self._config = service
-        self.name = self._config.get_name()
+        self.name = self._config.get_serviceType().split(':')[-2]
         self.actions = {}
 
         url = '%s/%s' % (base_url, service.get_SCPDURL().strip('/'))
