@@ -6,9 +6,9 @@ import six
 six.add_move(six.MovedAttribute('html_escape', 'cgi', 'html', 'escape'))
 
 # pylint: disable=wrong-import-position
-from six.moves import html_escape
-from . import Device
-from ..color import get_profiles, limit_to_gamut
+from six.moves import html_escape  # noqa E402
+from . import Device  # noqa E402
+from ..color import get_profiles, limit_to_gamut  # noqa E402
 
 
 CAPABILITY_ID2NAME = dict((
@@ -67,14 +67,16 @@ class Bridge(Device):
         end_device_list = et.fromstring(end_devices.get('DeviceLists'))
 
         for light in end_device_list.iter('DeviceInfo'):
-            uniqueID = light.find('DeviceID').text  # pylint: disable=invalid-name
+            # pylint: disable=invalid-name
+            uniqueID = light.find('DeviceID').text
             if uniqueID in self.Lights:
                 self.Lights[uniqueID].update_state(light)
             else:
                 self.Lights[uniqueID] = Light(self, light)
 
         for group in end_device_list.iter('GroupInfo'):
-            uniqueID = group.find('GroupID').text  # pylint: disable=invalid-name
+            # pylint: disable=invalid-name
+            uniqueID = group.find('GroupID').text
             if uniqueID in self.Groups:
                 self.Groups[uniqueID].update_state(group)
             else:
@@ -203,7 +205,8 @@ class Light(LinkedDevice):
         super(Light, self).__init__(bridge, info)
 
         self.device_index = info.findtext('DeviceIndex')
-        self.uniqueID = info.findtext('DeviceID')  # pylint: disable=invalid-name
+        # pylint: disable=invalid-name
+        self.uniqueID = info.findtext('DeviceID')
         self.iconvalue = info.findtext('IconVersion')
         self.firmware = info.findtext('FirmwareVersion')
         self.manufacturer = info.findtext('Manufacturer')
@@ -325,7 +328,8 @@ class Group(LinkedDevice):
     def __init__(self, bridge, info):
         """Create a Group device."""
         super(Group, self).__init__(bridge, info)
-        self.uniqueID = info.findtext('GroupID')  # pylint: disable=invalid-name
+        # pylint: disable=invalid-name
+        self.uniqueID = info.findtext('GroupID')
 
     def update_state(self, status):
         """Update the device state."""
