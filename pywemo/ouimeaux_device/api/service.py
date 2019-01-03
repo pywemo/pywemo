@@ -9,15 +9,16 @@ from .xsd import service as serviceParser
 
 LOG = logging.getLogger(__name__)
 
-REQUEST_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
-<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" """
-"""s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+REQUEST_TEMPLATE = """
+<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
  <s:Body>
   <u:{action} xmlns:u="{service}">
    {args}
   </u:{action}>
  </s:Body>
-</s:Envelope>"""
+</s:Envelope>
+"""
 
 
 class ActionException(Exception):

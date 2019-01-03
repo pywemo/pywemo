@@ -119,15 +119,7 @@ class SubscriptionRegistry:
         LOG.info("Unsubscribing to events from %r", device)
 
         with self._event_thread_cond:
-            # Remove any pending events for the device
-            for event in self._events[device.serialnumber]:
-                try:
-                    self._sched.cancel(event)
-                except ValueError:
-                    # event might execute and be removed from queue
-                    # concurrently.  Safe to ignore
-                    pass
-
+            # Remove any events, callbacks, and the device itself
             if self._callbacks[device.serialnumber] is not None:
                 del self._callbacks[device.serialnumber]
             if self._events[device.serialnumber] is not None:
