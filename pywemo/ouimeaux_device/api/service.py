@@ -10,17 +10,21 @@ from .xsd import service as serviceParser
 LOG = logging.getLogger(__name__)
 MAX_RETRIES = 3
 
-# noqa E501
+# The formatting here is a very hacky way around a too-long line flake8 error
+# I'm sorry.
 REQUEST_TEMPLATE = """
 <?xml version="1.0" encoding="utf-8"?>
-<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<s:Envelope xmlns:s="{envelope}" s:encodingStyle="{encoding}">
  <s:Body>
   <u:{action} xmlns:u="{service}">
    {args}
   </u:{action}>
  </s:Body>
 </s:Envelope>
-"""
+""".format(
+    envelope="http://schemas.xmlsoap.org/soap/envelope/",
+    encoding="http://schemas.xmlsoap.org/soap/encoding/",
+    action="{action}", service="{service}", args="{args}")
 
 
 class ActionException(Exception):
