@@ -120,7 +120,7 @@ class SubscriptionRegistry:
 
         with self._event_thread_cond:
             # Remove any pending events for the device
-            for event in self._events[device.serialnumber].values():
+            for event in self._events[device.serialnumber]:
                 try:
                     self._sched.cancel(event)
                 except ValueError:
@@ -195,7 +195,8 @@ class SubscriptionRegistry:
         """Execute the callback for a received event."""
         LOG.info("Received event from %s(%s) - %s %s",
                  device, device.host, type_, value)
-        for type_filter, callback in self._callbacks.get(device.serialnumber, ()):
+        for type_filter, callback in self._callbacks.get(
+                device.serialnumber, ()):
             if type_filter is None or type_ == type_filter:
                 callback(device, type_, value)
 

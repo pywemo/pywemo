@@ -9,19 +9,20 @@ from .xsd import service as serviceParser
 
 LOG = logging.getLogger(__name__)
 
-REQUEST_TEMPLATE = """
-<?xml version="1.0" encoding="utf-8"?>
-<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+REQUEST_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" """
+"""s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
  <s:Body>
   <u:{action} xmlns:u="{service}">
    {args}
   </u:{action}>
  </s:Body>
-</s:Envelope>
-"""
+</s:Envelope>"""
+
 
 class ActionException(Exception):
     """Generic exceptions when dealing with Actions."""
+
     pass
 
 
@@ -65,7 +66,7 @@ class Action:
                 # pylint: disable=deprecated-method
                 for response_item in et.fromstring(
                         response.content
-                    ).getchildren()[0].getchildren()[0].getchildren():
+                ).getchildren()[0].getchildren()[0].getchildren():
                     response_dict[response_item.tag] = response_item.text
                 return response_dict
             except requests.exceptions.RequestException:

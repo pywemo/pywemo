@@ -57,7 +57,8 @@ def device_from_description(description_url, mac, rediscovery_enabled=True):
         rediscovery_enabled=rediscovery_enabled)
 
 
-def device_from_uuid_and_location(uuid, mac, location, rediscovery_enabled=True):
+def device_from_uuid_and_location(uuid, mac, location,
+                                  rediscovery_enabled=True):
     """Determine device class based on the device uuid."""
     if uuid is None:
         return None
