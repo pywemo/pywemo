@@ -20,6 +20,10 @@ REQUEST_TEMPLATE = """
 </s:Envelope>
 """
 
+class ActionException(Exception):
+    """Generic exceptions when dealing with Actions."""
+    pass
+
 
 class Action:
     """Representation of an Action for a WeMo device."""
@@ -59,8 +63,9 @@ class Action:
                     headers=self.headers, timeout=10)
                 response_dict = {}
                 # pylint: disable=deprecated-method
-                for response_item in et.fromstring(response.content).\
-                getchildren()[0].getchildren()[0].getchildren():
+                for response_item in et.fromstring(
+                        response.content
+                    ).getchildren()[0].getchildren()[0].getchildren():
                     response_dict[response_item.tag] = response_item.text
                 return response_dict
             except requests.exceptions.RequestException:
@@ -70,8 +75,12 @@ class Action:
                 if self._device.rediscovery_enabled:
                     self._device.reconnect_with_device()
 
-        LOG.error("Error communicating with %s. Giving up", self._device.name)
-        return
+        LOG.error("Error communicating with %s after %i attempts. Giving up.",
+                  self._device.name, MAX_RETRIES)
+
+        raise ActionException(
+            "Error communicating with {0} after {1} attempts."
+            "Giving up.".format(self._device.name, MAX_RETRIES))
 
     def __repr__(self):
         """Return a string representation of the Action."""

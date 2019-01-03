@@ -110,6 +110,33 @@ class SubscriptionRegistry:
                 self._sched.enter(0, 0, self._resubscribe, [device]))
             self._event_thread_cond.notify()
 
+    def unregister(self, device):
+        """Unregister a device from subscription updates."""
+        if not device:
+            LOG.error("Called with an invalid device: %r", device)
+            return
+
+        LOG.info("Unsubscribing to events from %r", device)
+
+        with self._event_thread_cond:
+            # Remove any pending events for the device
+            for event in self._events[device.serialnumber].values():
+                try:
+                    self._sched.cancel(event)
+                except ValueError:
+                    # event might execute and be removed from queue
+                    # concurrently.  Safe to ignore
+                    pass
+
+            if self._callbacks[device.serialnumber] is not None:
+                del self._callbacks[device.serialnumber]
+            if self._events[device.serialnumber] is not None:
+                del self._events[device.serialnumber]
+            if self.devices[device.host] is not None:
+                del self.devices[device.host]
+
+            self._event_thread_cond.notify()
+
     def _resubscribe(self, device, sid=None, retry=0):
         LOG.info("Resubscribe for %s", device)
         headers = {'TIMEOUT': '300'}
@@ -168,14 +195,14 @@ class SubscriptionRegistry:
         """Execute the callback for a received event."""
         LOG.info("Received event from %s(%s) - %s %s",
                  device, device.host, type_, value)
-        for type_filter, callback in self._callbacks.get(device, ()):
+        for type_filter, callback in self._callbacks.get(device.serialnumber, ()):
             if type_filter is None or type_ == type_filter:
                 callback(device, type_, value)
 
     # pylint: disable=invalid-name
     def on(self, device, type_filter, callback):
         """Add an event callback for a device."""
-        self._callbacks[device].append((type_filter, callback))
+        self._callbacks[device.serialnumber].append((type_filter, callback))
 
     def _find_port(self):
         """Find a valid open port to run the HTTP server on."""

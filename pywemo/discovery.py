@@ -31,8 +31,9 @@ def discover_devices(ssdp_st=None, max_devices=None,
         if entry.match_device_description(
                 {'manufacturer': 'Belkin International Inc.'}):
             mac = entry.description.get('device').get('macAddress')
-            device = device_from_description(description_url=entry.location\
-            , mac=mac, rediscovery_enabled=rediscovery_enabled)
+            device = device_from_description(
+                description_url=entry.location, mac=mac,
+                rediscovery_enabled=rediscovery_enabled)
 
             if device is not None:
                 wemos.append(device)
@@ -51,8 +52,9 @@ def device_from_description(description_url, mac, rediscovery_enabled=True):
             'No MAC address was supplied or found in setup xml at: %s.',
             description_url)
 
-    return device_from_uuid_and_location(uuid, device_mac, description_url,\
-    rediscovery_enabled=rediscovery_enabled)
+    return device_from_uuid_and_location(
+        uuid, device_mac, description_url,
+        rediscovery_enabled=rediscovery_enabled)
 
 
 def device_from_uuid_and_location(uuid, mac, location, rediscovery_enabled=True):
