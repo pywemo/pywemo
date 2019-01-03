@@ -116,6 +116,8 @@ class LinkedDevice:
     def __init__(self, bridge, info):
         """Create a Linked Device."""
         self.bridge = bridge
+        self.host = bridge.host
+        self.port = bridge.port
         self.state = {}
         self.capabilities = []
         self._values = []
