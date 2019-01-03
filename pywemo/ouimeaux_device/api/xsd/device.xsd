@@ -91,5 +91,5 @@
       <xs:element name="device" type="DeviceType" minOccurs="1" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
- 	 
+
 </xs:schema>
