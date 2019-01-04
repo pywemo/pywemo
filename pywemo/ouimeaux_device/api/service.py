@@ -77,8 +77,9 @@ class Action:
                     response_dict[response_item.tag] = response_item.text
                 return response_dict
             except requests.exceptions.RequestException:
-                LOG.warning("Error communicating with %s, retry %i",
-                            self._device.name, attempt)
+                LOG.warning("Error communicating with %s at %s:%i, retry %i",
+                            self._device.name, self._device.host,
+                            self._device.port, attempt)
 
                 if self._device.rediscovery_enabled:
                     self._device.reconnect_with_device()
