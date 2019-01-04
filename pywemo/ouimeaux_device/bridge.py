@@ -52,7 +52,7 @@ class Bridge(Device):
                     name=self.name, lights=len(self.Lights),
                     groups=len(self.Groups))
 
-    def bridge_update(self, force_update=False):
+    def bridge_update(self, force_update=True):
         """Get updated status information for the bridge and its lights."""
         # pylint: disable=maybe-no-member
         if force_update or self.Lights is None or self.Groups is None:
