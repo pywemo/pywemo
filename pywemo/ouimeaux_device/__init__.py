@@ -73,7 +73,7 @@ class UnknownService(Exception):
 class Device(object):
     """Base object for WeMo devices."""
 
-    def __init__(self, url, mac):
+    def __init__(self, url, mac, rediscovery_enabled=True):
         """Create a WeMo device."""
         self._state = None
         self.basic_state_params = {}
@@ -83,6 +83,7 @@ class Device(object):
         self.port = parsed_url.port
         self.retrying = False
         self.mac = mac
+        self.rediscovery_enabled = rediscovery_enabled
         xml = requests.get(url, timeout=10)
         self._config = deviceParser.parseString(xml.content).device
         service_list = self._config.serviceList
@@ -147,6 +148,7 @@ class Device(object):
             try_no += 1
 
     def _reconnect_with_device_by_probing(self):
+        """Attempt to reconnect to the device on the existing port."""
         port = probe_device(self)
 
         if port is None:
@@ -166,9 +168,14 @@ class Device(object):
 
     def reconnect_with_device(self):
         """Re-probe & scan network to rediscover a disconnected device."""
-        if (not self._reconnect_with_device_by_probing() and
-                (self.mac or self.serialnumber)):
-            self._reconnect_with_device_by_discovery()
+        if self.rediscovery_enabled:
+            if (not self._reconnect_with_device_by_probing() and
+                    (self.mac or self.serialnumber)):
+                self._reconnect_with_device_by_discovery()
+        else:
+            LOG.warning("Rediscovery was requested for device %s, "
+                        "but rediscovery is disabled. Ignoring request.",
+                        self.name)
 
     def parse_basic_state(self, params):
         """Parse the basic state response from the device."""

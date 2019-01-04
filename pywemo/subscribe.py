@@ -51,7 +51,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         data = self.rfile.read(content_len)
         if device is None:
-            LOG.error('Received event for unregistered device %s', sender_ip)
+            LOG.warning('Received event for unregistered device %s', sender_ip)
         else:
             # trim garbage from end, if any
             data = data.decode("UTF-8").split("\n\n")[0]
@@ -110,6 +110,25 @@ class SubscriptionRegistry:
                 self._sched.enter(0, 0, self._resubscribe, [device]))
             self._event_thread_cond.notify()
 
+    def unregister(self, device):
+        """Unregister a device from subscription updates."""
+        if not device:
+            LOG.error("Called with an invalid device: %r", device)
+            return
+
+        LOG.info("Unsubscribing to events from %r", device)
+
+        with self._event_thread_cond:
+            # Remove any events, callbacks, and the device itself
+            if self._callbacks[device.serialnumber] is not None:
+                del self._callbacks[device.serialnumber]
+            if self._events[device.serialnumber] is not None:
+                del self._events[device.serialnumber]
+            if self.devices[device.host] is not None:
+                del self.devices[device.host]
+
+            self._event_thread_cond.notify()
+
     def _resubscribe(self, device, sid=None, retry=0):
         LOG.info("Resubscribe for %s", device)
         headers = {'TIMEOUT': '300'}
@@ -136,9 +155,10 @@ class SubscriptionRegistry:
                 device, ex, SUBSCRIPTION_RETRY)
             retry += 1
             if retry > 1:
-                # If this wan't a one off try rediscovery in case device has
-                # changed
-                device.reconnect_with_device()
+                # If this wasn't a one-off, try rediscovery
+                # in case the device has changed.
+                if device.rediscovery_enabled:
+                    device.reconnect_with_device()
             with self._event_thread_cond:
                 self._events[device.serialnumber] = (
                     self._sched.enter(SUBSCRIPTION_RETRY,
@@ -167,14 +187,15 @@ class SubscriptionRegistry:
         """Execute the callback for a received event."""
         LOG.info("Received event from %s(%s) - %s %s",
                  device, device.host, type_, value)
-        for type_filter, callback in self._callbacks.get(device, ()):
+        for type_filter, callback in self._callbacks.get(
+                device.serialnumber, ()):
             if type_filter is None or type_ == type_filter:
                 callback(device, type_, value)
 
     # pylint: disable=invalid-name
     def on(self, device, type_filter, callback):
         """Add an event callback for a device."""
-        self._callbacks[device].append((type_filter, callback))
+        self._callbacks[device.serialnumber].append((type_filter, callback))
 
     def _find_port(self):
         """Find a valid open port to run the HTTP server on."""

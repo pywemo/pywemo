@@ -52,35 +52,36 @@ class Bridge(Device):
                     name=self.name, lights=len(self.Lights),
                     groups=len(self.Groups))
 
-    def bridge_update(self):
+    def bridge_update(self, force_update=False):
         """Get updated status information for the bridge and its lights."""
         # pylint: disable=maybe-no-member
-        plugin_udn = self.basicevent.GetMacAddr().get('PluginUDN')
+        if force_update or self.Lights is None or self.Groups is None:
+            plugin_udn = self.basicevent.GetMacAddr().get('PluginUDN')
 
-        if hasattr(self.bridge, 'GetEndDevicesWithStatus'):
-            end_devices = self.bridge.GetEndDevicesWithStatus(
-                DevUDN=plugin_udn, ReqListType='PAIRED_LIST')
-        else:
-            end_devices = self.bridge.GetEndDevices(
-                DevUDN=plugin_udn, ReqListType='PAIRED_LIST')
-
-        end_device_list = et.fromstring(end_devices.get('DeviceLists'))
-
-        for light in end_device_list.iter('DeviceInfo'):
-            # pylint: disable=invalid-name
-            uniqueID = light.find('DeviceID').text
-            if uniqueID in self.Lights:
-                self.Lights[uniqueID].update_state(light)
+            if hasattr(self.bridge, 'GetEndDevicesWithStatus'):
+                end_devices = self.bridge.GetEndDevicesWithStatus(
+                    DevUDN=plugin_udn, ReqListType='PAIRED_LIST')
             else:
-                self.Lights[uniqueID] = Light(self, light)
+                end_devices = self.bridge.GetEndDevices(
+                    DevUDN=plugin_udn, ReqListType='PAIRED_LIST')
 
-        for group in end_device_list.iter('GroupInfo'):
-            # pylint: disable=invalid-name
-            uniqueID = group.find('GroupID').text
-            if uniqueID in self.Groups:
-                self.Groups[uniqueID].update_state(group)
-            else:
-                self.Groups[uniqueID] = Group(self, group)
+            end_device_list = et.fromstring(end_devices.get('DeviceLists'))
+
+            for light in end_device_list.iter('DeviceInfo'):
+                # pylint: disable=invalid-name
+                uniqueID = light.find('DeviceID').text
+                if uniqueID in self.Lights:
+                    self.Lights[uniqueID].update_state(light)
+                else:
+                    self.Lights[uniqueID] = Light(self, light)
+
+            for group in end_device_list.iter('GroupInfo'):
+                # pylint: disable=invalid-name
+                uniqueID = group.find('GroupID').text
+                if uniqueID in self.Groups:
+                    self.Groups[uniqueID].update_state(group)
+                else:
+                    self.Groups[uniqueID] = Group(self, group)
 
         return self.Lights, self.Groups
 
@@ -115,11 +116,15 @@ class LinkedDevice:
     def __init__(self, bridge, info):
         """Create a Linked Device."""
         self.bridge = bridge
+        self.host = bridge.host
+        self.port = bridge.port
         self.state = {}
         self.capabilities = []
         self._values = []
         self.update_state(info)
         self._last_err = None
+        self.mac = self.bridge.mac
+        self.serialnumber = self.bridge.serialnumber
 
     def get_state(self, force_update=False):
         """Return the status of the device."""
