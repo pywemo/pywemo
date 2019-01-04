@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 CONST_DESC = 'Lightweight Python module to discover and control WeMo devices'
 
 setup(name='pywemo',
-      version='0.4.34',
+      version='0.4.35',
       description=CONST_DESC,
       url='http://github.com/pavoni/pywemo',
       author='Greg Dowling',
