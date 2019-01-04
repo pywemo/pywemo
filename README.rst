@@ -1,5 +1,5 @@
 pyWeMo |Build Status|
-======
+=====================
 Lightweight Python 2 and Python 3 module to discover and control WeMo devices.
 
 This is a stripped down version of the Python API for WeMo devices [ouimeaux](https://github.com/iancmcc/ouimeaux) with simpler dependencies.
@@ -23,7 +23,7 @@ How to use
     
     
 If discovery doesn't work on your network
-----------
+-----------------------------------------
 On some networks discovery doesn't work reliably, in that case if you can find the ip address of your Wemo device you can use the following code.
 
 .. code:: python
