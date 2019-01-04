@@ -1,4 +1,5 @@
 """Representation of Services and Actions for WeMo devices."""
+# flake8: noqa E501
 import logging
 from xml.etree import cElementTree as et
 
