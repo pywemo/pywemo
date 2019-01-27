@@ -58,6 +58,11 @@ class Maker(Switch):
         self.get_state(True)
 
     @property
+    def device_type(self):
+        """Return what kind of WeMo this device is."""
+        return "Maker"
+
+    @property
     def sensor_state(self):
         """Return the state of the sensor."""
         return self.maker_params['sensorstate']

@@ -67,6 +67,11 @@ class Insight(Switch):
         return Switch.get_state(self, force_update)
 
     @property
+    def device_type(self):
+        """Return what kind of WeMo this device is."""
+        return "Insight"
+
+    @property
     def today_kwh(self):
         """Return the kwh used today."""
         return self.insight_params['todaymw'] * 1.6666667e-8

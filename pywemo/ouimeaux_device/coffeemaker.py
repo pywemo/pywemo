@@ -93,6 +93,11 @@ class CoffeeMaker(Switch):
         return Switch.subscription_update(self, _type, _params)
 
     @property
+    def device_type(self):
+        """Return what kind of WeMo this device is."""
+        return "CoffeeMaker"
+
+    @property
     def mode(self):
         """Return the mode of the device."""
         return self._attributes.get('Mode')
