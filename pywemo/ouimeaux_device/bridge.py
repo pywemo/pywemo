@@ -109,6 +109,11 @@ class Bridge(Device):
         # pylint: disable=maybe-no-member
         return self.bridge.SetDeviceStatus(DeviceStatusList=send_state)
 
+    @property
+    def device_type(self):
+        """Return what kind of WeMo this device is."""
+        return "Bridge"
+
 
 class LinkedDevice:
     """Representation of a device connected to the bridge."""
@@ -200,6 +205,11 @@ class LinkedDevice:
     def toggle(self):
         """Toggle the device from on to off or off to on."""
         return self._setdevicestatus(onoff=TOGGLE)
+
+    @property
+    def device_type(self):
+        """Return what kind of WeMo this device is."""
+        return "LinkedDevice"
 
 
 class Light(LinkedDevice):
@@ -326,6 +336,11 @@ class Light(LinkedDevice):
         """Start ramping the brightness up or down."""
         return self._setdevicestatus(levelcontrol_stop='')
 
+    @property
+    def device_type(self):
+        """Return what kind of WeMo this device is."""
+        return "Light"
+
 
 class Group(LinkedDevice):
     """Representation of a Group of lights connected to the Bridge."""
@@ -358,3 +373,8 @@ class Group(LinkedDevice):
     def __repr__(self):
         """Return a string representation of the device."""
         return '<GROUP "{name}">'.format(name=self.name)
+
+    @property
+    def device_type(self):
+        """Return what kind of WeMo this device is."""
+        return "Group"

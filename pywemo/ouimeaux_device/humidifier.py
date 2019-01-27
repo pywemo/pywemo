@@ -162,6 +162,11 @@ class Humidifier(Switch):
         return Switch.subscription_update(self, _type, _params)
 
     @property
+    def device_type(self):
+        """Return what kind of WeMo this device is."""
+        return "Humidifier"
+
+    @property
     def fan_mode(self):
         """Return the FanMode setting (as an int index of the IntEnum)."""
         return self._attributes.get('fan_mode')

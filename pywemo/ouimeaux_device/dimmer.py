@@ -47,3 +47,8 @@ class Dimmer(Switch):
     def __repr__(self):
         """Return a string representation of the device."""
         return '<WeMo Dimmer "{name}">'.format(name=self.name)
+
+    @property
+    def device_type(self):
+        """Return what kind of WeMo this device is."""
+        return "Dimmer"
