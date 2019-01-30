@@ -37,7 +37,7 @@ On some networks discovery doesn't work reliably, in that case if you can find t
     >> print(device)
     <WeMo Insight "AC Insight">
     
-Please note that you need to use ip addresses as shown above, rather than hostnames, otherwise the scbscription update logic won't work.
+Please note that you need to use ip addresses as shown above, rather than hostnames, otherwise the subscription update logic won't work.
 
 License
 -------
