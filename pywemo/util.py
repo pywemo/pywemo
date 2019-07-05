@@ -1,6 +1,6 @@
 """Miscellaneous utility functions."""
 from collections import defaultdict
-import netifaces
+import ifaddr
 
 
 # Taken from http://stackoverflow.com/a/10077069
@@ -34,14 +34,20 @@ def etree_to_dict(tree):
     return tree_dict
 
 
-def interface_addresses(family=netifaces.AF_INET):
+def interface_addresses():
     """
     Return local address for broadcast/multicast.
 
     Return local address of any network associated with a local interface
     that has broadcast (and probably multicast) capability.
     """
-    return [addr['addr']
-            for i in netifaces.interfaces()
-            for addr in netifaces.ifaddresses(i).get(family) or []
-            if 'broadcast' in addr]
+    addresses = []
+
+    for iface in ifaddr.get_adapters():
+        for addr in iface.ips:
+            if not addr.is_IPv4 or addr.ip == '127.0.0.1':
+                continue
+
+            addresses.append(addr.ip)
+
+    return addresses
