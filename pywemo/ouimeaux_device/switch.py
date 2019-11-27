@@ -31,4 +31,4 @@ class Switch(Device):
     @property
     def device_type(self):
         """Return what kind of WeMo this device is."""
-        return "Humidifier"
+        return "Switch"
