@@ -6,7 +6,7 @@ CONST_DESC = 'Lightweight Python module to discover and control WeMo devices'
 
 
 setup(name='pywemo',
-      version='0.4.41',
+      version='0.4.42',
       description=CONST_DESC,
       long_description=open('README.rst').read(),
       url='http://github.com/pavoni/pywemo',
