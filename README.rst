@@ -47,8 +47,8 @@ The code in pywemo/ouimeaux_device is written and copyright by Ian McCracken and
    :target: https://travis-ci.org/pavoni/pywemo
    :alt: Status of latest Travis CI build
 .. |PyPI Version Badge| image:: https://pypip.in/v/pywemo/badge.png
-    :target: https://crate.io/packages/pywemo/
+    :target: https://pypi.org/project/pywemo/
     :alt: Latest PyPI version
 .. |PyPI Downloads Badge| image:: https://pypip.in/d/pywemo/badge.png
-    :target: https://crate.io/packages/pywemo/
+    :target: https://pypi.org/project/pywemo/
     :alt: Number of PyPI downloads
