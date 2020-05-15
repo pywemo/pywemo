@@ -1,4 +1,4 @@
-pyWeMo |Build Status|
+pyWeMo |Build Badge| |PyPi Version Badge| |PyPi Downloads Badge|
 =====================
 Lightweight Python 2 and Python 3 module to discover and control WeMo devices.
 
@@ -43,5 +43,12 @@ License
 -------
 The code in pywemo/ouimeaux_device is written and copyright by Ian McCracken and released under the BSD license. The rest is released under the MIT license.
 
-.. |Build Status| image:: https://travis-ci.org/pavoni/pywemo.svg?branch=master
+.. |Build Badge| image:: https://travis-ci.org/pavoni/pywemo.svg?branch=master
    :target: https://travis-ci.org/pavoni/pywemo
+   :alt: Status of latest Travis CI build
+.. |PyPi Version Badge| image:: https://pypip.in/v/pywemo/badge.png
+    :target: https://crate.io/packages/pywemo/
+    :alt: Latest PyPI version
+.. |PyPi Downloads Badge| image:: https://pypip.in/d/pywemo/badge.png
+    :target: https://crate.io/packages/pywemo/
+    :alt: Number of PyPI downloads
