@@ -1,4 +1,4 @@
-pyWeMo |Build Badge| |PyPi Version Badge| |PyPi Downloads Badge|
+pyWeMo |Build Badge| |PyPI Version Badge| |PyPI Downloads Badge|
 =====================
 Lightweight Python 2 and Python 3 module to discover and control WeMo devices.
 
@@ -6,7 +6,7 @@ This is a stripped down version of the Python API for WeMo devices, `ouimeaux <h
 
 Dependencies
 ------------
-pyWeMo depends on Python packages requests, ifaddr and six.
+pyWeMo depends on Python packages: requests, ifaddr and six
 
 How to use
 ----------
@@ -46,9 +46,9 @@ The code in pywemo/ouimeaux_device is written and copyright by Ian McCracken and
 .. |Build Badge| image:: https://travis-ci.org/pavoni/pywemo.svg?branch=master
    :target: https://travis-ci.org/pavoni/pywemo
    :alt: Status of latest Travis CI build
-.. |PyPi Version Badge| image:: https://pypip.in/v/pywemo/badge.png
+.. |PyPI Version Badge| image:: https://pypip.in/v/pywemo/badge.png
     :target: https://crate.io/packages/pywemo/
     :alt: Latest PyPI version
-.. |PyPi Downloads Badge| image:: https://pypip.in/d/pywemo/badge.png
+.. |PyPI Downloads Badge| image:: https://pypip.in/d/pywemo/badge.png
     :target: https://crate.io/packages/pywemo/
     :alt: Number of PyPI downloads
