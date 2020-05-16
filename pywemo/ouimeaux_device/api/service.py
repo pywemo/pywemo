@@ -84,7 +84,7 @@ class Action:
                   self._device.name, MAX_RETRIES)
 
         raise ActionException(
-            "Error communicating with {0} after {1} attempts."
+            "Error communicating with {0} after {1} attempts. "
             "Giving up.".format(self._device.name, MAX_RETRIES))
 
     def __repr__(self):
