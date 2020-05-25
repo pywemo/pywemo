@@ -71,7 +71,7 @@ class TestAction:
         headers = post_mock.call_args.kwargs[HEADERS_KWARG_KEY]
         soapaction_header = headers[SOAPACTION_KEY]
 
-        assert soapaction_header == f'"{service_type}#{name}"'
+        assert soapaction_header == '"%s#%s"' % (service_type, name)
 
     def test_call_request_is_tried_up_to_max_on_communication_error(self):
         action = self.get_mock_action()
