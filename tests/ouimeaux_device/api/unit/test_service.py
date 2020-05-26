@@ -1,7 +1,8 @@
 """Tests for pywemo.ouimeaux_device.api.service."""
 
-from xml.etree import cElementTree as et
-import mock
+from xml.etree import cElementTree as cet
+from xml.etree import ElementTree
+import unittest.mock as mock
 import pytest
 import requests
 
@@ -16,11 +17,12 @@ svc.LOG = mock.Mock()
 
 class TestAction:
     @staticmethod
-    def get_mock_action(name="", service_type=""):
+    def get_mock_action(name="", service_type="", url=""):
         device = mock.Mock()
 
         service = mock.Mock()
         service.serviceType = service_type
+        service.controlURL = url
 
         action_config = mock.MagicMock()
         action_config.get_name = lambda: name
@@ -30,16 +32,26 @@ class TestAction:
     def test_call_post_request_is_made_exactly_once_when_successful(self):
         action = self.get_mock_action()
         requests.post = mock.Mock()
-        et.fromstring = mock.MagicMock()
+        cet.fromstring = mock.MagicMock()
 
         action()
 
         requests.post.assert_called_once()
 
-    def test_call_request_has_correct_headers(self):
+    def test_call_request_has_well_formed_xml_body(self):
+        action = self.get_mock_action(name="cool_name", service_type="service")
+        requests.post = post_mock = mock.Mock()
+        cet.fromstring = mock.MagicMock()
+
+        action()
+
+        body = post_mock.call_args.args[1]
+        ElementTree.fromstring(body)  # will throw if xml is malformed
+
+    def test_call_request_has_correct_header_keys(self):
         action = self.get_mock_action()
         requests.post = post_mock = mock.Mock()
-        et.fromstring = mock.MagicMock()
+        cet.fromstring = mock.MagicMock()
 
         action()
 
@@ -50,7 +62,7 @@ class TestAction:
     def test_call_headers_has_correct_content_type(self):
         action = self.get_mock_action()
         requests.post = post_mock = mock.Mock()
-        et.fromstring = mock.MagicMock()
+        cet.fromstring = mock.MagicMock()
 
         action()
 
@@ -64,7 +76,7 @@ class TestAction:
         name = "cool_name"
         action = self.get_mock_action(name, service_type)
         requests.post = post_mock = mock.Mock()
-        et.fromstring = mock.MagicMock()
+        cet.fromstring = mock.MagicMock()
 
         action()
 
@@ -73,24 +85,36 @@ class TestAction:
 
         assert soapaction_header == '"%s#%s"' % (service_type, name)
 
+    def test_call_headers_has_correct_url(self):
+        url = "http://www.github.com/"
+        action = self.get_mock_action(url=url)
+        requests.post = post_mock = mock.Mock()
+        cet.fromstring = mock.MagicMock()
+
+        action()
+
+        actual_url = post_mock.call_args.args[0]
+
+        assert actual_url == url
+
     def test_call_request_is_tried_up_to_max_on_communication_error(self):
         action = self.get_mock_action()
-        requests.post = mock.Mock(
+        requests.post = post_mock = mock.Mock(
             side_effect=requests.exceptions.RequestException)
-        et.fromstring = mock.MagicMock()
+        cet.fromstring = mock.MagicMock()
 
         try:
             action()
         except svc.ActionException:
             pass
 
-        assert requests.post.call_count == svc.MAX_RETRIES
+        assert post_mock.call_count == svc.MAX_RETRIES
 
     def test_call_throws_when_final_retry_fails(self):
         action = self.get_mock_action()
         requests.post = mock.Mock(
             side_effect=requests.exceptions.RequestException)
-        et.fromstring = mock.MagicMock()
+        cet.fromstring = mock.MagicMock()
 
         with pytest.raises(svc.ActionException):
             action()
@@ -99,9 +123,9 @@ class TestAction:
         action = self.get_mock_action()
         requests.post = mock.Mock()
 
-        envelope = et.Element("soapEnvelope")
-        body = et.SubElement(envelope, "soapBody")
-        response = et.SubElement(body, "soapResponse")
+        envelope = cet.Element("soapEnvelope")
+        body = cet.SubElement(envelope, "soapBody")
+        response = cet.SubElement(body, "soapResponse")
 
         response_content = {
             "key1": "value1",
@@ -110,10 +134,10 @@ class TestAction:
         }
 
         for key, value in response_content.items():
-            element = et.SubElement(response, key)
+            element = cet.SubElement(response, key)
             element.text = value
 
-        et.fromstring = mock.MagicMock(return_value=envelope)
+        cet.fromstring = mock.MagicMock(return_value=envelope)
 
         actual_responses = action()
 
