@@ -49,7 +49,7 @@ class TestAction:
         action()
 
         body = post_mock.call_args[MOCK_ARGS_ORDERED][1]
-        ElementTree.fromstring(body)  # will throw if xml is malformed
+        ElementTree.fromstring(body)  # will raise error if xml is malformed
 
     def test_call_request_has_correct_header_keys(self):
         action = self.get_mock_action()
