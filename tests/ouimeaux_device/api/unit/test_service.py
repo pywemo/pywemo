@@ -12,6 +12,9 @@ HEADERS_KWARG_KEY = 'headers'
 CONTENT_TYPE_KEY = 'Content-Type'
 SOAPACTION_KEY = 'SOAPACTION'
 
+MOCK_ARGS_ORDERED = 0
+MOCK_ARGS_KWARGS = 1
+
 svc.LOG = mock.Mock()
 
 
@@ -31,12 +34,12 @@ class TestAction:
 
     def test_call_post_request_is_made_exactly_once_when_successful(self):
         action = self.get_mock_action()
-        requests.post = mock.Mock()
+        requests.post = post_mock = mock.Mock()
         cet.fromstring = mock.MagicMock()
 
         action()
 
-        requests.post.assert_called_once()
+        assert post_mock.call_count == 1
 
     def test_call_request_has_well_formed_xml_body(self):
         action = self.get_mock_action(name="cool_name", service_type="service")
@@ -45,7 +48,7 @@ class TestAction:
 
         action()
 
-        body = post_mock.call_args.args[1]
+        body = post_mock.call_args[MOCK_ARGS_ORDERED][1]
         ElementTree.fromstring(body)  # will throw if xml is malformed
 
     def test_call_request_has_correct_header_keys(self):
@@ -55,7 +58,7 @@ class TestAction:
 
         action()
 
-        headers = post_mock.call_args.kwargs[HEADERS_KWARG_KEY]
+        headers = post_mock.call_args[MOCK_ARGS_KWARGS][HEADERS_KWARG_KEY]
         for header in [CONTENT_TYPE_KEY, SOAPACTION_KEY]:
             assert header in headers
 
@@ -66,7 +69,7 @@ class TestAction:
 
         action()
 
-        headers = post_mock.call_args.kwargs[HEADERS_KWARG_KEY]
+        headers = post_mock.call_args[MOCK_ARGS_KWARGS][HEADERS_KWARG_KEY]
         content_type_header = headers[CONTENT_TYPE_KEY]
 
         assert content_type_header == "text/xml"
@@ -80,7 +83,7 @@ class TestAction:
 
         action()
 
-        headers = post_mock.call_args.kwargs[HEADERS_KWARG_KEY]
+        headers = post_mock.call_args[MOCK_ARGS_KWARGS][HEADERS_KWARG_KEY]
         soapaction_header = headers[SOAPACTION_KEY]
 
         assert soapaction_header == '"%s#%s"' % (service_type, name)
