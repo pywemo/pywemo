@@ -18,5 +18,5 @@ cache:
     - $HOME/.cache/pip
 install: pip install -U tox
 language: python
-before_script: chmod +x $TRAVIS_BUILD_DIR/scripts/check_dirty
+before_script: chmod +x $TRAVIS_BUILD_DIR/script/check_dirty
 script: travis_wait 30 tox --develop
