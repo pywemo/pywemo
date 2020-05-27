@@ -96,8 +96,7 @@ class TestAction:
 
         action()
 
-        actual_url = post_mock.call_args.args[0]
-
+        actual_url = post_mock.call_args[MOCK_ARGS_ORDERED][0]
         assert actual_url == url
 
     def test_call_request_is_tried_up_to_max_on_communication_error(self):
