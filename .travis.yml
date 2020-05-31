@@ -10,10 +10,13 @@ matrix:
       env: TOXENV=lint
     - python: "3.5.3"
       env: TOXENV=pylint
+    - python: "3.5.3"
+      env: TOXENV=py35
 
 cache:
   directories:
     - $HOME/.cache/pip
 install: pip install -U tox
 language: python
+before_script: chmod +x $TRAVIS_BUILD_DIR/script/check_dirty
 script: travis_wait 30 tox --develop
