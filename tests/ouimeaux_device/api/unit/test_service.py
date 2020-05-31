@@ -8,9 +8,9 @@ import requests
 
 import pywemo.ouimeaux_device.api.service as svc
 
-HEADERS_KWARG_KEY = 'headers'
-CONTENT_TYPE_KEY = 'Content-Type'
-SOAPACTION_KEY = 'SOAPACTION'
+HEADERS_KWARG_KEY = "headers"
+CONTENT_TYPE_KEY = "Content-Type"
+SOAPACTION_KEY = "SOAPACTION"
 
 MOCK_ARGS_ORDERED = 0
 MOCK_ARGS_KWARGS = 1
@@ -102,7 +102,8 @@ class TestAction:
     def test_call_request_is_tried_up_to_max_on_communication_error(self):
         action = self.get_mock_action()
         requests.post = post_mock = mock.Mock(
-            side_effect=requests.exceptions.RequestException)
+            side_effect=requests.exceptions.RequestException
+        )
         cet.fromstring = mock.MagicMock()
 
         try:
@@ -114,8 +115,7 @@ class TestAction:
 
     def test_call_throws_when_final_retry_fails(self):
         action = self.get_mock_action()
-        requests.post = mock.Mock(
-            side_effect=requests.exceptions.RequestException)
+        requests.post = mock.Mock(side_effect=requests.exceptions.RequestException)
         cet.fromstring = mock.MagicMock()
 
         with pytest.raises(svc.ActionException):
