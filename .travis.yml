@@ -11,7 +11,7 @@ matrix:
     - python: "3.5.3"
       env: TOXENV=pylint
     - python: "3.5.3"
-      env: TOXENV=pytest
+      env: TOXENV=py35
 
 cache:
   directories:
