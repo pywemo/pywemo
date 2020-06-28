@@ -81,7 +81,7 @@ class Insight(Switch):
     def current_power(self):
         """Return the current power usage in mW."""
         return self.insight_params['currentpower']
-   
+
     @property
     def wifi_power(self):
         """Return the current rssi wifi signal."""
