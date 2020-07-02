@@ -43,7 +43,7 @@ class Insight(Switch):
             ontoday,  # seconds
             ontotal,  # seconds
             timeperiod,  # pylint: disable=unused-variable
-            _x,  # This one is always 19 for me; what is it?
+            wifipower,  # wifi rssi signal strength
             currentmw,
             todaymw,
             totalmw,
@@ -57,6 +57,7 @@ class Insight(Switch):
                 'todaymw': int(float(todaymw)),
                 'totalmw': int(float(totalmw)),
                 'currentpower': int(float(currentmw)),
+                'wifipower': int(float(wifipower)),
                 'powerthreshold': int(float(powerthreshold))}
 
     def get_state(self, force_update=False):
@@ -80,6 +81,11 @@ class Insight(Switch):
     def current_power(self):
         """Return the current power usage in mW."""
         return self.insight_params['currentpower']
+
+    @property
+    def wifi_power(self):
+        """Return the current rssi wifi signal."""
+        return self.insight_params['wifipower']
 
     @property
     def threshold_power(self):
