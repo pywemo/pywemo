@@ -15,7 +15,7 @@ class LightSwitch(Switch):
         if _type == "BinaryState":
             try:
                 self._state = int(_params)
-            except ValueError:
+            except ValueError as e:
                 LOG.error(
                     "Could not parse BinaryState update '%s': %s", _params, e)
                 self._state = 0
