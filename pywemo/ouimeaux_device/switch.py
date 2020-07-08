@@ -1,9 +1,5 @@
 """Representation of a WeMo Switch device."""
-
-import logging
 from . import Device
-
-LOG = logging.getLogger(__name__)
 
 
 class Switch(Device):
@@ -27,15 +23,6 @@ class Switch(Device):
     def toggle(self):
         """Toggle the switch's state."""
         return self.set_state(not self.get_state())
-
-    def parse_basic_state(self, params):
-        """Parse the basic state response from the device."""
-        try:
-            state = int(params)
-        except ValueError as e:
-            state = 0
-            LOG.error("Could not parse state: %s", e)
-        return {"state": state}
 
     def __repr__(self):
         """Return a string representation of the device."""
