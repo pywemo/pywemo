@@ -279,10 +279,10 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
                     device = entry.description.get('device', {})
                     mac = device.get('macAddress')
                     serial = device.get('serialNumber')
+                    services = device.get("serviceList", {}).get("service", [])
                     service_types = [
                         service.get("serviceType")
-                        for service in device.get("serviceList", {}).get("service", [])
-                        if isinstance(service, dict)
+                        for service in services if isinstance(service, dict)
                     ]
                 else:
                     mac = None
