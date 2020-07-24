@@ -279,9 +279,15 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
                     device = entry.description.get('device', {})
                     mac = device.get('macAddress')
                     serial = device.get('serialNumber')
+                    service_types = [
+                        service.get("serviceType")
+                        for service in device.get("serviceList", {}).get("service", [])
+                        if isinstance(service, dict)
+                    ]
                 else:
                     mac = None
                     serial = None
+                    service_types = []
 
                 # Search for devices
                 if (st is not None or
@@ -295,7 +301,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
                             if match_serial == serial:
                                 entries.append(entry)
                         elif st is not None:
-                            if st == entry.st:
+                            if st == entry.st or st in service_types:
                                 entries.append(entry)
                 elif not entry_in_entries(entry, entries, mac, serial):
                     entries.append(entry)
