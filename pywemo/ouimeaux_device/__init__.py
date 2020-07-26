@@ -179,22 +179,12 @@ class Device(object):
 
     def parse_basic_state(self, params):
         """Parse the basic state response from the device."""
-        # BinaryState
-        # 1|1492338954|0|922|14195|1209600|0|940670|15213709|227088884
-        (
-            state,  # 0 if off, 1 if on,
-            _x1,
-            _x2,
-            _x3,
-            _x4,
-            _x5,
-            _x6,
-            _x7,
-            _x8,
-            _x9
-        ) = params.split('|')
-
-        return {'state': state}
+        # The BinaryState `params` could have two different formats:
+        #   1|1492338954|0|922|14195|1209600|0|940670|15213709|227088884
+        #   1
+        # In both formats, the first integer value indicates the state.
+        # 0 if off, 1 if on,
+        return {'state': params.split('|')[0]}
 
     def update_binary_state(self):
         """Update the cached copy of the basic state response."""
@@ -208,6 +198,8 @@ class Device(object):
             try:
                 self._state = int(self.parse_basic_state(_params).get("state"))
             except ValueError:
+                LOG.warning("Unexpected BinaryState value `%s` for device %s. "
+                            "Defaulting to _state=0.", _params, self.name)
                 self._state = 0
             return True
         return False

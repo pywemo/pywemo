@@ -1,26 +1,9 @@
-"""Representation of a WeMo LightSwitch device."""
-
-import logging
+"""Representation of a WeMo Motion device."""
 from .switch import Switch
-
-LOG = logging.getLogger(__name__)
 
 
 class LightSwitch(Switch):
-    """Representation of a WeMo LightSwitch device."""
-
-    def subscription_update(self, _type, _params):
-        """Update device state based on subscription event."""
-        LOG.debug("subscription_update %s %s", _type, _params)
-        if _type == "BinaryState":
-            try:
-                self._state = int(_params)
-            except ValueError as e:
-                LOG.error(
-                    "Could not parse BinaryState update '%s': %s", _params, e)
-                self._state = 0
-            return True
-        return False
+    """Representation of a WeMo Motion device."""
 
     def __repr__(self):
         """Return a string representation of the device."""
