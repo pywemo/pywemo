@@ -237,7 +237,6 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
     entries = []
 
     calc_now = datetime.now
-    start = calc_now()
 
     ssdp_request = build_ssdp_request(st, ssdp_mx=1)
     sockets = []
@@ -251,6 +250,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
             except socket.error:
                 pass
 
+        start = calc_now()
         while sockets:
             time_diff = calc_now() - start
 
