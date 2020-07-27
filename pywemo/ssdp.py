@@ -4,7 +4,6 @@ import re
 import select
 import socket
 import threading
-import time
 
 from datetime import datetime, timedelta
 import xml.etree.ElementTree as XMLElementTree
@@ -260,7 +259,8 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
 
             ready = select.select(sockets, [], [], min(1, seconds_left))[0]
             if not ready:
-                # No more results. Exit if the time has expired, or probe again.
+                # No more results. Exit if the time has expired,
+                # or probe again.
                 if seconds_left <= 0:
                     return entries
                 for s in sockets:
