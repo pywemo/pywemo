@@ -142,6 +142,7 @@ class UPNPEntry:
                                 etree_to_dict(tree).get('root', {})
                         else:
                             UPNPEntry.DESCRIPTION_CACHE[url] = {}
+                        break
 
                     except requests.RequestException:
                         logging.getLogger(__name__).warning(
@@ -259,8 +260,9 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
 
             ready = select.select(sockets, [], [], min(1, seconds_left))[0]
             if not ready:
-                # No more results. Exit if the time has expired,
-                # or probe again.
+                # Only check for timeout when there are no more results. Exit
+                # if the time has expired, or probe again if there is more
+                # time remaining.
                 if seconds_left <= 0:
                     return entries
                 for s in sockets:
