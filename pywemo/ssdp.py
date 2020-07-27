@@ -130,23 +130,24 @@ class UPNPEntry:
 
         if url not in UPNPEntry.DESCRIPTION_CACHE:
             try:
-                xml = requests.get(url, timeout=10).text
+                for _ in range(3):
+                    try:
+                        xml = requests.get(url, timeout=10).text
 
-                tree = None
-                if xml is not None:
-                    tree = XMLElementTree.fromstring(xml)
+                        tree = None
+                        if xml is not None:
+                            tree = XMLElementTree.fromstring(xml)
 
-                if tree is not None:
-                    UPNPEntry.DESCRIPTION_CACHE[url] = \
-                        etree_to_dict(tree).get('root', {})
-                else:
-                    UPNPEntry.DESCRIPTION_CACHE[url] = {}
+                        if tree is not None:
+                            UPNPEntry.DESCRIPTION_CACHE[url] = \
+                                etree_to_dict(tree).get('root', {})
+                        else:
+                            UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
-            except requests.RequestException:
-                logging.getLogger(__name__).warning(
-                    "Error fetching description at %s", url)
-
-                UPNPEntry.DESCRIPTION_CACHE[url] = {}
+                    except requests.RequestException:
+                        logging.getLogger(__name__).warning(
+                            "Error fetching description at %s", url)
+                        UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
             except XMLElementTree.ParseError:
                 # There used to be a log message here to record an error about
@@ -239,24 +240,15 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
     calc_now = datetime.now
     start = calc_now()
 
+    ssdp_request = build_ssdp_request(st, ssdp_mx=1)
     sockets = []
     try:
         for addr in interface_addresses():
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                sockets.append(s)
                 s.bind((addr, 0))
-
-                # Send 2 separate ssdp requests to mimic wemo app behavior:
-                ssdp_request = build_ssdp_request(st, ssdp_mx=1)
                 s.sendto(ssdp_request, ssdp_target)
-
-                time.sleep(0.5)
-
-                ssdp_request = build_ssdp_request(st, ssdp_mx=2)
-                s.sendto(ssdp_request, ssdp_target)
-
-                s.setblocking(0)
+                sockets.append(s)
             except socket.error:
                 pass
 
@@ -266,14 +258,20 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
             # pylint: disable=maybe-no-member
             seconds_left = timeout - time_diff.seconds
 
-            if seconds_left <= 0:
-                return entries
-
-            ready = select.select(sockets, [], [], seconds_left)[0]
+            ready = select.select(sockets, [], [], min(1, seconds_left))[0]
+            if not ready:
+                # No more results. Exit if the time has expired, or probe again.
+                if seconds_left <= 0:
+                    return entries
+                for s in sockets:
+                    s.sendto(ssdp_request, ssdp_target)
 
             for sock in ready:
                 response = sock.recv(1024).decode("UTF-8", "replace")
 
+                # The device could be slow to respond when fetching the
+                # description. It is possible that fetching the results for a
+                # single device will take longer than the requested timeout.
                 entry = UPNPEntry.from_response(response)
                 if entry.description is not None:
                     device = entry.description.get('device', {})
