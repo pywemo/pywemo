@@ -198,9 +198,8 @@ class Device(object):
             try:
                 self._state = int(self.parse_basic_state(_params).get("state"))
             except ValueError:
-                LOG.warning("Unexpected BinaryState value `%s` for device %s. "
-                            "Defaulting to _state=0.", _params, self.name)
-                self._state = 0
+                LOG.error("Unexpected BinaryState value `%s` for device %s.",
+                          _params, self.name)
             return True
         return False
 
