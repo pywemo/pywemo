@@ -256,7 +256,7 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
             time_diff = calc_now() - start
 
             # pylint: disable=maybe-no-member
-            seconds_left = timeout - time_diff.seconds
+            seconds_left = max(timeout - time_diff.seconds, 0)
 
             ready = select.select(sockets, [], [], min(1, seconds_left))[0]
             if not ready:
