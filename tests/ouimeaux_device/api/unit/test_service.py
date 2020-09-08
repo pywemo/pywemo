@@ -115,9 +115,7 @@ class TestAction:
 
     def test_call_throws_when_final_retry_fails(self):
         action = self.get_mock_action()
-        requests.post = mock.Mock(
-            side_effect=requests.exceptions.RequestException
-        )
+        requests.post = mock.Mock(side_effect=requests.exceptions.RequestException)
         cet.fromstring = mock.MagicMock()
 
         with pytest.raises(svc.ActionException):

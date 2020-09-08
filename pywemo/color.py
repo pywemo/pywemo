@@ -2,23 +2,35 @@
 
 # Define usable ranges as bulbs either ignore or behave unexpectedly
 # when it is sent a value is outside of the range.
-TEMPERATURE_PROFILES = dict((model, temp) for models, temp in (
-    # Lightify RGBW, 1900-6500K
-    (["LIGHTIFY A19 RGBW"], (151, 555)),
-) for model in models)
+TEMPERATURE_PROFILES = dict(
+    (model, temp)
+    for models, temp in (
+        # Lightify RGBW, 1900-6500K
+        (["LIGHTIFY A19 RGBW"], (151, 555)),
+    )
+    for model in models
+)
 
-COLOR_PROFILES = dict((model, gamut) for models, gamut in (
-    # Lightify RGBW, 1900-6500K
-    # http://flow-morewithless.blogspot.com/2015/01/osram-lightify-color-gamut-and-spectrum.html
-    (["LIGHTIFY A19 RGBW"],
-     ((0.683924, 0.315904), (0.391678, 0.501414), (0.136990, 0.051035))),
-) for model in models)
+COLOR_PROFILES = dict(
+    (model, gamut)
+    for models, gamut in (
+        # Lightify RGBW, 1900-6500K
+        # http://flow-morewithless.blogspot.com/2015/01/osram-lightify-color-gamut-and-spectrum.html
+        (
+            ["LIGHTIFY A19 RGBW"],
+            ((0.683924, 0.315904), (0.391678, 0.501414), (0.136990, 0.051035)),
+        ),
+    )
+    for model in models
+)
 
 
 def get_profiles(model):
     """Return the temperature and color profiles for a given model."""
-    return (TEMPERATURE_PROFILES.get(model, (150, 600)),
-            COLOR_PROFILES.get(model, ((1., 0.), (0., 1.), (0., 0.))))
+    return (
+        TEMPERATURE_PROFILES.get(model, (150, 600)),
+        COLOR_PROFILES.get(model, ((1.0, 0.0), (0.0, 1.0), (0.0, 0.0))),
+    )
 
 
 # pylint: disable=invalid-name

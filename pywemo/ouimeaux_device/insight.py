@@ -23,7 +23,7 @@ class Insight(Switch):
     def update_insight_params(self):
         """Get and parse the device attributes."""
         # pylint: disable=maybe-no-member
-        params = self.insight.GetInsightParams().get('InsightParams')
+        params = self.insight.GetInsightParams().get("InsightParams")
         self.insight_params = self.parse_insight_params(params)
 
     def subscription_update(self, _type, _params):
@@ -47,18 +47,20 @@ class Insight(Switch):
             currentmw,
             todaymw,
             totalmw,
-            powerthreshold
-        ) = params.split('|')
-        return {'state': state,
-                'lastchange': datetime.fromtimestamp(int(lastchange)),
-                'onfor': int(onfor),
-                'ontoday': int(ontoday),
-                'ontotal': int(ontotal),
-                'todaymw': int(float(todaymw)),
-                'totalmw': int(float(totalmw)),
-                'currentpower': int(float(currentmw)),
-                'wifipower': int(float(wifipower)),
-                'powerthreshold': int(float(powerthreshold))}
+            powerthreshold,
+        ) = params.split("|")
+        return {
+            "state": state,
+            "lastchange": datetime.fromtimestamp(int(lastchange)),
+            "onfor": int(onfor),
+            "ontoday": int(ontoday),
+            "ontotal": int(ontotal),
+            "todaymw": int(float(todaymw)),
+            "totalmw": int(float(totalmw)),
+            "currentpower": int(float(currentmw)),
+            "wifipower": int(float(wifipower)),
+            "powerthreshold": int(float(powerthreshold)),
+        }
 
     def get_state(self, force_update=False):
         """Return the device state."""
@@ -75,17 +77,17 @@ class Insight(Switch):
     @property
     def today_kwh(self):
         """Return the kwh used today."""
-        return self.insight_params['todaymw'] * 1.6666667e-8
+        return self.insight_params["todaymw"] * 1.6666667e-8
 
     @property
     def current_power(self):
         """Return the current power usage in mW."""
-        return self.insight_params['currentpower']
+        return self.insight_params["currentpower"]
 
     @property
     def wifi_power(self):
         """Return the current rssi wifi signal."""
-        return self.insight_params['wifipower']
+        return self.insight_params["wifipower"]
 
     @property
     def threshold_power(self):
@@ -94,37 +96,37 @@ class Insight(Switch):
 
         Above this the device is on, below it is standby.
         """
-        return self.insight_params['powerthreshold']
+        return self.insight_params["powerthreshold"]
 
     @property
     def today_on_time(self):
         """Return how long the device has been on today."""
-        return self.insight_params['ontoday']
+        return self.insight_params["ontoday"]
 
     @property
     def on_for(self):
         """Return how long the device has been on."""
-        return self.insight_params['onfor']
+        return self.insight_params["onfor"]
 
     @property
     def last_change(self):
         """Return the last change datetime."""
-        return self.insight_params['lastchange']
+        return self.insight_params["lastchange"]
 
     @property
     def today_standby_time(self):
         """Return how long the device has been in standby today."""
-        return self.insight_params['ontoday']
+        return self.insight_params["ontoday"]
 
     @property
     def get_standby_state(self):
         """Return the standby state of the device."""
-        state = self.insight_params['state']
+        state = self.insight_params["state"]
 
-        if state == '0':
-            return 'off'
+        if state == "0":
+            return "off"
 
-        if state == '1':
-            return 'on'
+        if state == "1":
+            return "on"
 
-        return 'standby'
+        return "standby"

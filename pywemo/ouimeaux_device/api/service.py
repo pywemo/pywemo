@@ -42,8 +42,8 @@ class Action:
         self.controlURL = service.controlURL
         self.args = {}
         self.headers = {
-            'Content-Type': 'text/xml',
-            'SOAPACTION': '"%s#%s"' % (self.serviceType, self.name)
+            "Content-Type": "text/xml",
+            "SOAPACTION": '"%s#%s"' % (self.serviceType, self.name),
         }
 
         arglist = action_config.get_argumentList()
@@ -53,39 +53,49 @@ class Action:
 
     def __call__(self, **kwargs):
         """Representations a method or function call."""
-        arglist = '\n'.join('<{0}>{1}</{0}>'.format(arg, value)
-                            for arg, value in kwargs.items())
+        arglist = "\n".join(
+            "<{0}>{1}</{0}>".format(arg, value) for arg, value in kwargs.items()
+        )
         body = REQUEST_TEMPLATE.format(
-            action=self.name,
-            service=self.serviceType,
-            args=arglist
+            action=self.name, service=self.serviceType, args=arglist
         )
         for attempt in range(3):
             try:
                 response = requests.post(
-                    self.controlURL, body.strip(),
-                    headers=self.headers, timeout=10)
+                    self.controlURL, body.strip(), headers=self.headers, timeout=10
+                )
                 response_dict = {}
                 # pylint: disable=deprecated-method
-                for response_item in et.fromstring(
-                        response.content
-                ).getchildren()[0].getchildren()[0].getchildren():
+                for response_item in (
+                    et.fromstring(response.content)
+                    .getchildren()[0]
+                    .getchildren()[0]
+                    .getchildren()
+                ):
                     response_dict[response_item.tag] = response_item.text
                 return response_dict
             except requests.exceptions.RequestException:
-                LOG.warning("Error communicating with %s at %s:%i, retry %i",
-                            self._device.name, self._device.host,
-                            self._device.port, attempt)
+                LOG.warning(
+                    "Error communicating with %s at %s:%i, retry %i",
+                    self._device.name,
+                    self._device.host,
+                    self._device.port,
+                    attempt,
+                )
 
                 if self._device.rediscovery_enabled:
                     self._device.reconnect_with_device()
 
-        LOG.error("Error communicating with %s after %i attempts. Giving up.",
-                  self._device.name, MAX_RETRIES)
+        LOG.error(
+            "Error communicating with %s after %i attempts. Giving up.",
+            self._device.name,
+            MAX_RETRIES,
+        )
 
         raise ActionException(
             "Error communicating with {0} after {1} attempts. "
-            "Giving up.".format(self._device.name, MAX_RETRIES))
+            "Giving up.".format(self._device.name, MAX_RETRIES)
+        )
 
     def __repr__(self):
         """Return a string representation of the Action."""
@@ -97,12 +107,12 @@ class Service:
 
     def __init__(self, device, service, base_url):
         """Create an instance of a Service."""
-        self._base_url = base_url.rstrip('/')
+        self._base_url = base_url.rstrip("/")
         self._config = service
-        self.name = self._config.get_serviceType().split(':')[-2]
+        self.name = self._config.get_serviceType().split(":")[-2]
         self.actions = {}
 
-        url = '%s/%s' % (base_url, service.get_SCPDURL().strip('/'))
+        url = "%s/%s" % (base_url, service.get_SCPDURL().strip("/"))
         xml = requests.get(url, timeout=10)
         if xml.status_code != 200:
             return
@@ -117,14 +127,13 @@ class Service:
     @property
     def hostname(self):
         """Get the hostname from the base URL."""
-        return self._base_url.split('/')[-1]
+        return self._base_url.split("/")[-1]
 
     # pylint: disable=invalid-name
     @property
     def controlURL(self):
         """Get the controlURL for interacting with this Service."""
-        return '%s/%s' % (self._base_url,
-                          self._config.get_controlURL().strip('/'))
+        return "%s/%s" % (self._base_url, self._config.get_controlURL().strip("/"))
 
     @property
     def serviceType(self):
