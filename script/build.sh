@@ -44,7 +44,7 @@ echo "===Formatting code==="
 if [[ `which black` ]]; then
   BLACK_ARGS=""
   if [[ "${CI:-}" = "1" ]]; then
-    BLACK_ARGS="--check"
+    BLACK_ARGS="--check --exclude ouimeaux_device"
   fi
 
   black $BLACK_ARGS .
