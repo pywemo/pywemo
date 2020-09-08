@@ -25,7 +25,7 @@ poetry install
 
 
 echo
-echo "===Installing dependencies==="
+echo "===Installing black==="
 pip install black
 
 
