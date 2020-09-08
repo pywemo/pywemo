@@ -33,7 +33,7 @@ echo
 echo "===Sorting imports==="
 ISORT_ARGS="--apply"
 if [[ "${CI:-}" = "1" ]]; then
-  ISORT_ARGS="--check-only --exclude ouimeaux_device"
+  ISORT_ARGS="--check-only"
 fi
 
 # isort $ISORT_ARGS
@@ -44,7 +44,7 @@ echo "===Formatting code==="
 if [[ `which black` ]]; then
   BLACK_ARGS=""
   if [[ "${CI:-}" = "1" ]]; then
-    BLACK_ARGS="--check"
+    BLACK_ARGS="--check --exclude ouimeaux_device"
   fi
 
   black $BLACK_ARGS .
