@@ -18,7 +18,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Build
         run: |
-          ./scripts/build.sh
+          ./script/build.sh
         env:
           CI: 1
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
