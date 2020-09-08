@@ -72,7 +72,7 @@ class SSDP:
         """Scan for new uPnP devices and services."""
         with self._lock:
             if self.last_scan is None or force_update or \
-               datetime.now()-self.last_scan > MIN_TIME_BETWEEN_SCANS:
+               datetime.now() - self.last_scan > MIN_TIME_BETWEEN_SCANS:
 
                 self.remove_expired()
 
