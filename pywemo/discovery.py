@@ -18,11 +18,11 @@ LOG = logging.getLogger(__name__)
 
 
 def discover_devices(
-    ssdp_st=None,
-    max_devices=None,
-    match_mac=None,
-    match_serial=None,
-    rediscovery_enabled=True,
+        ssdp_st=None,
+        max_devices=None,
+        match_mac=None,
+        match_serial=None,
+        rediscovery_enabled=True,
 ):
     """Find WeMo devices on the local network."""
     ssdp_st = ssdp_st or ssdp.ST
@@ -34,7 +34,7 @@ def discover_devices(
 
     for entry in ssdp_entries:
         if entry.match_device_description(
-            {"manufacturer": "Belkin International Inc."}
+                {"manufacturer": "Belkin International Inc."}
         ):
             mac = entry.description.get("device").get("macAddress")
             device = device_from_description(
