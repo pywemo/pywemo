@@ -15,6 +15,6 @@ jobs:
           python-version: 3.7
       - name: Build and publish
         run: |
-          ./scripts/build_and_publish.sh ${{ secrets.PYPI_PASSWORD }}
+          ./script/build_and_publish.sh ${{ secrets.PYPI_PASSWORD }}
         env:
           CI: 1
