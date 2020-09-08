@@ -33,7 +33,7 @@ echo
 echo "===Sorting imports==="
 ISORT_ARGS="--apply"
 if [[ "${CI:-}" = "1" ]]; then
-  ISORT_ARGS="--check-only"
+  ISORT_ARGS="--check-only --exclude ouimeaux_device"
 fi
 
 # isort $ISORT_ARGS
