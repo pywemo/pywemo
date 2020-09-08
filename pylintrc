@@ -1,8 +1,5 @@
 [MASTER]
-ignore=
-  ouimeaux_device,
-  tests,
-  build
+ignore=ouimeaux_device
 reports=no
 
 disable=

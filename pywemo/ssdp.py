@@ -74,9 +74,9 @@ class SSDP:
         """Scan for new uPnP devices and services."""
         with self._lock:
             if (
-                    self.last_scan is None
-                    or force_update
-                    or datetime.now() - self.last_scan > MIN_TIME_BETWEEN_SCANS
+                self.last_scan is None
+                or force_update
+                or datetime.now() - self.last_scan > MIN_TIME_BETWEEN_SCANS
             ):
 
                 self.remove_expired()
@@ -236,11 +236,11 @@ def entry_in_entries(entry, entries, mac, serial):
 
 # pylint: disable=invalid-name,too-many-nested-blocks
 def scan(
-        st=None,
-        timeout=DISCOVER_TIMEOUT,
-        max_entries=None,
-        match_mac=None,
-        match_serial=None,
+    st=None,
+    timeout=DISCOVER_TIMEOUT,
+    max_entries=None,
+    match_mac=None,
+    match_serial=None,
 ):
     """
     Send a message over the network to discover upnp devices.
