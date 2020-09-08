@@ -25,6 +25,11 @@ poetry install
 
 
 echo
+echo "===Installing black==="
+pip install black
+
+
+echo
 echo "===Sorting imports==="
 ISORT_ARGS="--apply"
 if [[ "${CI:-}" = "1" ]]; then
