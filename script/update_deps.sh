@@ -25,5 +25,10 @@ poetry install
 
 
 echo
+echo "===Installing dependencies==="
+pip install black
+
+
+echo
 echo "===Updating poetry lock file==="
 poetry update --lock
