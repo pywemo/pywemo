@@ -7,4 +7,3 @@ mypy>=0.650
 pydocstyle==3.0.0
 pylint>=2.2.2
 pytest>=4.0.2
-black
