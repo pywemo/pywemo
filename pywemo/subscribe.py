@@ -17,7 +17,7 @@ import requests
 
 LOG = logging.getLogger(__name__)
 NS = "{urn:schemas-upnp-org:event-1-0}"
-SUCCESS = "<html><body><h1>200 OK</h1></body></html>"
+SUCCESS = '<html><body><h1>200 OK</h1></body></html>'
 SUBSCRIPTION_RETRY = 60
 
 
@@ -27,7 +27,7 @@ class SubscriptionRegistryFailed(Exception):
     pass
 
 
-def get_ip_address(host="1.2.3.4"):
+def get_ip_address(host='1.2.3.4'):
     """Return IP from hostname or IP."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
@@ -48,23 +48,23 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         sender_ip, _ = self.client_address
         outer = self.server.outer
         device = outer.devices.get(sender_ip)
-        content_len = int(self.headers.get("content-length", 0))
+        content_len = int(self.headers.get('content-length', 0))
         data = self.rfile.read(content_len)
         if device is None:
-            LOG.warning("Received event for unregistered device %s", sender_ip)
+            LOG.warning('Received event for unregistered device %s', sender_ip)
         else:
             # trim garbage from end, if any
             data = data.decode("UTF-8").split("\n\n")[0]
             doc = cElementTree.fromstring(data)
-            for propnode in doc.findall("./{0}property".format(NS)):
+            for propnode in doc.findall('./{0}property'.format(NS)):
                 for property_ in propnode.getchildren():
                     text = property_.text
                     outer.event(device, property_.tag, text)
 
         self.send_response(200)
-        self.send_header("Content-Type", "text/html")
-        self.send_header("Content-Length", len(SUCCESS))
-        self.send_header("Connection", "close")
+        self.send_header('Content-Type', 'text/html')
+        self.send_header('Content-Length', len(SUCCESS))
+        self.send_header('Connection', 'close')
         self.end_headers()
         self.wfile.write(SUCCESS.encode("UTF-8"))
 
@@ -90,7 +90,6 @@ class SubscriptionRegistry:
         def sleep(secs):
             with self._event_thread_cond:
                 self._event_thread_cond.wait(secs)
-
         self._sched = sched.scheduler(time.time, sleep)
 
         self._http_thread = None
@@ -107,9 +106,8 @@ class SubscriptionRegistry:
         self.devices[device.host] = device
 
         with self._event_thread_cond:
-            self._events[device.serialnumber] = self._sched.enter(
-                0, 0, self._resubscribe, [device]
-            )
+            self._events[device.serialnumber] = (
+                self._sched.enter(0, 0, self._resubscribe, [device]))
             self._event_thread_cond.notify()
 
     def unregister(self, device):
@@ -133,17 +131,19 @@ class SubscriptionRegistry:
 
     def _resubscribe(self, device, sid=None, retry=0):
         LOG.info("Resubscribe for %s", device)
-        headers = {"TIMEOUT": "300"}
+        headers = {'TIMEOUT': '300'}
         if sid is not None:
-            headers["SID"] = sid
+            headers['SID'] = sid
         else:
             host = get_ip_address(host=device.host)
-            headers.update(
-                {"CALLBACK": "<http://%s:%d>" % (host, self._port), "NT": "upnp:event"}
-            )
+            headers.update({
+                "CALLBACK": '<http://%s:%d>' % (host, self._port),
+                "NT": "upnp:event"
+            })
         try:
             # Basic events
-            self._url_resubscribe(device, headers, sid, device.basicevent.eventSubURL)
+            self._url_resubscribe(device, headers, sid,
+                                  device.basicevent.eventSubURL)
             # Insight events
             # if hasattr(device, 'insight'):
             #     self._url_resubscribe(
@@ -152,10 +152,7 @@ class SubscriptionRegistry:
         except requests.exceptions.RequestException as ex:
             LOG.warning(
                 "Resubscribe error for %s (%s), will retry in %ss",
-                device,
-                ex,
-                SUBSCRIPTION_RETRY,
-            )
+                device, ex, SUBSCRIPTION_RETRY)
             retry += 1
             if retry > 1:
                 # If this wasn't a one-off, try rediscovery
@@ -163,33 +160,35 @@ class SubscriptionRegistry:
                 if device.rediscovery_enabled:
                     device.reconnect_with_device()
             with self._event_thread_cond:
-                self._events[device.serialnumber] = self._sched.enter(
-                    SUBSCRIPTION_RETRY, 0, self._resubscribe, [device, sid, retry]
-                )
+                self._events[device.serialnumber] = (
+                    self._sched.enter(SUBSCRIPTION_RETRY,
+                                      0, self._resubscribe,
+                                      [device, sid, retry]))
 
     def _url_resubscribe(self, device, headers, sid, url):
         request_headers = headers.copy()
-        response = requests.request(
-            method="SUBSCRIBE", url=url, headers=request_headers
-        )
+        response = requests.request(method="SUBSCRIBE", url=url,
+                                    headers=request_headers)
         if response.status_code == 412 and sid:
             # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
             # start over.
-            requests.request(method="UNSUBSCRIBE", url=url, headers={"SID": sid})
+            requests.request(
+                method='UNSUBSCRIBE', url=url, headers={'SID': sid})
             return self._resubscribe(device)
-        timeout = int(response.headers.get("timeout", "1801").replace("Second-", ""))
-        sid = response.headers.get("sid", sid)
+        timeout = int(response.headers.get('timeout', '1801').replace(
+            'Second-', ''))
+        sid = response.headers.get('sid', sid)
         with self._event_thread_cond:
-            self._events[device.serialnumber] = self._sched.enter(
-                int(timeout * 0.75), 0, self._resubscribe, [device, sid]
-            )
+            self._events[device.serialnumber] = (
+                self._sched.enter(int(timeout * 0.75),
+                                  0, self._resubscribe, [device, sid]))
 
     def event(self, device, type_, value):
         """Execute the callback for a received event."""
-        LOG.info(
-            "Received event from %s(%s) - %s %s", device, device.host, type_, value
-        )
-        for type_filter, callback in self._callbacks.get(device.serialnumber, ()):
+        LOG.info("Received event from %s(%s) - %s %s",
+                 device, device.host, type_, value)
+        for type_filter, callback in self._callbacks.get(
+                device.serialnumber, ()):
             if type_filter is None or type_ == type_filter:
                 callback(device, type_, value)
 
@@ -203,7 +202,8 @@ class SubscriptionRegistry:
         for i in range(0, 128):
             port = 8989 + i
             try:
-                self._httpd = BaseHTTPServer.HTTPServer(("", port), RequestHandler)
+                self._httpd = BaseHTTPServer.HTTPServer(
+                    ('', port), RequestHandler)
                 self._port = port
                 break
             except (OSError, socket.error):
@@ -214,16 +214,15 @@ class SubscriptionRegistry:
         self._port = None
         self._find_port()
         if self._port is None:
-            raise SubscriptionRegistryFailed("Unable to bind a port for listening")
-        self._http_thread = threading.Thread(
-            target=self._run_http_server, name="Wemo HTTP Thread"
-        )
+            raise SubscriptionRegistryFailed(
+                'Unable to bind a port for listening')
+        self._http_thread = threading.Thread(target=self._run_http_server,
+                                             name='Wemo HTTP Thread')
         self._http_thread.deamon = True
         self._http_thread.start()
 
-        self._event_thread = threading.Thread(
-            target=self._run_event_loop, name="Wemo Events Thread"
-        )
+        self._event_thread = threading.Thread(target=self._run_event_loop,
+                                              name='Wemo Events Thread')
         self._event_thread.deamon = True
         self._event_thread.start()
 
@@ -246,7 +245,8 @@ class SubscriptionRegistry:
             # Wake up event thread if its sleeping
             self._event_thread_cond.notify()
         self.join()
-        LOG.info("Terminated threads")
+        LOG.info(
+            "Terminated threads")
 
     def join(self):
         """Block until the HTTP server and event threads have terminated."""

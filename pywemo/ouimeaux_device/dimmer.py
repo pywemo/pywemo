@@ -15,7 +15,7 @@ class Dimmer(Switch):
         if force_update or self._brightness is None:
             try:
                 # pylint: disable=maybe-no-member
-                brightness = self.basicevent.GetBinaryState().get("brightness")
+                brightness = self.basicevent.GetBinaryState().get('brightness')
             except ValueError:
                 brightness = 0
             self._brightness = brightness

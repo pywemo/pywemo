@@ -7,13 +7,10 @@ from .switch import Switch
 
 
 if sys.version_info[0] < 3:
-
     class IntEnum:
         """Enum class."""
 
         pass
-
-
 else:
     from enum import IntEnum
 
@@ -40,7 +37,7 @@ FAN_MODE_NAMES = {
     FanMode.Low: "Low",
     FanMode.Medium: "Medium",
     FanMode.High: "High",
-    FanMode.Maximum: "Maximum",
+    FanMode.Maximum: "Maximum"
 }
 
 
@@ -59,7 +56,7 @@ DESIRED_HUMIDITY_NAMES = {
     DesiredHumidity.FiftyPercent: "50",
     DesiredHumidity.FiftyFivePercent: "55",
     DesiredHumidity.SixtyPercent: "60",
-    DesiredHumidity.OneHundredPercent: "100",
+    DesiredHumidity.OneHundredPercent: "100"
 }
 
 
@@ -120,9 +117,9 @@ def attribute_xml_to_dict(xml_blob):
                 pass
         elif attribute[0].text == "FilterLife":
             try:
-                result["filter_life"] = float(
-                    round((float(attribute[1].text) / float(60480)) * float(100), 2)
-                )
+                result["filter_life"] = float(round((float(attribute[1].text)
+                                                     / float(60480))
+                                                    * float(100), 2))
             except ValueError:
                 pass
         elif attribute[0].text == "ExpiredFilterTime":
@@ -150,7 +147,7 @@ class Humidifier(Switch):
     def update_attributes(self):
         """Request state from device."""
         # pylint: disable=maybe-no-member
-        resp = self.deviceevent.GetAttributes().get("attributeList")
+        resp = self.deviceevent.GetAttributes().get('attributeList')
         self._attributes = attribute_xml_to_dict(resp)
         self._state = self.fan_mode
 
@@ -172,7 +169,7 @@ class Humidifier(Switch):
     @property
     def fan_mode(self):
         """Return the FanMode setting (as an int index of the IntEnum)."""
-        return self._attributes.get("fan_mode")
+        return self._attributes.get('fan_mode')
 
     @property
     def fan_mode_string(self):
@@ -186,7 +183,7 @@ class Humidifier(Switch):
     @property
     def desired_humidity(self):
         """Return the desired humidity (as an int index of the IntEnum)."""
-        return self._attributes.get("desired_humidity")
+        return self._attributes.get('desired_humidity')
 
     @property
     def desired_humidity_percent(self):
@@ -196,12 +193,12 @@ class Humidifier(Switch):
     @property
     def current_humidity_percent(self):
         """Return the observed relative humidity in percent (float)."""
-        return self._attributes.get("current_humidity")
+        return self._attributes.get('current_humidity')
 
     @property
     def water_level(self):
         """Return 0 if water level is Empty, 1 if Low, and 2 if Good."""
-        return self._attributes.get("water_level")
+        return self._attributes.get('water_level')
 
     @property
     def water_level_string(self):
@@ -211,12 +208,12 @@ class Humidifier(Switch):
     @property
     def filter_life_percent(self):
         """Return the percentage (float) of filter life remaining."""
-        return self._attributes.get("filter_life")
+        return self._attributes.get('filter_life')
 
     @property
     def filter_expired(self):
         """Return 0 if filter is OK, and 1 if it needs to be changed."""
-        return self._attributes.get("filter_expired")
+        return self._attributes.get('filter_expired')
 
     def get_state(self, force_update=False):
         """Return 0 if off and 1 if on."""
@@ -245,13 +242,9 @@ class Humidifier(Switch):
         """
         # Send the attribute list to the device
         # pylint: disable=maybe-no-member
-        self.deviceevent.SetAttributes(
-            attributeList=quote_xml(
-                "<attribute><name>FanMode</name><value>"
-                + str(int(fan_mode))
-                + "</value></attribute>"
-            )
-        )
+        self.deviceevent.SetAttributes(attributeList=quote_xml(
+            "<attribute><name>FanMode</name><value>" +
+            str(int(fan_mode)) + "</value></attribute>"))
 
         # Refresh the device state
         self.get_state(True)
@@ -260,13 +253,9 @@ class Humidifier(Switch):
         """Set the desired humidity (as int index of the IntEnum)."""
         # Send the attribute list to the device
         # pylint: disable=maybe-no-member
-        self.deviceevent.SetAttributes(
-            attributeList=quote_xml(
-                "<attribute><name>DesiredHumidity</name><value>"
-                + str(int(desired_humidity))
-                + "</value></attribute>"
-            )
-        )
+        self.deviceevent.SetAttributes(attributeList=quote_xml(
+            "<attribute><name>DesiredHumidity</name><value>" +
+            str(int(desired_humidity)) + "</value></attribute>"))
 
         # Refresh the device state
         self.get_state(True)
@@ -279,16 +268,11 @@ class Humidifier(Switch):
         """
         # Send the attribute list to the device
         # pylint: disable=maybe-no-member
-        self.deviceevent.SetAttributes(
-            attributeList=quote_xml(
-                "<attribute><name>FanMode</name><value>"
-                + str(int(fan_mode))
-                + "</value></attribute>"
-                + "<attribute><name>DesiredHumidity</name><value>"
-                + str(int(desired_humidity))
-                + "</value></attribute>"
-            )
-        )
+        self.deviceevent.SetAttributes(attributeList=quote_xml(
+            "<attribute><name>FanMode</name><value>" +
+            str(int(fan_mode)) + "</value></attribute>" +
+            "<attribute><name>DesiredHumidity</name><value>" +
+            str(int(desired_humidity)) + "</value></attribute>"))
 
         # Refresh the device state
         self.get_state(True)
@@ -297,13 +281,9 @@ class Humidifier(Switch):
         """Reset the filter life (call this when you install a new filter)."""
         # Send the attribute list to the device
         # pylint: disable=maybe-no-member
-        self.deviceevent.SetAttributes(
-            attributeList=quote_xml(
-                "<attribute><name>FilterLife</name><value>"
-                + str(FILTER_LIFE_MAX)
-                + "</value></attribute>"
-            )
-        )
+        self.deviceevent.SetAttributes(attributeList=quote_xml(
+            "<attribute><name>FilterLife</name><value>" +
+            str(FILTER_LIFE_MAX) + "</value></attribute>"))
 
         # Refresh the device state
         self.get_state(True)

@@ -13,14 +13,13 @@ from datetime import datetime, tzinfo, timedelta
 
 etree_ = None
 Verbose_import_ = False
-(XMLParser_import_none, XMLParser_import_lxml, XMLParser_import_elementtree) = list(
-    range(3)
-)
+(   XMLParser_import_none, XMLParser_import_lxml,
+    XMLParser_import_elementtree
+    ) = list(range(3))
 XMLParser_import_library = None
 try:
     # lxml
     from lxml import etree as etree_
-
     XMLParser_import_library = XMLParser_import_lxml
     if Verbose_import_:
         print("running with lxml.etree")
@@ -28,7 +27,6 @@ except ImportError:
     try:
         # cElementTree from Python 2.5+
         import xml.etree.cElementTree as etree_
-
         XMLParser_import_library = XMLParser_import_elementtree
         if Verbose_import_:
             print("running with cElementTree on Python 2.5+")
@@ -36,7 +34,6 @@ except ImportError:
         try:
             # ElementTree from Python 2.5+
             import xml.etree.ElementTree as etree_
-
             XMLParser_import_library = XMLParser_import_elementtree
             if Verbose_import_:
                 print("running with ElementTree on Python 2.5+")
@@ -44,7 +41,6 @@ except ImportError:
             try:
                 # normal cElementTree install
                 import cElementTree as etree_
-
                 XMLParser_import_library = XMLParser_import_elementtree
                 if Verbose_import_:
                     print("running with cElementTree")
@@ -52,24 +48,21 @@ except ImportError:
                 try:
                     # normal ElementTree install
                     import elementtree.ElementTree as etree_
-
                     XMLParser_import_library = XMLParser_import_elementtree
                     if Verbose_import_:
                         print("running with ElementTree")
                 except ImportError:
                     raise ImportError(
-                        "Failed to import ElementTree from any known place"
-                    )
-
+                        "Failed to import ElementTree from any known place")
 
 def parsexml_(*args, **kwargs):
-    if XMLParser_import_library == XMLParser_import_lxml and "parser" not in kwargs:
+    if (XMLParser_import_library == XMLParser_import_lxml and
+        'parser' not in kwargs):
         # Use the lxml ElementTree compatible parser so that, e.g.,
         #   we ignore comments.
-        kwargs["parser"] = etree_.ETCompatXMLParser()
+        kwargs['parser'] = etree_.ETCompatXMLParser()
     doc = etree_.parse(*args, **kwargs)
     return doc
-
 
 #
 # User methods
@@ -83,223 +76,192 @@ try:
 except ImportError as exp:
 
     class GeneratedsSuper(object):
-        tzoff_pattern = re_.compile(r"(\+|-)((0\d|1[0-3]):[0-5]\d|14:00)$")
-
+        tzoff_pattern = re_.compile(r'(\+|-)((0\d|1[0-3]):[0-5]\d|14:00)$')
         class _FixedOffsetTZ(tzinfo):
             def __init__(self, offset, name):
-                self.__offset = timedelta(minutes=offset)
+                self.__offset = timedelta(minutes = offset)
                 self.__name = name
-
             def utcoffset(self, dt):
                 return self.__offset
-
             def tzname(self, dt):
                 return self.__name
-
             def dst(self, dt):
                 return None
-
-        def gds_format_string(self, input_data, input_name=""):
+        def gds_format_string(self, input_data, input_name=''):
             return input_data
-
-        def gds_validate_string(self, input_data, node, input_name=""):
+        def gds_validate_string(self, input_data, node, input_name=''):
             return input_data
-
-        def gds_format_base64(self, input_data, input_name=""):
+        def gds_format_base64(self, input_data, input_name=''):
             return base64.b64encode(input_data)
-
-        def gds_validate_base64(self, input_data, node, input_name=""):
+        def gds_validate_base64(self, input_data, node, input_name=''):
             return input_data
-
-        def gds_format_integer(self, input_data, input_name=""):
-            return "%d" % input_data
-
-        def gds_validate_integer(self, input_data, node, input_name=""):
+        def gds_format_integer(self, input_data, input_name=''):
+            return '%d' % input_data
+        def gds_validate_integer(self, input_data, node, input_name=''):
             return input_data
-
-        def gds_format_integer_list(self, input_data, input_name=""):
-            return "%s" % input_data
-
-        def gds_validate_integer_list(self, input_data, node, input_name=""):
+        def gds_format_integer_list(self, input_data, input_name=''):
+            return '%s' % input_data
+        def gds_validate_integer_list(self, input_data, node, input_name=''):
             values = input_data.split()
             for value in values:
                 try:
                     fvalue = float(value)
                 except (TypeError, ValueError) as exp:
-                    raise_parse_error(node, "Requires sequence of integers")
+                    raise_parse_error(node, 'Requires sequence of integers')
             return input_data
-
-        def gds_format_float(self, input_data, input_name=""):
-            return "%f" % input_data
-
-        def gds_validate_float(self, input_data, node, input_name=""):
+        def gds_format_float(self, input_data, input_name=''):
+            return '%f' % input_data
+        def gds_validate_float(self, input_data, node, input_name=''):
             return input_data
-
-        def gds_format_float_list(self, input_data, input_name=""):
-            return "%s" % input_data
-
-        def gds_validate_float_list(self, input_data, node, input_name=""):
+        def gds_format_float_list(self, input_data, input_name=''):
+            return '%s' % input_data
+        def gds_validate_float_list(self, input_data, node, input_name=''):
             values = input_data.split()
             for value in values:
                 try:
                     fvalue = float(value)
                 except (TypeError, ValueError) as exp:
-                    raise_parse_error(node, "Requires sequence of floats")
+                    raise_parse_error(node, 'Requires sequence of floats')
             return input_data
-
-        def gds_format_double(self, input_data, input_name=""):
-            return "%e" % input_data
-
-        def gds_validate_double(self, input_data, node, input_name=""):
+        def gds_format_double(self, input_data, input_name=''):
+            return '%e' % input_data
+        def gds_validate_double(self, input_data, node, input_name=''):
             return input_data
-
-        def gds_format_double_list(self, input_data, input_name=""):
-            return "%s" % input_data
-
-        def gds_validate_double_list(self, input_data, node, input_name=""):
+        def gds_format_double_list(self, input_data, input_name=''):
+            return '%s' % input_data
+        def gds_validate_double_list(self, input_data, node, input_name=''):
             values = input_data.split()
             for value in values:
                 try:
                     fvalue = float(value)
                 except (TypeError, ValueError) as exp:
-                    raise_parse_error(node, "Requires sequence of doubles")
+                    raise_parse_error(node, 'Requires sequence of doubles')
             return input_data
-
-        def gds_format_boolean(self, input_data, input_name=""):
-            return "%s" % input_data
-
-        def gds_validate_boolean(self, input_data, node, input_name=""):
+        def gds_format_boolean(self, input_data, input_name=''):
+            return '%s' % input_data
+        def gds_validate_boolean(self, input_data, node, input_name=''):
             return input_data
-
-        def gds_format_boolean_list(self, input_data, input_name=""):
-            return "%s" % input_data
-
-        def gds_validate_boolean_list(self, input_data, node, input_name=""):
+        def gds_format_boolean_list(self, input_data, input_name=''):
+            return '%s' % input_data
+        def gds_validate_boolean_list(self, input_data, node, input_name=''):
             values = input_data.split()
             for value in values:
-                if value not in ("true", "1", "false", "0",):
-                    raise_parse_error(
-                        node,
-                        "Requires sequence of booleans " '("true", "1", "false", "0")',
-                    )
+                if value not in ('true', '1', 'false', '0', ):
+                    raise_parse_error(node,
+                        'Requires sequence of booleans '
+                        '("true", "1", "false", "0")')
             return input_data
-
-        def gds_validate_datetime(self, input_data, node, input_name=""):
+        def gds_validate_datetime(self, input_data, node, input_name=''):
             return input_data
-
-        def gds_format_datetime(self, input_data, input_name=""):
+        def gds_format_datetime(self, input_data, input_name=''):
             if input_data.microsecond == 0:
-                _svalue = input_data.strftime("%Y-%m-%dT%H:%M:%S")
+                _svalue = input_data.strftime('%Y-%m-%dT%H:%M:%S')
             else:
-                _svalue = input_data.strftime("%Y-%m-%dT%H:%M:%S.%f")
+                _svalue = input_data.strftime('%Y-%m-%dT%H:%M:%S.%f')
             if input_data.tzinfo is not None:
                 tzoff = input_data.tzinfo.utcoffset(input_data)
                 if tzoff is not None:
                     total_seconds = tzoff.seconds + (86400 * tzoff.days)
                     if total_seconds == 0:
-                        _svalue += "Z"
+                        _svalue += 'Z'
                     else:
                         if total_seconds < 0:
-                            _svalue += "-"
+                            _svalue += '-'
                             total_seconds *= -1
                         else:
-                            _svalue += "+"
+                            _svalue += '+'
                         hours = total_seconds // 3600
                         minutes = (total_seconds - (hours * 3600)) // 60
-                        _svalue += "{0:02d}:{1:02d}".format(hours, minutes)
+                        _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
             return _svalue
-
-        def gds_parse_datetime(self, input_data, node, input_name=""):
+        def gds_parse_datetime(self, input_data, node, input_name=''):
             tz = None
-            if input_data[-1] == "Z":
-                tz = GeneratedsSuper._FixedOffsetTZ(0, "GMT")
+            if input_data[-1] == 'Z':
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'GMT')
                 input_data = input_data[:-1]
             else:
                 results = GeneratedsSuper.tzoff_pattern.search(input_data)
                 if results is not None:
-                    tzoff_parts = results.group(2).split(":")
+                    tzoff_parts = results.group(2).split(':')
                     tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
-                    if results.group(1) == "-":
+                    if results.group(1) == '-':
                         tzoff *= -1
-                    tz = GeneratedsSuper._FixedOffsetTZ(tzoff, results.group(0))
+                    tz = GeneratedsSuper._FixedOffsetTZ(
+                        tzoff, results.group(0))
                     input_data = input_data[:-6]
-            if len(input_data.split(".")) > 1:
-                dt = datetime.strptime(input_data, "%Y-%m-%dT%H:%M:%S.%f")
+            if len(input_data.split('.')) > 1:
+                dt = datetime.strptime(
+                        input_data, '%Y-%m-%dT%H:%M:%S.%f')
             else:
-                dt = datetime.strptime(input_data, "%Y-%m-%dT%H:%M:%S")
-            return dt.replace(tzinfo=tz)
+                dt = datetime.strptime(
+                        input_data, '%Y-%m-%dT%H:%M:%S')
+            return dt.replace(tzinfo = tz)
 
-        def gds_validate_date(self, input_data, node, input_name=""):
+        def gds_validate_date(self, input_data, node, input_name=''):
             return input_data
-
-        def gds_format_date(self, input_data, input_name=""):
-            _svalue = input_data.strftime("%Y-%m-%d")
+        def gds_format_date(self, input_data, input_name=''):
+            _svalue = input_data.strftime('%Y-%m-%d')
             if input_data.tzinfo is not None:
                 tzoff = input_data.tzinfo.utcoffset(input_data)
                 if tzoff is not None:
                     total_seconds = tzoff.seconds + (86400 * tzoff.days)
                     if total_seconds == 0:
-                        _svalue += "Z"
+                        _svalue += 'Z'
                     else:
                         if total_seconds < 0:
-                            _svalue += "-"
+                            _svalue += '-'
                             total_seconds *= -1
                         else:
-                            _svalue += "+"
+                            _svalue += '+'
                         hours = total_seconds // 3600
                         minutes = (total_seconds - (hours * 3600)) // 60
-                        _svalue += "{0:02d}:{1:02d}".format(hours, minutes)
+                        _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
             return _svalue
-
-        def gds_parse_date(self, input_data, node, input_name=""):
+        def gds_parse_date(self, input_data, node, input_name=''):
             tz = None
-            if input_data[-1] == "Z":
-                tz = GeneratedsSuper._FixedOffsetTZ(0, "GMT")
+            if input_data[-1] == 'Z':
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'GMT')
                 input_data = input_data[:-1]
             else:
                 results = GeneratedsSuper.tzoff_pattern.search(input_data)
                 if results is not None:
-                    tzoff_parts = results.group(2).split(":")
+                    tzoff_parts = results.group(2).split(':')
                     tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
-                    if results.group(1) == "-":
+                    if results.group(1) == '-':
                         tzoff *= -1
-                    tz = GeneratedsSuper._FixedOffsetTZ(tzoff, results.group(0))
+                    tz = GeneratedsSuper._FixedOffsetTZ(
+                        tzoff, results.group(0))
                     input_data = input_data[:-6]
-            return datetime.strptime(input_data, "%Y-%m-%d").replace(tzinfo=tz)
-
+            return datetime.strptime(input_data,
+                '%Y-%m-%d').replace(tzinfo = tz)
         def gds_str_lower(self, instring):
             return instring.lower()
-
         def get_path_(self, node):
             path_list = []
             self.get_path_list_(node, path_list)
             path_list.reverse()
-            path = "/".join(path_list)
+            path = '/'.join(path_list)
             return path
-
-        Tag_strip_pattern_ = re_.compile(r"\{.*\}")
-
+        Tag_strip_pattern_ = re_.compile(r'\{.*\}')
         def get_path_list_(self, node, path_list):
             if node is None:
                 return
-            tag = GeneratedsSuper.Tag_strip_pattern_.sub("", node.tag)
+            tag = GeneratedsSuper.Tag_strip_pattern_.sub('', node.tag)
             if tag:
                 path_list.append(tag)
             self.get_path_list_(node.getparent(), path_list)
-
         def get_class_obj_(self, node, default_class=None):
             class_obj1 = default_class
-            if "xsi" in node.nsmap:
-                classname = node.get("{%s}type" % node.nsmap["xsi"])
+            if 'xsi' in node.nsmap:
+                classname = node.get('{%s}type' % node.nsmap['xsi'])
                 if classname is not None:
-                    names = classname.split(":")
+                    names = classname.split(':')
                     if len(names) == 2:
                         classname = names[1]
                     class_obj2 = globals().get(classname)
                     if class_obj2 is not None:
                         class_obj1 = class_obj2
             return class_obj1
-
         def gds_build_any(self, node, type_name=None):
             return None
 
@@ -323,37 +285,36 @@ except ImportError as exp:
 # Globals
 #
 
-ExternalEncoding = "ascii"
-Tag_pattern_ = re_.compile(r"({.*})?(.*)")
+ExternalEncoding = 'ascii'
+Tag_pattern_ = re_.compile(r'({.*})?(.*)')
 String_cleanup_pat_ = re_.compile(r"[\n\r\s]+")
-Namespace_extract_pat_ = re_.compile(r"{(.*)}(.*)")
+Namespace_extract_pat_ = re_.compile(r'{(.*)}(.*)')
 
 #
 # Support/utility functions.
 #
 
-
 def showIndent(outfile, level, pretty_print=True):
     if pretty_print:
         for idx in range(level):
-            outfile.write("    ")
-
+            outfile.write('    ')
 
 def quote_xml(inStr):
     if not inStr:
-        return ""
-    s1 = isinstance(inStr, str) and inStr or "%s" % inStr
-    s1 = s1.replace("&", "&amp;")
-    s1 = s1.replace("<", "&lt;")
-    s1 = s1.replace(">", "&gt;")
+        return ''
+    s1 = (isinstance(inStr, str) and inStr or
+          '%s' % inStr)
+    s1 = s1.replace('&', '&amp;')
+    s1 = s1.replace('<', '&lt;')
+    s1 = s1.replace('>', '&gt;')
     return s1
 
-
 def quote_attrib(inStr):
-    s1 = isinstance(inStr, str) and inStr or "%s" % inStr
-    s1 = s1.replace("&", "&amp;")
-    s1 = s1.replace("<", "&lt;")
-    s1 = s1.replace(">", "&gt;")
+    s1 = (isinstance(inStr, str) and inStr or
+          '%s' % inStr)
+    s1 = s1.replace('&', '&amp;')
+    s1 = s1.replace('<', '&lt;')
+    s1 = s1.replace('>', '&gt;')
     if '"' in s1:
         if "'" in s1:
             s1 = '"%s"' % s1.replace('"', "&quot;")
@@ -363,37 +324,34 @@ def quote_attrib(inStr):
         s1 = '"%s"' % s1
     return s1
 
-
 def quote_python(inStr):
     s1 = inStr
     if s1.find("'") == -1:
-        if s1.find("\n") == -1:
+        if s1.find('\n') == -1:
             return "'%s'" % s1
         else:
             return "'''%s'''" % s1
     else:
         if s1.find('"') != -1:
             s1 = s1.replace('"', '\\"')
-        if s1.find("\n") == -1:
+        if s1.find('\n') == -1:
             return '"%s"' % s1
         else:
             return '"""%s"""' % s1
-
 
 def get_all_text_(node):
     if node.text is not None:
         text = node.text
     else:
-        text = ""
+        text = ''
     for child in node:
         if child.tail is not None:
             text += child.tail
     return text
 
-
 def find_attr_value_(attr_name, node):
     attrs = node.attrib
-    attr_parts = attr_name.split(":")
+    attr_parts = attr_name.split(':')
     value = None
     if len(attr_parts) == 1:
         value = attrs.get(attr_name)
@@ -401,19 +359,19 @@ def find_attr_value_(attr_name, node):
         prefix, name = attr_parts
         namespace = node.nsmap.get(prefix)
         if namespace is not None:
-            value = attrs.get("{%s}%s" % (namespace, name,))
+            value = attrs.get('{%s}%s' % (namespace, name, ))
     return value
 
 
 class GDSParseError(Exception):
     pass
 
-
 def raise_parse_error(node, msg):
     if XMLParser_import_library == XMLParser_import_lxml:
-        msg = "%s (element %s/line %d)" % (msg, node.tag, node.sourceline,)
+        msg = '%s (element %s/line %d)' % (
+            msg, node.tag, node.sourceline, )
     else:
-        msg = "%s (element %s)" % (msg, node.tag,)
+        msg = '%s (element %s)' % (msg, node.tag, )
     raise GDSParseError(msg)
 
 
@@ -433,25 +391,19 @@ class MixedContainer:
     TypeDouble = 6
     TypeBoolean = 7
     TypeBase64 = 8
-
     def __init__(self, category, content_type, name, value):
         self.category = category
         self.content_type = content_type
         self.name = name
         self.value = value
-
     def getCategory(self):
         return self.category
-
     def getContenttype(self, content_type):
         return self.content_type
-
     def getValue(self):
         return self.value
-
     def getName(self):
         return self.name
-
     def export(self, outfile, level, name, namespace, pretty_print=True):
         if self.category == MixedContainer.CategoryText:
             # Prevent exporting empty content as empty lines.
@@ -459,503 +411,314 @@ class MixedContainer:
                 outfile.write(self.value)
         elif self.category == MixedContainer.CategorySimple:
             self.exportSimple(outfile, level, name)
-        else:  # category == MixedContainer.CategoryComplex
+        else:    # category == MixedContainer.CategoryComplex
             self.value.export(outfile, level, namespace, name, pretty_print)
-
     def exportSimple(self, outfile, level, name):
         if self.content_type == MixedContainer.TypeString:
-            outfile.write("<%s>%s</%s>" % (self.name, self.value, self.name))
-        elif (
-            self.content_type == MixedContainer.TypeInteger
-            or self.content_type == MixedContainer.TypeBoolean
-        ):
-            outfile.write("<%s>%d</%s>" % (self.name, self.value, self.name))
-        elif (
-            self.content_type == MixedContainer.TypeFloat
-            or self.content_type == MixedContainer.TypeDecimal
-        ):
-            outfile.write("<%s>%f</%s>" % (self.name, self.value, self.name))
+            outfile.write('<%s>%s</%s>' %
+                (self.name, self.value, self.name))
+        elif self.content_type == MixedContainer.TypeInteger or \
+                self.content_type == MixedContainer.TypeBoolean:
+            outfile.write('<%s>%d</%s>' %
+                (self.name, self.value, self.name))
+        elif self.content_type == MixedContainer.TypeFloat or \
+                self.content_type == MixedContainer.TypeDecimal:
+            outfile.write('<%s>%f</%s>' %
+                (self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeDouble:
-            outfile.write("<%s>%g</%s>" % (self.name, self.value, self.name))
+            outfile.write('<%s>%g</%s>' %
+                (self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeBase64:
-            outfile.write(
-                "<%s>%s</%s>" % (self.name, base64.b64encode(self.value), self.name)
-            )
-
+            outfile.write('<%s>%s</%s>' %
+                (self.name, base64.b64encode(self.value), self.name))
     def exportLiteral(self, outfile, level, name):
         if self.category == MixedContainer.CategoryText:
             showIndent(outfile, level)
-            outfile.write(
-                'model_.MixedContainer(%d, %d, "%s", "%s"),\n'
-                % (self.category, self.content_type, self.name, self.value)
-            )
+            outfile.write('model_.MixedContainer(%d, %d, "%s", "%s"),\n'
+                % (self.category, self.content_type, self.name, self.value))
         elif self.category == MixedContainer.CategorySimple:
             showIndent(outfile, level)
-            outfile.write(
-                'model_.MixedContainer(%d, %d, "%s", "%s"),\n'
-                % (self.category, self.content_type, self.name, self.value)
-            )
-        else:  # category == MixedContainer.CategoryComplex
+            outfile.write('model_.MixedContainer(%d, %d, "%s", "%s"),\n'
+                % (self.category, self.content_type, self.name, self.value))
+        else:    # category == MixedContainer.CategoryComplex
             showIndent(outfile, level)
-            outfile.write(
-                'model_.MixedContainer(%d, %d, "%s",\n'
-                % (self.category, self.content_type, self.name,)
-            )
+            outfile.write('model_.MixedContainer(%d, %d, "%s",\n' % \
+                (self.category, self.content_type, self.name,))
             self.value.exportLiteral(outfile, level + 1)
             showIndent(outfile, level)
-            outfile.write(")\n")
+            outfile.write(')\n')
 
 
 class MemberSpec_(object):
-    def __init__(self, name="", data_type="", container=0):
+    def __init__(self, name='', data_type='', container=0):
         self.name = name
         self.data_type = data_type
         self.container = container
-
-    def set_name(self, name):
-        self.name = name
-
-    def get_name(self):
-        return self.name
-
-    def set_data_type(self, data_type):
-        self.data_type = data_type
-
-    def get_data_type_chain(self):
-        return self.data_type
-
+    def set_name(self, name): self.name = name
+    def get_name(self): return self.name
+    def set_data_type(self, data_type): self.data_type = data_type
+    def get_data_type_chain(self): return self.data_type
     def get_data_type(self):
         if isinstance(self.data_type, list):
             if len(self.data_type) > 0:
                 return self.data_type[-1]
             else:
-                return "xs:string"
+                return 'xs:string'
         else:
             return self.data_type
-
-    def set_container(self, container):
-        self.container = container
-
-    def get_container(self):
-        return self.container
-
+    def set_container(self, container): self.container = container
+    def get_container(self): return self.container
 
 def _cast(typ, value):
     if typ is None or value is None:
         return value
     return typ(value)
 
-
 #
 # Data representation classes.
 #
 
-
 class root(GeneratedsSuper):
     subclass = None
     superclass = None
-
     def __init__(self, specVersion=None, URLBase=None, device=None):
         self.specVersion = specVersion
         self.URLBase = URLBase
         self.device = device
         self.anyAttributes_ = {}
-
     def factory(*args_, **kwargs_):
         if root.subclass:
             return root.subclass(*args_, **kwargs_)
         else:
             return root(*args_, **kwargs_)
-
     factory = staticmethod(factory)
-
-    def get_specVersion(self):
-        return self.specVersion
-
-    def set_specVersion(self, specVersion):
-        self.specVersion = specVersion
-
-    def get_URLBase(self):
-        return self.URLBase
-
-    def set_URLBase(self, URLBase):
-        self.URLBase = URLBase
-
-    def get_device(self):
-        return self.device
-
-    def set_device(self, device):
-        self.device = device
-
-    def get_anyAttributes_(self):
-        return self.anyAttributes_
-
-    def set_anyAttributes_(self, anyAttributes_):
-        self.anyAttributes_ = anyAttributes_
-
-    def export(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="root",
-        namespacedef_="",
-        pretty_print=True,
-    ):
+    def get_specVersion(self): return self.specVersion
+    def set_specVersion(self, specVersion): self.specVersion = specVersion
+    def get_URLBase(self): return self.URLBase
+    def set_URLBase(self, URLBase): self.URLBase = URLBase
+    def get_device(self): return self.device
+    def set_device(self, device): self.device = device
+    def get_anyAttributes_(self): return self.anyAttributes_
+    def set_anyAttributes_(self, anyAttributes_): self.anyAttributes_ = anyAttributes_
+    def export(self, outfile, level, namespace_='tns:', name_='root', namespacedef_='', pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         showIndent(outfile, level, pretty_print)
-        outfile.write(
-            "<%s%s%s"
-            % (namespace_, name_, namespacedef_ and " " + namespacedef_ or "",)
-        )
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = []
-        self.exportAttributes(
-            outfile, level, already_processed, namespace_, name_="root"
-        )
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='root')
         if self.hasContent_():
-            outfile.write(">%s" % (eol_,))
-            self.exportChildren(
-                outfile, level + 1, namespace_, name_, pretty_print=pretty_print
-            )
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write("</%s%s>%s" % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
-            outfile.write("/>%s" % (eol_,))
-
-    def exportAttributes(
-        self, outfile, level, already_processed, namespace_="tns:", name_="root"
-    ):
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='tns:', name_='root'):
         unique_counter = 0
         for name, value in self.anyAttributes_.items():
-            xsinamespaceprefix = "xsi"
-            xsinamespace1 = "http://www.w3.org/2001/XMLSchema-instance"
-            xsinamespace2 = "{%s}" % (xsinamespace1,)
+            xsinamespaceprefix = 'xsi'
+            xsinamespace1 = 'http://www.w3.org/2001/XMLSchema-instance'
+            xsinamespace2 = '{%s}' % (xsinamespace1, )
             if name.startswith(xsinamespace2):
-                name1 = name[len(xsinamespace2) :]
-                name2 = "%s:%s" % (xsinamespaceprefix, name1,)
+                name1 = name[len(xsinamespace2):]
+                name2 = '%s:%s' % (xsinamespaceprefix, name1, )
                 if name2 not in already_processed:
                     already_processed.append(name2)
-                    outfile.write(" %s=%s" % (name2, quote_attrib(value),))
+                    outfile.write(' %s=%s' % (name2, quote_attrib(value), ))
             else:
                 mo = re_.match(Namespace_extract_pat_, name)
                 if mo is not None:
                     namespace, name = mo.group(1, 2)
                     if name not in already_processed:
                         already_processed.append(name)
-                        if namespace == "http://www.w3.org/XML/1998/namespace":
-                            outfile.write(" %s=%s" % (name, quote_attrib(value),))
+                        if namespace == 'http://www.w3.org/XML/1998/namespace':
+                            outfile.write(' %s=%s' % (
+                                name, quote_attrib(value), ))
                         else:
                             unique_counter += 1
-                            outfile.write(
-                                ' xmlns:yyy%d="%s"' % (unique_counter, namespace,)
-                            )
-                            outfile.write(
-                                " yyy%d:%s=%s"
-                                % (unique_counter, name, quote_attrib(value),)
-                            )
+                            outfile.write(' xmlns:yyy%d="%s"' % (
+                                unique_counter, namespace, ))
+                            outfile.write(' yyy%d:%s=%s' % (
+                                unique_counter, name, quote_attrib(value), ))
                 else:
                     if name not in already_processed:
                         already_processed.append(name)
-                        outfile.write(" %s=%s" % (name, quote_attrib(value),))
+                        outfile.write(' %s=%s' % (
+                            name, quote_attrib(value), ))
         pass
-
-    def exportChildren(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="root",
-        fromsubclass_=False,
-        pretty_print=True,
-    ):
+    def exportChildren(self, outfile, level, namespace_='tns:', name_='root', fromsubclass_=False, pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         if self.specVersion is not None:
-            self.specVersion.export(
-                outfile,
-                level,
-                namespace_,
-                name_="specVersion",
-                pretty_print=pretty_print,
-            )
+            self.specVersion.export(outfile, level, namespace_, name_='specVersion', pretty_print=pretty_print)
         if self.URLBase is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sURLBase>%s</%sURLBase>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.URLBase).encode(ExternalEncoding),
-                        input_name="URLBase",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sURLBase>%s</%sURLBase>%s' % (namespace_, self.gds_format_string(quote_xml(self.URLBase).encode(ExternalEncoding), input_name='URLBase'), namespace_, eol_))
         if self.device is not None:
-            self.device.export(
-                outfile, level, namespace_, name_="device", pretty_print=pretty_print
-            )
-
+            self.device.export(outfile, level, namespace_, name_='device', pretty_print=pretty_print)
     def hasContent_(self):
         if (
-            self.specVersion is not None
-            or self.URLBase is not None
-            or self.device is not None
-        ):
+            self.specVersion is not None or
+            self.URLBase is not None or
+            self.device is not None
+            ):
             return True
         else:
             return False
-
-    def exportLiteral(self, outfile, level, name_="root"):
+    def exportLiteral(self, outfile, level, name_='root'):
         level += 1
         self.exportLiteralAttributes(outfile, level, [], name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
-
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         for name, value in self.anyAttributes_.items():
             showIndent(outfile, level)
             outfile.write('%s = "%s",\n' % (name, value,))
-
     def exportLiteralChildren(self, outfile, level, name_):
         if self.specVersion is not None:
             showIndent(outfile, level)
-            outfile.write("specVersion=model_.SpecVersionType(\n")
-            self.specVersion.exportLiteral(outfile, level, name_="specVersion")
+            outfile.write('specVersion=model_.SpecVersionType(\n')
+            self.specVersion.exportLiteral(outfile, level, name_='specVersion')
             showIndent(outfile, level)
-            outfile.write("),\n")
+            outfile.write('),\n')
         if self.URLBase is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "URLBase=%s,\n" % quote_python(self.URLBase).encode(ExternalEncoding)
-            )
+            outfile.write('URLBase=%s,\n' % quote_python(self.URLBase).encode(ExternalEncoding))
         if self.device is not None:
             showIndent(outfile, level)
-            outfile.write("device=model_.DeviceType(\n")
-            self.device.exportLiteral(outfile, level, name_="device")
+            outfile.write('device=model_.DeviceType(\n')
+            self.device.exportLiteral(outfile, level, name_='device')
             showIndent(outfile, level)
-            outfile.write("),\n")
-
+            outfile.write('),\n')
     def build(self, node):
         self.buildAttributes(node, node.attrib, [])
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
-
     def buildAttributes(self, node, attrs, already_processed):
         self.anyAttributes_ = {}
         for name, value in attrs.items():
             if name not in already_processed:
                 self.anyAttributes_[name] = value
-
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == "specVersion":
+        if nodeName_ == 'specVersion':
             obj_ = SpecVersionType.factory()
             obj_.build(child_)
             self.set_specVersion(obj_)
-        elif nodeName_ == "URLBase":
+        elif nodeName_ == 'URLBase':
             URLBase_ = child_.text
-            URLBase_ = self.gds_validate_string(URLBase_, node, "URLBase")
+            URLBase_ = self.gds_validate_string(URLBase_, node, 'URLBase')
             self.URLBase = URLBase_
-        elif nodeName_ == "device":
+        elif nodeName_ == 'device':
             obj_ = DeviceType.factory()
             obj_.build(child_)
             self.set_device(obj_)
-
-
 # end class root
 
 
 class SpecVersionType(GeneratedsSuper):
     subclass = None
     superclass = None
-
     def __init__(self, major=None, minor=None):
         self.major = major
         self.minor = minor
-
     def factory(*args_, **kwargs_):
         if SpecVersionType.subclass:
             return SpecVersionType.subclass(*args_, **kwargs_)
         else:
             return SpecVersionType(*args_, **kwargs_)
-
     factory = staticmethod(factory)
-
-    def get_major(self):
-        return self.major
-
-    def set_major(self, major):
-        self.major = major
-
-    def get_minor(self):
-        return self.minor
-
-    def set_minor(self, minor):
-        self.minor = minor
-
-    def export(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="SpecVersionType",
-        namespacedef_="",
-        pretty_print=True,
-    ):
+    def get_major(self): return self.major
+    def set_major(self, major): self.major = major
+    def get_minor(self): return self.minor
+    def set_minor(self, minor): self.minor = minor
+    def export(self, outfile, level, namespace_='tns:', name_='SpecVersionType', namespacedef_='', pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         showIndent(outfile, level, pretty_print)
-        outfile.write(
-            "<%s%s%s"
-            % (namespace_, name_, namespacedef_ and " " + namespacedef_ or "",)
-        )
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = []
-        self.exportAttributes(
-            outfile, level, already_processed, namespace_, name_="SpecVersionType"
-        )
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='SpecVersionType')
         if self.hasContent_():
-            outfile.write(">%s" % (eol_,))
-            self.exportChildren(
-                outfile, level + 1, namespace_, name_, pretty_print=pretty_print
-            )
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write("</%s%s>%s" % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
-            outfile.write("/>%s" % (eol_,))
-
-    def exportAttributes(
-        self,
-        outfile,
-        level,
-        already_processed,
-        namespace_="tns:",
-        name_="SpecVersionType",
-    ):
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='tns:', name_='SpecVersionType'):
         pass
-
-    def exportChildren(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="SpecVersionType",
-        fromsubclass_=False,
-        pretty_print=True,
-    ):
+    def exportChildren(self, outfile, level, namespace_='tns:', name_='SpecVersionType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         if self.major is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%smajor>%s</%smajor>%s"
-                % (
-                    namespace_,
-                    self.gds_format_integer(self.major, input_name="major"),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%smajor>%s</%smajor>%s' % (namespace_, self.gds_format_integer(self.major, input_name='major'), namespace_, eol_))
         if self.minor is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sminor>%s</%sminor>%s"
-                % (
-                    namespace_,
-                    self.gds_format_integer(self.minor, input_name="minor"),
-                    namespace_,
-                    eol_,
-                )
-            )
-
+            outfile.write('<%sminor>%s</%sminor>%s' % (namespace_, self.gds_format_integer(self.minor, input_name='minor'), namespace_, eol_))
     def hasContent_(self):
-        if self.major is not None or self.minor is not None:
+        if (
+            self.major is not None or
+            self.minor is not None
+            ):
             return True
         else:
             return False
-
-    def exportLiteral(self, outfile, level, name_="SpecVersionType"):
+    def exportLiteral(self, outfile, level, name_='SpecVersionType'):
         level += 1
         self.exportLiteralAttributes(outfile, level, [], name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
-
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         pass
-
     def exportLiteralChildren(self, outfile, level, name_):
         if self.major is not None:
             showIndent(outfile, level)
-            outfile.write("major=%d,\n" % self.major)
+            outfile.write('major=%d,\n' % self.major)
         if self.minor is not None:
             showIndent(outfile, level)
-            outfile.write("minor=%d,\n" % self.minor)
-
+            outfile.write('minor=%d,\n' % self.minor)
     def build(self, node):
         self.buildAttributes(node, node.attrib, [])
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
-
     def buildAttributes(self, node, attrs, already_processed):
         pass
-
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == "major":
+        if nodeName_ == 'major':
             sval_ = child_.text
             try:
                 ival_ = int(sval_)
             except (TypeError, ValueError) as exp:
-                raise_parse_error(child_, "requires integer: %s" % exp)
-            ival_ = self.gds_validate_integer(ival_, node, "major")
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'major')
             self.major = ival_
-        elif nodeName_ == "minor":
+        elif nodeName_ == 'minor':
             sval_ = child_.text
             try:
                 ival_ = int(sval_)
             except (TypeError, ValueError) as exp:
-                raise_parse_error(child_, "requires integer: %s" % exp)
-            ival_ = self.gds_validate_integer(ival_, node, "minor")
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'minor')
             self.minor = ival_
-
-
 # end class SpecVersionType
 
 
 class DeviceType(GeneratedsSuper):
     subclass = None
     superclass = None
-
-    def __init__(
-        self,
-        deviceType=None,
-        friendlyName=None,
-        manufacturer=None,
-        manufacturerURL=None,
-        modelDescription=None,
-        modelName=None,
-        modelNumber=None,
-        modelURL=None,
-        serialNumber=None,
-        UDN=None,
-        macAddress=None,
-        UPC=None,
-        iconList=None,
-        serviceList=None,
-        deviceList=None,
-        presentationURL=None,
-        anytypeobjs_=None,
-    ):
+    def __init__(self, deviceType=None, friendlyName=None, manufacturer=None, manufacturerURL=None, modelDescription=None, modelName=None, modelNumber=None, modelURL=None, serialNumber=None, UDN=None, macAddress=None, UPC=None, iconList=None, serviceList=None, deviceList=None, presentationURL=None, anytypeobjs_=None):
         self.deviceType = deviceType
         self.friendlyName = friendlyName
         self.manufacturer = manufacturer
@@ -976,1538 +739,830 @@ class DeviceType(GeneratedsSuper):
             self.anytypeobjs_ = []
         else:
             self.anytypeobjs_ = anytypeobjs_
-
     def factory(*args_, **kwargs_):
         if DeviceType.subclass:
             return DeviceType.subclass(*args_, **kwargs_)
         else:
             return DeviceType(*args_, **kwargs_)
-
     factory = staticmethod(factory)
-
-    def get_deviceType(self):
-        return self.deviceType
-
-    def set_deviceType(self, deviceType):
-        self.deviceType = deviceType
-
-    def get_friendlyName(self):
-        return self.friendlyName
-
-    def set_friendlyName(self, friendlyName):
-        self.friendlyName = friendlyName
-
-    def get_manufacturer(self):
-        return self.manufacturer
-
-    def set_manufacturer(self, manufacturer):
-        self.manufacturer = manufacturer
-
-    def get_manufacturerURL(self):
-        return self.manufacturerURL
-
-    def set_manufacturerURL(self, manufacturerURL):
-        self.manufacturerURL = manufacturerURL
-
-    def get_modelDescription(self):
-        return self.modelDescription
-
-    def set_modelDescription(self, modelDescription):
-        self.modelDescription = modelDescription
-
-    def get_modelName(self):
-        return self.modelName
-
-    def set_modelName(self, modelName):
-        self.modelName = modelName
-
-    def get_modelNumber(self):
-        return self.modelNumber
-
-    def set_modelNumber(self, modelNumber):
-        self.modelNumber = modelNumber
-
-    def get_modelURL(self):
-        return self.modelURL
-
-    def set_modelURL(self, modelURL):
-        self.modelURL = modelURL
-
-    def get_serialNumber(self):
-        return self.serialNumber
-
-    def set_serialNumber(self, serialNumber):
-        self.serialNumber = serialNumber
-
-    def get_UDN(self):
-        return self.UDN
-
-    def set_UDN(self, UDN):
-        self.UDN = UDN
-
-    def get_macAddress(self):
-        return self.macAddress
-
-    def set_macAddress(self, macAddress):
-        self.macAddress = macAddress
-
-    def get_UPC(self):
-        return self.UPC
-
-    def set_UPC(self, UPC):
-        self.UPC = UPC
-
-    def get_iconList(self):
-        return self.iconList
-
-    def set_iconList(self, iconList):
-        self.iconList = iconList
-
-    def get_serviceList(self):
-        return self.serviceList
-
-    def set_serviceList(self, serviceList):
-        self.serviceList = serviceList
-
-    def get_deviceList(self):
-        return self.deviceList
-
-    def set_deviceList(self, deviceList):
-        self.deviceList = deviceList
-
-    def get_presentationURL(self):
-        return self.presentationURL
-
-    def set_presentationURL(self, presentationURL):
-        self.presentationURL = presentationURL
-
-    def get_anytypeobjs_(self):
-        return self.anytypeobjs_
-
-    def set_anytypeobjs_(self, anytypeobjs_):
-        self.anytypeobjs_ = anytypeobjs_
-
-    def add_anytypeobjs_(self, value):
-        self.anytypeobjs_.append(value)
-
-    def insert_anytypeobjs_(self, index, value):
-        self._anytypeobjs_[index] = value
-
-    def export(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="DeviceType",
-        namespacedef_="",
-        pretty_print=True,
-    ):
+    def get_deviceType(self): return self.deviceType
+    def set_deviceType(self, deviceType): self.deviceType = deviceType
+    def get_friendlyName(self): return self.friendlyName
+    def set_friendlyName(self, friendlyName): self.friendlyName = friendlyName
+    def get_manufacturer(self): return self.manufacturer
+    def set_manufacturer(self, manufacturer): self.manufacturer = manufacturer
+    def get_manufacturerURL(self): return self.manufacturerURL
+    def set_manufacturerURL(self, manufacturerURL): self.manufacturerURL = manufacturerURL
+    def get_modelDescription(self): return self.modelDescription
+    def set_modelDescription(self, modelDescription): self.modelDescription = modelDescription
+    def get_modelName(self): return self.modelName
+    def set_modelName(self, modelName): self.modelName = modelName
+    def get_modelNumber(self): return self.modelNumber
+    def set_modelNumber(self, modelNumber): self.modelNumber = modelNumber
+    def get_modelURL(self): return self.modelURL
+    def set_modelURL(self, modelURL): self.modelURL = modelURL
+    def get_serialNumber(self): return self.serialNumber
+    def set_serialNumber(self, serialNumber): self.serialNumber = serialNumber
+    def get_UDN(self): return self.UDN
+    def set_UDN(self, UDN): self.UDN = UDN
+    def get_macAddress(self): return self.macAddress
+    def set_macAddress(self, macAddress): self.macAddress = macAddress
+    def get_UPC(self): return self.UPC
+    def set_UPC(self, UPC): self.UPC = UPC
+    def get_iconList(self): return self.iconList
+    def set_iconList(self, iconList): self.iconList = iconList
+    def get_serviceList(self): return self.serviceList
+    def set_serviceList(self, serviceList): self.serviceList = serviceList
+    def get_deviceList(self): return self.deviceList
+    def set_deviceList(self, deviceList): self.deviceList = deviceList
+    def get_presentationURL(self): return self.presentationURL
+    def set_presentationURL(self, presentationURL): self.presentationURL = presentationURL
+    def get_anytypeobjs_(self): return self.anytypeobjs_
+    def set_anytypeobjs_(self, anytypeobjs_): self.anytypeobjs_ = anytypeobjs_
+    def add_anytypeobjs_(self, value): self.anytypeobjs_.append(value)
+    def insert_anytypeobjs_(self, index, value): self._anytypeobjs_[index] = value
+    def export(self, outfile, level, namespace_='tns:', name_='DeviceType', namespacedef_='', pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         showIndent(outfile, level, pretty_print)
-        outfile.write(
-            "<%s%s%s"
-            % (namespace_, name_, namespacedef_ and " " + namespacedef_ or "",)
-        )
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = []
-        self.exportAttributes(
-            outfile, level, already_processed, namespace_, name_="DeviceType"
-        )
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='DeviceType')
         if self.hasContent_():
-            outfile.write(">%s" % (eol_,))
-            self.exportChildren(
-                outfile, level + 1, namespace_, name_, pretty_print=pretty_print
-            )
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write("</%s%s>%s" % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
-            outfile.write("/>%s" % (eol_,))
-
-    def exportAttributes(
-        self, outfile, level, already_processed, namespace_="tns:", name_="DeviceType"
-    ):
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='tns:', name_='DeviceType'):
         pass
-
-    def exportChildren(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="DeviceType",
-        fromsubclass_=False,
-        pretty_print=True,
-    ):
+    def exportChildren(self, outfile, level, namespace_='tns:', name_='DeviceType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         if self.deviceType is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sdeviceType>%s</%sdeviceType>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.deviceType).encode(ExternalEncoding),
-                        input_name="deviceType",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sdeviceType>%s</%sdeviceType>%s' % (namespace_, self.gds_format_string(quote_xml(self.deviceType).encode(ExternalEncoding), input_name='deviceType'), namespace_, eol_))
         if self.friendlyName is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sfriendlyName>%s</%sfriendlyName>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.friendlyName).encode(ExternalEncoding),
-                        input_name="friendlyName",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sfriendlyName>%s</%sfriendlyName>%s' % (namespace_, self.gds_format_string(quote_xml(self.friendlyName).encode(ExternalEncoding), input_name='friendlyName'), namespace_, eol_))
         if self.manufacturer is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%smanufacturer>%s</%smanufacturer>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.manufacturer).encode(ExternalEncoding),
-                        input_name="manufacturer",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%smanufacturer>%s</%smanufacturer>%s' % (namespace_, self.gds_format_string(quote_xml(self.manufacturer).encode(ExternalEncoding), input_name='manufacturer'), namespace_, eol_))
         if self.manufacturerURL is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%smanufacturerURL>%s</%smanufacturerURL>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.manufacturerURL).encode(ExternalEncoding),
-                        input_name="manufacturerURL",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%smanufacturerURL>%s</%smanufacturerURL>%s' % (namespace_, self.gds_format_string(quote_xml(self.manufacturerURL).encode(ExternalEncoding), input_name='manufacturerURL'), namespace_, eol_))
         if self.modelDescription is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%smodelDescription>%s</%smodelDescription>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.modelDescription).encode(ExternalEncoding),
-                        input_name="modelDescription",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%smodelDescription>%s</%smodelDescription>%s' % (namespace_, self.gds_format_string(quote_xml(self.modelDescription).encode(ExternalEncoding), input_name='modelDescription'), namespace_, eol_))
         if self.modelName is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%smodelName>%s</%smodelName>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.modelName).encode(ExternalEncoding),
-                        input_name="modelName",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%smodelName>%s</%smodelName>%s' % (namespace_, self.gds_format_string(quote_xml(self.modelName).encode(ExternalEncoding), input_name='modelName'), namespace_, eol_))
         if self.modelNumber is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%smodelNumber>%s</%smodelNumber>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.modelNumber).encode(ExternalEncoding),
-                        input_name="modelNumber",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%smodelNumber>%s</%smodelNumber>%s' % (namespace_, self.gds_format_string(quote_xml(self.modelNumber).encode(ExternalEncoding), input_name='modelNumber'), namespace_, eol_))
         if self.modelURL is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%smodelURL>%s</%smodelURL>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.modelURL).encode(ExternalEncoding),
-                        input_name="modelURL",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%smodelURL>%s</%smodelURL>%s' % (namespace_, self.gds_format_string(quote_xml(self.modelURL).encode(ExternalEncoding), input_name='modelURL'), namespace_, eol_))
         if self.serialNumber is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sserialNumber>%s</%sserialNumber>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.serialNumber).encode(ExternalEncoding),
-                        input_name="serialNumber",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sserialNumber>%s</%sserialNumber>%s' % (namespace_, self.gds_format_string(quote_xml(self.serialNumber).encode(ExternalEncoding), input_name='serialNumber'), namespace_, eol_))
         if self.UDN is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sUDN>%s</%sUDN>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.UDN).encode(ExternalEncoding), input_name="UDN"
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sUDN>%s</%sUDN>%s' % (namespace_, self.gds_format_string(quote_xml(self.UDN).encode(ExternalEncoding), input_name='UDN'), namespace_, eol_))
         if self.macAddress is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%smacAddress>%s</%smacAddress>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.macAddress).encode(ExternalEncoding),
-                        input_name="macAddress",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%smacAddress>%s</%smacAddress>%s' % (namespace_, self.gds_format_string(quote_xml(self.macAddress).encode(ExternalEncoding), input_name='macAddress'), namespace_, eol_))
         if self.UPC is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sUPC>%s</%sUPC>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.UPC).encode(ExternalEncoding), input_name="UPC"
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sUPC>%s</%sUPC>%s' % (namespace_, self.gds_format_string(quote_xml(self.UPC).encode(ExternalEncoding), input_name='UPC'), namespace_, eol_))
         if self.iconList is not None:
-            self.iconList.export(
-                outfile, level, namespace_, name_="iconList", pretty_print=pretty_print
-            )
+            self.iconList.export(outfile, level, namespace_, name_='iconList', pretty_print=pretty_print)
         if self.serviceList is not None:
-            self.serviceList.export(
-                outfile,
-                level,
-                namespace_,
-                name_="serviceList",
-                pretty_print=pretty_print,
-            )
+            self.serviceList.export(outfile, level, namespace_, name_='serviceList', pretty_print=pretty_print)
         if self.deviceList is not None:
-            self.deviceList.export(
-                outfile,
-                level,
-                namespace_,
-                name_="deviceList",
-                pretty_print=pretty_print,
-            )
+            self.deviceList.export(outfile, level, namespace_, name_='deviceList', pretty_print=pretty_print)
         if self.presentationURL is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%spresentationURL>%s</%spresentationURL>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.presentationURL).encode(ExternalEncoding),
-                        input_name="presentationURL",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%spresentationURL>%s</%spresentationURL>%s' % (namespace_, self.gds_format_string(quote_xml(self.presentationURL).encode(ExternalEncoding), input_name='presentationURL'), namespace_, eol_))
         for obj_ in self.anytypeobjs_:
             obj_.export(outfile, level, namespace_, pretty_print=pretty_print)
-
     def hasContent_(self):
         if (
-            self.deviceType is not None
-            or self.friendlyName is not None
-            or self.manufacturer is not None
-            or self.manufacturerURL is not None
-            or self.modelDescription is not None
-            or self.modelName is not None
-            or self.modelNumber is not None
-            or self.modelURL is not None
-            or self.serialNumber is not None
-            or self.UDN is not None
-            or self.macAddress is not None
-            or self.UPC is not None
-            or self.iconList is not None
-            or self.serviceList is not None
-            or self.deviceList is not None
-            or self.presentationURL is not None
-            or self.anytypeobjs_
-        ):
+            self.deviceType is not None or
+            self.friendlyName is not None or
+            self.manufacturer is not None or
+            self.manufacturerURL is not None or
+            self.modelDescription is not None or
+            self.modelName is not None or
+            self.modelNumber is not None or
+            self.modelURL is not None or
+            self.serialNumber is not None or
+            self.UDN is not None or
+            self.macAddress is not None or
+            self.UPC is not None or
+            self.iconList is not None or
+            self.serviceList is not None or
+            self.deviceList is not None or
+            self.presentationURL is not None or
+            self.anytypeobjs_
+            ):
             return True
         else:
             return False
-
-    def exportLiteral(self, outfile, level, name_="DeviceType"):
+    def exportLiteral(self, outfile, level, name_='DeviceType'):
         level += 1
         self.exportLiteralAttributes(outfile, level, [], name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
-
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         pass
-
     def exportLiteralChildren(self, outfile, level, name_):
         if self.deviceType is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "deviceType=%s,\n"
-                % quote_python(self.deviceType).encode(ExternalEncoding)
-            )
+            outfile.write('deviceType=%s,\n' % quote_python(self.deviceType).encode(ExternalEncoding))
         if self.friendlyName is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "friendlyName=%s,\n"
-                % quote_python(self.friendlyName).encode(ExternalEncoding)
-            )
+            outfile.write('friendlyName=%s,\n' % quote_python(self.friendlyName).encode(ExternalEncoding))
         if self.manufacturer is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "manufacturer=%s,\n"
-                % quote_python(self.manufacturer).encode(ExternalEncoding)
-            )
+            outfile.write('manufacturer=%s,\n' % quote_python(self.manufacturer).encode(ExternalEncoding))
         if self.manufacturerURL is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "manufacturerURL=%s,\n"
-                % quote_python(self.manufacturerURL).encode(ExternalEncoding)
-            )
+            outfile.write('manufacturerURL=%s,\n' % quote_python(self.manufacturerURL).encode(ExternalEncoding))
         if self.modelDescription is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "modelDescription=%s,\n"
-                % quote_python(self.modelDescription).encode(ExternalEncoding)
-            )
+            outfile.write('modelDescription=%s,\n' % quote_python(self.modelDescription).encode(ExternalEncoding))
         if self.modelName is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "modelName=%s,\n"
-                % quote_python(self.modelName).encode(ExternalEncoding)
-            )
+            outfile.write('modelName=%s,\n' % quote_python(self.modelName).encode(ExternalEncoding))
         if self.modelNumber is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "modelNumber=%s,\n"
-                % quote_python(self.modelNumber).encode(ExternalEncoding)
-            )
+            outfile.write('modelNumber=%s,\n' % quote_python(self.modelNumber).encode(ExternalEncoding))
         if self.modelURL is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "modelURL=%s,\n" % quote_python(self.modelURL).encode(ExternalEncoding)
-            )
+            outfile.write('modelURL=%s,\n' % quote_python(self.modelURL).encode(ExternalEncoding))
         if self.serialNumber is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "serialNumber=%s,\n"
-                % quote_python(self.serialNumber).encode(ExternalEncoding)
-            )
+            outfile.write('serialNumber=%s,\n' % quote_python(self.serialNumber).encode(ExternalEncoding))
         if self.UDN is not None:
             showIndent(outfile, level)
-            outfile.write("UDN=%s,\n" % quote_python(self.UDN).encode(ExternalEncoding))
+            outfile.write('UDN=%s,\n' % quote_python(self.UDN).encode(ExternalEncoding))
         if self.macAddress is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "macAddress=%s,\n"
-                % quote_python(self.macAddress).encode(ExternalEncoding)
-            )
+            outfile.write('macAddress=%s,\n' % quote_python(self.macAddress).encode(ExternalEncoding))
         if self.UPC is not None:
             showIndent(outfile, level)
-            outfile.write("UPC=%s,\n" % quote_python(self.UPC).encode(ExternalEncoding))
+            outfile.write('UPC=%s,\n' % quote_python(self.UPC).encode(ExternalEncoding))
         if self.iconList is not None:
             showIndent(outfile, level)
-            outfile.write("iconList=model_.IconListType(\n")
-            self.iconList.exportLiteral(outfile, level, name_="iconList")
+            outfile.write('iconList=model_.IconListType(\n')
+            self.iconList.exportLiteral(outfile, level, name_='iconList')
             showIndent(outfile, level)
-            outfile.write("),\n")
+            outfile.write('),\n')
         if self.serviceList is not None:
             showIndent(outfile, level)
-            outfile.write("serviceList=model_.ServiceListType(\n")
-            self.serviceList.exportLiteral(outfile, level, name_="serviceList")
+            outfile.write('serviceList=model_.ServiceListType(\n')
+            self.serviceList.exportLiteral(outfile, level, name_='serviceList')
             showIndent(outfile, level)
-            outfile.write("),\n")
+            outfile.write('),\n')
         if self.deviceList is not None:
             showIndent(outfile, level)
-            outfile.write("deviceList=model_.DeviceListType(\n")
-            self.deviceList.exportLiteral(outfile, level, name_="deviceList")
+            outfile.write('deviceList=model_.DeviceListType(\n')
+            self.deviceList.exportLiteral(outfile, level, name_='deviceList')
             showIndent(outfile, level)
-            outfile.write("),\n")
+            outfile.write('),\n')
         if self.presentationURL is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "presentationURL=%s,\n"
-                % quote_python(self.presentationURL).encode(ExternalEncoding)
-            )
+            outfile.write('presentationURL=%s,\n' % quote_python(self.presentationURL).encode(ExternalEncoding))
         showIndent(outfile, level)
-        outfile.write("anytypeobjs_=[\n")
+        outfile.write('anytypeobjs_=[\n')
         level += 1
         for anytypeobjs_ in self.anytypeobjs_:
             anytypeobjs_.exportLiteral(outfile, level)
         level -= 1
         showIndent(outfile, level)
-        outfile.write("],\n")
-
+        outfile.write('],\n')
     def build(self, node):
         self.buildAttributes(node, node.attrib, [])
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
-
     def buildAttributes(self, node, attrs, already_processed):
         pass
-
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == "deviceType":
+        if nodeName_ == 'deviceType':
             deviceType_ = child_.text
-            deviceType_ = self.gds_validate_string(deviceType_, node, "deviceType")
+            deviceType_ = self.gds_validate_string(deviceType_, node, 'deviceType')
             self.deviceType = deviceType_
-        elif nodeName_ == "friendlyName":
+        elif nodeName_ == 'friendlyName':
             friendlyName_ = child_.text
-            friendlyName_ = self.gds_validate_string(
-                friendlyName_, node, "friendlyName"
-            )
+            friendlyName_ = self.gds_validate_string(friendlyName_, node, 'friendlyName')
             self.friendlyName = friendlyName_
-        elif nodeName_ == "manufacturer":
+        elif nodeName_ == 'manufacturer':
             manufacturer_ = child_.text
-            manufacturer_ = self.gds_validate_string(
-                manufacturer_, node, "manufacturer"
-            )
+            manufacturer_ = self.gds_validate_string(manufacturer_, node, 'manufacturer')
             self.manufacturer = manufacturer_
-        elif nodeName_ == "manufacturerURL":
+        elif nodeName_ == 'manufacturerURL':
             manufacturerURL_ = child_.text
-            manufacturerURL_ = self.gds_validate_string(
-                manufacturerURL_, node, "manufacturerURL"
-            )
+            manufacturerURL_ = self.gds_validate_string(manufacturerURL_, node, 'manufacturerURL')
             self.manufacturerURL = manufacturerURL_
-        elif nodeName_ == "modelDescription":
+        elif nodeName_ == 'modelDescription':
             modelDescription_ = child_.text
-            modelDescription_ = self.gds_validate_string(
-                modelDescription_, node, "modelDescription"
-            )
+            modelDescription_ = self.gds_validate_string(modelDescription_, node, 'modelDescription')
             self.modelDescription = modelDescription_
-        elif nodeName_ == "modelName":
+        elif nodeName_ == 'modelName':
             modelName_ = child_.text
-            modelName_ = self.gds_validate_string(modelName_, node, "modelName")
+            modelName_ = self.gds_validate_string(modelName_, node, 'modelName')
             self.modelName = modelName_
-        elif nodeName_ == "modelNumber":
+        elif nodeName_ == 'modelNumber':
             modelNumber_ = child_.text
-            modelNumber_ = self.gds_validate_string(modelNumber_, node, "modelNumber")
+            modelNumber_ = self.gds_validate_string(modelNumber_, node, 'modelNumber')
             self.modelNumber = modelNumber_
-        elif nodeName_ == "modelURL":
+        elif nodeName_ == 'modelURL':
             modelURL_ = child_.text
-            modelURL_ = self.gds_validate_string(modelURL_, node, "modelURL")
+            modelURL_ = self.gds_validate_string(modelURL_, node, 'modelURL')
             self.modelURL = modelURL_
-        elif nodeName_ == "serialNumber":
+        elif nodeName_ == 'serialNumber':
             serialNumber_ = child_.text
-            serialNumber_ = self.gds_validate_string(
-                serialNumber_, node, "serialNumber"
-            )
+            serialNumber_ = self.gds_validate_string(serialNumber_, node, 'serialNumber')
             self.serialNumber = serialNumber_
-        elif nodeName_ == "UDN":
+        elif nodeName_ == 'UDN':
             UDN_ = child_.text
-            UDN_ = self.gds_validate_string(UDN_, node, "UDN")
+            UDN_ = self.gds_validate_string(UDN_, node, 'UDN')
             self.UDN = UDN_
-        elif nodeName_ == "macAddress":
+        elif nodeName_ == 'macAddress':
             macAddress_ = child_.text
-            macAddress_ = self.gds_validate_string(macAddress_, node, "macAddress")
+            macAddress_ = self.gds_validate_string(macAddress_, node, 'macAddress')
             self.macAddress = macAddress_
-        elif nodeName_ == "UPC":
+        elif nodeName_ == 'UPC':
             UPC_ = child_.text
-            UPC_ = self.gds_validate_string(UPC_, node, "UPC")
+            UPC_ = self.gds_validate_string(UPC_, node, 'UPC')
             self.UPC = UPC_
-        elif nodeName_ == "iconList":
+        elif nodeName_ == 'iconList':
             obj_ = IconListType.factory()
             obj_.build(child_)
             self.set_iconList(obj_)
-        elif nodeName_ == "serviceList":
+        elif nodeName_ == 'serviceList':
             obj_ = ServiceListType.factory()
             obj_.build(child_)
             self.set_serviceList(obj_)
-        elif nodeName_ == "deviceList":
+        elif nodeName_ == 'deviceList':
             obj_ = DeviceListType.factory()
             obj_.build(child_)
             self.set_deviceList(obj_)
-        elif nodeName_ == "presentationURL":
+        elif nodeName_ == 'presentationURL':
             presentationURL_ = child_.text
-            presentationURL_ = self.gds_validate_string(
-                presentationURL_, node, "presentationURL"
-            )
+            presentationURL_ = self.gds_validate_string(presentationURL_, node, 'presentationURL')
             self.presentationURL = presentationURL_
         else:
-            obj_ = self.gds_build_any(child_, "DeviceType")
+            obj_ = self.gds_build_any(child_, 'DeviceType')
             if obj_ is not None:
                 self.add_anytypeobjs_(obj_)
-
-
 # end class DeviceType
 
 
 class IconListType(GeneratedsSuper):
     subclass = None
     superclass = None
-
     def __init__(self, icon=None):
         if icon is None:
             self.icon = []
         else:
             self.icon = icon
-
     def factory(*args_, **kwargs_):
         if IconListType.subclass:
             return IconListType.subclass(*args_, **kwargs_)
         else:
             return IconListType(*args_, **kwargs_)
-
     factory = staticmethod(factory)
-
-    def get_icon(self):
-        return self.icon
-
-    def set_icon(self, icon):
-        self.icon = icon
-
-    def add_icon(self, value):
-        self.icon.append(value)
-
-    def insert_icon(self, index, value):
-        self.icon[index] = value
-
-    def export(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="IconListType",
-        namespacedef_="",
-        pretty_print=True,
-    ):
+    def get_icon(self): return self.icon
+    def set_icon(self, icon): self.icon = icon
+    def add_icon(self, value): self.icon.append(value)
+    def insert_icon(self, index, value): self.icon[index] = value
+    def export(self, outfile, level, namespace_='tns:', name_='IconListType', namespacedef_='', pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         showIndent(outfile, level, pretty_print)
-        outfile.write(
-            "<%s%s%s"
-            % (namespace_, name_, namespacedef_ and " " + namespacedef_ or "",)
-        )
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = []
-        self.exportAttributes(
-            outfile, level, already_processed, namespace_, name_="IconListType"
-        )
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='IconListType')
         if self.hasContent_():
-            outfile.write(">%s" % (eol_,))
-            self.exportChildren(
-                outfile, level + 1, namespace_, name_, pretty_print=pretty_print
-            )
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write("</%s%s>%s" % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
-            outfile.write("/>%s" % (eol_,))
-
-    def exportAttributes(
-        self, outfile, level, already_processed, namespace_="tns:", name_="IconListType"
-    ):
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='tns:', name_='IconListType'):
         pass
-
-    def exportChildren(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="IconListType",
-        fromsubclass_=False,
-        pretty_print=True,
-    ):
+    def exportChildren(self, outfile, level, namespace_='tns:', name_='IconListType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         for icon_ in self.icon:
-            icon_.export(
-                outfile, level, namespace_, name_="icon", pretty_print=pretty_print
-            )
-
+            icon_.export(outfile, level, namespace_, name_='icon', pretty_print=pretty_print)
     def hasContent_(self):
-        if self.icon:
+        if (
+            self.icon
+            ):
             return True
         else:
             return False
-
-    def exportLiteral(self, outfile, level, name_="IconListType"):
+    def exportLiteral(self, outfile, level, name_='IconListType'):
         level += 1
         self.exportLiteralAttributes(outfile, level, [], name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
-
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         pass
-
     def exportLiteralChildren(self, outfile, level, name_):
         showIndent(outfile, level)
-        outfile.write("icon=[\n")
+        outfile.write('icon=[\n')
         level += 1
         for icon_ in self.icon:
             showIndent(outfile, level)
-            outfile.write("model_.iconType(\n")
-            icon_.exportLiteral(outfile, level, name_="iconType")
+            outfile.write('model_.iconType(\n')
+            icon_.exportLiteral(outfile, level, name_='iconType')
             showIndent(outfile, level)
-            outfile.write("),\n")
+            outfile.write('),\n')
         level -= 1
         showIndent(outfile, level)
-        outfile.write("],\n")
-
+        outfile.write('],\n')
     def build(self, node):
         self.buildAttributes(node, node.attrib, [])
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
-
     def buildAttributes(self, node, attrs, already_processed):
         pass
-
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == "icon":
+        if nodeName_ == 'icon':
             obj_ = iconType.factory()
             obj_.build(child_)
             self.icon.append(obj_)
-
-
 # end class IconListType
 
 
 class ServiceListType(GeneratedsSuper):
     subclass = None
     superclass = None
-
     def __init__(self, service=None):
         if service is None:
             self.service = []
         else:
             self.service = service
-
     def factory(*args_, **kwargs_):
         if ServiceListType.subclass:
             return ServiceListType.subclass(*args_, **kwargs_)
         else:
             return ServiceListType(*args_, **kwargs_)
-
     factory = staticmethod(factory)
-
-    def get_service(self):
-        return self.service
-
-    def set_service(self, service):
-        self.service = service
-
-    def add_service(self, value):
-        self.service.append(value)
-
-    def insert_service(self, index, value):
-        self.service[index] = value
-
-    def export(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="ServiceListType",
-        namespacedef_="",
-        pretty_print=True,
-    ):
+    def get_service(self): return self.service
+    def set_service(self, service): self.service = service
+    def add_service(self, value): self.service.append(value)
+    def insert_service(self, index, value): self.service[index] = value
+    def export(self, outfile, level, namespace_='tns:', name_='ServiceListType', namespacedef_='', pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         showIndent(outfile, level, pretty_print)
-        outfile.write(
-            "<%s%s%s"
-            % (namespace_, name_, namespacedef_ and " " + namespacedef_ or "",)
-        )
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = []
-        self.exportAttributes(
-            outfile, level, already_processed, namespace_, name_="ServiceListType"
-        )
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='ServiceListType')
         if self.hasContent_():
-            outfile.write(">%s" % (eol_,))
-            self.exportChildren(
-                outfile, level + 1, namespace_, name_, pretty_print=pretty_print
-            )
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write("</%s%s>%s" % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
-            outfile.write("/>%s" % (eol_,))
-
-    def exportAttributes(
-        self,
-        outfile,
-        level,
-        already_processed,
-        namespace_="tns:",
-        name_="ServiceListType",
-    ):
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='tns:', name_='ServiceListType'):
         pass
-
-    def exportChildren(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="ServiceListType",
-        fromsubclass_=False,
-        pretty_print=True,
-    ):
+    def exportChildren(self, outfile, level, namespace_='tns:', name_='ServiceListType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         for service_ in self.service:
-            service_.export(
-                outfile, level, namespace_, name_="service", pretty_print=pretty_print
-            )
-
+            service_.export(outfile, level, namespace_, name_='service', pretty_print=pretty_print)
     def hasContent_(self):
-        if self.service:
+        if (
+            self.service
+            ):
             return True
         else:
             return False
-
-    def exportLiteral(self, outfile, level, name_="ServiceListType"):
+    def exportLiteral(self, outfile, level, name_='ServiceListType'):
         level += 1
         self.exportLiteralAttributes(outfile, level, [], name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
-
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         pass
-
     def exportLiteralChildren(self, outfile, level, name_):
         showIndent(outfile, level)
-        outfile.write("service=[\n")
+        outfile.write('service=[\n')
         level += 1
         for service_ in self.service:
             showIndent(outfile, level)
-            outfile.write("model_.serviceType(\n")
-            service_.exportLiteral(outfile, level, name_="serviceType")
+            outfile.write('model_.serviceType(\n')
+            service_.exportLiteral(outfile, level, name_='serviceType')
             showIndent(outfile, level)
-            outfile.write("),\n")
+            outfile.write('),\n')
         level -= 1
         showIndent(outfile, level)
-        outfile.write("],\n")
-
+        outfile.write('],\n')
     def build(self, node):
         self.buildAttributes(node, node.attrib, [])
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
-
     def buildAttributes(self, node, attrs, already_processed):
         pass
-
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == "service":
+        if nodeName_ == 'service':
             obj_ = serviceType.factory()
             obj_.build(child_)
             self.service.append(obj_)
-
-
 # end class ServiceListType
 
 
 class DeviceListType(GeneratedsSuper):
     subclass = None
     superclass = None
-
     def __init__(self, device=None):
         if device is None:
             self.device = []
         else:
             self.device = device
-
     def factory(*args_, **kwargs_):
         if DeviceListType.subclass:
             return DeviceListType.subclass(*args_, **kwargs_)
         else:
             return DeviceListType(*args_, **kwargs_)
-
     factory = staticmethod(factory)
-
-    def get_device(self):
-        return self.device
-
-    def set_device(self, device):
-        self.device = device
-
-    def add_device(self, value):
-        self.device.append(value)
-
-    def insert_device(self, index, value):
-        self.device[index] = value
-
-    def export(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="DeviceListType",
-        namespacedef_="",
-        pretty_print=True,
-    ):
+    def get_device(self): return self.device
+    def set_device(self, device): self.device = device
+    def add_device(self, value): self.device.append(value)
+    def insert_device(self, index, value): self.device[index] = value
+    def export(self, outfile, level, namespace_='tns:', name_='DeviceListType', namespacedef_='', pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         showIndent(outfile, level, pretty_print)
-        outfile.write(
-            "<%s%s%s"
-            % (namespace_, name_, namespacedef_ and " " + namespacedef_ or "",)
-        )
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = []
-        self.exportAttributes(
-            outfile, level, already_processed, namespace_, name_="DeviceListType"
-        )
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='DeviceListType')
         if self.hasContent_():
-            outfile.write(">%s" % (eol_,))
-            self.exportChildren(
-                outfile, level + 1, namespace_, name_, pretty_print=pretty_print
-            )
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write("</%s%s>%s" % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
-            outfile.write("/>%s" % (eol_,))
-
-    def exportAttributes(
-        self,
-        outfile,
-        level,
-        already_processed,
-        namespace_="tns:",
-        name_="DeviceListType",
-    ):
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='tns:', name_='DeviceListType'):
         pass
-
-    def exportChildren(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="DeviceListType",
-        fromsubclass_=False,
-        pretty_print=True,
-    ):
+    def exportChildren(self, outfile, level, namespace_='tns:', name_='DeviceListType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         for device_ in self.device:
-            device_.export(
-                outfile, level, namespace_, name_="device", pretty_print=pretty_print
-            )
-
+            device_.export(outfile, level, namespace_, name_='device', pretty_print=pretty_print)
     def hasContent_(self):
-        if self.device:
+        if (
+            self.device
+            ):
             return True
         else:
             return False
-
-    def exportLiteral(self, outfile, level, name_="DeviceListType"):
+    def exportLiteral(self, outfile, level, name_='DeviceListType'):
         level += 1
         self.exportLiteralAttributes(outfile, level, [], name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
-
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         pass
-
     def exportLiteralChildren(self, outfile, level, name_):
         showIndent(outfile, level)
-        outfile.write("device=[\n")
+        outfile.write('device=[\n')
         level += 1
         for device_ in self.device:
             showIndent(outfile, level)
-            outfile.write("model_.DeviceType(\n")
-            device_.exportLiteral(outfile, level, name_="DeviceType")
+            outfile.write('model_.DeviceType(\n')
+            device_.exportLiteral(outfile, level, name_='DeviceType')
             showIndent(outfile, level)
-            outfile.write("),\n")
+            outfile.write('),\n')
         level -= 1
         showIndent(outfile, level)
-        outfile.write("],\n")
-
+        outfile.write('],\n')
     def build(self, node):
         self.buildAttributes(node, node.attrib, [])
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
-
     def buildAttributes(self, node, attrs, already_processed):
         pass
-
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == "device":
+        if nodeName_ == 'device':
             obj_ = DeviceType.factory()
             obj_.build(child_)
             self.device.append(obj_)
-
-
 # end class DeviceListType
 
 
 class iconType(GeneratedsSuper):
     subclass = None
     superclass = None
-
     def __init__(self, mimetype=None, width=None, height=None, depth=None, url=None):
         self.mimetype = mimetype
         self.width = width
         self.height = height
         self.depth = depth
         self.url = url
-
     def factory(*args_, **kwargs_):
         if iconType.subclass:
             return iconType.subclass(*args_, **kwargs_)
         else:
             return iconType(*args_, **kwargs_)
-
     factory = staticmethod(factory)
-
-    def get_mimetype(self):
-        return self.mimetype
-
-    def set_mimetype(self, mimetype):
-        self.mimetype = mimetype
-
-    def get_width(self):
-        return self.width
-
-    def set_width(self, width):
-        self.width = width
-
-    def get_height(self):
-        return self.height
-
-    def set_height(self, height):
-        self.height = height
-
-    def get_depth(self):
-        return self.depth
-
-    def set_depth(self, depth):
-        self.depth = depth
-
-    def get_url(self):
-        return self.url
-
-    def set_url(self, url):
-        self.url = url
-
-    def export(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="iconType",
-        namespacedef_="",
-        pretty_print=True,
-    ):
+    def get_mimetype(self): return self.mimetype
+    def set_mimetype(self, mimetype): self.mimetype = mimetype
+    def get_width(self): return self.width
+    def set_width(self, width): self.width = width
+    def get_height(self): return self.height
+    def set_height(self, height): self.height = height
+    def get_depth(self): return self.depth
+    def set_depth(self, depth): self.depth = depth
+    def get_url(self): return self.url
+    def set_url(self, url): self.url = url
+    def export(self, outfile, level, namespace_='tns:', name_='iconType', namespacedef_='', pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         showIndent(outfile, level, pretty_print)
-        outfile.write(
-            "<%s%s%s"
-            % (namespace_, name_, namespacedef_ and " " + namespacedef_ or "",)
-        )
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = []
-        self.exportAttributes(
-            outfile, level, already_processed, namespace_, name_="iconType"
-        )
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='iconType')
         if self.hasContent_():
-            outfile.write(">%s" % (eol_,))
-            self.exportChildren(
-                outfile, level + 1, namespace_, name_, pretty_print=pretty_print
-            )
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write("</%s%s>%s" % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
-            outfile.write("/>%s" % (eol_,))
-
-    def exportAttributes(
-        self, outfile, level, already_processed, namespace_="tns:", name_="iconType"
-    ):
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='tns:', name_='iconType'):
         pass
-
-    def exportChildren(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="iconType",
-        fromsubclass_=False,
-        pretty_print=True,
-    ):
+    def exportChildren(self, outfile, level, namespace_='tns:', name_='iconType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         if self.mimetype is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%smimetype>%s</%smimetype>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.mimetype).encode(ExternalEncoding),
-                        input_name="mimetype",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%smimetype>%s</%smimetype>%s' % (namespace_, self.gds_format_string(quote_xml(self.mimetype).encode(ExternalEncoding), input_name='mimetype'), namespace_, eol_))
         if self.width is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%swidth>%s</%swidth>%s"
-                % (
-                    namespace_,
-                    self.gds_format_integer(self.width, input_name="width"),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%swidth>%s</%swidth>%s' % (namespace_, self.gds_format_integer(self.width, input_name='width'), namespace_, eol_))
         if self.height is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sheight>%s</%sheight>%s"
-                % (
-                    namespace_,
-                    self.gds_format_integer(self.height, input_name="height"),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sheight>%s</%sheight>%s' % (namespace_, self.gds_format_integer(self.height, input_name='height'), namespace_, eol_))
         if self.depth is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sdepth>%s</%sdepth>%s"
-                % (
-                    namespace_,
-                    self.gds_format_integer(self.depth, input_name="depth"),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sdepth>%s</%sdepth>%s' % (namespace_, self.gds_format_integer(self.depth, input_name='depth'), namespace_, eol_))
         if self.url is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%surl>%s</%surl>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.url).encode(ExternalEncoding), input_name="url"
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
-
+            outfile.write('<%surl>%s</%surl>%s' % (namespace_, self.gds_format_string(quote_xml(self.url).encode(ExternalEncoding), input_name='url'), namespace_, eol_))
     def hasContent_(self):
         if (
-            self.mimetype is not None
-            or self.width is not None
-            or self.height is not None
-            or self.depth is not None
-            or self.url is not None
-        ):
+            self.mimetype is not None or
+            self.width is not None or
+            self.height is not None or
+            self.depth is not None or
+            self.url is not None
+            ):
             return True
         else:
             return False
-
-    def exportLiteral(self, outfile, level, name_="iconType"):
+    def exportLiteral(self, outfile, level, name_='iconType'):
         level += 1
         self.exportLiteralAttributes(outfile, level, [], name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
-
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         pass
-
     def exportLiteralChildren(self, outfile, level, name_):
         if self.mimetype is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "mimetype=%s,\n" % quote_python(self.mimetype).encode(ExternalEncoding)
-            )
+            outfile.write('mimetype=%s,\n' % quote_python(self.mimetype).encode(ExternalEncoding))
         if self.width is not None:
             showIndent(outfile, level)
-            outfile.write("width=%d,\n" % self.width)
+            outfile.write('width=%d,\n' % self.width)
         if self.height is not None:
             showIndent(outfile, level)
-            outfile.write("height=%d,\n" % self.height)
+            outfile.write('height=%d,\n' % self.height)
         if self.depth is not None:
             showIndent(outfile, level)
-            outfile.write("depth=%d,\n" % self.depth)
+            outfile.write('depth=%d,\n' % self.depth)
         if self.url is not None:
             showIndent(outfile, level)
-            outfile.write("url=%s,\n" % quote_python(self.url).encode(ExternalEncoding))
-
+            outfile.write('url=%s,\n' % quote_python(self.url).encode(ExternalEncoding))
     def build(self, node):
         self.buildAttributes(node, node.attrib, [])
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
-
     def buildAttributes(self, node, attrs, already_processed):
         pass
-
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == "mimetype":
+        if nodeName_ == 'mimetype':
             mimetype_ = child_.text
-            mimetype_ = self.gds_validate_string(mimetype_, node, "mimetype")
+            mimetype_ = self.gds_validate_string(mimetype_, node, 'mimetype')
             self.mimetype = mimetype_
-        elif nodeName_ == "width":
+        elif nodeName_ == 'width':
             sval_ = child_.text
             try:
                 ival_ = int(sval_)
             except (TypeError, ValueError) as exp:
-                raise_parse_error(child_, "requires integer: %s" % exp)
-            ival_ = self.gds_validate_integer(ival_, node, "width")
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'width')
             self.width = ival_
-        elif nodeName_ == "height":
+        elif nodeName_ == 'height':
             sval_ = child_.text
             try:
                 ival_ = int(sval_)
             except (TypeError, ValueError) as exp:
-                raise_parse_error(child_, "requires integer: %s" % exp)
-            ival_ = self.gds_validate_integer(ival_, node, "height")
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'height')
             self.height = ival_
-        elif nodeName_ == "depth":
+        elif nodeName_ == 'depth':
             sval_ = child_.text
             try:
                 ival_ = int(sval_)
             except (TypeError, ValueError) as exp:
-                raise_parse_error(child_, "requires integer: %s" % exp)
-            ival_ = self.gds_validate_integer(ival_, node, "depth")
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'depth')
             self.depth = ival_
-        elif nodeName_ == "url":
+        elif nodeName_ == 'url':
             url_ = child_.text
-            url_ = self.gds_validate_string(url_, node, "url")
+            url_ = self.gds_validate_string(url_, node, 'url')
             self.url = url_
-
-
 # end class iconType
 
 
 class serviceType(GeneratedsSuper):
     subclass = None
     superclass = None
-
-    def __init__(
-        self,
-        serviceType=None,
-        serviceId=None,
-        SCPDURL=None,
-        controlURL=None,
-        eventSubURL=None,
-    ):
+    def __init__(self, serviceType=None, serviceId=None, SCPDURL=None, controlURL=None, eventSubURL=None):
         self.serviceType = serviceType
         self.serviceId = serviceId
         self.SCPDURL = SCPDURL
         self.controlURL = controlURL
         self.eventSubURL = eventSubURL
-
     def factory(*args_, **kwargs_):
         if serviceType.subclass:
             return serviceType.subclass(*args_, **kwargs_)
         else:
             return serviceType(*args_, **kwargs_)
-
     factory = staticmethod(factory)
-
-    def get_serviceType(self):
-        return self.serviceType
-
-    def set_serviceType(self, serviceType):
-        self.serviceType = serviceType
-
-    def get_serviceId(self):
-        return self.serviceId
-
-    def set_serviceId(self, serviceId):
-        self.serviceId = serviceId
-
-    def get_SCPDURL(self):
-        return self.SCPDURL
-
-    def set_SCPDURL(self, SCPDURL):
-        self.SCPDURL = SCPDURL
-
-    def get_controlURL(self):
-        return self.controlURL
-
-    def set_controlURL(self, controlURL):
-        self.controlURL = controlURL
-
-    def get_eventSubURL(self):
-        return self.eventSubURL
-
-    def set_eventSubURL(self, eventSubURL):
-        self.eventSubURL = eventSubURL
-
-    def export(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="serviceType",
-        namespacedef_="",
-        pretty_print=True,
-    ):
+    def get_serviceType(self): return self.serviceType
+    def set_serviceType(self, serviceType): self.serviceType = serviceType
+    def get_serviceId(self): return self.serviceId
+    def set_serviceId(self, serviceId): self.serviceId = serviceId
+    def get_SCPDURL(self): return self.SCPDURL
+    def set_SCPDURL(self, SCPDURL): self.SCPDURL = SCPDURL
+    def get_controlURL(self): return self.controlURL
+    def set_controlURL(self, controlURL): self.controlURL = controlURL
+    def get_eventSubURL(self): return self.eventSubURL
+    def set_eventSubURL(self, eventSubURL): self.eventSubURL = eventSubURL
+    def export(self, outfile, level, namespace_='tns:', name_='serviceType', namespacedef_='', pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         showIndent(outfile, level, pretty_print)
-        outfile.write(
-            "<%s%s%s"
-            % (namespace_, name_, namespacedef_ and " " + namespacedef_ or "",)
-        )
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = []
-        self.exportAttributes(
-            outfile, level, already_processed, namespace_, name_="serviceType"
-        )
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='serviceType')
         if self.hasContent_():
-            outfile.write(">%s" % (eol_,))
-            self.exportChildren(
-                outfile, level + 1, namespace_, name_, pretty_print=pretty_print
-            )
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write("</%s%s>%s" % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
         else:
-            outfile.write("/>%s" % (eol_,))
-
-    def exportAttributes(
-        self, outfile, level, already_processed, namespace_="tns:", name_="serviceType"
-    ):
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='tns:', name_='serviceType'):
         pass
-
-    def exportChildren(
-        self,
-        outfile,
-        level,
-        namespace_="tns:",
-        name_="serviceType",
-        fromsubclass_=False,
-        pretty_print=True,
-    ):
+    def exportChildren(self, outfile, level, namespace_='tns:', name_='serviceType', fromsubclass_=False, pretty_print=True):
         if pretty_print:
-            eol_ = "\n"
+            eol_ = '\n'
         else:
-            eol_ = ""
+            eol_ = ''
         if self.serviceType is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sserviceType>%s</%sserviceType>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.serviceType).encode(ExternalEncoding),
-                        input_name="serviceType",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sserviceType>%s</%sserviceType>%s' % (namespace_, self.gds_format_string(quote_xml(self.serviceType).encode(ExternalEncoding), input_name='serviceType'), namespace_, eol_))
         if self.serviceId is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sserviceId>%s</%sserviceId>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.serviceId).encode(ExternalEncoding),
-                        input_name="serviceId",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sserviceId>%s</%sserviceId>%s' % (namespace_, self.gds_format_string(quote_xml(self.serviceId).encode(ExternalEncoding), input_name='serviceId'), namespace_, eol_))
         if self.SCPDURL is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%sSCPDURL>%s</%sSCPDURL>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.SCPDURL).encode(ExternalEncoding),
-                        input_name="SCPDURL",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%sSCPDURL>%s</%sSCPDURL>%s' % (namespace_, self.gds_format_string(quote_xml(self.SCPDURL).encode(ExternalEncoding), input_name='SCPDURL'), namespace_, eol_))
         if self.controlURL is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%scontrolURL>%s</%scontrolURL>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.controlURL).encode(ExternalEncoding),
-                        input_name="controlURL",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
+            outfile.write('<%scontrolURL>%s</%scontrolURL>%s' % (namespace_, self.gds_format_string(quote_xml(self.controlURL).encode(ExternalEncoding), input_name='controlURL'), namespace_, eol_))
         if self.eventSubURL is not None:
             showIndent(outfile, level, pretty_print)
-            outfile.write(
-                "<%seventSubURL>%s</%seventSubURL>%s"
-                % (
-                    namespace_,
-                    self.gds_format_string(
-                        quote_xml(self.eventSubURL).encode(ExternalEncoding),
-                        input_name="eventSubURL",
-                    ),
-                    namespace_,
-                    eol_,
-                )
-            )
-
+            outfile.write('<%seventSubURL>%s</%seventSubURL>%s' % (namespace_, self.gds_format_string(quote_xml(self.eventSubURL).encode(ExternalEncoding), input_name='eventSubURL'), namespace_, eol_))
     def hasContent_(self):
         if (
-            self.serviceType is not None
-            or self.serviceId is not None
-            or self.SCPDURL is not None
-            or self.controlURL is not None
-            or self.eventSubURL is not None
-        ):
+            self.serviceType is not None or
+            self.serviceId is not None or
+            self.SCPDURL is not None or
+            self.controlURL is not None or
+            self.eventSubURL is not None
+            ):
             return True
         else:
             return False
-
-    def exportLiteral(self, outfile, level, name_="serviceType"):
+    def exportLiteral(self, outfile, level, name_='serviceType'):
         level += 1
         self.exportLiteralAttributes(outfile, level, [], name_)
         if self.hasContent_():
             self.exportLiteralChildren(outfile, level, name_)
-
     def exportLiteralAttributes(self, outfile, level, already_processed, name_):
         pass
-
     def exportLiteralChildren(self, outfile, level, name_):
         if self.serviceType is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "serviceType=%s,\n"
-                % quote_python(self.serviceType).encode(ExternalEncoding)
-            )
+            outfile.write('serviceType=%s,\n' % quote_python(self.serviceType).encode(ExternalEncoding))
         if self.serviceId is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "serviceId=%s,\n"
-                % quote_python(self.serviceId).encode(ExternalEncoding)
-            )
+            outfile.write('serviceId=%s,\n' % quote_python(self.serviceId).encode(ExternalEncoding))
         if self.SCPDURL is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "SCPDURL=%s,\n" % quote_python(self.SCPDURL).encode(ExternalEncoding)
-            )
+            outfile.write('SCPDURL=%s,\n' % quote_python(self.SCPDURL).encode(ExternalEncoding))
         if self.controlURL is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "controlURL=%s,\n"
-                % quote_python(self.controlURL).encode(ExternalEncoding)
-            )
+            outfile.write('controlURL=%s,\n' % quote_python(self.controlURL).encode(ExternalEncoding))
         if self.eventSubURL is not None:
             showIndent(outfile, level)
-            outfile.write(
-                "eventSubURL=%s,\n"
-                % quote_python(self.eventSubURL).encode(ExternalEncoding)
-            )
-
+            outfile.write('eventSubURL=%s,\n' % quote_python(self.eventSubURL).encode(ExternalEncoding))
     def build(self, node):
         self.buildAttributes(node, node.attrib, [])
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
             self.buildChildren(child, node, nodeName_)
-
     def buildAttributes(self, node, attrs, already_processed):
         pass
-
     def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == "serviceType":
+        if nodeName_ == 'serviceType':
             serviceType_ = child_.text
-            serviceType_ = self.gds_validate_string(serviceType_, node, "serviceType")
+            serviceType_ = self.gds_validate_string(serviceType_, node, 'serviceType')
             self.serviceType = serviceType_
-        elif nodeName_ == "serviceId":
+        elif nodeName_ == 'serviceId':
             serviceId_ = child_.text
-            serviceId_ = self.gds_validate_string(serviceId_, node, "serviceId")
+            serviceId_ = self.gds_validate_string(serviceId_, node, 'serviceId')
             self.serviceId = serviceId_
-        elif nodeName_ == "SCPDURL":
+        elif nodeName_ == 'SCPDURL':
             SCPDURL_ = child_.text
-            SCPDURL_ = self.gds_validate_string(SCPDURL_, node, "SCPDURL")
+            SCPDURL_ = self.gds_validate_string(SCPDURL_, node, 'SCPDURL')
             self.SCPDURL = SCPDURL_
-        elif nodeName_ == "controlURL":
+        elif nodeName_ == 'controlURL':
             controlURL_ = child_.text
-            controlURL_ = self.gds_validate_string(controlURL_, node, "controlURL")
+            controlURL_ = self.gds_validate_string(controlURL_, node, 'controlURL')
             self.controlURL = controlURL_
-        elif nodeName_ == "eventSubURL":
+        elif nodeName_ == 'eventSubURL':
             eventSubURL_ = child_.text
-            eventSubURL_ = self.gds_validate_string(eventSubURL_, node, "eventSubURL")
+            eventSubURL_ = self.gds_validate_string(eventSubURL_, node, 'eventSubURL')
             self.eventSubURL = eventSubURL_
-
-
 # end class serviceType
 
 
 GDSClassesMapping = {
-    "serviceList": ServiceListType,
-    "service": serviceType,
-    "iconList": IconListType,
-    "deviceList": DeviceListType,
-    "device": DeviceType,
-    "specVersion": SpecVersionType,
-    "icon": iconType,
+    'serviceList': ServiceListType,
+    'service': serviceType,
+    'iconList': IconListType,
+    'deviceList': DeviceListType,
+    'device': DeviceType,
+    'specVersion': SpecVersionType,
+    'icon': iconType,
 }
 
 
 USAGE_TEXT = """
 Usage: python <Parser>.py [ -s ] <in_xml_file>
 """
-
 
 def usage():
     print(USAGE_TEXT)
@@ -2527,7 +1582,7 @@ def parse(inFileName):
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = "root"
+        rootTag = 'root'
         rootClass = root
     rootObj = rootClass.factory()
     rootObj.build(rootNode)
@@ -2538,12 +1593,11 @@ def parse(inFileName):
 
 def parseString(inString):
     from io import BytesIO
-
     doc = parsexml_(BytesIO(inString))
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = "root"
+        rootTag = 'root'
         rootClass = root
     rootObj = rootClass.factory()
     rootObj.build(rootNode)
@@ -2557,18 +1611,18 @@ def parseLiteral(inFileName):
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = "root"
+        rootTag = 'root'
         rootClass = root
     rootObj = rootClass.factory()
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
     doc = None
-    sys.stdout.write("#from device import *\n\n")
-    sys.stdout.write("from datetime import datetime as datetime_\n\n")
-    sys.stdout.write("import device as model_\n\n")
-    sys.stdout.write("rootObj = model_.rootTag(\n")
+    sys.stdout.write('#from device import *\n\n')
+    sys.stdout.write('from datetime import datetime as datetime_\n\n')
+    sys.stdout.write('import device as model_\n\n')
+    sys.stdout.write('rootObj = model_.rootTag(\n')
     rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
-    sys.stdout.write(")\n")
+    sys.stdout.write(')\n')
     return rootObj
 
 
@@ -2580,8 +1634,8 @@ def main():
         usage()
 
 
-if __name__ == "__main__":
-    # import pdb; pdb.set_trace()
+if __name__ == '__main__':
+    #import pdb; pdb.set_trace()
     main()
 
 
@@ -2593,5 +1647,5 @@ __all__ = [
     "SpecVersionType",
     "iconType",
     "root",
-    "serviceType",
-]
+    "serviceType"
+    ]

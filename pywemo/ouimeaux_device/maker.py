@@ -14,7 +14,7 @@ class Maker(Switch):
     def maker_params(self):
         """Get and parse the device attributes."""
         # pylint: disable=maybe-no-member
-        makerresp = self.deviceevent.GetAttributes().get("attributeList")
+        makerresp = self.deviceevent.GetAttributes().get('attributeList')
         makerresp = "<attributes>" + makerresp + "</attributes>"
         makerresp = makerresp.replace("&gt;", ">")
         makerresp = makerresp.replace("&lt;", "<")
@@ -29,11 +29,10 @@ class Maker(Switch):
             elif attribute[0].text == "SensorPresent":
                 hassensor = attribute[1].text
         return {
-            "switchstate": int(switchstate),
-            "sensorstate": int(sensorstate),
-            "switchmode": int(switchmode),
-            "hassensor": int(hassensor),
-        }
+            'switchstate': int(switchstate),
+            'sensorstate': int(sensorstate),
+            'switchmode': int(switchmode),
+            'hassensor': int(hassensor)}
 
     def get_state(self, force_update=False):
         """Return 0 if off and 1 if on."""
@@ -43,7 +42,7 @@ class Maker(Switch):
         if force_update or self._state is None:
             params = self.maker_params or {}
             try:
-                self._state = int(params.get("switchstate", 0))
+                self._state = int(params.get('switchstate', 0))
             except ValueError:
                 self._state = 0
 
@@ -66,14 +65,14 @@ class Maker(Switch):
     @property
     def sensor_state(self):
         """Return the state of the sensor."""
-        return self.maker_params["sensorstate"]
+        return self.maker_params['sensorstate']
 
     @property
     def switch_mode(self):
         """Return the switch mode of the sensor."""
-        return self.maker_params["switchmode"]
+        return self.maker_params['switchmode']
 
     @property
     def has_sensor(self):
         """Return whether the device has a sensor."""
-        return self.maker_params["hassensor"]
+        return self.maker_params['hassensor']
