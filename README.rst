@@ -20,8 +20,8 @@ How to use
     [<WeMo Insight "AC Insight">]
 
     >> devices[0].toggle()
-    
-    
+
+
 If discovery doesn't work on your network
 -----------------------------------------
 On some networks discovery doesn't work reliably, in that case if you can find the ip address of your Wemo device you can use the following code.
@@ -29,15 +29,23 @@ On some networks discovery doesn't work reliably, in that case if you can find t
 .. code:: python
 
     >> import pywemo
-    
+
     >> address = "192.168.100.193"
     >> port = pywemo.ouimeaux_device.probe_wemo(address)
     >> url = 'http://%s:%i/setup.xml' % (address, port)
     >> device = pywemo.discovery.device_from_description(url, None)
     >> print(device)
     <WeMo Insight "AC Insight">
-    
+
 Please note that you need to use ip addresses as shown above, rather than hostnames, otherwise the subscription update logic won't work.
+
+Developing
+-------
+Setup and builds are fully automated. You can run build pipeline locally by running.
+~~~~
+# Setup, build, lint and test the code.
+./scripts/build.sh
+~~~~
 
 License
 -------
