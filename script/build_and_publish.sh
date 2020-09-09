@@ -17,6 +17,4 @@ enterVenv
 
 echo
 echo "===Publishing package==="
-poetry config repositories.testpypi https://test.pypi.org/legacy/
-# poetry publish --username __token__ --password "$PUBLISH_PASSWORD"
-poetry publish -r testpypi --username __token__ --password "$PUBLISH_PASSWORD"
+poetry publish --username __token__ --password "$PUBLISH_PASSWORD"

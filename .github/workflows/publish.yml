@@ -1,11 +1,8 @@
 name: Publish
 
 on:
-  push
-
-# on:
-#   release:
-#     types: [created]
+  release:
+    types: [created]
 
 jobs:
   deploy:
@@ -18,6 +15,6 @@ jobs:
           python-version: 3.7
       - name: Build and publish
         run: |
-          ./script/build_and_publish.sh ${{ secrets.PYPI_PASSWORD_TEST }}
+          ./script/build_and_publish.sh ${{ secrets.PYPI_PASSWORD }}
         env:
           CI: 1
