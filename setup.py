@@ -14,7 +14,7 @@ setup(name='pywemo',
       author_email='mail@gregdowling.com',
       license='MIT',
       install_requires=['ifaddr>=0.1.0', 'requests>=2.0', 'six>=1.10.0'],
-      packages=find_packages(),
+      packages=find_packages(exclude=['tests', 'tests.*']),
       zip_safe=True,
       classifiers=[
           "Programming Language :: Python :: 2",
