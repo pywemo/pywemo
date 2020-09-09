@@ -7,7 +7,7 @@ import ifaddr
 def etree_to_dict(tree):
     """Split a tree into a dict."""
     # strip namespace
-    tag_name = tree.tag[tree.tag.find("}")+1:]
+    tag_name = tree.tag[tree.tag.find("}") + 1:]
 
     tree_dict = {tag_name: {} if tree.attrib else None}
     children = list(tree)
