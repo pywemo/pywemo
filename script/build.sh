@@ -63,9 +63,9 @@ echo "===Lint with pylint==="
 pylint $LINT_PATHS
 
 
-# echo
-# echo "===Test with pytest==="
-# pytest
+echo
+echo "===Test with pytest==="
+pytest
 
 
 echo
