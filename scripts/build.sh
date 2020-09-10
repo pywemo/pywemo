@@ -40,7 +40,7 @@ fi
 
 
 echo
-echo "===Formatting code==="
+echo "===Lint with black==="
 if [[ `which black` ]]; then
   BLACK_ARGS=""
   if [[ "${CI:-}" = "1" ]]; then
@@ -49,6 +49,7 @@ if [[ `which black` ]]; then
 
 # SQLDiablo 2020-09-08: Disabling black until we can get it to play nice with the other linters
 #  black $BLACK_ARGS .
+echo "Linting with black is temporarily disabled"
 else
   echo "Warning: Skipping code formatting. You should use python >= 3.6."
 fi

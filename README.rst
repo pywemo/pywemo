@@ -11,7 +11,7 @@ pyWeMo depends on Python packages: requests, ifaddr and six
 How to use
 ----------
 
-.. code:: python
+.. code-block:: python
 
     >> import pywemo
 
@@ -26,7 +26,7 @@ If discovery doesn't work on your network
 -----------------------------------------
 On some networks discovery doesn't work reliably, in that case if you can find the ip address of your Wemo device you can use the following code.
 
-.. code:: python
+.. code-block:: python
 
     >> import pywemo
 
@@ -42,10 +42,12 @@ Please note that you need to use ip addresses as shown above, rather than hostna
 Developing
 -------
 Setup and builds are fully automated. You can run build pipeline locally by running.
-~~~~
-# Setup, build, lint and test the code.
-./scripts/build.sh
-~~~~
+
+.. code-block:: none
+
+    # Setup, build, lint and test the code:
+    
+    ./scripts/build.sh
 
 License
 -------
