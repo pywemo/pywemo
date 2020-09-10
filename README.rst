@@ -43,7 +43,7 @@ Developing
 -------
 Setup and builds are fully automated. You can run build pipeline locally by running.
 
-.. code:: bash
+.. code:: shell
     # Setup, build, lint and test the code.
     ./scripts/build.sh
 
