@@ -26,7 +26,7 @@ If discovery doesn't work on your network
 -----------------------------------------
 On some networks discovery doesn't work reliably, in that case if you can find the ip address of your Wemo device you can use the following code.
 
-.. code:: python
+.. code-block:: python
 
     >> import pywemo
 
@@ -43,10 +43,10 @@ Developing
 -------
 Setup and builds are fully automated. You can run build pipeline locally by running.
 
-.. code:: shell
+.. code-block:: none
+
     # Setup, build, lint and test the code.
     ./scripts/build.sh
-
 
 License
 -------
