@@ -11,7 +11,7 @@ pyWeMo depends on Python packages: requests, ifaddr and six
 How to use
 ----------
 
-.. code:: python
+.. code-block:: python
 
     >> import pywemo
 
@@ -45,7 +45,8 @@ Setup and builds are fully automated. You can run build pipeline locally by runn
 
 .. code-block:: none
 
-    # Setup, build, lint and test the code.
+    # Setup, build, lint and test the code:
+    
     ./scripts/build.sh
 
 License
