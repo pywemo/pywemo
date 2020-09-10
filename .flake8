@@ -1,8 +1,23 @@
   
 [flake8]
-exclude = venv,.venv,.git,.tox,.eggs,docs,venv,bin,lib,deps,build,ouimeaux_device,tests
+exclude =
+    venv,
+    .venv,
+    .git,
+    .tox,
+    .eggs,
+    docs,
+    venv,
+    bin,
+    lib,
+    deps,
+    build,
+    ouimeaux_device,
+    tests,
+
 # To work with Black
 max-line-length = 88
+
 # E501: line too long
 # W503: Line break occurred before a binary operator
 # E203: Whitespace before ':'
