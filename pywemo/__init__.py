@@ -6,6 +6,7 @@ from .exceptions import PyWeMoException
 from .ouimeaux_device import Device as WeMoDevice
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
+from .ouimeaux_device.crockpot import CrockPot
 from .ouimeaux_device.dimmer import Dimmer
 from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.insight import Insight
