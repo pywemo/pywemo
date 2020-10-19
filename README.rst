@@ -37,7 +37,7 @@ On some networks discovery doesn't work reliably, in that case if you can find t
     >> print(device)
     <WeMo Insight "AC Insight">
 
-Please note that you need to use ip addresses as shown above, rather than hostnames, otherwise the subscription update logic won't work.
+Please note that you must use IP addresses here, rather than hostnames. First, because subscription update logic won't work properly; second, because recent versions of the WeMo firmware may not accept connections from hostnames, and will return a 500 error.
 
 Developing
 -------
