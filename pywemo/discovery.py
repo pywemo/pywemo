@@ -96,6 +96,7 @@ def device_from_uuid_and_location(uuid, mac, location,
 
     return None
 
+
 def setup_url_for_address(host, port):
     """Determine setup.xml url for a given host and port pair."""
 
