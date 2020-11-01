@@ -13,6 +13,7 @@ from .ouimeaux_device.maker import Maker
 from .ouimeaux_device.coffeemaker import CoffeeMaker
 from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.api.xsd import device as deviceParser
+from .ouimeaux_device import probe_wemo
 
 LOG = logging.getLogger(__name__)
 
@@ -91,3 +92,14 @@ def device_from_uuid_and_location(uuid, mac, location,
                           rediscovery_enabled=rediscovery_enabled)
 
     return None
+
+
+def setup_url_for_address(host, port):
+    """Determine setup.xml url for given host and port pair."""
+    if not port:
+        port = probe_wemo(host)
+
+    if not port:
+        return None
+
+    return "http://%s:%s/setup.xml" % (host, port)
