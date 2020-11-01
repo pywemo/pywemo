@@ -2,6 +2,9 @@
 import logging
 import requests
 
+from socket import gethostbyname, gaierror
+from ipaddress import ip_address
+
 from . import ssdp
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.insight import Insight
@@ -93,9 +96,37 @@ def device_from_uuid_and_location(uuid, mac, location,
 
     return None
 
-
 def setup_url_for_address(host, port):
-    """Determine setup.xml url for given host and port pair."""
+    """Determine setup.xml url for a given host and port pair."""
+
+    # Force hostnames into IP addresses
+    try:
+        # Attempt to register {host} as an IP address; if this fails ({host} is not an IP address),
+        # this will throw a ValueError.
+        ip_address(host)
+    except ValueError:
+        # The provided {host} should be treated as a hostname.
+        is_hostname = True
+
+    if is_hostname:
+        try:
+            # The {host} must be resolved to an IP address; if this fails, this will throw a socket.gaierror.
+            host_address = gethostbyname(host)
+
+            # Reset {host} to the resolved address.
+            LOG.debug(
+                'Resolved hostname %s to IP address %s.',
+                host, host_address)
+            host = host_address
+
+        except gaierror:
+            # The {host}-as-hostname did not resolve to an IP address.
+            LOG.debug(
+                'Could not resolve hostname %s to an IP address.',
+                host)
+            return None
+
+    # Automatically determine the port if not provided.
     if not port:
         port = probe_wemo(host)
 
