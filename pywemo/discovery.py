@@ -1,9 +1,9 @@
 """Module to discover WeMo devices."""
-import logging
-import requests
-
 from socket import gethostbyname, gaierror
 from ipaddress import ip_address
+
+import logging
+import requests
 
 from . import ssdp
 from .ouimeaux_device.bridge import Bridge
@@ -111,7 +111,8 @@ def setup_url_for_address(host, port):
 
     if is_hostname:
         try:
-            # The {host} must be resolved to an IP address; if this fails, this will throw a socket.gaierror.
+            # The {host} must be resolved to an IP address; if this fails, this will
+            # throw a socket.gaierror.
             host_address = gethostbyname(host)
 
             # Reset {host} to the resolved address.
