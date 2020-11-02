@@ -67,9 +67,9 @@ class Action:
                     headers=self.headers, timeout=10)
                 response_dict = {}
                 # pylint: disable=deprecated-method
-                for response_item in et.fromstring(
+                for response_item in list(list(list(et.fromstring(
                         response.content
-                ).getchildren()[0].getchildren()[0].getchildren():
+                        )))[0])[0]:
                     response_dict[response_item.tag] = response_item.text
                 return response_dict
             except requests.exceptions.RequestException:
