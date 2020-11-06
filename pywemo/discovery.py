@@ -98,7 +98,7 @@ def device_from_uuid_and_location(uuid, mac, location,
 
 
 def hostname_lookup(hostname):
-    """Resolve a hostname into an IP address"""
+    """Resolve a hostname into an IP address."""
     try:
         # The {host} must be resolved to an IP address; if this fails, this will
         # throw a socket.gaierror.
