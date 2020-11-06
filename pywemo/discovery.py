@@ -97,6 +97,27 @@ def device_from_uuid_and_location(uuid, mac, location,
     return None
 
 
+def hostname_lookup(hostname):
+    """Resolve a hostname into an IP address"""
+    try:
+        # The {host} must be resolved to an IP address; if this fails, this will
+        # throw a socket.gaierror.
+        host_address = gethostbyname(hostname)
+
+        # Reset {host} to the resolved address.
+        LOG.debug(
+            'Resolved hostname %s to IP address %s.',
+            hostname, host_address)
+        return host_address
+
+    except gaierror:
+        # The {host}-as-hostname did not resolve to an IP address.
+        LOG.debug(
+            'Could not resolve hostname %s to an IP address.',
+            hostname)
+        return None
+
+
 def setup_url_for_address(host, port):
     """Determine setup.xml url for a given host and port pair."""
 
@@ -111,22 +132,10 @@ def setup_url_for_address(host, port):
         is_hostname = True
 
     if is_hostname:
-        try:
-            # The {host} must be resolved to an IP address; if this fails, this will
-            # throw a socket.gaierror.
-            host_address = gethostbyname(host)
-
-            # Reset {host} to the resolved address.
-            LOG.debug(
-                'Resolved hostname %s to IP address %s.',
-                host, host_address)
+        host_address = hostname_lookup(host)
+        if host_address is not None:
             host = host_address
-
-        except gaierror:
-            # The {host}-as-hostname did not resolve to an IP address.
-            LOG.debug(
-                'Could not resolve hostname %s to an IP address.',
-                host)
+        else:
             return None
 
     # Automatically determine the port if not provided.
