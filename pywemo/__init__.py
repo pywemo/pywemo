@@ -11,5 +11,6 @@ from .ouimeaux_device.coffeemaker import CoffeeMaker  # noqa F401
 from .ouimeaux_device.bridge import Bridge  # noqa F401
 from .ouimeaux_device.humidifier import Humidifier  # noqa F401
 
+from .discovery import setup_url_for_address  # noqa F401
 from .discovery import discover_devices  # noqa F401
 from .subscribe import SubscriptionRegistry  # noqa F401

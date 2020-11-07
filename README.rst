@@ -28,16 +28,17 @@ On some networks discovery doesn't work reliably, in that case if you can find t
 
 .. code-block:: python
 
-    >> import pywemo
+    >>> import pywemo
+    >>> url = pywemo.setup_url_for_address("192.168.1.192", None)
+    >>> print(url)
+    http://192.168.1.192:49153/setup.xml
+    >>> device = pywemo.discovery.device_from_description(url, None)
+    >>> print(device)
+    <WeMo Maker "Hi Fi Systemline Sensor">
 
-    >> address = "192.168.100.193"
-    >> port = pywemo.ouimeaux_device.probe_wemo(address)
-    >> url = 'http://%s:%i/setup.xml' % (address, port)
-    >> device = pywemo.discovery.device_from_description(url, None)
-    >> print(device)
-    <WeMo Insight "AC Insight">
+Please note that `discovery.device_from_description` call requires a `url` with an IP address, rather than a hostnames. This is needed for the subscription update logic to work properly. In addition recent versions of the WeMo firmware may not accept connections from hostnames, and will return a 500 error.
 
-Please note that you must use IP addresses here, rather than hostnames. First, because subscription update logic won't work properly; second, because recent versions of the WeMo firmware may not accept connections from hostnames, and will return a 500 error.
+The `setup_url_for_address` function will lookup a hostname and provide a suitable `url` with an IP addesss.
 
 Developing
 -------
@@ -46,7 +47,7 @@ Setup and builds are fully automated. You can run build pipeline locally by runn
 .. code-block:: none
 
     # Setup, build, lint and test the code:
-    
+
     ./scripts/build.sh
 
 License
