@@ -126,12 +126,8 @@ def setup_url_for_address(host, port):
         # Attempt to register {host} as an IP address; if this fails ({host} is not an IP address),
         # this will throw a ValueError.
         ip_address(host)
-        is_hostname = False
     except ValueError:
         # The provided {host} should be treated as a hostname.
-        is_hostname = True
-
-    if is_hostname:
         host_address = hostname_lookup(host)
         if host_address is not None:
             host = host_address
