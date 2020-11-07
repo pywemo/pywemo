@@ -115,7 +115,7 @@ def hostname_lookup(hostname):
         LOG.debug(
             'Could not resolve hostname %s to an IP address.',
             hostname)
-        return None
+        return hostname
 
 
 def setup_url_for_address(host, port):
@@ -128,11 +128,7 @@ def setup_url_for_address(host, port):
         ip_address(host)
     except ValueError:
         # The provided {host} should be treated as a hostname.
-        host_address = hostname_lookup(host)
-        if host_address is not None:
-            host = host_address
-        else:
-            return None
+        host = hostname_lookup(host)
 
     # Automatically determine the port if not provided.
     if not port:
