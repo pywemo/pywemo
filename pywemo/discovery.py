@@ -1,4 +1,7 @@
 """Module to discover WeMo devices."""
+from socket import gethostbyname, gaierror
+from ipaddress import ip_address
+
 import logging
 import requests
 
@@ -13,6 +16,7 @@ from .ouimeaux_device.maker import Maker
 from .ouimeaux_device.coffeemaker import CoffeeMaker
 from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.api.xsd import device as deviceParser
+from .ouimeaux_device import probe_wemo
 
 LOG = logging.getLogger(__name__)
 
@@ -91,3 +95,46 @@ def device_from_uuid_and_location(uuid, mac, location,
                           rediscovery_enabled=rediscovery_enabled)
 
     return None
+
+
+def hostname_lookup(hostname):
+    """Resolve a hostname into an IP address."""
+    try:
+        # The {host} must be resolved to an IP address; if this fails, this will
+        # throw a socket.gaierror.
+        host_address = gethostbyname(hostname)
+
+        # Reset {host} to the resolved address.
+        LOG.debug(
+            'Resolved hostname %s to IP address %s.',
+            hostname, host_address)
+        return host_address
+
+    except gaierror:
+        # The {host}-as-hostname did not resolve to an IP address.
+        LOG.debug(
+            'Could not resolve hostname %s to an IP address.',
+            hostname)
+        return hostname
+
+
+def setup_url_for_address(host, port):
+    """Determine setup.xml url for a given host and port pair."""
+
+    # Force hostnames into IP addresses
+    try:
+        # Attempt to register {host} as an IP address; if this fails ({host} is not an IP address),
+        # this will throw a ValueError.
+        ip_address(host)
+    except ValueError:
+        # The provided {host} should be treated as a hostname.
+        host = hostname_lookup(host)
+
+    # Automatically determine the port if not provided.
+    if not port:
+        port = probe_wemo(host)
+
+    if not port:
+        return None
+
+    return "http://%s:%s/setup.xml" % (host, port)
