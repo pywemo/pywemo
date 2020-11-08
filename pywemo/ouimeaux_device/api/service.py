@@ -66,7 +66,7 @@ class Action:
                     self.controlURL, body.strip(),
                     headers=self.headers, timeout=10)
                 response_dict = {}
-                # pylint: disable=deprecated-method
+
                 for response_item in list(list(list(et.fromstring(
                         response.content
                         )))[0])[0]:
