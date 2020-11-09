@@ -41,10 +41,10 @@ Please note that `discovery.device_from_description` call requires a `url` with 
 The `setup_url_for_address` function will lookup a hostname and provide a suitable `url` with an IP addesss.
 
 Developing
--------
+----------
 Setup and builds are fully automated. You can run build pipeline locally by running.
 
-.. code-block:: none
+.. code-block::
 
     # Setup, build, lint and test the code:
 
