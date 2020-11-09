@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pywemo"
-version = "0.5.1"
+version = "0.5.2"
 description = "Lightweight Python module to discover and control WeMo devices"
 authors = ["Greg Dowling <mail@gregdowling.com>"]
 license = "MIT"
