@@ -42,7 +42,7 @@ The `setup_url_for_address` function will lookup a hostname and provide a suitab
 Firmware Warning
 ----------------
 Starting in May of 2020, Belkin started requiring users to create an account and login to the app (Android app version 1.25).
-In addition to the account, most of the app functionality now requires a connection to the cloud (internet access), even for simple actions such and toggling a switch.
+In addition to the account, most of the app functionality now requires a connection to the cloud (internet access), even for simple actions such as toggling a switch.
 All of the commands that go through the cloud are encrypted and cannot be easily inspected.
 This raises the possibility that Belkin could, in the future, update Wemo device firmware and make breaking API changes that can not longer be deciphered.
 If this happens, pywemo may no longer function on that device.
