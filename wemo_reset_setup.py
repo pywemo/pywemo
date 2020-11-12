@@ -134,8 +134,8 @@ def find_wemo_aps() -> Tuple[List[str], str]:
             # it is possible that the user could be connected to multiple
             # access points - for example, if they have multiple wireless
             # cards installed and in use - but we won't bother trying to
-            # decide which card to use or anything and will simply try to
-            # recommect them back to the the first one listed
+            # decide which card to use and will simply try to reconnect them
+            # back to the the first one listed
             current_network = current_network or ssid
         if ssid.lower().startswith('wemo.'):
             log.info(
@@ -177,7 +177,7 @@ def log_details(device: Device) -> None:
                 # display entire result (dictionary)
                 log.info('    %40s: %s', action, result)
         except (AttributeError, KeyError, TypeError):
-            # some devices might not support these sevices/actions?
+            # some devices might not support these services/actions?
             pass
     for key, value in setup_details.items():
         log.info('  %-42s: %s', '[DETAILS FOR RE-SETUP] ' + key, value)
@@ -263,19 +263,19 @@ def encrypt_wifi_password_aes128(password: str, wemo_keydata: str) -> str:
     # the last 4 digits that wemo expects should be xxyy, where:
     #     xx: length of the encrypted password
     #     yy: length of the original password
-    nencrypted = len(encrypted_password)
-    npassword = len(password)
-    log.debug('password length (before encryption): %s', npassword)
-    log.debug('password length (after encryption): %s', nencrypted)
-    if nencrypted > 255 or npassword > 255:
+    n_encrypted = len(encrypted_password)
+    n_password = len(password)
+    log.debug('password length (before encryption): %s', n_password)
+    log.debug('password length (after encryption): %s', n_encrypted)
+    if n_encrypted > 255 or n_password > 255:
         raise WemoException(
             'Wemo requires the wifi password, including after encryption, '
             'to be 255 or less characters, but found password of length '
-            f'{npassword} and {nencrypted} length after encryption.'
+            f'{n_password} and {n_encrypted} length after encryption.'
         )
 
-    encrypted_password += f'{nencrypted:#04x}'[2:]
-    encrypted_password += f'{npassword:#04x}'[2:]
+    encrypted_password += f'{n_encrypted:#04x}'[2:]
+    encrypted_password += f'{n_password:#04x}'[2:]
     return encrypted_password
 
 
@@ -336,7 +336,7 @@ def wemo_setup(
             'encryption on your network'
         )
         auth_mode = 'OPEN'
-        encryped_password = ''
+        encrypted_password = ''
     else:
         # get the meta information of the device
         meta_info = device.metainfo.GetMetaInfo()['MetaInfo']
@@ -346,12 +346,12 @@ def wemo_setup(
         # select parts of the meta information for password use
         keydata = meta_info[0][:6] + meta_info[1] + meta_info[0][6:12]
 
-        encryped_password = encrypt_wifi_password_aes128(password, keydata)
+        encrypted_password = encrypt_wifi_password_aes128(password, keydata)
 
     result = device.WiFiSetup.ConnectHomeNetwork(
         ssid=ssid,
         auth=auth_mode,
-        password=encryped_password,
+        password=encrypted_password,
         encrypt=encryption_method,
         channel=channel,
     )
@@ -430,8 +430,8 @@ def wemo_connect_and_setup(
 
     devices = discover_and_log_devices(only_needing_setup=True)
     # NOTE: if the user is connected to multiple networks (e.g. has multiple
-    #       wireless adappters), then discovery will still return all devices,
-    #       not only those on the current wemo's AP.
+    #       wireless adapters), then discovery will still return all devices,
+    #       not only those on the current Wemo's AP.
     for device in devices:
         wemo_setup(device, ssid=ssid, password=password, timeout=timeout)
 
