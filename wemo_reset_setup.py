@@ -4,38 +4,17 @@
 This is a script used to reset and setup Belkin WeMo devices, without using the
 Belkin iOS/Android App.
 
-Note that OpenSSL should be installed to use this script for device setup, as
-OpenSSL is used to encrypt the password (AES).
+This script uses click for a cli interface.  To see informational and help
+message(s), you can run:
+    wemo_reset_setup.py --help
 
-NOTE: this script has only been tested on linux (Ubuntu 20.04) with OpenSSL
-(version 1.1.1f) and on the following devices (all US market devices):
+Each of the Commands listed within help also have their own help
+documentation with additional information, for example:
+    wemo_reset_setup.py reset --help
+    wemo_reset_setup.py setup --help
 
-    |--------------------------------------------------------------------------
-    | Device Type        | FirmwareVersion
-    |--------------------------------------------------------------------------
-    | Socket (Mini)      | WeMo_WW_2.00.11452.PVT-OWRT-SNSV2
-    | Lightswitch        | WeMo_WW_2.00.11408.PVT-OWRT-LS
-    | Dimmer             | WeMo_WW_2.00.11453.PVT-OWRT-Dimmer
-    |--------------------------------------------------------------------------
-
-NOTE: You should be on the same network as the device you want to interact
-      with!  To reset a device, you should be connected to your normal network.
-      To setup a device, you should be connected to the devices locally
-      broadcast network, usually something of the form: Wemo.Device.XXX where
-      Device is the type of Wemo (e.g. Mini, Light, or Dimmer) and XXX is the
-      last 3 digits of the device serial number.  The --setup-all option will
-      use your wifi card to search for Wemo networks and try to setup all of
-      those found.
-
-NOTE: Wemo devices seem to have trouble connecting to an access point that
-      uses the same name (SSID) for the 2.4GHz and 5GHz signals.  Thus it is
-      recommended to disable the 5GHz signal while setting up the Wemo devices,
-      and then re-enabling it upon completion.
-
-NOTE: I've often found that when trying to setup the Wemo, it will fail to
-      connect to my wifi the first time, but then re-running the setup again a
-      second time will work.  So be sure to try again if it fails the first
-      time.
+It is highly recommended to read each of the --help pages for helping details
+and information.
 """
 
 
@@ -44,8 +23,12 @@ NOTE: I've often found that when trying to setup the Wemo, it will fail to
 # -----------------------------------------------------------------------------
 import time
 import base64
+import pathlib
 import logging
+import datetime
+import platform
 import subprocess
+from functools import partial
 from typing import List, Tuple
 
 import click
@@ -63,6 +46,9 @@ __version__ = '1.0.0'
 log = colorlog.getLogger()
 log.addHandler(logging.NullHandler())
 
+# context for -h/--help usage with click
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
 
 # -----------------------------------------------------------------------------
 class WemoException(Exception):
@@ -75,19 +61,40 @@ class WemoException(Exception):
 def setup_logger(verbose: int) -> None:
     """Logger setup."""
     handler = colorlog.StreamHandler()
-    handler.setFormatter(
-        colorlog.ColoredFormatter('%(log_color)s[%(levelname)-8s] %(message)s')
+    formatter = colorlog.ColoredFormatter(
+        '%(log_color)s[%(levelname)-8s] %(message)s'
     )
+    handler.setFormatter(formatter)
     log.addHandler(handler)
+    filename = pathlib.Path('wemo_reset_setup.log')
     if verbose == 0:
         log.setLevel(logging.INFO)
     elif verbose == 1:
         # include debug messages from this script, but not others
         log.setLevel(logging.DEBUG)
         logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
-    else:
-        # include all debug messages if multiple verbose flags are given
+    elif verbose == 2:
+        # include all debug messages
         log.setLevel(logging.DEBUG)
+    else:
+        # include all debug messages and also write the log to a file
+        log.setLevel(logging.DEBUG)
+        handler = logging.FileHandler(filename, mode='w')
+        handler.setFormatter(formatter)
+        log.addHandler(handler)
+
+    # Record some system and program information
+    date_time = datetime.datetime.now().astimezone()
+    date_time = date_time.strftime('%B %d, %Y, %I:%M %p (%Z)')
+    platinfo = ', '.join(platform.uname())
+    log.debug('logging started:  %s', date_time)
+    log.debug('program version:  %s', __version__)
+    # pywemo does not provide version at this time
+    # log.debug('pywemo version:  %s', pywemo.__version__)
+    log.debug('platform:  %s', platinfo)
+    log.debug('current directory:  %s', pathlib.Path.cwd())
+    if verbose > 2:
+        log.debug('logging to file:  %s', filename.resolve())
 
 
 # -----------------------------------------------------------------------------
@@ -484,42 +491,85 @@ def get_device_by_name(name: str) -> Device:
 
 
 # -----------------------------------------------------------------------------
-@click.group()
+@click.group(
+    context_settings=CONTEXT_SETTINGS,
+    epilog='''Each of the Commands listed above also have their own help
+    documentation with additional details and information.  It is highly
+    recommended to check those help messages as well.  You can see that by
+    specifying the command first, for example:
+
+    wemo_reset_setup.py reset --help
+    ''',
+)
 @click.version_option(version=__version__)
-@click.option('-v', '--verbose', count=True, help='Print debug messages')
+@click.option(
+    '-v',
+    '--verbose',
+    count=True,
+    help='''Print debug messages.  Use -v to enable debug messages from this
+    script, -vv to also enable debug messages from upstream libraries,
+    and -vvv also output the log to a file.''',
+)
 def click_main(verbose: int) -> None:
-    """Main entry point for this script."""
+    """Wemo script to reset and setup Wemo devices.
+
+    This script can be used to reset and setup Belkin WeMo devices, without
+    using the Belkin iOS/Android App.
+
+    NOTE: OpenSSL should be installed to use this script for device setup on
+    a network using encryption, as OpenSSL is used to encrypt the password
+    (AES only).
+
+    NOTE: This script has only been tested on linux (Ubuntu 20.04) with OpenSSL
+    (version 1.1.1f) and on the following devices:
+
+        \b
+        |---------------------------------------------------------------------|
+        | Device Type      | Market | FirmwareVersion                         |
+        |---------------------------------------------------------------------|
+        | Socket (Mini)    | US     | WeMo_WW_2.00.11452.PVT-OWRT-SNSV2       |
+        | Lightswitch      | US     | WeMo_WW_2.00.11408.PVT-OWRT-LS          |
+        | Dimmer           | US     | WeMo_WW_2.00.11453.PVT-OWRT-Dimmer      |
+        |---------------------------------------------------------------------|
+
+    NOTE: You should be on the same network as the device you want to interact
+    with!
+    """
     setup_logger(verbose)
 
 
 # -----------------------------------------------------------------------------
-@click_main.command(name='list')
+@click_main.command(name='list', context_settings=CONTEXT_SETTINGS)
 def wemo_discover() -> List[Device]:
-    """Click interface to list all discovered devices."""
+    """Discover and print information about devices on current network(s)."""
     discover_and_log_devices(details=True)
 
 
 # -----------------------------------------------------------------------------
-@click_main.command(name='reset')
-@click.option(
-    '--data', is_flag=True, help='Set this flag to clear the device data'
-)
+@click_main.command(name='reset', context_settings=CONTEXT_SETTINGS)
+@click.option('--data', is_flag=True, help='Set flag to clear the device data')
 @click.option(
     '--wifi',
     is_flag=True,
-    help='Set this flag to clear the device wifi information',
+    help='Set flag to clear the device wifi information',
 )
 @click.option(
     '--full',
     is_flag=True,
-    help='This flag implies --data and --wifi',
+    help='Full factory reset, implies --data and --wifi',
 )
 @click.option(
     '--reset-all',
     is_flag=True,
-    help='Reset ALL devices found',
+    help='''Scan network(s) for devices and reset all found devices (will be
+    prompted to continue after discovery).''',
 )
-@click.option('--name', help='Friendly name of device to work on')
+@click.option(
+    '--name',
+    help='''Friendly name of the device to reset.  This option is required (and
+    only used) if --reset-all is NOT used.  You must be conencted to whatever
+    network the device is connected to.''',
+)
 def click_wemo_reset(
     data: bool,
     wifi: bool,
@@ -527,7 +577,12 @@ def click_wemo_reset(
     reset_all: bool,
     name: str,
 ) -> None:
-    """Click interface to reset a device."""
+    """Reset a Wemo device.
+
+    NOTE: You should be on the same network as the device you want to interact
+    with!  To reset a device, you should be connected to your normal network
+    that the device is connected to.
+    """
     if full:
         data = True
         wifi = True
@@ -555,34 +610,53 @@ def click_wemo_reset(
 
 
 # -----------------------------------------------------------------------------
-@click_main.command(name='setup')
+@click_main.command(name='setup', context_settings=CONTEXT_SETTINGS)
 @click.option(
     '--ssid',
     required=True,
-    help='Provide the SSID of the network you want the wemo device to join',
+    help='The SSID of the network you want the wemo device to join',
 )
 @click.option(
     '--password',
     prompt=True,
     hide_input=True,
-    help='Password for the provided SSID',
+    help='Password for the provided SSID (will be prompted)',
 )
 @click.option(
     '--setup-all',
     is_flag=True,
-    help='Try to connect all available devices (requires Linux)',
+    help='''Scan for available Wemo device networks and try to setup any device
+    on all discovered networks (requires Linux and nmcli to find and connect to
+    the networks)'''
 )
 @click.option(
     '--name',
-    help=(
-        'Friendly name of device to work on (must be connected to the devices'
-        'local network)'
-    ),
+    help='''Friendly name of the device to setup.  This option is required (and
+    only used) if --setup-all is NOT used.  You must be connected to the
+    devices local network (usually of the form Wemo.Device.XXX).'''
 )
 def click_wemo_setup(
     ssid: str, password: str, setup_all: bool, name: str
 ) -> None:
-    """Click interface to setup a device."""
+    """Setup a Wemo device.
+
+    NOTE: You should be on the same network as the device you want to interact
+    with!  To setup a device, you should be connected to the devices locally
+    broadcast network, usually something of the form: Wemo.Device.XXX where
+    Device is the type of Wemo (e.g. Mini, Light, or Dimmer) and XXX is the
+    last 3 digits of the device serial number.  The --setup-all option will
+    attempt to search for all networks of the form Wemo.* and try to setup
+    any wemo it finds on those network(s).
+
+    NOTE: Wemo devices seem to have trouble connecting to an access point that
+    uses the same name (SSID) for the 2.4GHz and 5GHz signals.  Thus it is
+    recommended to disable the 5GHz signal while setting up the Wemo devices,
+    and then re-enabling it upon completion.
+
+    NOTE: Often times the Wemo will fail to connect to wifi the first time it
+    is attempted, but then will connect when setup is re-run on the device.
+    So be sure to try again if it fails the first time.
+    """
     try:
         if setup_all:
             wemo_aps, current = find_wemo_aps()
