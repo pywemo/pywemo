@@ -42,8 +42,8 @@ __version__ = '1.0.0'
 
 
 # -----------------------------------------------------------------------------
-log = colorlog.getLogger()
-log.addHandler(logging.NullHandler())
+LOG = colorlog.getLogger()
+LOG.addHandler(logging.NullHandler())
 
 # context for -h/--help usage with click
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -64,36 +64,36 @@ def setup_logger(verbose: int) -> None:
         '%(log_color)s[%(levelname)-8s] %(message)s'
     )
     handler.setFormatter(formatter)
-    log.addHandler(handler)
+    LOG.addHandler(handler)
     filename = pathlib.Path('wemo_reset_setup.log')
     if verbose == 0:
-        log.setLevel(logging.INFO)
+        LOG.setLevel(logging.INFO)
     elif verbose == 1:
         # include debug messages from this script, but not others
-        log.setLevel(logging.DEBUG)
+        LOG.setLevel(logging.DEBUG)
         logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
     elif verbose == 2:
         # include all debug messages
-        log.setLevel(logging.DEBUG)
+        LOG.setLevel(logging.DEBUG)
     else:
         # include all debug messages and also write the log to a file
-        log.setLevel(logging.DEBUG)
+        LOG.setLevel(logging.DEBUG)
         handler = logging.FileHandler(filename, mode='w')
         handler.setFormatter(formatter)
-        log.addHandler(handler)
+        LOG.addHandler(handler)
 
     # Record some system and program information
     date_time = datetime.datetime.now().astimezone()
     date_time = date_time.strftime('%B %d, %Y, %I:%M %p (%Z)')
     platinfo = ', '.join(platform.uname())
-    log.debug('logging started:  %s', date_time)
-    log.debug('program version:  %s', __version__)
+    LOG.debug('logging started:  %s', date_time)
+    LOG.debug('program version:  %s', __version__)
     # pywemo does not provide version at this time
-    # log.debug('pywemo version:  %s', pywemo.__version__)
-    log.debug('platform:  %s', platinfo)
-    log.debug('current directory:  %s', pathlib.Path.cwd())
+    # LOG.debug('pywemo version:  %s', pywemo.__version__)
+    LOG.debug('platform:  %s', platinfo)
+    LOG.debug('current directory:  %s', pathlib.Path.cwd())
     if verbose > 2:
-        log.debug('logging to file:  %s', filename.resolve())
+        LOG.debug('logging to file:  %s', filename.resolve())
 
 
 # -----------------------------------------------------------------------------
@@ -118,19 +118,19 @@ def find_wemo_aps() -> Tuple[List[str], str]:
         ) from exc
     except subprocess.CalledProcessError as exc:
         stderr = networks.stderr.decode().strip()
-        log.error('stderr:\n%s', stderr)
+        LOG.error('stderr:\n%s', stderr)
         raise WemoException('nmcli command failed') from exc
 
     args = ' '.join(networks.args)
     stdout = networks.stdout.decode().strip()
-    log.debug('result of "%s":\nstdout:\n%s', args, stdout)
+    LOG.debug('result of "%s":\nstdout:\n%s', args, stdout)
 
     wemo_networks = []
     current_network = ''
     for line in stdout.split('\n'):
         ssid, in_use, channel, signal, security = line.rsplit(':', 4)
         if in_use == '*':
-            log.debug(
+            LOG.debug(
                 'current network: %s (channel=%s, signal=%s, security=%s)',
                 ssid,
                 channel,
@@ -144,7 +144,7 @@ def find_wemo_aps() -> Tuple[List[str], str]:
             # back to the the first one listed
             current_network = current_network or ssid
         if ssid.lower().startswith('wemo.'):
-            log.info(
+            LOG.info(
                 'expected wemo: %s (channel=%s, signal=%s, security=%s)',
                 ssid,
                 channel,
@@ -175,47 +175,47 @@ def log_details(device: Device) -> None:
             result = device.services[service].actions[action]()
             if key:
                 # display a specific result
-                log.info('    %40s: %s', key, result[key])
+                LOG.info('    %40s: %s', key, result[key])
                 if key == 'MetaInfo':
                     ssid = result[key].split('|')[-2]
                     setup_details['Default SSID'] = ssid
             else:
                 # display entire result (dictionary)
-                log.info('    %40s: %s', action, result)
+                LOG.info('    %40s: %s', action, result)
         except (AttributeError, KeyError, TypeError):
             # some devices might not support these services/actions?
             pass
     for key, value in setup_details.items():
-        log.info('  %-42s: %s', '[DETAILS FOR RE-SETUP] ' + key, value)
+        LOG.info('  %-42s: %s', '[DETAILS FOR RE-SETUP] ' + key, value)
 
 
 # -----------------------------------------------------------------------------
 def wemo_reset(device: Device, data: bool = True, wifi: bool = True) -> None:
     """Wemo device(s) reset."""
-    log.info('information on device (may aid in re-setup): %s', device)
+    LOG.info('information on device (may aid in re-setup): %s', device)
     log_details(device)
 
     if data and wifi:
-        log.info('attempting a full factory reset (clear data and wifi info)')
+        LOG.info('attempting a full factory reset (clear data and wifi info)')
         result = device.basicevent.ReSetup(Reset=2)
     elif data:
-        log.info('attempting to reset data such as icon and rules')
+        LOG.info('attempting to reset data such as icon and rules')
         result = device.basicevent.ReSetup(Reset=1)
         try:
             info = device.deviceinfo.GetDeviceInformation()
-            log.debug('device information: %s', info)
+            LOG.debug('device information: %s', info)
             original_name = info['DeviceInformation'].split('|')[-1]
-            log.info('changing name to: %s', original_name)
+            LOG.info('changing name to: %s', original_name)
             device.basicevent.ChangeFriendlyName(FriendlyName=original_name)
         except (AttributeError, KeyError):
             pass
     elif wifi:
-        log.info('attempting to clear wifi information only')
+        LOG.info('attempting to clear wifi information only')
         result = device.basicevent.ReSetup(Reset=5)
     else:
         raise WemoException('no action requested')
 
-    log.info('result of reset: %s', result['Reset'])
+    LOG.info('result of reset: %s', result['Reset'])
 
     return result
 
@@ -233,9 +233,9 @@ def encrypt_wifi_password_aes128(password: str, wemo_keydata: str) -> str:
     # Wemo gets this data from the device meta data
     salt, initialization_vector = wemo_keydata[:8], wemo_keydata[:16]
     if len(salt) != 8 or len(initialization_vector) != 16:
-        log.warning('device meta information may not be supported')
-    log.debug('salt: %s', salt)
-    log.debug('initialization_vector: %s', initialization_vector)
+        LOG.warning('device meta information may not be supported')
+    LOG.debug('salt: %s', salt)
+    LOG.debug('initialization_vector: %s', initialization_vector)
 
     # call OpenSSL to encrypt the data
     # NOTE: newer versions of OpenSSL may give a warning similar to the two
@@ -271,8 +271,8 @@ def encrypt_wifi_password_aes128(password: str, wemo_keydata: str) -> str:
     #     yy: length of the original password
     n_encrypted = len(encrypted_password)
     n_password = len(password)
-    log.debug('password length (before encryption): %s', n_password)
-    log.debug('password length (after encryption): %s', n_encrypted)
+    LOG.debug('password length (before encryption): %s', n_password)
+    LOG.debug('password length (after encryption): %s', n_encrypted)
     if n_encrypted > 255 or n_password > 255:
         raise WemoException(
             'Wemo requires the wifi password, including after encryption, '
@@ -297,20 +297,20 @@ def wemo_setup(
     # find all access points that the device can see, and select the one
     # matching the desired SSID
     selected_ap = None
-    log.info('searching for AP\'s...')
+    LOG.info('searching for AP\'s...')
     access_points = device.WiFiSetup.GetApList()['ApList']
     for access_point in access_points.split('\n'):
         access_point = access_point.strip().rstrip(',')
         if not access_point.strip():
             continue
-        log.debug('found AP: %s', access_point)
+        LOG.debug('found AP: %s', access_point)
         if access_point.startswith(f'{ssid}|'):
-            log.info('found AP with SSID: %s', ssid)
+            LOG.info('found AP with SSID: %s', ssid)
             # don't break here, so that all found AP's get logged, but select
             # only the first one from the list
             if selected_ap is None:
                 selected_ap = access_point
-                log.info('using this access point data: %s', selected_ap)
+                LOG.info('using this access point data: %s', selected_ap)
 
     if selected_ap is None:
         raise WemoException(
@@ -322,9 +322,9 @@ def wemo_setup(
     columns = selected_ap.split('|')
     channel = columns[1].strip()
     auth_mode, encryption_method = columns[-1].strip().split('/')
-    log.debug('selected AP channel: %s', channel)
-    log.debug('selected AP authorization mode(s): %s', auth_mode)
-    log.debug('selected AP encryption method: %s', encryption_method)
+    LOG.debug('selected AP channel: %s', channel)
+    LOG.debug('selected AP authorization mode(s): %s', auth_mode)
+    LOG.debug('selected AP encryption method: %s', encryption_method)
 
     # check if the encryption type is supported by this script
     supported_encryptions = {'NONE', 'AES'}
@@ -336,8 +336,8 @@ def wemo_setup(
 
     # try to connect the device to the selected network
     if encryption_method == 'NONE':
-        log.info('selected network has no encryption (ignoring any password)')
-        log.warning(
+        LOG.info('selected network has no encryption (ignoring any password)')
+        LOG.warning(
             'it is advisable to use encryption, please consider enabling '
             'encryption on your network'
         )
@@ -346,7 +346,7 @@ def wemo_setup(
     else:
         # get the meta information of the device
         meta_info = device.metainfo.GetMetaInfo()['MetaInfo']
-        log.debug('device meta info: %s', meta_info)
+        LOG.debug('device meta info: %s', meta_info)
         meta_info = meta_info.split('|')
 
         # select parts of the meta information for password use
@@ -362,28 +362,28 @@ def wemo_setup(
         channel=channel,
     )
     pairing_status = result['PairingStatus']
-    log.debug('pairing status: %s', pairing_status)
+    LOG.debug('pairing status: %s', pairing_status)
 
-    log.info('waiting an initial 5 seconds...')
+    LOG.info('waiting an initial 5 seconds...')
     time.sleep(5.0)
 
-    log.info('starting status checks...(timeout of %s seconds)', timeout)
+    LOG.info('starting status checks...(timeout of %s seconds)', timeout)
     timeout = int(timeout)
     for i in range(timeout):
         time.sleep(1.0)
         network_status = device.WiFiSetup.GetNetworkStatus()['NetworkStatus']
-        log.debug('network status (%s seconds): %s', i + 1, network_status)
+        LOG.debug('network status (%s seconds): %s', i + 1, network_status)
         if network_status == '1':
             break
 
     network_status = device.WiFiSetup.GetNetworkStatus()['NetworkStatus']
-    log.debug('network status (need 1 or 3): %s', network_status)
+    LOG.debug('network status (need 1 or 3): %s', network_status)
 
     close_status = device.WiFiSetup.CloseSetup()['status']
-    log.debug('close status (need success): %s', close_status)
+    LOG.debug('close status (need success): %s', close_status)
 
     if network_status not in ['1', '3'] or close_status != 'success':
-        log.error(
+        LOG.error(
             'device failed to connect to the network "%s", please try again '
             '(add -v for addition debug information).  Wemo devices often '
             'need to try wifi setup a second time.',
@@ -393,9 +393,9 @@ def wemo_setup(
         try:
             device.basicevent.SetSetupDoneStatus()
         except AttributeError:
-            log.warning('SetSetupDoneStatus not able to be set')
+            LOG.warning('SetSetupDoneStatus not able to be set')
             pass
-        log.info('device connected to network "%s"', ssid)
+        LOG.info('device connected to network "%s"', ssid)
 
 
 # -----------------------------------------------------------------------------
@@ -422,14 +422,14 @@ def wemo_connect_and_setup(
         ) from exc
     except subprocess.CalledProcessError as exc:
         stderr = networks.stderr.decode().strip()
-        log.error('stderr:\n%s', stderr)
+        LOG.error('stderr:\n%s', stderr)
         raise WemoException(
             'nmcli command failed (network may not exist anymore?)'
         ) from exc
 
     args = ' '.join(networks.args)
     stdout = networks.stdout.decode().strip()
-    log.debug('result of "%s":\nstdout:\n%s', args, stdout)
+    LOG.debug('result of "%s":\nstdout:\n%s', args, stdout)
 
     # a short delay to make sure the connection is well established
     time.sleep(2.0)
@@ -455,14 +455,14 @@ def discover_and_log_devices(
             status = device.WiFiSetup.GetNetworkStatus()['NetworkStatus']
             if status not in ['1', '3']:
                 not_setup.append(device)
-                log.info('found device needing setup: %s', device)
+                LOG.info('found device needing setup: %s', device)
         else:
-            log.info('-' * 50)
-            log.info('found device: %s', device)
+            LOG.info('-' * 50)
+            LOG.info('found device: %s', device)
             if details:
                 log_details(device)
     if device:
-        log.info('-' * 50)
+        LOG.info('-' * 50)
 
     if only_needing_setup:
         return not_setup
@@ -473,12 +473,12 @@ def discover_and_log_devices(
 def get_device_by_name(name: str) -> Device:
     """Get a device by the friendly name."""
     selected_device = None
-    log.info('starting discovery...this may take a few seconds')
+    LOG.info('starting discovery...this may take a few seconds')
     devices = pywemo.discover_devices()
     for device in devices:
-        log.debug('found device: %s', device)
+        LOG.debug('found device: %s', device)
         if device.name.lower() == name.lower():
-            log.info('found device with name: %s', name)
+            LOG.info('found device with name: %s', name)
             # don't break here, so that all found devices get logged, but
             # select only the first one from the list
             if selected_device is None:
@@ -589,7 +589,7 @@ def click_wemo_reset(
         if reset_all:
             devices = discover_and_log_devices()
             if name is not None:
-                log.warning(
+                LOG.warning(
                     'name %s ignored, all discovered devices will be reset'
                 )
             if click.confirm(
@@ -605,7 +605,7 @@ def click_wemo_reset(
                 'either --name=<str> must be provided or --all flag used'
             )
     except WemoException as exc:
-        log.critical(exc)
+        LOG.critical(exc)
 
 
 # -----------------------------------------------------------------------------
@@ -675,12 +675,12 @@ def click_wemo_setup(
                             wemo_ap, ssid=ssid, password=password
                         )
                     except WemoException as exc:
-                        log.error(exc)
-                        log.error('|-- thus skipping ap: %s', wemo_ap)
+                        LOG.error(exc)
+                        LOG.error('|-- thus skipping ap: %s', wemo_ap)
 
                 if current and not current.lower().startswith('wemo.'):
                     try:
-                        log.info('attempting to reconnect host to %s', current)
+                        LOG.info('attempting to reconnect host to %s', current)
                         subprocess.run(
                             ['nmcli', 'device', 'wifi', 'connect', current],
                             check=True,
@@ -698,7 +698,7 @@ def click_wemo_setup(
                 'either --name=<str> must be provided or --all flag used'
             )
     except WemoException as exc:
-        log.critical(exc)
+        LOG.critical(exc)
 
 
 # -----------------------------------------------------------------------------
