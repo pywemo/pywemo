@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
-This is a script used to reset and setup Belkin WeMo devices, without using the
-Belkin iOS/Android App.
+Reset and setup Belkin Wemo devices without using the Belkin iOS/Android App.
 
 This script uses click for a cli interface.  To see informational and help
 message(s), you can run:
@@ -28,7 +28,6 @@ import logging
 import datetime
 import platform
 import subprocess
-from functools import partial
 from typing import List, Tuple
 
 import click
@@ -192,7 +191,7 @@ def log_details(device: Device) -> None:
 
 # -----------------------------------------------------------------------------
 def wemo_reset(device: Device, data: bool = True, wifi: bool = True) -> None:
-    """Reset a wemo device."""
+    """Wemo device(s) reset."""
     log.info('information on device (may aid in re-setup): %s', device)
     log_details(device)
 
@@ -225,7 +224,7 @@ def wemo_reset(device: Device, data: bool = True, wifi: bool = True) -> None:
 def encrypt_wifi_password_aes128(password: str, wemo_keydata: str) -> str:
     """Encrypt a password using OpenSSL.
 
-    This function is borrowed heavily from Vadim's "wemosetup" script here:
+    Function borrows heavily from Vadim's "wemosetup" script:
     https://github.com/vadimkantorov/wemosetup
     """
     if not password:
@@ -290,9 +289,9 @@ def encrypt_wifi_password_aes128(password: str, wemo_keydata: str) -> str:
 def wemo_setup(
     device: Device, ssid: str, password: str, timeout: int = 20
 ) -> None:
-    """Setup a wemo device (connect it to your wifi/AP).
+    """Wemo device(s) setup (connect device to wifi/AP).
 
-    This function is inspired by Vadim's "wemosetup" code here:
+    Function inspired by Vadim's "wemosetup" code:
     https://github.com/vadimkantorov/wemosetup
     """
     # find all access points that the device can see, and select the one
@@ -403,7 +402,7 @@ def wemo_setup(
 def wemo_connect_and_setup(
     wemossid: str, ssid: str, password: str, timeout: int = 20
 ) -> None:
-    """Connect to a wemo devices AP and then set up the device."""
+    """Connect to a Wemo devices AP and then set up the device."""
     try:
         networks = subprocess.run(
             [
@@ -511,9 +510,9 @@ def get_device_by_name(name: str) -> Device:
     and -vvv also output the log to a file.''',
 )
 def click_main(verbose: int) -> None:
-    """Wemo script to reset and setup Wemo devices.
+    r"""Wemo script to reset and setup Wemo devices.
 
-    This script can be used to reset and setup Belkin WeMo devices, without
+    This script can be used to reset and setup Belkin Wemo devices, without
     using the Belkin iOS/Android App.
 
     NOTE: OpenSSL should be installed to use this script for device setup on
@@ -577,7 +576,7 @@ def click_wemo_reset(
     reset_all: bool,
     name: str,
 ) -> None:
-    """Reset a Wemo device.
+    """Wemo device(s) reset (cli interface).
 
     NOTE: You should be on the same network as the device you want to interact
     with!  To reset a device, you should be connected to your normal network
@@ -614,7 +613,7 @@ def click_wemo_reset(
 @click.option(
     '--ssid',
     required=True,
-    help='The SSID of the network you want the wemo device to join',
+    help='The SSID of the network you want the Wemo device to join',
 )
 @click.option(
     '--password',
@@ -627,18 +626,18 @@ def click_wemo_reset(
     is_flag=True,
     help='''Scan for available Wemo device networks and try to setup any device
     on all discovered networks (requires Linux and nmcli to find and connect to
-    the networks)'''
+    the networks)''',
 )
 @click.option(
     '--name',
     help='''Friendly name of the device to setup.  This option is required (and
     only used) if --setup-all is NOT used.  You must be connected to the
-    devices local network (usually of the form Wemo.Device.XXX).'''
+    devices local network (usually of the form Wemo.Device.XXX).''',
 )
 def click_wemo_setup(
     ssid: str, password: str, setup_all: bool, name: str
 ) -> None:
-    """Setup a Wemo device.
+    """Wemo device(s) setup (cli interface).
 
     NOTE: You should be on the same network as the device you want to interact
     with!  To setup a device, you should be connected to the devices locally
@@ -662,7 +661,7 @@ def click_wemo_setup(
             wemo_aps, current = find_wemo_aps()
             if not wemo_aps:
                 raise WemoException(
-                    'no valid wemo device AP\'s found, first try running this '
+                    'no valid Wemo device AP\'s found, first try running this '
                     'again, otherwise consider directly connecting to the '
                     'devices network yourself and using the --name option'
                 )
@@ -687,10 +686,9 @@ def click_wemo_setup(
                             check=True,
                             capture_output=True,
                         )
-                    except (
-                        subprocess.CalledProcessError,
-                        FileNotFoundError,
-                    ) as exc:
+                    except (subprocess.CalledProcessError, FileNotFoundError):
+                        # just skip re-connection, the OS will likely
+                        # auto-reconnect anyway
                         pass
         elif name is not None:
             device = get_device_by_name(name)
