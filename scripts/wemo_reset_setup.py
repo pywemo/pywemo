@@ -509,8 +509,8 @@ def get_device_by_name(name: str) -> Device:
     script, -vv to also enable debug messages from upstream libraries,
     and -vvv also output the log to a file.''',
 )
-def click_main(verbose: int) -> None:
-    r"""Wemo script to reset and setup Wemo devices.
+def cli(verbose: int) -> None:
+    """Wemo script to reset and setup Wemo devices.
 
     This script can be used to reset and setup Belkin Wemo devices, without
     using the Belkin iOS/Android App.
@@ -533,19 +533,19 @@ def click_main(verbose: int) -> None:
 
     NOTE: You should be on the same network as the device you want to interact
     with!
-    """
+    """  # noqa: D301  # need to keep the \b with raw string for click
     setup_logger(verbose)
 
 
 # -----------------------------------------------------------------------------
-@click_main.command(name='list', context_settings=CONTEXT_SETTINGS)
+@cli.command(name='list', context_settings=CONTEXT_SETTINGS)
 def wemo_discover() -> List[Device]:
     """Discover and print information about devices on current network(s)."""
     discover_and_log_devices(details=True)
 
 
 # -----------------------------------------------------------------------------
-@click_main.command(name='reset', context_settings=CONTEXT_SETTINGS)
+@cli.command(name='reset', context_settings=CONTEXT_SETTINGS)
 @click.option('--data', is_flag=True, help='Set flag to clear the device data')
 @click.option(
     '--wifi',
@@ -609,7 +609,7 @@ def click_wemo_reset(
 
 
 # -----------------------------------------------------------------------------
-@click_main.command(name='setup', context_settings=CONTEXT_SETTINGS)
+@cli.command(name='setup', context_settings=CONTEXT_SETTINGS)
 @click.option(
     '--ssid',
     required=True,
@@ -705,7 +705,7 @@ def click_wemo_setup(
 # Run the script
 if __name__ == '__main__':
     # pylint: disable= no-value-for-parameter
-    click_main()
+    cli()
 
 
 # ---[ END OF FILE ]-----------------------------------------------------------
