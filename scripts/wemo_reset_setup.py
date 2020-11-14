@@ -136,8 +136,11 @@ def find_wemo_aps() -> Tuple[List[str], str]:
             'manager installed)'
         ) from exc
     except subprocess.CalledProcessError as exc:
-        stderr = networks.stderr.decode().strip()
-        LOG.error('stderr:\n%s', stderr)
+        try:
+            LOG.error('stdout:\n%s', networks.stdout.decode().strip())
+            LOG.error('stderr:\n%s', networks.stderr.decode().strip())
+        except UnboundLocalError:
+            pass
         raise WemoException('nmcli command failed') from exc
 
     args = ' '.join(networks.args)
@@ -293,7 +296,7 @@ def wemo_reset(device: Device, data: bool = True, wifi: bool = True) -> None:
 def encrypt_wifi_password_aes128(password: str, wemo_keydata: str) -> str:
     """Encrypt a password using OpenSSL.
 
-    Function borrows heavily from Vadim's "wemosetup" script:
+    Function borrows heavily from Vadim Kantorov's "wemosetup" script:
     https://github.com/vadimkantorov/wemosetup
     """
     if not password:
@@ -312,28 +315,45 @@ def encrypt_wifi_password_aes128(password: str, wemo_keydata: str) -> str:
     # compatible with wemo.
     #     *** WARNING : deprecated key derivation used.
     #     Using -iter or -pbkdf2 would be better.
-    stdout, _ = subprocess.Popen(
-        [
-            'openssl',
-            'enc',
-            '-aes-128-cbc',
-            '-md',
-            'md5',
-            '-salt',
-            '-S',
-            salt.encode('utf-8').hex(),
-            '-iv',
-            initialization_vector.encode('utf-8').hex(),
-            '-pass',
-            'pass:' + wemo_keydata,
-        ],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-    ).communicate(password.encode('utf-8'))
+    try:
+        openssl = subprocess.run(
+            [
+                'openssl',
+                'enc',
+                '-aes-128-cbc',
+                '-md',
+                'md5',
+                '-salt',
+                '-S',
+                salt.encode('utf-8').hex(),
+                '-iv',
+                initialization_vector.encode('utf-8').hex(),
+                '-pass',
+                'pass:' + wemo_keydata,
+            ],
+            check=True,
+            capture_output=True,
+            input=password.encode('utf-8'),
+        )
+    except FileNotFoundError as exc:
+        raise WemoException(
+            'openssl command failed (this function requires that openssl be '
+            'on your path)'
+        ) from exc
+    except subprocess.CalledProcessError as exc:
+        try:
+            LOG.error('stdout:\n%s', openssl.stdout.decode().strip())
+            LOG.error('stderr:\n%s', openssl.stderr.decode().strip())
+        except UnicodeDecodeError:
+            LOG.error('stdout:\n%s', openssl.stdout)
+            LOG.error('stderr:\n%s', openssl.stderr)
+        except UnboundLocalError:
+            pass
+        raise WemoException('openssl command failed') from exc
 
     # removing 16byte magic and salt prefix inserted by OpenSSL, which is of
     # the form "Salted__XXXXXXXX" before the actual password
-    encrypted_password = base64.b64encode(stdout[16:]).decode()
+    encrypted_password = base64.b64encode(openssl.stdout[16:]).decode()
 
     # the last 4 digits that wemo expects should be xxyy, where:
     #     xx: length of the encrypted password
@@ -520,8 +540,8 @@ def wemo_connect_and_setup(
         ) from exc
     except subprocess.CalledProcessError as exc:
         try:
-            stderr = networks.stderr.decode().strip()
-            LOG.error('stderr:\n%s', stderr)
+            LOG.error('stdout:\n%s', networks.stdout.decode().strip())
+            LOG.error('stderr:\n%s', networks.stderr.decode().strip())
         except UnboundLocalError:
             pass
         raise WemoException(
