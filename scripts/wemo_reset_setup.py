@@ -92,8 +92,7 @@ def setup_logger(verbose: int) -> None:
     platinfo = ', '.join(platform.uname())
     LOG.debug('logging started:  %s', date_time)
     LOG.debug('program version:  %s', __version__)
-    # pywemo does not provide version at this time
-    # LOG.debug('pywemo version:  %s', pywemo.__version__)
+    # pywemo does not provide version at this time (no pywemo.__version__)
     LOG.debug('platform:  %s', platinfo)
     LOG.debug('current directory:  %s', pathlib.Path.cwd())
     if verbose > 2:
