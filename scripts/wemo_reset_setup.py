@@ -765,10 +765,6 @@ def click_wemo_setup(
     uses the same name (SSID) for the 2.4GHz and 5GHz signals.  Thus it is
     recommended to disable the 5GHz signal while setting up the Wemo devices,
     and then re-enabling it upon completion.
-
-    NOTE: Often times the Wemo will fail to connect to wifi the first time it
-    is attempted, but then will connect when setup is re-run on the device.
-    So be sure to try again if it fails the first time.
     """
     try:
         if setup_all:
