@@ -15,6 +15,12 @@ enterVenv
 
 
 echo
+echo "===Upgrade pip==="
+pip install poetry
+python -m pip install --upgrade pip
+
+
+echo
 echo "===Installing poetry==="
 pip install poetry
 
