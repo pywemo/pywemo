@@ -8,7 +8,7 @@ Dependencies
 ------------
 pyWeMo depends on Python packages: requests, ifaddr and six
 
-provided_setup_reset.py additionally depends on: click, colorlog
+provided wemo_reset_setup.py additionally depends on: click, colorlog
 
 How to use
 ----------
