@@ -22,12 +22,14 @@ and information.
 # ---[ Imports ]---------------------------------------------------------------
 # -----------------------------------------------------------------------------
 import time
+import shutil
 import base64
 import pathlib
 import logging
 import datetime
 import platform
 import subprocess
+from getpass import getpass
 from typing import List, Tuple
 
 import click
@@ -44,6 +46,8 @@ __version__ = '1.0.0'
 # -----------------------------------------------------------------------------
 LOG = colorlog.getLogger()
 LOG.addHandler(logging.NullHandler())
+
+DASHES = '-' * (shutil.get_terminal_size().columns - 11)
 
 # context for -h/--help usage with click
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -100,6 +104,15 @@ def setup_logger(verbose: int) -> None:
 def find_wemo_aps() -> Tuple[List[str], str]:
     """Use linux network manager to find wemo access points to connect to."""
     try:
+        subprocess.run(
+            [
+                'nmcli',
+                'device',
+                'wifi',
+                'rescan',
+            ],
+            check=False,
+        )
         networks = subprocess.run(
             [
                 'nmcli',
@@ -157,43 +170,87 @@ def find_wemo_aps() -> Tuple[List[str], str]:
 
 
 # -----------------------------------------------------------------------------
-def log_details(device: Device) -> None:
+def log_details(device: Device, verbose: int = 0) -> None:
     """Log some basic details about the device."""
     # display some general information about the device that the
     # user may find useful in understanding it
-    setup_details = {}
-    for service, action, key in [
-        ('basicevent', 'GetFriendlyName', 'FriendlyName'),
-        ('basicevent', 'GetSignalStrength', 'SignalStrength'),
-        ('basicevent', 'GetMacAddr', None),
-        ('firmwareupdate', 'GetFirmwareVersion', 'FirmwareVersion'),
-        ('metainfo', 'GetMetaInfo', 'MetaInfo'),
-        ('metainfo', 'GetExtMetaInfo', 'ExtMetaInfo'),
-        ('deviceinfo', 'GetDeviceInformation', 'DeviceInformation'),
-    ]:
+    if verbose == 0:
+        data_to_print = [
+            ('basicevent', 'GetFriendlyName', 'FriendlyName'),
+            ('basicevent', 'GetMacAddr', None),
+            ('metainfo', 'GetMetaInfo', 'MetaInfo'),
+        ]
+    elif verbose == 1:
+        data_to_print = [
+            ('basicevent', 'GetFriendlyName', 'FriendlyName'),
+            ('basicevent', 'GetSignalStrength', 'SignalStrength'),
+            ('basicevent', 'GetMacAddr', None),
+            ('firmwareupdate', 'GetFirmwareVersion', 'FirmwareVersion'),
+            ('metainfo', 'GetMetaInfo', 'MetaInfo'),
+            ('metainfo', 'GetExtMetaInfo', 'ExtMetaInfo'),
+            ('deviceinfo', 'GetDeviceInformation', 'DeviceInformation'),
+            # ('basicevent', 'GetSetupDoneStatus', None),
+        ]
+    else:
+        data_to_print = []
+        if verbose == 2:
+            # skip the calls to GetApList and GetNetworkList since they are
+            # slow, but do include them if higher verbose is requested
+            skip_actions = {'getaplist', 'getnetworklist'}
+        else:
+            skip_actions = {}
+        for service_name, service in device.services.items():
+            for action_name in service.actions.keys():
+                if action_name.lower() in skip_actions:
+                    continue
+                if action_name.lower().startswith('get'):
+                    data_to_print.append((service_name, action_name, None))
+
+    failed_calls = []
+    for service_name, action_name, key in data_to_print:
+        name = f'{service_name}.{action_name}'
         try:
-            result = device.services[service].actions[action]()
-            if key:
-                # display a specific result
-                LOG.info('    %40s: %s', key, result[key])
-                if key == 'MetaInfo':
-                    ssid = result[key].split('|')[-2]
-                    setup_details['Default SSID'] = ssid
-            else:
-                # display entire result (dictionary)
-                LOG.info('    %40s: %s', action, result)
-        except (AttributeError, KeyError, TypeError):
-            # some devices might not support these services/actions?
-            pass
-    for key, value in setup_details.items():
-        LOG.info('  %-42s: %s', '[DETAILS FOR RE-SETUP] ' + key, value)
+            result = device.services[service_name].actions[action_name]()
+
+            try:
+                failed = result['faultstring'].lower() == 'upnperror'
+                if failed:
+                    # print the failed ones at the end for easier visual
+                    # separation
+                    failed_calls.append((name, result))
+                    continue
+            except KeyError:
+                pass
+
+            # try to display the requested key, but display the entire result
+            # if it doesn't exist (or is None since that key shouldn't exist)
+            try:
+                name = f'{service_name}.{action_name}[{key}]'
+                LOG.info('    %60s: %s', name, result[key])
+            except KeyError:
+                LOG.info('    %60s: %s', name, result)
+        except (AttributeError, KeyError, TypeError) as exc:
+            # something went wrong, hard coded services may not be available on
+            # all platforms, or some Get methods may require an argument
+            LOG.warning(
+                '    %60s: %s', f'Failed to get result for s{name}', exc
+            )
+
+    if failed_calls:
+        LOG.warning(
+            '    The results below resulted in an error.  This may be due to '
+            'the action no longer working or that the method requires an '
+            'argument.'
+        )
+    for name, result in failed_calls:
+        LOG.info('    %60s: %s', name, result)
 
 
 # -----------------------------------------------------------------------------
 def wemo_reset(device: Device, data: bool = True, wifi: bool = True) -> None:
     """Wemo device(s) reset."""
     LOG.info('information on device (may aid in re-setup): %s', device)
-    log_details(device)
+    log_details(device, verbose=1)
 
     if data and wifi:
         LOG.info('attempting a full factory reset (clear data and wifi info)')
@@ -215,7 +272,13 @@ def wemo_reset(device: Device, data: bool = True, wifi: bool = True) -> None:
     else:
         raise WemoException('no action requested')
 
-    LOG.info('result of reset: %s', result['Reset'])
+    status = result['Reset']
+    if status.strip().lower() == 'success':
+        LOG.info('result of reset: %s', status)
+    else:
+        # one unit always returns "reset_remote" here instead of "success",
+        # but it appears to still do a reset...
+        LOG.error('result of reset (it might still have worked): %s', status)
 
     return result
 
@@ -287,15 +350,23 @@ def encrypt_wifi_password_aes128(password: str, wemo_keydata: str) -> str:
 
 # -----------------------------------------------------------------------------
 def wemo_setup(
-    device: Device, ssid: str, password: str, timeout: int = 20
+    device: Device,
+    ssid: str,
+    password: str,
+    timeout: float = 20,
+    connection_attempts: int = 2,
 ) -> None:
     """Wemo device(s) setup (connect device to wifi/AP).
 
-    Function inspired by Vadim's "wemosetup" code:
-    https://github.com/vadimkantorov/wemosetup
+    The timeout is for each connection_attempt.
     """
     # find all access points that the device can see, and select the one
     # matching the desired SSID
+    if timeout < 20:
+        LOG.warning('setting timeout to minimum of 20 (received %s)', timeout)
+        timeout = 20
+    connection_attempts = int(max(1, connection_attempts))
+
     selected_ap = None
     LOG.info('searching for AP\'s...')
     access_points = device.WiFiSetup.GetApList()['ApList']
@@ -354,53 +425,74 @@ def wemo_setup(
 
         encrypted_password = encrypt_wifi_password_aes128(password, keydata)
 
-    result = device.WiFiSetup.ConnectHomeNetwork(
-        ssid=ssid,
-        auth=auth_mode,
-        password=encrypted_password,
-        encrypt=encryption_method,
-        channel=channel,
-    )
-    pairing_status = result['PairingStatus']
-    LOG.debug('pairing status: %s', pairing_status)
+    delta_delay = 2.0  # between network status checks
+    success_statuses = {'1'}
+    # success_statuses = {'1', '3'}
 
-    LOG.info('waiting an initial 5 seconds...')
-    time.sleep(5.0)
+    # optionally make multiple connection attempts
+    start_time = time.time()
+    for attempt in range(connection_attempts):
+        LOG.info('sending connection request (try %s)', attempt + 1)
+        # success rate is *much* higher if the ConnectHomeNetwork command is
+        # sent twice (not sure why!)
+        for _ in range(2):
+            result = device.WiFiSetup.ConnectHomeNetwork(
+                ssid=ssid,
+                auth=auth_mode,
+                password=encrypted_password,
+                encrypt=encryption_method,
+                channel=channel,
+            )
+            time.sleep(0.15)
+        try:
+            LOG.info('pairing status: %s', result['PairingStatus'])
+        except KeyError:
+            LOG.info('pairing status: %s', result)
+        stime = time.time()
 
-    LOG.info('starting status checks...(timeout of %s seconds)', timeout)
-    timeout = int(timeout)
-    for i in range(timeout):
-        time.sleep(1.0)
-        network_status = device.WiFiSetup.GetNetworkStatus()['NetworkStatus']
-        LOG.debug('network status (%s seconds): %s', i + 1, network_status)
-        if network_status == '1':
+        LOG.info('starting status checks (%s second timeout)', timeout)
+        while time.time() - stime < timeout:
+            time.sleep(delta_delay)
+            status = device.WiFiSetup.GetNetworkStatus()['NetworkStatus']
+            LOG.debug(
+                'network status after %.2f seconds: %s',
+                time.time() - stime,
+                status,
+            )
+            if status in success_statuses:
+                break
+        if status in success_statuses:
             break
 
-    network_status = device.WiFiSetup.GetNetworkStatus()['NetworkStatus']
-    LOG.debug('network status (need 1 or 3): %s', network_status)
-
     close_status = device.WiFiSetup.CloseSetup()['status']
-    LOG.debug('close status (need success): %s', close_status)
+    LOG.debug('close status: %s', close_status)
 
-    if network_status not in ['1', '3'] or close_status != 'success':
+    if status not in success_statuses or close_status != 'success':
         LOG.error(
-            'device failed to connect to the network "%s", please try again '
-            '(add -v for addition debug information).  Wemo devices often '
-            'need to try wifi setup a second time.',
+            'Wemo device failed to connect to the network "%s", please try '
+            'again (add -v for addition debug information).',
             ssid,
         )
     else:
         try:
             device.basicevent.SetSetupDoneStatus()
         except AttributeError:
-            LOG.warning('SetSetupDoneStatus not able to be set')
-            pass
-        LOG.info('device connected to network "%s"', ssid)
+            LOG.warning(
+                'SetSetupDoneStatus not able to be set (some devices do not '
+                'have this method)'
+            )
+        LOG.info(
+            'Wemo device connected to network "%s", which took %.2f total '
+            'seconds over %s connection attempt(s)',
+            ssid,
+            time.time() - start_time,
+            attempt + 1,
+        )
 
 
 # -----------------------------------------------------------------------------
 def wemo_connect_and_setup(
-    wemossid: str, ssid: str, password: str, timeout: int = 20
+    wemossid: str, ssid: str, password: str, timeout: float = 20.0
 ) -> None:
     """Connect to a Wemo devices AP and then set up the device."""
     try:
@@ -421,8 +513,11 @@ def wemo_connect_and_setup(
             'manager installed)'
         ) from exc
     except subprocess.CalledProcessError as exc:
-        stderr = networks.stderr.decode().strip()
-        LOG.error('stderr:\n%s', stderr)
+        try:
+            stderr = networks.stderr.decode().strip()
+            LOG.error('stderr:\n%s', stderr)
+        except UnboundLocalError:
+            pass
         raise WemoException(
             'nmcli command failed (network may not exist anymore?)'
         ) from exc
@@ -434,6 +529,7 @@ def wemo_connect_and_setup(
     # a short delay to make sure the connection is well established
     time.sleep(2.0)
 
+    LOG.info('searching %s for wemo devices', wemossid)
     devices = discover_and_log_devices(only_needing_setup=True)
     # NOTE: if the user is connected to multiple networks (e.g. has multiple
     #       wireless adapters), then discovery will still return all devices,
@@ -444,7 +540,8 @@ def wemo_connect_and_setup(
 
 # -----------------------------------------------------------------------------
 def discover_and_log_devices(
-    only_needing_setup: bool = False, details: bool = False
+    only_needing_setup: bool = False,
+    verbose: int = 0,
 ) -> List[Device]:
     """Click interface to list all discovered devices."""
     devices = pywemo.discover_devices()
@@ -453,19 +550,20 @@ def discover_and_log_devices(
     for device in devices:
         if only_needing_setup:
             status = device.WiFiSetup.GetNetworkStatus()['NetworkStatus']
-            if status not in ['1', '3']:
+            if status not in {'1'}:
                 not_setup.append(device)
                 LOG.info('found device needing setup: %s', device)
         else:
-            LOG.info('-' * 50)
+            LOG.info(DASHES)
             LOG.info('found device: %s', device)
-            if details:
-                log_details(device)
-    if device:
-        LOG.info('-' * 50)
+            log_details(device, verbose)
 
     if only_needing_setup:
         return not_setup
+
+    if device:
+        LOG.info(DASHES)
+    LOG.info('found %s devices', len(devices))
     return devices
 
 
@@ -539,9 +637,18 @@ def cli(verbose: int) -> None:
 
 # -----------------------------------------------------------------------------
 @cli.command(name='list', context_settings=CONTEXT_SETTINGS)
-def wemo_discover() -> List[Device]:
+@click.option(
+    '-v',
+    '--verbose',
+    count=True,
+    help='''How much information to print.  Use -v to print all actions for
+    the device that start with "Get", except for those that scan for APs or
+    networks (slow).  Use -vv to also include those AP/network scans.  If no -v
+    is provided, a smaller hand-selected subset of functions are run.''',
+)
+def wemo_discover(verbose=0) -> List[Device]:
     """Discover and print information about devices on current network(s)."""
-    discover_and_log_devices(details=True)
+    discover_and_log_devices(verbose=verbose + 1)
 
 
 # -----------------------------------------------------------------------------
@@ -592,11 +699,14 @@ def click_wemo_reset(
                 LOG.warning(
                     'name %s ignored, all discovered devices will be reset'
                 )
-            if click.confirm(
-                'Are you sure you want to reset all devices listed above?'
+            if devices and click.confirm(
+                f'Are you sure you want to reset all {len(devices)} devices '
+                'listed above?'
             ):
                 for device in devices:
+                    LOG.info(DASHES)
                     wemo_reset(device, data=data, wifi=wifi)
+                LOG.info(DASHES)
         elif name is not None:
             device = get_device_by_name(name)
             wemo_reset(device, data=data, wifi=wifi)
@@ -604,6 +714,7 @@ def click_wemo_reset(
             raise WemoException(
                 'either --name=<str> must be provided or --all flag used'
             )
+        LOG.info('devices will take approximately 90 seconds to reset')
     except WemoException as exc:
         LOG.critical(exc)
 
@@ -613,13 +724,14 @@ def click_wemo_reset(
 @click.option(
     '--ssid',
     required=True,
+    type=str,
     help='The SSID of the network you want the Wemo device to join',
 )
 @click.option(
     '--password',
-    prompt=True,
-    hide_input=True,
-    help='Password for the provided SSID (will be prompted)',
+    default='',
+    type=str,
+    help='Password for the provided SSID (skip to be prompted)',
 )
 @click.option(
     '--setup-all',
@@ -638,6 +750,8 @@ def click_wemo_setup(
     ssid: str, password: str, setup_all: bool, name: str
 ) -> None:
     """Wemo device(s) setup (cli interface).
+
+    User will be prompted for wifi password, if not provided.
 
     NOTE: You should be on the same network as the device you want to interact
     with!  To setup a device, you should be connected to the devices locally
@@ -665,11 +779,20 @@ def click_wemo_setup(
                     'again, otherwise consider directly connecting to the '
                     'devices network yourself and using the --name option'
                 )
-            elif click.confirm(
-                'Are you sure you want to setup all "expected wemo" devices '
-                'listed above?'
+
+            if wemo_aps and click.confirm(
+                f'Are you sure you want to setup all {len(wemo_aps)} '
+                '"expected wemo" devices listed above?'
             ):
+                LOG.info(DASHES)
+                LOG.info(
+                    'NOTE: If some or all devices fail to connect, try '
+                    're-running the same command a second time!'
+                )
+                if not password:
+                    password = getpass()
                 for wemo_ap in wemo_aps:
+                    LOG.info(DASHES)
                     try:
                         wemo_connect_and_setup(
                             wemo_ap, ssid=ssid, password=password
@@ -677,6 +800,7 @@ def click_wemo_setup(
                     except WemoException as exc:
                         LOG.error(exc)
                         LOG.error('|-- thus skipping ap: %s', wemo_ap)
+                LOG.info(DASHES)
 
                 if current and not current.lower().startswith('wemo.'):
                     try:
