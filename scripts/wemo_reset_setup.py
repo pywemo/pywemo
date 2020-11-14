@@ -4,6 +4,13 @@
 """
 Reset and setup Belkin Wemo devices without using the Belkin iOS/Android App.
 
+python requirements:
+    - pywemo, click, colorlog
+
+external requirements (for setup only):
+    - openssl: used to encrypt the password
+    - nmcli (only if using --setup-all): used to find and connect to Wemo APs
+
 This script uses click for a cli interface.  To see informational and help
 message(s), you can run:
     wemo_reset_setup.py --help
@@ -612,9 +619,15 @@ def cli(verbose: int) -> None:
     This script can be used to reset and setup Belkin Wemo devices, without
     using the Belkin iOS/Android App.
 
-    NOTE: OpenSSL should be installed to use this script for device setup on
-    a network using encryption, as OpenSSL is used to encrypt the password
-    (AES only).
+    \b
+    External Requirements (for setup only)
+    --------------------------------------
+      - OpenSSL should be installed to use this script for device setup on
+        a network using encryption, as OpenSSL is used to encrypt the password
+        (AES only supported in this script).
+      - nmcli (network manager cli) is used (only if --setup-all flag is used)
+        to find and connect to Wemo APs.
+
 
     NOTE: This script has only been tested on linux (Ubuntu 20.04) with OpenSSL
     (version 1.1.1f) and on the following devices:
@@ -627,9 +640,6 @@ def cli(verbose: int) -> None:
         | Lightswitch      | US     | WeMo_WW_2.00.11408.PVT-OWRT-LS          |
         | Dimmer           | US     | WeMo_WW_2.00.11453.PVT-OWRT-Dimmer      |
         |---------------------------------------------------------------------|
-
-    NOTE: You should be on the same network as the device you want to interact
-    with!
     """  # noqa: D301  # need to keep the \b with raw string for click
     setup_logger(verbose)
 
