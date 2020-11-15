@@ -17,6 +17,14 @@ MOCK_ARGS_KWARGS = 1
 
 svc.LOG = mock.Mock()
 
+MOCK_RESPONSE = (
+    b'<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"'
+    b' s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'
+    b'<s:Body>\n<u:GetInsightParamsResponse xmlns:u="urn:Belkin:service:metainfo:1">'
+    b"\r\n<InsightParams>0|1604849509|85|1315|27628|1209600|772|0|21689183|386799026.000000|8000"
+    b"</InsightParams>\r\n</u:GetInsightParamsResponse>\r\n</s:Body> </s:Envelope>"
+)
+
 
 class TestAction:
     @staticmethod
@@ -32,10 +40,15 @@ class TestAction:
 
         return svc.Action(device, service, action_config)
 
+    @staticmethod
+    def get_et_mock():
+        resp = cet.fromstring(MOCK_RESPONSE)
+        return mock.MagicMock(return_value=resp)
+
     def test_call_post_request_is_made_exactly_once_when_successful(self):
         action = self.get_mock_action()
         requests.post = post_mock = mock.Mock()
-        cet.fromstring = mock.MagicMock()
+        cet.fromstring = self.get_et_mock()
 
         action()
 
@@ -44,7 +57,7 @@ class TestAction:
     def test_call_request_has_well_formed_xml_body(self):
         action = self.get_mock_action(name="cool_name", service_type="service")
         requests.post = post_mock = mock.Mock()
-        cet.fromstring = mock.MagicMock()
+        cet.fromstring = self.get_et_mock()
 
         action()
 
@@ -54,7 +67,6 @@ class TestAction:
     def test_call_request_has_correct_header_keys(self):
         action = self.get_mock_action()
         requests.post = post_mock = mock.Mock()
-        cet.fromstring = mock.MagicMock()
 
         action()
 
@@ -65,7 +77,6 @@ class TestAction:
     def test_call_headers_has_correct_content_type(self):
         action = self.get_mock_action()
         requests.post = post_mock = mock.Mock()
-        cet.fromstring = mock.MagicMock()
 
         action()
 
@@ -79,7 +90,6 @@ class TestAction:
         name = "cool_name"
         action = self.get_mock_action(name, service_type)
         requests.post = post_mock = mock.Mock()
-        cet.fromstring = mock.MagicMock()
 
         action()
 
@@ -92,7 +102,6 @@ class TestAction:
         url = "http://www.github.com/"
         action = self.get_mock_action(url=url)
         requests.post = post_mock = mock.Mock()
-        cet.fromstring = mock.MagicMock()
 
         action()
 
@@ -104,7 +113,6 @@ class TestAction:
         requests.post = post_mock = mock.Mock(
             side_effect=requests.exceptions.RequestException
         )
-        cet.fromstring = mock.MagicMock()
 
         try:
             action()
@@ -115,10 +123,7 @@ class TestAction:
 
     def test_call_throws_when_final_retry_fails(self):
         action = self.get_mock_action()
-        requests.post = mock.Mock(
-            side_effect=requests.exceptions.RequestException
-        )
-        cet.fromstring = mock.MagicMock()
+        requests.post = mock.Mock(side_effect=requests.exceptions.RequestException)
 
         with pytest.raises(svc.ActionException):
             action()

@@ -57,7 +57,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             data = data.decode("UTF-8").split("\n\n")[0]
             doc = cElementTree.fromstring(data)
             for propnode in doc.findall('./{0}property'.format(NS)):
-                for property_ in propnode.getchildren():
+                for property_ in list(propnode):
                     text = property_.text
                     outer.event(device, property_.tag, text)
 
