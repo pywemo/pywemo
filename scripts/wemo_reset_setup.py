@@ -108,7 +108,7 @@ def setup_logger(verbose: int) -> None:
 
 # -----------------------------------------------------------------------------
 def find_wemo_aps() -> Tuple[List[str], str]:
-    """Use linux network manager to find wemo access points to connect to."""
+    """Use network manager cli to find wemo access points to connect to."""
     try:
         subprocess.run(
             [
@@ -132,8 +132,8 @@ def find_wemo_aps() -> Tuple[List[str], str]:
         )
     except FileNotFoundError as exc:
         raise WemoException(
-            'nmcli command failed (this function requires linux with network '
-            'manager installed)'
+            'nmcli command failed (this function requires network manager to '
+            'be installed)'
         ) from exc
     except subprocess.CalledProcessError as exc:
         try:
@@ -535,8 +535,8 @@ def wemo_connect_and_setup(
         )
     except FileNotFoundError as exc:
         raise WemoException(
-            'nmcli command failed (this function requires linux with network '
-            'manager installed)'
+            'nmcli command failed (this function requires network manager to '
+            'be installed)'
         ) from exc
     except subprocess.CalledProcessError as exc:
         try:
@@ -649,8 +649,7 @@ def cli(verbose: int) -> None:
         to find and connect to Wemo APs.
 
 
-    NOTE: This script has only been tested on linux (Ubuntu 20.04) with OpenSSL
-    (version 1.1.1f) and on the following devices:
+    NOTE: This script has been tested on the following devices:
 
         \b
         |---------------------------------------------------------------------|
@@ -659,6 +658,9 @@ def cli(verbose: int) -> None:
         | Socket (Mini)    | US     | WeMo_WW_2.00.11452.PVT-OWRT-SNSV2       |
         | Lightswitch      | US     | WeMo_WW_2.00.11408.PVT-OWRT-LS          |
         | Dimmer           | US     | WeMo_WW_2.00.11453.PVT-OWRT-Dimmer      |
+        | Insight Switch   | UK     | WeMo_WW_2.00.11483.PVT-OWRT-Insight     |
+        | Switch           | UK     | WeMo_WW_2.00.11408.PVT-OWRT-SNS         |
+        | Maker            | UK     | WeMo_WW_2.00.11423.PVT-OWRT-Maker       |
         |---------------------------------------------------------------------|
     """  # noqa: D301  # need to keep the \b with raw string for click
     setup_logger(verbose)
@@ -741,7 +743,7 @@ def click_wemo_reset(
             wemo_reset(device, data=data, wifi=wifi)
         else:
             raise WemoException(
-                'either --name=<str> must be provided or --all flag used'
+                'either --name=<str> must be provided or --reset-all flag used'
             )
         LOG.info('devices will take approximately 90 seconds to reset')
     except WemoException as exc:
@@ -766,8 +768,8 @@ def click_wemo_reset(
     '--setup-all',
     is_flag=True,
     help='''Scan for available Wemo device networks and try to setup any device
-    on all discovered networks (requires Linux and nmcli to find and connect to
-    the networks)''',
+    on all discovered networks (requires nmcli to find and connect to the
+    networks)''',
 )
 @click.option(
     '--name',
@@ -844,7 +846,7 @@ def click_wemo_setup(
             wemo_setup(device, ssid=ssid, password=password)
         else:
             raise WemoException(
-                'either --name=<str> must be provided or --all flag used'
+                'either --name=<str> must be provided or --setup-all flag used'
             )
     except WemoException as exc:
         LOG.critical(exc)
