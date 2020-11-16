@@ -798,6 +798,12 @@ def click_wemo_setup(
     and then re-enabling it upon completion.
     """
     try:
+        LOG.info(DASHES)
+        LOG.info(
+            'NOTE: If some or all devices fail to connect, try '
+            're-running the same command a second time!'
+        )
+        LOG.info(DASHES)
         if setup_all:
             wemo_aps, current = find_wemo_aps()
             if not wemo_aps:
@@ -812,10 +818,6 @@ def click_wemo_setup(
                 '"expected wemo" devices listed above?'
             ):
                 LOG.info(DASHES)
-                LOG.info(
-                    'NOTE: If some or all devices fail to connect, try '
-                    're-running the same command a second time!'
-                )
                 if not password:
                     password = getpass()
                 for wemo_ap in wemo_aps:
