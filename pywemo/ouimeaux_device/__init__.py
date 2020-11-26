@@ -295,12 +295,14 @@ class Device(object):
             # "success", but it appears to still reset successfully
             LOG.warning('result of reset (may be successful): %s', status)
 
+        return status
+
     def factory_reset(self):
         """Convenience method to perform a full factory reset."""
         self.reset(data=True, wifi=True)
 
     @staticmethod
-    def encrypt_aes128( password, wemo_metadata):
+    def encrypt_aes128(password, wemo_metadata):
         """
         Encrypt a password using OpenSSL.
 
@@ -386,7 +388,7 @@ class Device(object):
     def setup(self, *args, **kwargs):
         """Interface method for device setup."""
         try:
-            self._setup(*args, **kwargs)
+            return self._setup(*args, **kwargs)
         except (AttributeError, KeyError) as exc:
             #    Exception      | Reason to catch it
             #    --------------------------------------------------------------
@@ -538,6 +540,8 @@ class Device(object):
             raise SetupException(
                 f'Wemo device failed to connect to "{ssid}", please try again.'
             )
+
+        return status, close_status
 
     @property
     def model(self):
