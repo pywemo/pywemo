@@ -389,7 +389,7 @@ class Device(object):
         """Interface method for device setup."""
         try:
             return self._setup(*args, **kwargs)
-        except (AttributeError, KeyError) as exc:
+        except (UnknownService, AttributeError, KeyError) as exc:
             #    Exception      | Reason to catch it
             #    --------------------------------------------------------------
             #    UnknownService | some devices or firmwares may not have the
