@@ -299,7 +299,7 @@ class Device(object):
 
     def factory_reset(self):
         """Convenience method to perform a full factory reset."""
-        self.reset(data=True, wifi=True)
+        return self.reset(data=True, wifi=True)
 
     @staticmethod
     def encrypt_aes128(password, wemo_metadata):
