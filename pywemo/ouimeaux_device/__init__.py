@@ -329,7 +329,6 @@ class Device(object):
                     '-aes-128-cbc',
                     '-md',
                     'md5',
-                    '-salt',
                     '-S',
                     salt.encode('utf-8').hex(),
                     '-iv',
