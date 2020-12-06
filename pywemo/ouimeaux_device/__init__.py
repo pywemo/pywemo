@@ -424,9 +424,9 @@ class Device(object):
         access_points = wifisetup.GetApList()['ApList']
 
         selected_ap = None
-        for access_point in access_points.split('\n'):
+        for access_point in access_points.split('\n')[1:]:
             access_point = access_point.strip().rstrip(',')
-            if not access_point.strip():
+            if not access_point.strip() or '|' not in access_point:
                 continue
             LOG.debug('found AP: %s', access_point)
             if access_point.startswith(f'{ssid}|'):
@@ -511,7 +511,8 @@ class Device(object):
         except KeyError:
             # print entire dictionary if status doesn't exist
             close_status = result
-        LOG.info('close status: %s', close_status)
+        LOG.debug('network status: %s', status)
+        LOG.debug('close status: %s', close_status)
 
         if status == '1' and close_status == 'success':
             try:
