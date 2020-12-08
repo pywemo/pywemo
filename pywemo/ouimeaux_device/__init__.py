@@ -85,13 +85,13 @@ class SetupException(Exception):
 
 
 class APNotFound(SetupException):
-    """Exception raised whe the AP requested is not found."""
+    """Exception raised when the AP requested is not found."""
 
     pass
 
 
-class BadPassword(SetupException):
-    """Exception raised whe the AP requested is not found."""
+class ShortPassword(SetupException):
+    """Exception raised when a password is too short (<8 characters)."""
 
     pass
 
@@ -538,6 +538,16 @@ class Device(object):
 
         # optionally make multiple connection attempts
         start_time = time.time()
+
+        # status messages:
+        #     0: still trying to connect to network
+        #     1: successfully connected
+        #     2: short password (Wemo requires at least 8 characters)
+        #     3: performing handshake? (uncertain, but devices generally
+        #        go to status 3 for a few moments before switching to
+        #        successful status 1)
+        skip = {'1', '2'}
+
         for attempt in range(connection_attempts):
             LOG.info('sending connection request (try %s)', attempt + 1)
             # success rate is much higher if the ConnectHomeNetwork command is
@@ -569,7 +579,7 @@ class Device(object):
             status = wifisetup.GetNetworkStatus()['NetworkStatus']
             LOG.debug('initial status check: %s', status)
 
-            while time.time() - timeout_start < timeout and status != '1':
+            while time.time() - timeout_start < timeout and status not in skip:
                 time.sleep(status_delay)
                 status = wifisetup.GetNetworkStatus()['NetworkStatus']
                 LOG.debug(
@@ -577,15 +587,8 @@ class Device(object):
                     time.time() - timeout_start,
                     status,
                 )
-            # status messages:
-            #     0: still trying to connect to network
-            #     1: successfully connected
-            #     2: wrong password
-            #     3: performing handshake? (uncertain, but devices generally
-            #        go to status 3 for a few moment before switching to
-            #        successful status 1)
-            if status in {'1', '2'}:
-                # skip any further attempts if it successful or wrong password
+            if status in skip:
+                # skip any further attempts
                 break
 
         try:
@@ -603,7 +606,13 @@ class Device(object):
         LOG.debug('close status: %s', close_status)
 
         if status == '2':
-            raise BadPassword(f'Wrong password provided for SSID {ssid}.')
+            # we could check the password length way earlier (start of the
+            # function), but perhaps Wemo will change this requirement some
+            # day to make it longer, so instead just use the status '2' return
+            # code.
+            raise ShortPassword(
+                f'Password is too short (Wemo requires at least 8 characters).'
+            )
 
         if status == '1' and close_status == 'success':
             try:
