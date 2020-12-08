@@ -546,8 +546,8 @@ class Device(object):
             LOG.info('starting status checks (%s second timeout)', timeout)
             status = None
 
-            # Make an initial, quick check
-            time.sleep(0.50)
+            # Make an initial, quicker check
+            time.sleep(min(0.50, status_delay / 3.0))
             status = wifisetup.GetNetworkStatus()['NetworkStatus']
             LOG.debug('initial status check: %s', status)
 
