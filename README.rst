@@ -54,8 +54,8 @@ Device setup is through the `setup` method.
 The user must first connect to the devices locally broadcast access point, then discover the device there.
 Once done, pass the desired SSID and password (AES encryption only) to the `setup` method to connect it to your wifi network.
 
-Impotant note for setup method
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Impotant Note for Device Setup - OpenSSL is Required!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OpenSSL is used to encrypt the password by the pywemo library.
 It must be installed and available on the path via calling `openssl` with a terminal (or command prompt, if on Windows).
