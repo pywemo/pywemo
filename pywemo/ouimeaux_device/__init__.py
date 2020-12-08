@@ -425,7 +425,7 @@ class Device(object):
         connection_attempts : int, optional
             Number of times to try connecting a debice to the network, if it
             has failed to connect within `timeout` seconds.
-        status_delay : float
+        status_delay : float, optional
             Number of seconds to delay between each called to the connection
             status of the device.  Generally should prefer this to be as short
             as possible, but not too quick to overload the devive with
