@@ -90,6 +90,12 @@ class APNotFound(SetupException):
     pass
 
 
+class BadPassword(SetupException):
+    """Exception raised whe the AP requested is not found."""
+
+    pass
+
+
 class Device(object):
     """Base object for WeMo devices."""
 
@@ -597,7 +603,7 @@ class Device(object):
         LOG.debug('close status: %s', close_status)
 
         if status == '2':
-            raise SetupException(f'Wrong password provided for SSID {ssid}.')
+            raise BadPassword(f'Wrong password provided for SSID {ssid}.')
 
         if status == '1' and close_status == 'success':
             try:
