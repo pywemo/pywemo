@@ -460,7 +460,7 @@ class Device(object):
             #                    | lost power (been unplugged).
             #    --------------------------------------------------------------
             raise SetupException(
-                f'pywemo lost device {self} and was unable to re-connect.  '
+                f'pywemo lost device {self} and was unable to reconnect.  '
                 'Setup status is uncertain, re-probing and checking is '
                 'required.'
             ) from exc
