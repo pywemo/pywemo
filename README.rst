@@ -48,13 +48,13 @@ Reset can be performed with the `reset` method, which has 2 boolean input argume
 Setting `data=True` will reset data ("Clear Personalized Info" in the Wemo app), which resets the device name and cleans the icon and rules.
 Setting `wifi=True` will clear wifi information ("Change Wi-Fi" in the Wemo app), which does not clear the rules, name, etc.
 Setting both to true is equivalent to a "Factory Restore" from the app.
-It should also be noted that devices contain a hardware reset procuedure as well, so using the software is for convience or if physical access is not available.
+It should also be noted that devices contain a hardware reset procedure as well, so using the software is for convenience or if physical access is not available.
 
 Device setup is through the `setup` method.
 The user must first connect to the devices locally broadcast access point, then discover the device there.
 Once done, pass the desired SSID and password (AES encryption only) to the `setup` method to connect it to your wifi network.
 
-Impotant Note for Device Setup - OpenSSL is Required!
+Important Note for Device Setup - OpenSSL is Required!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OpenSSL is used to encrypt the password by the pywemo library.

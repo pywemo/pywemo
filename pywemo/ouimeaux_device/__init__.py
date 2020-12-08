@@ -12,7 +12,7 @@ except ImportError:
 
 import requests
 
-from .api.service import Service
+from .api.service import Service, ActionException
 from .api.xsd import device as deviceParser
 
 LOG = logging.getLogger(__name__)
@@ -274,8 +274,9 @@ class Device(object):
         -----
         Setting both to true is equivalent to a "Factory Restore" from the app.
 
-        Wemo devices contain a hardware reset procuedure as well, so this
-        method is mainly for convience or when physical access is not possible.
+        Wemo devices contain a hardware reset procedure as well, so this
+        method is mainly for convenience or when physical access is not
+        possible.
 
         From testing on a handful of devices, the Reset codes used in the
         ReSetup action below were consistent.  These could potentially change
@@ -428,7 +429,7 @@ class Device(object):
         status_delay : float, optional
             Number of seconds to delay between each called to the connection
             status of the device.  Generally should prefer this to be as short
-            as possible, but not too quick to overload the devive with
+            as possible, but not too quick to overload the device with
             requests.  It must be less than or equal to half of the `timeout`.
 
         Notes
@@ -439,18 +440,30 @@ class Device(object):
         try:
             return self._setup(*args, **kwargs)
         except (UnknownService, AttributeError, KeyError) as exc:
-            #    Exception      | Reason to catch it
+            #    Exception       | Reason to catch it
             #    --------------------------------------------------------------
-            #    UnknownService | some devices or firmwares may not have the
-            #                   | services used
+            #    UnknownService  | some devices or firmwares may not have the
+            #                    | services used
             #    --------------------------------------------------------------
-            #    AttributeError | some devices or firmwares may not have the
-            #                   | actions used
+            #    AttributeError  | some devices or firmwares may not have the
+            #                    | actions used
             #    --------------------------------------------------------------
-            #    KeyError       | an expected result (return from an action)
-            #                   | does not exist (e.g. ApList)
+            #    KeyError        | an expected result (return from an action)
+            #                    | does not exist (e.g. ApList)
             #    --------------------------------------------------------------
             raise SetupException(f'pywemo cannot setup {self}') from exc
+        except ActionException as exc:
+            #    Exception       | Reason to catch it
+            #    --------------------------------------------------------------
+            #    ActionException | one of the action calls never returned!  The
+            #                    | device was not re-discovered.  It may have
+            #                    | lost power (been unplugged).
+            #    --------------------------------------------------------------
+            raise SetupException(
+                f'pywemo lost device {self} and was unable to re-connect.  '
+                'Setup status is uncertain, re-probing and checking is '
+                'required.'
+            ) from exc
 
     def _setup(
         self,
@@ -465,7 +478,7 @@ class Device(object):
 
         See the setup method for details.
         """
-        # a timeoiut of less than 20 is too short for many devices, so require
+        # a timeout of less than 20 is too short for many devices, so require
         # at least 20 seconds.
         timeout = min(timeout, 15.0)
         status_delay = min(status_delay, timeout / 2.0)
@@ -558,8 +571,15 @@ class Device(object):
                     time.time() - timeout_start,
                     status,
                 )
-            if status == '1':
-                # skip any further attempts if it successfully connected
+            # status messages:
+            #     0: still trying to connect to network
+            #     1: successfully connected
+            #     2: wrong password
+            #     3: performing handshake? (uncertain, but devices generally
+            #        go to status 3 for a few moment before switching to
+            #        successful status 1)
+            if status in {'1', '2'}:
+                # skip any further attempts if it successful or wrong password
                 break
 
         try:
@@ -575,6 +595,9 @@ class Device(object):
             close_status = result
         LOG.debug('network status: %s', status)
         LOG.debug('close status: %s', close_status)
+
+        if status == '2':
+            raise SetupException(f'Wrong password provided for SSID {ssid}.')
 
         if status == '1' and close_status == 'success':
             try:
