@@ -461,19 +461,18 @@ class Device(object):
         status_delay=1.0,
     ):
         """
-        Setup Wemo device (connect device to wifi/AP).
+        Setup a Wemo device (connect to wifi/AP).
 
         See the setup method for details.
         """
-        # find all access points that the device can see, and select the one
-        # matching the desired SSID
-
         # a timeoiut of less than 20 is too short for many devices, so require
         # at least 20 seconds.
         timeout = min(timeout, 15.0)
         status_delay = min(status_delay, timeout / 2.0)
         connection_attempts = int(max(1, connection_attempts))
 
+        # find all access points that the device can see, and select the one
+        # matching the desired SSID
         LOG.info('scanning for AP\'s...')
         wifisetup = self.get_service('WiFiSetup')
         access_points = wifisetup.GetApList()['ApList']
