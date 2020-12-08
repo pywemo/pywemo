@@ -260,9 +260,27 @@ class Device(object):
         """
         Reset Wemo device.
 
+        Parameters
+        ----------
+        data : bool
+            Set to True to reset the data ("Clear Personalized Info" in the
+            Wemo app), which resets the device name and cleans the icon and
+            rules.
+        wifi : bool
+            Set to True to clear wifi information ("Change Wi-Fi" in the Wemo
+            app), which does not clear the rules, name, etc.
+
+        Notes
+        -----
+        Setting both to true is equivalent to a "Factory Restore" from the app.
+
+        Wemo devices contain a hardware reset procuedure as well, so this
+        method is mainly for convience or when physical access is not possible.
+
         From testing on a handful of devices, the Reset codes used in the
         ReSetup action below were consistent.  These could potentially change
-        in the future or may be different for other untested devices.
+        in a future firmware revision or may be different for other untested
+        devices.
         """
         try:
             action = self.basicevent.ReSetup
@@ -385,7 +403,39 @@ class Device(object):
         return encrypted_password
 
     def setup(self, *args, **kwargs):
-        """Interface method for device setup."""
+        """
+        Setup a Wemo device (connect to wifi/AP).
+
+        This function should be used and will capture several potential
+        exceptions to indicate when the setup method won't work on a device.
+
+        Parameters
+        ----------
+        ssid : str
+            SSID to connect the device to.
+        password : str
+            Password for the indicated SSID.  This password will be encrypted
+            with OpenSSL and then sent to the device.  To connect to an open,
+            unsecured network, pass anything for the password as it will be
+            ignored.
+        timeout : float, optional
+            Number of seconds to wait and poll a device to see if it has
+            successfully connected to the network.  The minimum value allows is
+            15 seconds as devices sometimes take 10-15 seconds to connect.
+        connection_attempts : int, optional
+            Number of times to try connecting a debice to the network, if it
+            has failed to connect within `timeout` seconds.
+        status_delay : float
+            Number of seconds to delay between each called to the connection
+            status of the device.  Generally should prefer this to be as short
+            as possible, but not too quick to overload the devive with
+            requests.  It must be less than or equal to half of the `timeout`.
+
+        Notes
+        -----
+        The timeout applies to each connection attempt, so the total wait time
+        will be approximately timeout * connection_attempts
+        """
         try:
             return self._setup(*args, **kwargs)
         except (UnknownService, AttributeError, KeyError) as exc:
@@ -402,21 +452,26 @@ class Device(object):
             #    --------------------------------------------------------------
             raise SetupException(f'pywemo cannot setup {self}') from exc
 
-    def _setup(self, ssid, password, timeout=20, connection_attempts=1):
+    def _setup(
+        self,
+        ssid,
+        password,
+        timeout=20.0,
+        connection_attempts=1,
+        status_delay=1.0,
+    ):
         """
         Setup Wemo device (connect device to wifi/AP).
 
-        If the network is unsecured (open wifi/no password required), then
-        pass anything for password (it will be ignored).
-
-        The timeout applies to each connection attempt, so the total wait time
-        will be approximately timeout * connection_attempts
+        See the setup method for details.
         """
         # find all access points that the device can see, and select the one
         # matching the desired SSID
-        if timeout < 20:
-            LOG.info('changing timeout from %s to 20 (minimum)', timeout)
-            timeout = 20
+
+        # a timeoiut of less than 20 is too short for many devices, so require
+        # at least 20 seconds.
+        timeout = min(timeout, 15.0)
+        status_delay = min(status_delay, timeout / 2.0)
         connection_attempts = int(max(1, connection_attempts))
 
         LOG.info('scanning for AP\'s...')
@@ -467,9 +522,9 @@ class Device(object):
         start_time = time.time()
         for attempt in range(connection_attempts):
             LOG.info('sending connection request (try %s)', attempt + 1)
-            # success rate on the first attempt is much higher if the
-            # ConnectHomeNetwork command is sent twice (not sure why!)
-            for _ in range(2):
+            # success rate is much higher if the ConnectHomeNetwork command is
+            # sent twice (not sure why!)
+            for i in range(2):
                 result = wifisetup.ConnectHomeNetwork(
                     ssid=ssid,
                     auth=auth_mode,
@@ -477,19 +532,27 @@ class Device(object):
                     encrypt=encryption_method,
                     channel=channel,
                 )
-                time.sleep(0.10)
-            try:
-                status = result['PairingStatus']
-            except KeyError:
-                # print entire dictionary if PairingStatus doesn't exist
-                status = result
-            LOG.info('pairing status: %s', result)
+                try:
+                    status = result['PairingStatus']
+                except KeyError:
+                    # print entire dictionary if PairingStatus doesn't exist
+                    status = result
+                LOG.debug('pairing status (second %s): %s', result, i + 1)
+                if i == 0:
+                    # skip this sleep on the second send
+                    time.sleep(0.10)
 
             timeout_start = time.time()
             LOG.info('starting status checks (%s second timeout)', timeout)
             status = None
+
+            # Make an initial, quick check
+            time.sleep(0.50)
+            status = wifisetup.GetNetworkStatus()['NetworkStatus']
+            LOG.debug('initial status check: %s', status)
+
             while time.time() - timeout_start < timeout and status != '1':
-                time.sleep(1.5)
+                time.sleep(status_delay)
                 status = wifisetup.GetNetworkStatus()['NetworkStatus']
                 LOG.debug(
                     'network status after %.2f seconds: %s',
