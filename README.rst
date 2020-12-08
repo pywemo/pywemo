@@ -61,6 +61,7 @@ OpenSSL is used to encrypt the password by the pywemo library.
 It must be installed and available on the path via calling `openssl` with a terminal (or command prompt, if on Windows).
 This is not required if connecting the device to an open network, since that requires no password, although an open network certainly isn't recommended.
 
+
 Firmware Warning
 ----------------
 Starting in May of 2020, Belkin started requiring users to create an account and login to the app (Android app version 1.25).
