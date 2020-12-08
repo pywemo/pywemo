@@ -290,7 +290,7 @@ class Device(object):
             )
 
         if data and wifi:
-            LOG.info('Clearing data and wifi (factor reset)')
+            LOG.info('Clearing data and wifi (factory reset)')
             result = action(Reset=2)
         elif data:
             LOG.info('Clearing data (icon, rules, etc)')
