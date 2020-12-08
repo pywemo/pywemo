@@ -591,6 +591,17 @@ class Device(object):
                 # skip any further attempts
                 break
 
+        # status 3 usually (always?) occurs shortly before it switches to
+        # status 1, so if the status is 3 here, then delay a few more seconds
+        # to see if it switches to status 1.
+        if status == '3':
+            LOG.debug('delaying a little longer (status 3)...')
+            loops = 3  # 3 seconds with default status_delay
+            while loops > 0 and status not in skip:
+                time.sleep(status_delay)
+                status = wifisetup.GetNetworkStatus()['NetworkStatus']
+                loops -= 1
+
         try:
             result = wifisetup.CloseSetup()
         except AttributeError:
@@ -631,14 +642,23 @@ class Device(object):
             )
         elif status == '1':
             LOG.warning(
-                'Wemo device may not have connected to "%s", please verify '
+                'Wemo device likely connected to "%s", but should be verified '
                 '(CloseSetup returned "%s").',
                 ssid,
                 close_status,
             )
+        elif status == '3':
+            raise SetupException(
+                f'Wemo device failed to connect to "{ssid}", but has status=3,'
+                'which usually precedes a successful connection.  Thus it may '
+                'still connect to the network shortly.  Otherwise, please try '
+                'again.'
+            )
         else:
             raise SetupException(
-                f'Wemo device failed to connect to "{ssid}", please try again.'
+                f'Wemo device failed to connect to "{ssid}".  It could be a '
+                'wrong password or Wemo device/firmware issue.  Please try '
+                'again.'
             )
 
         return status, close_status
