@@ -539,7 +539,7 @@ class Device(object):
                     status = result
                 LOG.debug('pairing status (second %s): %s', result, i + 1)
                 if i == 0:
-                    # skip this sleep on the second send
+                    # only delay on the first call
                     time.sleep(0.10)
 
             timeout_start = time.time()
@@ -566,8 +566,8 @@ class Device(object):
         try:
             result = wifisetup.CloseSetup()
         except AttributeError:
-            # if CloseSetup fails, it might have still been successful?
-            result = {'status': 'CloseSetup action not found'}
+            # if CloseSetup doesn't exist, it may still work
+            result = {'status': 'CloseSetup action not available'}
 
         try:
             close_status = result['status']
@@ -582,12 +582,12 @@ class Device(object):
                 self.basicevent.SetSetupDoneStatus()
             except AttributeError:
                 LOG.debug(
-                    'SetSetupDoneStatus not able to be set (some devices do '
-                    'not have this method)'
+                    'SetSetupDoneStatus not available (some devices do not '
+                    'have this method)'
                 )
             LOG.info(
-                'Wemo device connected to "%s", which took %.2f total seconds '
-                'over %s connection attempt(s)',
+                'Wemo device connected to "%s" in %.2f seconds (%s connection '
+                'attempts(s))',
                 ssid,
                 time.time() - start_time,
                 attempt + 1,
