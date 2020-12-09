@@ -87,6 +87,7 @@ virtualization/vagrant/config
 
 # Visual Studio Code
 .vscode
+*.code-workspace
 
 # Built docs
 docs/build
