@@ -45,7 +45,7 @@ pywemo includes the ability to reset and setup devices, without use of the Belki
 This can be particularly useful if the intended use is fully local control, such as using Home Assistant.
 
 Reset can be performed with the :code:`reset` method, which has 2 boolean input arguments, :code:`data` and :code:`wifi`.
-Setting :code:`data=True` will reset data ("Clear Personalized Info" in the Wemo app), which resets the device name and cleans the icon and rules.
+Setting :code:`data=True` will reset data ("Clear Personalized Info" in the Wemo app), which resets the device name and clears the icon and rules.
 Setting :code:`wifi=True` will clear wifi information ("Change Wi-Fi" in the Wemo app), which does not clear the rules, name, etc.
 Setting both to true is equivalent to a "Factory Restore" from the app.
 It should also be noted that devices contain a hardware reset procedure as well, so using the software is for convenience or if physical access is not available.
