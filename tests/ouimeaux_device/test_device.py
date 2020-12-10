@@ -132,7 +132,9 @@ RESPONSE_SETUP = '''<?xml version="1.0"?>
 ENC_PASSWORD = b'Salted__XXXXXX12\xc0\xd4\xd4v4\xfep\rikEmk\xf8\xe0\x12'
 
 APLIST = (
-    'Page:1/1/2$\nap_aes|6|100|WPA2PSK/AES,\nap_tkip|6|50|WPA2PSK/TKIP,\n'
+    'Page:1/1/2$\n'
+    'ap_aes|6|100|WPA2PSK/AES,\n'
+    'ap_tkip|6|50|WPA2PSK/TKIP,\n'
     'ap_open|1|85|OPEN/NONE,\n'
 )
 
