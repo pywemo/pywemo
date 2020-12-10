@@ -41,16 +41,16 @@ The `setup_url_for_address` function will lookup a hostname and provide a suitab
 
 Device Reset and Setup
 ----------------------
-pywemo includes the ability to reset and setup devices, without the use of the Belkin app nor need to create a Belkin account.
+pywemo includes the ability to reset and setup devices, without use of the Belkin app nor need to create a Belkin account.
 This can be particularly useful if the intended use is fully local control, such as using Home Assistant.
 
-Reset can be performed with the `reset` method, which has 2 boolean input arguments, `data` and `wifi`.
-Setting `data=True` will reset data ("Clear Personalized Info" in the Wemo app), which resets the device name and cleans the icon and rules.
-Setting `wifi=True` will clear wifi information ("Change Wi-Fi" in the Wemo app), which does not clear the rules, name, etc.
+Reset can be performed with the :code:`reset` method, which has 2 boolean input arguments, :code:`data` and :code:`wifi`.
+Setting :code:`data=True` will reset data ("Clear Personalized Info" in the Wemo app), which resets the device name and cleans the icon and rules.
+Setting :code:`wifi=True` will clear wifi information ("Change Wi-Fi" in the Wemo app), which does not clear the rules, name, etc.
 Setting both to true is equivalent to a "Factory Restore" from the app.
 It should also be noted that devices contain a hardware reset procedure as well, so using the software is for convenience or if physical access is not available.
 
-Device setup is through the `setup` method.
+Device setup is through the :code:`setup` method.
 The user must first connect to the devices locally broadcast access point, then discover the device there.
 Once done, pass the desired SSID and password (AES encryption only) to the `setup` method to connect it to your wifi network.
 
@@ -58,7 +58,7 @@ Important Note for Device Setup - OpenSSL is Required!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OpenSSL is used to encrypt the password by the pywemo library.
-It must be installed and available on the path via calling `openssl` with a terminal (or command prompt, if on Windows).
+It must be installed and available on the path via calling :code:`openssl` with a terminal (or command prompt, if on Windows).
 This is not required if connecting the device to an open network, since that requires no password, although an open network certainly isn't recommended.
 
 Firmware Warning
