@@ -35,9 +35,9 @@ On some networks discovery doesn't work reliably, in that case if you can find t
     >>> print(device)
     <WeMo Maker "Hi Fi Systemline Sensor">
 
-Please note that `discovery.device_from_description` call requires a `url` with an IP address, rather than a hostnames. This is needed for the subscription update logic to work properly. In addition recent versions of the WeMo firmware may not accept connections from hostnames, and will return a 500 error.
+Please note that :code:`discovery.device_from_description` call requires a :code:`url` with an IP address, rather than a hostnames. This is needed for the subscription update logic to work properly. In addition recent versions of the WeMo firmware may not accept connections from hostnames, and will return a 500 error.
 
-The `setup_url_for_address` function will lookup a hostname and provide a suitable `url` with an IP address.
+The :code:`setup_url_for_address` function will lookup a hostname and provide a suitable :code:`url` with an IP address.
 
 Device Reset and Setup
 ----------------------
@@ -52,7 +52,7 @@ It should also be noted that devices contain a hardware reset procedure as well,
 
 Device setup is through the :code:`setup` method.
 The user must first connect to the devices locally broadcast access point, then discover the device there.
-Once done, pass the desired SSID and password (AES encryption only) to the `setup` method to connect it to your wifi network.
+Once done, pass the desired SSID and password (AES encryption only) to the :code:`setup` method to connect it to your wifi network.
 
 Important Note for Device Setup - OpenSSL is Required!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
