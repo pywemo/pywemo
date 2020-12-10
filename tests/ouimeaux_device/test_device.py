@@ -129,7 +129,7 @@ RESPONSE_SETUP = '''<?xml version="1.0"?>
 </device>
 </root>'''
 
-ENC_RESULT = b'Salted__XXXXXX12\xc0\xd4\xd4v4\xfep\rikEmk\xf8\xe0\x12'
+ENC_PASSWORD = b'Salted__XXXXXX12\xc0\xd4\xd4v4\xfep\rikEmk\xf8\xe0\x12'
 
 APLIST = (
     'Page:1/1/2$\nap_aes|6|100|WPA2PSK/AES,\nap_tkip|6|50|WPA2PSK/TKIP,\n'
@@ -251,7 +251,7 @@ class TestDevice:
             assert device.encrypt_aes128('password', self.METAINFO)
         assert mock_run.call_count == 1
 
-    @mock.patch('subprocess.run', return_value=mock.Mock(stdout=ENC_RESULT))
+    @mock.patch('subprocess.run', return_value=mock.Mock(stdout=ENC_PASSWORD))
     def test_encryption_successful(self, mock_run, device):
         """Test device encryption (good result)."""
         correct = 'wNTUdjT+cA1pa0Vta/jgEg==1808'
