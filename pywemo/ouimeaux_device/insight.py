@@ -1,6 +1,7 @@
 """Representation of a WeMo Insight device."""
 import logging
 from datetime import datetime
+
 from .switch import Switch
 
 LOG = logging.getLogger(__name__)

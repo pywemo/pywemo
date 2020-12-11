@@ -1,7 +1,9 @@
 """Representation of a WeMo CofeeMaker device."""
-from xml.etree import cElementTree as et
 import sys
+from xml.etree import cElementTree as et
+
 from pywemo.ouimeaux_device.api.xsd.device import quote_xml
+
 from .switch import Switch
 
 if sys.version_info[0] < 3:

@@ -1,8 +1,9 @@
 """Tests for pywemo.ouimeaux_device.api.service."""
 
-from xml.etree import cElementTree as cet
-from xml.etree import ElementTree
 import unittest.mock as mock
+from xml.etree import ElementTree
+from xml.etree import cElementTree as cet
+
 import pytest
 import requests
 

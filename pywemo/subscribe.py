@@ -3,9 +3,8 @@ import collections
 import logging
 import sched
 import socket
-import time
 import threading
-
+import time
 from xml.etree import cElementTree
 
 try:

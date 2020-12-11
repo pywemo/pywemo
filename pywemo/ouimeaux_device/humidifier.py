@@ -1,10 +1,11 @@
 """Representation of a WeMo Humidifier device."""
 
-from xml.etree import cElementTree as et
 import sys
-from pywemo.ouimeaux_device.api.xsd.device import quote_xml
-from .switch import Switch
+from xml.etree import cElementTree as et
 
+from pywemo.ouimeaux_device.api.xsd.device import quote_xml
+
+from .switch import Switch
 
 if sys.version_info[0] < 3:
 

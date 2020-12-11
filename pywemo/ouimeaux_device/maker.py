@@ -1,5 +1,6 @@
 """Representation of a WeMo Maker device."""
 from xml.etree import cElementTree as et
+
 from .switch import Switch
 
 

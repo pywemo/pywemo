@@ -4,9 +4,9 @@ import re
 import select
 import socket
 import threading
-
-from datetime import datetime, timedelta
 import xml.etree.ElementTree as XMLElementTree
+from datetime import datetime, timedelta
+
 import requests
 
 from .util import etree_to_dict, interface_addresses

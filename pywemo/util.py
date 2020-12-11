@@ -1,5 +1,6 @@
 """Miscellaneous utility functions."""
 from collections import defaultdict
+
 import ifaddr
 
 

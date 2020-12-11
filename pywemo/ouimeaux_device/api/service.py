@@ -7,7 +7,6 @@ import requests
 
 from .xsd import service as serviceParser
 
-
 LOG = logging.getLogger(__name__)
 MAX_RETRIES = 3
 

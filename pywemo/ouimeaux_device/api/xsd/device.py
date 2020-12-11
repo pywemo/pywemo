@@ -5,11 +5,11 @@
 # Generated Thu Jan 31 15:50:44 2013 by generateDS.py version 2.8b.
 #
 
-import sys
+import base64
 import getopt
 import re as re_
-import base64
-from datetime import datetime, tzinfo, timedelta
+import sys
+from datetime import datetime, timedelta, tzinfo
 
 etree_ = None
 Verbose_import_ = False

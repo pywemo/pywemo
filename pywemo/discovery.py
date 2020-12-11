@@ -1,22 +1,22 @@
 """Module to discover WeMo devices."""
-from socket import gethostbyname, gaierror
-from ipaddress import ip_address
-
 import logging
+from ipaddress import ip_address
+from socket import gaierror, gethostbyname
+
 import requests
 
 from . import ssdp
+from .ouimeaux_device import probe_wemo
+from .ouimeaux_device.api.xsd import device as deviceParser
 from .ouimeaux_device.bridge import Bridge
+from .ouimeaux_device.coffeemaker import CoffeeMaker
+from .ouimeaux_device.dimmer import Dimmer
+from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.insight import Insight
 from .ouimeaux_device.lightswitch import LightSwitch
-from .ouimeaux_device.dimmer import Dimmer
+from .ouimeaux_device.maker import Maker
 from .ouimeaux_device.motion import Motion
 from .ouimeaux_device.switch import Switch
-from .ouimeaux_device.maker import Maker
-from .ouimeaux_device.coffeemaker import CoffeeMaker
-from .ouimeaux_device.humidifier import Humidifier
-from .ouimeaux_device.api.xsd import device as deviceParser
-from .ouimeaux_device import probe_wemo
 
 LOG = logging.getLogger(__name__)
 

@@ -1,9 +1,9 @@
 """Base WeMo Device class."""
 
-import logging
-import time
 import base64
+import logging
 import subprocess
+import time
 
 try:
     from urllib.parse import urlparse
@@ -12,7 +12,7 @@ except ImportError:
 
 import requests
 
-from .api.service import Service, ActionException
+from .api.service import ActionException, Service
 from .api.xsd import device as deviceParser
 
 LOG = logging.getLogger(__name__)
