@@ -5,10 +5,13 @@ from pywemo.ouimeaux_device.api.xsd.device import quote_xml
 from .switch import Switch
 
 if sys.version_info[0] < 3:
+
     class IntEnum:
         """Enum class."""
 
         pass
+
+
 else:
     from enum import IntEnum
 
@@ -127,8 +130,11 @@ class CoffeeMaker(Switch):
             # to change the Mode to "Brewing"
 
             # pylint: disable=maybe-no-member
-            self.deviceevent.SetAttributes(attributeList=quote_xml(
-                "<attribute><name>Mode</name><value>4</value></attribute>"))
+            self.deviceevent.SetAttributes(
+                attributeList=quote_xml(
+                    "<attribute><name>Mode</name><value>4</value></attribute>"
+                )
+            )
 
         # The Coffee Maker might not be ready - so it's not safe
         # to assume the state is what you just set,

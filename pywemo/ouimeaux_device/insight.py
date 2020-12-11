@@ -47,18 +47,20 @@ class Insight(Switch):
             currentmw,
             todaymw,
             totalmw,
-            powerthreshold
+            powerthreshold,
         ) = params.split('|')
-        return {'state': state,
-                'lastchange': datetime.fromtimestamp(int(lastchange)),
-                'onfor': int(onfor),
-                'ontoday': int(ontoday),
-                'ontotal': int(ontotal),
-                'todaymw': int(float(todaymw)),
-                'totalmw': int(float(totalmw)),
-                'currentpower': int(float(currentmw)),
-                'wifipower': int(float(wifipower)),
-                'powerthreshold': int(float(powerthreshold))}
+        return {
+            'state': state,
+            'lastchange': datetime.fromtimestamp(int(lastchange)),
+            'onfor': int(onfor),
+            'ontoday': int(ontoday),
+            'ontotal': int(ontotal),
+            'todaymw': int(float(todaymw)),
+            'totalmw': int(float(totalmw)),
+            'currentpower': int(float(currentmw)),
+            'wifipower': int(float(wifipower)),
+            'powerthreshold': int(float(powerthreshold)),
+        }
 
     def get_state(self, force_update=False):
         """Return the device state."""

@@ -31,22 +31,25 @@ def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=10):
     """
     for port in ports:
         try:
-            response = requests.get('http://%s:%i/setup.xml' % (host, port),
-                                    timeout=probe_timeout)
+            response = requests.get(
+                'http://%s:%i/setup.xml' % (host, port), timeout=probe_timeout
+            )
             if ('WeMo' in response.text) or ('Belkin' in response.text):
                 return port
         except requests.ConnectTimeout:
             # If we timed out connecting, then the wemo is gone,
             # no point in trying further.
-            LOG.debug('Timed out connecting to %s on port %i, '
-                      'wemo is offline', host, port)
+            LOG.debug(
+                'Timed out connecting to %s on port %i, ' 'wemo is offline',
+                host,
+                port,
+            )
             break
         except requests.Timeout:
             # Apparently sometimes wemos get into a wedged state where
             # they still accept connections on an old port, but do not
             # respond. If that happens, we should keep searching.
-            LOG.debug('No response from %s on port %i, continuing',
-                      host, port)
+            LOG.debug('No response from %s on port %i, continuing', host, port)
             continue
         except requests.ConnectionError:
             pass
@@ -142,9 +145,12 @@ class Device(object):
         try_no = 0
 
         while True:
-            found = discover_devices(ssdp_st=None, max_devices=1,
-                                     match_mac=self.mac,
-                                     match_serial=self.serialnumber)
+            found = discover_devices(
+                ssdp_st=None,
+                max_devices=1,
+                match_mac=self.mac,
+                match_serial=self.serialnumber,
+            )
 
             if found:
                 LOG.info("Found %s again, updating local values", self.name)
@@ -159,12 +165,16 @@ class Device(object):
 
             LOG.info(
                 "%s Not found in try %i. Trying again in %i seconds",
-                self.name, try_no, wait_time)
+                self.name,
+                try_no,
+                wait_time,
+            )
 
             if try_no == 5:
                 LOG.error(
                     "Unable to reconnect with %s in 5 tries. Stopping.",
-                    self.name)
+                    self.name,
+                )
                 self.retrying = False
 
                 return
@@ -181,8 +191,7 @@ class Device(object):
             LOG.error('Unable to re-probe wemo at %s', self.host)
             return False
 
-        LOG.info('Reconnected to wemo at %s on port %i',
-                 self.host, port)
+        LOG.info('Reconnected to wemo at %s on port %i', self.host, port)
 
         self.port = port
         url = 'http://{}:{}/setup.xml'.format(self.host, self.port)
@@ -195,13 +204,16 @@ class Device(object):
     def reconnect_with_device(self):
         """Re-probe & scan network to rediscover a disconnected device."""
         if self.rediscovery_enabled:
-            if (not self._reconnect_with_device_by_probing() and
-                    (self.mac or self.serialnumber)):
+            if not self._reconnect_with_device_by_probing() and (
+                self.mac or self.serialnumber
+            ):
                 self._reconnect_with_device_by_discovery()
         else:
-            LOG.warning("Rediscovery was requested for device %s, "
-                        "but rediscovery is disabled. Ignoring request.",
-                        self.name)
+            LOG.warning(
+                "Rediscovery was requested for device %s, "
+                "but rediscovery is disabled. Ignoring request.",
+                self.name,
+            )
 
     def parse_basic_state(self, params):
         """Parse the basic state response from the device."""
@@ -224,8 +236,11 @@ class Device(object):
             try:
                 self._state = int(self.parse_basic_state(_params).get("state"))
             except ValueError:
-                LOG.error("Unexpected BinaryState value `%s` for device %s.",
-                          _params, self.name)
+                LOG.error(
+                    "Unexpected BinaryState value `%s` for device %s.",
+                    _params,
+                    self.name,
+                )
             return True
         return False
 

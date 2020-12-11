@@ -52,8 +52,7 @@ class SSDP:
         with self._lock:
             self.update()
 
-            return [entry for entry in self.entries
-                    if entry.st == st]
+            return [entry for entry in self.entries if entry.st == st]
 
     def find_by_device_description(self, values):
         """
@@ -65,28 +64,37 @@ class SSDP:
         with self._lock:
             self.update()
 
-            return [entry for entry in self.entries
-                    if entry.match_device_description(values)]
+            return [
+                entry
+                for entry in self.entries
+                if entry.match_device_description(values)
+            ]
 
     def update(self, force_update=False):
         """Scan for new uPnP devices and services."""
         with self._lock:
-            if self.last_scan is None or force_update or \
-               datetime.now() - self.last_scan > MIN_TIME_BETWEEN_SCANS:
+            if (
+                self.last_scan is None
+                or force_update
+                or datetime.now() - self.last_scan > MIN_TIME_BETWEEN_SCANS
+            ):
 
                 self.remove_expired()
 
                 self.entries.extend(
-                    entry for entry in scan() + scan(ST)
-                    if entry not in self.entries)
+                    entry
+                    for entry in scan() + scan(ST)
+                    if entry not in self.entries
+                )
 
                 self.last_scan = datetime.now()
 
     def remove_expired(self):
         """Filter out expired entries."""
         with self._lock:
-            self.entries = [entry for entry in self.entries
-                            if not entry.is_expired]
+            self.entries = [
+                entry for entry in self.entries if not entry.is_expired
+            ]
 
 
 class UPNPEntry:
@@ -138,15 +146,17 @@ class UPNPEntry:
                             tree = XMLElementTree.fromstring(xml)
 
                         if tree is not None:
-                            UPNPEntry.DESCRIPTION_CACHE[url] = \
-                                etree_to_dict(tree).get('root', {})
+                            UPNPEntry.DESCRIPTION_CACHE[url] = etree_to_dict(
+                                tree
+                            ).get('root', {})
                         else:
                             UPNPEntry.DESCRIPTION_CACHE[url] = {}
                         break
 
                     except requests.RequestException:
                         logging.getLogger(__name__).warning(
-                            "Error fetching description at %s", url)
+                            "Error fetching description at %s", url
+                        )
                         UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
             except XMLElementTree.ParseError:
@@ -171,36 +181,45 @@ class UPNPEntry:
         if device is None:
             return False
 
-        return all(val == device.get(key)
-                   for key, val in values.items())
+        return all(val == device.get(key) for key, val in values.items())
 
     @classmethod
     def from_response(cls, response):
         """Create a uPnP entry from a response."""
-        return UPNPEntry({key.lower(): item for key, item
-                          in RESPONSE_REGEX.findall(response)})
+        return UPNPEntry(
+            {
+                key.lower(): item
+                for key, item in RESPONSE_REGEX.findall(response)
+            }
+        )
 
     def __eq__(self, other):
         """Equality operator."""
-        return (self.__class__ == other.__class__ and
-                self.values == other.values)
+        return (
+            self.__class__ == other.__class__ and self.values == other.values
+        )
 
     def __repr__(self):
         """Return the string representation of the object."""
         return "<UPNPEntry {} - {}>".format(
-            self.values.get('st', ''), self.values.get('location', ''))
+            self.values.get('st', ''), self.values.get('location', '')
+        )
 
 
 def build_ssdp_request(ssdp_st, ssdp_mx):
     """Build the standard request to send during SSDP discovery."""
     ssdp_st = ssdp_st or ST
-    return "\r\n".join([
-        'M-SEARCH * HTTP/1.1',
-        'ST: {}'.format(ssdp_st),
-        'MX: {:d}'.format(ssdp_mx),
-        'MAN: "ssdp:discover"',
-        'HOST: 239.255.255.250:1900',
-        '', '']).encode('ascii')
+    return "\r\n".join(
+        [
+            'M-SEARCH * HTTP/1.1',
+            'ST: {}'.format(ssdp_st),
+            'MX: {:d}'.format(ssdp_mx),
+            'MAN: "ssdp:discover"',
+            'HOST: 239.255.255.250:1900',
+            '',
+            '',
+        ]
+    ).encode('ascii')
 
 
 def entry_in_entries(entry, entries, mac, serial):
@@ -225,8 +244,13 @@ def entry_in_entries(entry, entries, mac, serial):
 
 
 # pylint: disable=invalid-name,too-many-nested-blocks
-def scan(st=None, timeout=DISCOVER_TIMEOUT,
-         max_entries=None, match_mac=None, match_serial=None):
+def scan(
+    st=None,
+    timeout=DISCOVER_TIMEOUT,
+    max_entries=None,
+    match_mac=None,
+    match_serial=None,
+):
     """
     Send a message over the network to discover upnp devices.
 
@@ -282,7 +306,8 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
                     services = device.get("serviceList", {}).get("service", [])
                     service_types = [
                         service.get("serviceType")
-                        for service in services if isinstance(service, dict)
+                        for service in services
+                        if isinstance(service, dict)
                     ]
                 else:
                     mac = None
@@ -290,9 +315,11 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
                     service_types = []
 
                 # Search for devices
-                if (st is not None or
-                        match_mac is not None or
-                        match_serial is not None):
+                if (
+                    st is not None
+                    or match_mac is not None
+                    or match_serial is not None
+                ):
                     if not entry_in_entries(entry, entries, mac, serial):
                         if match_mac is not None:
                             if match_mac == mac:
@@ -312,7 +339,8 @@ def scan(st=None, timeout=DISCOVER_TIMEOUT,
                         return entries
     except socket.error:
         logging.getLogger(__name__).exception(
-            "Socket error while discovering SSDP devices")
+            "Socket error while discovering SSDP devices"
+        )
     finally:
         for s in sockets:
             s.close()

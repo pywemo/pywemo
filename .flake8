@@ -1,4 +1,4 @@
-  
+
 [flake8]
 exclude =
     venv,
@@ -16,7 +16,7 @@ exclude =
     tests,
 
 # To work with Black
-max-line-length = 88
+max-line-length = 79
 
 # E501: line too long
 # W503: Line break occurred before a binary operator
