@@ -41,7 +41,6 @@ def get_ip_address(host='1.2.3.4'):
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     """Handles subscription responses received from devices."""
 
-    # pylint: disable=invalid-name
     def do_NOTIFY(self):
         """Handle subscription responses received from devices."""
         sender_ip, _ = self.client_address
@@ -153,11 +152,11 @@ class SubscriptionRegistry:
             #     self._url_resubscribe(
             #         device, headers, sid, device.insight.eventSubURL)
 
-        except requests.exceptions.RequestException as ex:
+        except requests.exceptions.RequestException as exc:
             LOG.warning(
                 "Resubscribe error for %s (%s), will retry in %ss",
                 device,
-                ex,
+                exc,
                 SUBSCRIPTION_RETRY,
             )
             retry += 1
@@ -210,7 +209,6 @@ class SubscriptionRegistry:
             if type_filter is None or type_ == type_filter:
                 callback(device, type_, value)
 
-    # pylint: disable=invalid-name
     def on(self, device, type_filter, callback):
         """Add an event callback for a device."""
         self._callbacks[device.serialnumber].append((type_filter, callback))

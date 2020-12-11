@@ -46,7 +46,6 @@ class SSDP:
 
             return list(self.entries)
 
-    # pylint: disable=invalid-name
     def find_by_st(self, st):
         """Return a list of entries that match the ST."""
         with self._lock:
@@ -119,7 +118,6 @@ class UPNPEntry:
         """Return whether the entry is expired or not."""
         return self.expires is not None and datetime.now() > self.expires
 
-    # pylint: disable=invalid-name
     @property
     def st(self):
         """Return ST value."""
@@ -243,7 +241,7 @@ def entry_in_entries(entry, entries, mac, serial):
     return False
 
 
-# pylint: disable=invalid-name,too-many-nested-blocks
+# pylint: disable=too-many-nested-blocks
 def scan(
     st=None,
     timeout=DISCOVER_TIMEOUT,

@@ -36,7 +36,6 @@ class Action:
         self._device = device
         self._action_config = action_config
         self.name = action_config.get_name()
-        # pylint: disable=invalid-name
         self.serviceType = service.serviceType
         self.controlURL = service.controlURL
         self.args = {}
@@ -129,7 +128,6 @@ class Service:
         """Get the hostname from the base URL."""
         return self._base_url.split('/')[-1]
 
-    # pylint: disable=invalid-name
     @property
     def controlURL(self):
         """Get the controlURL for interacting with this Service."""

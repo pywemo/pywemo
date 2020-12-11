@@ -33,9 +33,9 @@ def get_profiles(model):
     )
 
 
-# pylint: disable=invalid-name
 def is_same_side(p1, p2, a, b):
     """Test if points p1 and p2 lie on the same side of line a-b."""
+    # pylint: disable=invalid-name
     vector_ab = [y - x for x, y in zip(a, b)]
     vector_ap1 = [y - x for x, y in zip(a, p1)]
     vector_ap2 = [y - x for x, y in zip(a, p2)]
@@ -44,9 +44,9 @@ def is_same_side(p1, p2, a, b):
     return (cross_vab_ap1 * cross_vab_ap2) >= 0
 
 
-# pylint: disable=invalid-name
 def closest_point(p, a, b):
     """Test if points p1 and p2 lie on the same side of line a-b."""
+    # pylint: disable=invalid-name
     vector_ab = [y - x for x, y in zip(a, b)]
     vector_ap = [y - x for x, y in zip(a, p)]
     dot_ap_ab = sum(x * y for x, y in zip(vector_ap, vector_ab))
@@ -55,9 +55,9 @@ def closest_point(p, a, b):
     return a[0] + vector_ab[0] * t, a[1] + vector_ab[1] * t
 
 
-# pylint: disable=invalid-name
 def limit_to_gamut(xy, gamut):
     """Return the closest point within the gamut triangle for colorxy."""
+    # pylint: disable=invalid-name
     r, g, b = gamut
 
     # http://www.blackpawn.com/texts/pointinpoly/

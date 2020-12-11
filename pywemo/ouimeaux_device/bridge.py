@@ -46,7 +46,7 @@ class Bridge(Device):
 
     def __init__(self, *args, **kwargs):
         """Create a WeMo Bridge (Link) device."""
-        super(Bridge, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.bridge_update()
 
     def __repr__(self):
@@ -75,7 +75,6 @@ class Bridge(Device):
             end_device_list = et.fromstring(end_devices.get('DeviceLists'))
 
             for light in end_device_list.iter('DeviceInfo'):
-                # pylint: disable=invalid-name
                 uniqueID = light.find('DeviceID').text
                 if uniqueID in self.Lights:
                     self.Lights[uniqueID].update_state(light)
@@ -83,7 +82,6 @@ class Bridge(Device):
                     self.Lights[uniqueID] = Light(self, light)
 
             for group in end_device_list.iter('GroupInfo'):
-                # pylint: disable=invalid-name
                 uniqueID = group.find('GroupID').text
                 if uniqueID in self.Groups:
                     self.Groups[uniqueID].update_state(group)
@@ -224,10 +222,9 @@ class Light(LinkedDevice):
 
     def __init__(self, bridge, info):
         """Create a Light device."""
-        super(Light, self).__init__(bridge, info)
+        super().__init__(bridge, info)
 
         self.device_index = info.findtext('DeviceIndex')
-        # pylint: disable=invalid-name
         self.uniqueID = info.findtext('DeviceID')
         self.iconvalue = info.findtext('IconVersion')
         self.firmware = info.findtext('FirmwareVersion')
@@ -267,7 +264,7 @@ class Light(LinkedDevice):
         if currentstate is not None:
             self._values = currentstate.split(',')
 
-        super(Light, self).update_state(status)
+        super().update_state(status)
 
     def __repr__(self):
         """Return a string representation of the device."""
@@ -279,7 +276,7 @@ class Light(LinkedDevice):
 
         if level == 0:
             return self.turn_off(transition)
-        elif 'levelcontrol' in self.capabilities:
+        if 'levelcontrol' in self.capabilities:
             # Work around observed fw bugs.
             # - When we set a new brightness level but the bulb is off, it
             #   first turns on at the old brightness and then fades to the new
@@ -360,8 +357,7 @@ class Group(LinkedDevice):
 
     def __init__(self, bridge, info):
         """Create a Group device."""
-        super(Group, self).__init__(bridge, info)
-        # pylint: disable=invalid-name
+        super().__init__(bridge, info)
         self.uniqueID = info.findtext('GroupID')
 
     def update_state(self, status):
@@ -382,7 +378,7 @@ class Group(LinkedDevice):
             ]
         if currentstate is not None:
             self._values = currentstate.split(',')
-        super(Group, self).update_state(status)
+        super().update_state(status)
 
     def __repr__(self):
         """Return a string representation of the device."""

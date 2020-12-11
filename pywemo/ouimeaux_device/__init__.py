@@ -99,7 +99,7 @@ class ShortPassword(SetupException):
     pass
 
 
-class Device(object):
+class Device:
     """Base object for WeMo devices."""
 
     def __init__(self, url, mac, rediscovery_enabled=True):
@@ -133,6 +133,7 @@ class Device(object):
         on the network and update this device.
         """
         # Put here to avoid circular dependency
+        # pylint: disable=import-outside-toplevel
         from ..discovery import discover_devices
 
         # Avoid retrying from multiple threads
@@ -215,7 +216,8 @@ class Device(object):
                 self.name,
             )
 
-    def parse_basic_state(self, params):
+    @staticmethod
+    def parse_basic_state(params):
         """Parse the basic state response from the device."""
         # The BinaryState `params` could have two different formats:
         #   1|1492338954|0|922|14195|1209600|0|940670|15213709|227088884
@@ -261,8 +263,8 @@ class Device(object):
         """Get service object by name."""
         try:
             return self.services[name]
-        except KeyError:
-            raise UnknownService(name)
+        except KeyError as exc:
+            raise UnknownService(name) from exc
 
     def list_services(self):
         """Return list of services."""
@@ -306,10 +308,10 @@ class Device(object):
         """
         try:
             action = self.basicevent.ReSetup
-        except AttributeError:
+        except AttributeError as exc:
             raise ResetException(
                 'Cannot reset device: ReSetup action not found'
-            )
+            ) from exc
 
         if data and wifi:
             LOG.info('Clearing data and wifi (factory reset)')
@@ -637,7 +639,7 @@ class Device(object):
             # day to make it longer, so instead just use the status '2' return
             # code.
             raise ShortPassword(
-                f'Password is too short (Wemo requires at least 8 characters).'
+                'Password is too short (Wemo requires at least 8 characters).'
             )
 
         if status == '1' and close_status == 'success':

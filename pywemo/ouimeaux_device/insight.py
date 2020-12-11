@@ -35,7 +35,8 @@ class Insight(Switch):
             return True
         return Switch.subscription_update(self, _type, _params)
 
-    def parse_insight_params(self, params):
+    @staticmethod
+    def parse_insight_params(params):
         """Parse the Insight parameters."""
         (
             state,  # 0 if off, 1 if on, 8 if on but load is off
