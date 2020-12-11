@@ -2,22 +2,22 @@
 # pylint: disable=protected-access, no-self-use, no-member
 # pylint: disable=redefined-outer-name
 
-import logging
 import itertools
+import logging
 import unittest.mock as mock
 from subprocess import CalledProcessError
 
 import pytest
 
-from pywemo.ouimeaux_device.api.service import ActionException
 from pywemo.ouimeaux_device import (
+    APNotFound,
     Device,
-    UnknownService,
     ResetException,
     SetupException,
-    APNotFound,
     ShortPassword,
+    UnknownService,
 )
+from pywemo.ouimeaux_device.api.service import ActionException
 
 RESPONSE_SETUP = '''<?xml version="1.0"?>
 <root xmlns="urn:Belkin:device-1-0">
