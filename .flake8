@@ -12,7 +12,7 @@ exclude =
     lib,
     deps,
     build,
-    ouimeaux_device,
+    xsd,
     tests,
 
 # To work with Black
@@ -29,3 +29,4 @@ ignore =
     E203
     D202
     W504
+

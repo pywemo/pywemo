@@ -305,6 +305,7 @@ class Device:
         ReSetup action below were consistent.  These could potentially change
         in a future firmware revision or may be different for other untested
         devices.
+
         """
         try:
             action = self.basicevent.ReSetup
@@ -340,7 +341,7 @@ class Device:
         return status
 
     def factory_reset(self):
-        """Convenience method to perform a full factory reset."""
+        """Perform a full factory reset (convenience method)."""
         return self.reset(data=True, wifi=True)
 
     @staticmethod
@@ -428,7 +429,7 @@ class Device:
 
     def setup(self, *args, **kwargs):
         """
-        Setup a Wemo device (connect to wifi/AP).
+        Connect Wemo to wifi network.
 
         This function should be used and will capture several potential
         exceptions to indicate when the setup method won't work on a device.
@@ -459,6 +460,7 @@ class Device:
         -----
         The timeout applies to each connection attempt, so the total wait time
         will be approximately timeout * connection_attempts
+
         """
         try:
             return self._setup(*args, **kwargs)
@@ -497,7 +499,7 @@ class Device:
         status_delay=1.0,
     ):
         """
-        Setup a Wemo device (connect to wifi/AP).
+        Connect Wemo to wifi network.
 
         See the setup method for details.
         """
