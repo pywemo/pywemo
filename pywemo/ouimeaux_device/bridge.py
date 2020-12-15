@@ -1,27 +1,31 @@
 """Representation of a WeMo Bridge (Link) device."""
 import time
 from xml.etree import cElementTree as et
+
 import six
 
 six.add_move(six.MovedAttribute('html_escape', 'cgi', 'html', 'escape'))
 
 # pylint: disable=wrong-import-position
 from six.moves import html_escape  # noqa E402
-from . import Device  # noqa E402
+
 from ..color import get_profiles, limit_to_gamut  # noqa E402
+from . import Device  # noqa E402
 
-
-CAPABILITY_ID2NAME = dict((
-    ('10006', "onoff"),
-    ('10008', "levelcontrol"),
-    ('30008', "sleepfader"),
-    ('30009', "levelcontrol_move"),
-    ('3000A', "levelcontrol_stop"),
-    ('10300', "colorcontrol"),
-    ('30301', "colortemperature"),
-))
+CAPABILITY_ID2NAME = dict(
+    (
+        ('10006', "onoff"),
+        ('10008', "levelcontrol"),
+        ('30008', "sleepfader"),
+        ('30009', "levelcontrol_move"),
+        ('3000A', "levelcontrol_stop"),
+        ('10300', "colorcontrol"),
+        ('30301', "colortemperature"),
+    )
+)
 CAPABILITY_NAME2ID = dict(
-    (val, cap) for cap, val in CAPABILITY_ID2NAME.items())
+    (val, cap) for cap, val in CAPABILITY_ID2NAME.items()
+)
 
 # acceptable values for 'onoff'
 OFF = 0
@@ -42,15 +46,16 @@ class Bridge(Device):
 
     def __init__(self, *args, **kwargs):
         """Create a WeMo Bridge (Link) device."""
-        super(Bridge, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.bridge_update()
 
     def __repr__(self):
         """Return a string representation of the device."""
-        return ('<WeMo Bridge "{name}", Lights: {lights}, ' +
-                'Groups: {groups}>').format(
-                    name=self.name, lights=len(self.Lights),
-                    groups=len(self.Groups))
+        return (
+            '<WeMo Bridge "{name}", Lights: {lights}, ' + 'Groups: {groups}>'
+        ).format(
+            name=self.name, lights=len(self.Lights), groups=len(self.Groups)
+        )
 
     def bridge_update(self, force_update=True):
         """Get updated status information for the bridge and its lights."""
@@ -60,15 +65,16 @@ class Bridge(Device):
 
             if hasattr(self.bridge, 'GetEndDevicesWithStatus'):
                 end_devices = self.bridge.GetEndDevicesWithStatus(
-                    DevUDN=plugin_udn, ReqListType='PAIRED_LIST')
+                    DevUDN=plugin_udn, ReqListType='PAIRED_LIST'
+                )
             else:
                 end_devices = self.bridge.GetEndDevices(
-                    DevUDN=plugin_udn, ReqListType='PAIRED_LIST')
+                    DevUDN=plugin_udn, ReqListType='PAIRED_LIST'
+                )
 
             end_device_list = et.fromstring(end_devices.get('DeviceLists'))
 
             for light in end_device_list.iter('DeviceInfo'):
-                # pylint: disable=invalid-name
                 uniqueID = light.find('DeviceID').text
                 if uniqueID in self.Lights:
                     self.Lights[uniqueID].update_state(light)
@@ -76,7 +82,6 @@ class Bridge(Device):
                     self.Lights[uniqueID] = Light(self, light)
 
             for group in end_device_list.iter('GroupInfo'):
-                # pylint: disable=invalid-name
                 uniqueID = group.find('GroupID').text
                 if uniqueID in self.Groups:
                     self.Groups[uniqueID].update_state(group)
@@ -102,8 +107,7 @@ class Bridge(Device):
         et.SubElement(req, 'CapabilityValue').text = ','.join(values)
 
         buf = six.BytesIO()
-        et.ElementTree(req).write(buf, encoding='utf-8',
-                                  xml_declaration=True)
+        et.ElementTree(req).write(buf, encoding='utf-8', xml_declaration=True)
         send_state = html_escape(buf.getvalue().decode(), quote=True)
 
         # pylint: disable=maybe-no-member
@@ -173,7 +177,7 @@ class LinkedDevice:
 
         if status.get('colorcontrol') is not None:
             colorx, colory = status['colorcontrol'][:2]
-            colorx, colory = colorx / 65535., colory / 65535.
+            colorx, colory = colorx / 65535.0, colory / 65535.0
             self.state['color_xy'] = colorx, colory
 
     def _setdevicestatus(self, **kwargs):
@@ -191,7 +195,8 @@ class LinkedDevice:
 
         # pylint: disable=maybe-no-member
         self._last_err = self.bridge.bridge_setdevicestatus(
-            isgroup, self.uniqueID, capids, values)
+            isgroup, self.uniqueID, capids, values
+        )
         return self
 
     def turn_on(self, level=None, transition=0, force_update=False):
@@ -217,10 +222,9 @@ class Light(LinkedDevice):
 
     def __init__(self, bridge, info):
         """Create a Light device."""
-        super(Light, self).__init__(bridge, info)
+        super().__init__(bridge, info)
 
         self.device_index = info.findtext('DeviceIndex')
-        # pylint: disable=invalid-name
         self.uniqueID = info.findtext('DeviceID')
         self.iconvalue = info.findtext('IconVersion')
         self.firmware = info.findtext('FirmwareVersion')
@@ -246,20 +250,21 @@ class Light(LinkedDevice):
         if status.tag == 'DeviceInfo':
             self.name = status.findtext('FriendlyName')
 
-        capabilities = (status.findtext('CapabilityIDs') or
-                        status.findtext('CapabilityID'))
-        currentstate = (status.findtext('CurrentState') or
-                        status.findtext('CapabilityValue'))
+        capabilities = status.findtext('CapabilityIDs') or status.findtext(
+            'CapabilityID'
+        )
+        currentstate = status.findtext('CurrentState') or status.findtext(
+            'CapabilityValue'
+        )
 
         if capabilities is not None:
             self.capabilities = [
-                CAPABILITY_ID2NAME.get(c, c)
-                for c in capabilities.split(',')
+                CAPABILITY_ID2NAME.get(c, c) for c in capabilities.split(',')
             ]
         if currentstate is not None:
             self._values = currentstate.split(',')
 
-        super(Light, self).update_state(status)
+        super().update_state(status)
 
     def __repr__(self):
         """Return a string representation of the device."""
@@ -271,7 +276,7 @@ class Light(LinkedDevice):
 
         if level == 0:
             return self.turn_off(transition)
-        elif 'levelcontrol' in self.capabilities:
+        if 'levelcontrol' in self.capabilities:
             # Work around observed fw bugs.
             # - When we set a new brightness level but the bulb is off, it
             #   first turns on at the old brightness and then fades to the new
@@ -291,8 +296,9 @@ class Light(LinkedDevice):
                 self._setdevicestatus(levelcontrol=(0, 0), onoff=ON)
 
             level = limit(int(level), 0, 255)
-            return self._queuedevicestatus(levelcontrol=(level,
-                                                         transition_time))
+            return self._queuedevicestatus(
+                levelcontrol=(level, transition_time)
+            )
 
         return self._queuedevicestatus(onoff=ON)
 
@@ -302,20 +308,23 @@ class Light(LinkedDevice):
             # Sleepfader control did not turn off bulb when fadetime was 0
             transition_time = limit(int(transition * 10), 1, 65535)
             reference = int(time.time())
-            return self._queuedevicestatus(sleepfader=(transition_time,
-                                                       reference))
+            return self._queuedevicestatus(
+                sleepfader=(transition_time, reference)
+            )
 
         return self._queuedevicestatus(onoff=OFF)
 
-    def set_temperature(self, kelvin=2700, mireds=None,
-                        transition=0, delay=True):
+    def set_temperature(
+        self, kelvin=2700, mireds=None, transition=0, delay=True
+    ):
         """Set the color temperature of the light."""
         transition_time = limit(int(transition * 10), 0, 65535)
         if mireds is None:
             mireds = 1000000 / kelvin
         mireds = limit(int(mireds), *self.temperature_range)
         return self._queuedevicestatus(
-            colortemperature=(mireds, transition_time), queue=delay)
+            colortemperature=(mireds, transition_time), queue=delay
+        )
 
     def set_color(self, colorxy, transition=0, delay=True):
         """Set the color of the light."""
@@ -324,7 +333,8 @@ class Light(LinkedDevice):
         colorx = limit(int(colorxy[0] * 65535), 0, 65535)
         colory = limit(int(colorxy[1] * 65535), 0, 65535)
         return self._queuedevicestatus(
-            colorcontrol=(colorx, colory, transition_time), queue=delay)
+            colorcontrol=(colorx, colory, transition_time), queue=delay
+        )
 
     def start_ramp(self, ramp_up, rate):
         """Start ramping the brightness up or down."""
@@ -347,8 +357,7 @@ class Group(LinkedDevice):
 
     def __init__(self, bridge, info):
         """Create a Group device."""
-        super(Group, self).__init__(bridge, info)
-        # pylint: disable=invalid-name
+        super().__init__(bridge, info)
         self.uniqueID = info.findtext('GroupID')
 
     def update_state(self, status):
@@ -356,19 +365,20 @@ class Group(LinkedDevice):
         if status.tag == 'GroupInfo':
             self.name = status.findtext('GroupName')
 
-        capabilities = (status.findtext('GroupCapabilityIDs') or
-                        status.findtext('CapabilityID'))
-        currentstate = (status.findtext('GroupCapabilityValues') or
-                        status.findtext('CapabilityValue'))
+        capabilities = status.findtext(
+            'GroupCapabilityIDs'
+        ) or status.findtext('CapabilityID')
+        currentstate = status.findtext(
+            'GroupCapabilityValues'
+        ) or status.findtext('CapabilityValue')
 
         if capabilities is not None:
             self.capabilities = [
-                CAPABILITY_ID2NAME.get(c, c)
-                for c in capabilities.split(',')
+                CAPABILITY_ID2NAME.get(c, c) for c in capabilities.split(',')
             ]
         if currentstate is not None:
             self._values = currentstate.split(',')
-        super(Group, self).update_state(status)
+        super().update_state(status)
 
     def __repr__(self):
         """Return a string representation of the device."""

@@ -1,6 +1,7 @@
 """Representation of a WeMo Insight device."""
 import logging
 from datetime import datetime
+
 from .switch import Switch
 
 LOG = logging.getLogger(__name__)
@@ -34,7 +35,8 @@ class Insight(Switch):
             return True
         return Switch.subscription_update(self, _type, _params)
 
-    def parse_insight_params(self, params):
+    @staticmethod
+    def parse_insight_params(params):
         """Parse the Insight parameters."""
         (
             state,  # 0 if off, 1 if on, 8 if on but load is off
@@ -47,18 +49,20 @@ class Insight(Switch):
             currentmw,
             todaymw,
             totalmw,
-            powerthreshold
+            powerthreshold,
         ) = params.split('|')
-        return {'state': state,
-                'lastchange': datetime.fromtimestamp(int(lastchange)),
-                'onfor': int(onfor),
-                'ontoday': int(ontoday),
-                'ontotal': int(ontotal),
-                'todaymw': int(float(todaymw)),
-                'totalmw': int(float(totalmw)),
-                'currentpower': int(float(currentmw)),
-                'wifipower': int(float(wifipower)),
-                'powerthreshold': int(float(powerthreshold))}
+        return {
+            'state': state,
+            'lastchange': datetime.fromtimestamp(int(lastchange)),
+            'onfor': int(onfor),
+            'ontoday': int(ontoday),
+            'ontotal': int(ontotal),
+            'todaymw': int(float(todaymw)),
+            'totalmw': int(float(totalmw)),
+            'currentpower': int(float(currentmw)),
+            'wifipower': int(float(wifipower)),
+            'powerthreshold': int(float(powerthreshold)),
+        }
 
     def get_state(self, force_update=False):
         """Return the device state."""

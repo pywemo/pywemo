@@ -1,9 +1,9 @@
 """Base WeMo Device class."""
 
-import logging
-import time
 import base64
+import logging
 import subprocess
+import time
 
 try:
     from urllib.parse import urlparse
@@ -12,7 +12,7 @@ except ImportError:
 
 import requests
 
-from .api.service import Service, ActionException
+from .api.service import ActionException, Service
 from .api.xsd import device as deviceParser
 
 LOG = logging.getLogger(__name__)
@@ -31,22 +31,25 @@ def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=10):
     """
     for port in ports:
         try:
-            response = requests.get('http://%s:%i/setup.xml' % (host, port),
-                                    timeout=probe_timeout)
+            response = requests.get(
+                'http://%s:%i/setup.xml' % (host, port), timeout=probe_timeout
+            )
             if ('WeMo' in response.text) or ('Belkin' in response.text):
                 return port
         except requests.ConnectTimeout:
             # If we timed out connecting, then the wemo is gone,
             # no point in trying further.
-            LOG.debug('Timed out connecting to %s on port %i, '
-                      'wemo is offline', host, port)
+            LOG.debug(
+                'Timed out connecting to %s on port %i, ' 'wemo is offline',
+                host,
+                port,
+            )
             break
         except requests.Timeout:
             # Apparently sometimes wemos get into a wedged state where
             # they still accept connections on an old port, but do not
             # respond. If that happens, we should keep searching.
-            LOG.debug('No response from %s on port %i, continuing',
-                      host, port)
+            LOG.debug('No response from %s on port %i, continuing', host, port)
             continue
         except requests.ConnectionError:
             pass
@@ -96,7 +99,7 @@ class ShortPassword(SetupException):
     pass
 
 
-class Device(object):
+class Device:
     """Base object for WeMo devices."""
 
     def __init__(self, url, mac, rediscovery_enabled=True):
@@ -130,6 +133,7 @@ class Device(object):
         on the network and update this device.
         """
         # Put here to avoid circular dependency
+        # pylint: disable=import-outside-toplevel
         from ..discovery import discover_devices
 
         # Avoid retrying from multiple threads
@@ -142,9 +146,12 @@ class Device(object):
         try_no = 0
 
         while True:
-            found = discover_devices(ssdp_st=None, max_devices=1,
-                                     match_mac=self.mac,
-                                     match_serial=self.serialnumber)
+            found = discover_devices(
+                ssdp_st=None,
+                max_devices=1,
+                match_mac=self.mac,
+                match_serial=self.serialnumber,
+            )
 
             if found:
                 LOG.info("Found %s again, updating local values", self.name)
@@ -159,12 +166,16 @@ class Device(object):
 
             LOG.info(
                 "%s Not found in try %i. Trying again in %i seconds",
-                self.name, try_no, wait_time)
+                self.name,
+                try_no,
+                wait_time,
+            )
 
             if try_no == 5:
                 LOG.error(
                     "Unable to reconnect with %s in 5 tries. Stopping.",
-                    self.name)
+                    self.name,
+                )
                 self.retrying = False
 
                 return
@@ -181,8 +192,7 @@ class Device(object):
             LOG.error('Unable to re-probe wemo at %s', self.host)
             return False
 
-        LOG.info('Reconnected to wemo at %s on port %i',
-                 self.host, port)
+        LOG.info('Reconnected to wemo at %s on port %i', self.host, port)
 
         self.port = port
         url = 'http://{}:{}/setup.xml'.format(self.host, self.port)
@@ -195,15 +205,19 @@ class Device(object):
     def reconnect_with_device(self):
         """Re-probe & scan network to rediscover a disconnected device."""
         if self.rediscovery_enabled:
-            if (not self._reconnect_with_device_by_probing() and
-                    (self.mac or self.serialnumber)):
+            if not self._reconnect_with_device_by_probing() and (
+                self.mac or self.serialnumber
+            ):
                 self._reconnect_with_device_by_discovery()
         else:
-            LOG.warning("Rediscovery was requested for device %s, "
-                        "but rediscovery is disabled. Ignoring request.",
-                        self.name)
+            LOG.warning(
+                "Rediscovery was requested for device %s, "
+                "but rediscovery is disabled. Ignoring request.",
+                self.name,
+            )
 
-    def parse_basic_state(self, params):
+    @staticmethod
+    def parse_basic_state(params):
         """Parse the basic state response from the device."""
         # The BinaryState `params` could have two different formats:
         #   1|1492338954|0|922|14195|1209600|0|940670|15213709|227088884
@@ -224,8 +238,11 @@ class Device(object):
             try:
                 self._state = int(self.parse_basic_state(_params).get("state"))
             except ValueError:
-                LOG.error("Unexpected BinaryState value `%s` for device %s.",
-                          _params, self.name)
+                LOG.error(
+                    "Unexpected BinaryState value `%s` for device %s.",
+                    _params,
+                    self.name,
+                )
             return True
         return False
 
@@ -246,8 +263,8 @@ class Device(object):
         """Get service object by name."""
         try:
             return self.services[name]
-        except KeyError:
-            raise UnknownService(name)
+        except KeyError as exc:
+            raise UnknownService(name) from exc
 
     def list_services(self):
         """Return list of services."""
@@ -288,13 +305,14 @@ class Device(object):
         ReSetup action below were consistent.  These could potentially change
         in a future firmware revision or may be different for other untested
         devices.
+
         """
         try:
             action = self.basicevent.ReSetup
-        except AttributeError:
+        except AttributeError as exc:
             raise ResetException(
                 'Cannot reset device: ReSetup action not found'
-            )
+            ) from exc
 
         if data and wifi:
             LOG.info('Clearing data and wifi (factory reset)')
@@ -323,7 +341,7 @@ class Device(object):
         return status
 
     def factory_reset(self):
-        """Convenience method to perform a full factory reset."""
+        """Perform a full factory reset (convenience method)."""
         return self.reset(data=True, wifi=True)
 
     @staticmethod
@@ -411,7 +429,7 @@ class Device(object):
 
     def setup(self, *args, **kwargs):
         """
-        Setup a Wemo device (connect to wifi/AP).
+        Connect Wemo to wifi network.
 
         This function should be used and will capture several potential
         exceptions to indicate when the setup method won't work on a device.
@@ -442,6 +460,7 @@ class Device(object):
         -----
         The timeout applies to each connection attempt, so the total wait time
         will be approximately timeout * connection_attempts
+
         """
         try:
             return self._setup(*args, **kwargs)
@@ -480,7 +499,7 @@ class Device(object):
         status_delay=1.0,
     ):
         """
-        Setup a Wemo device (connect to wifi/AP).
+        Connect Wemo to wifi network.
 
         See the setup method for details.
         """
@@ -622,7 +641,7 @@ class Device(object):
             # day to make it longer, so instead just use the status '2' return
             # code.
             raise ShortPassword(
-                f'Password is too short (Wemo requires at least 8 characters).'
+                'Password is too short (Wemo requires at least 8 characters).'
             )
 
         if status == '1' and close_status == 'success':

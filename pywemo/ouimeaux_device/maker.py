@@ -1,5 +1,6 @@
 """Representation of a WeMo Maker device."""
 from xml.etree import cElementTree as et
+
 from .switch import Switch
 
 
@@ -32,7 +33,8 @@ class Maker(Switch):
             'switchstate': int(switchstate),
             'sensorstate': int(sensorstate),
             'switchmode': int(switchmode),
-            'hassensor': int(hassensor)}
+            'hassensor': int(hassensor),
+        }
 
     def get_state(self, force_update=False):
         """Return 0 if off and 1 if on."""
