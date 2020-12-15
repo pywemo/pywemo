@@ -39,7 +39,7 @@ Please note that `discovery.device_from_description` call requires a `url` with 
 The `setup_url_for_address` function will lookup a hostname and provide a suitable `url` with an IP address.
 
 Device Reset and Setup
-----------------------
+---------------------
 pywemo includes the ability to reset and setup devices, without using the Belkin app or needing to create a Belkin account.
 This can be particularly useful if the intended use is fully local control, such as using Home Assistant.
 
