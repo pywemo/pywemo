@@ -21,7 +21,7 @@ echo "===Installing dependencies==="
 poetry install
 
 echo
-echo "===Sorting imports==="
+echo "===Sort imports with isort==="
 ISORT_ARGS=""
 if [[ "${CI:-}" = "1" ]]; then
   ISORT_ARGS="--check-only"
