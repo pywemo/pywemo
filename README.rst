@@ -1,8 +1,6 @@
 pyWeMo |Build Badge| |PyPI Version Badge| |PyPI Downloads Badge|
 ================================================================
-Lightweight Python 2 and Python 3 module to discover and control WeMo devices.
-
-This is a stripped down version of the Python API for WeMo devices, `ouimeaux <https://github.com/iancmcc/ouimeaux>`_, with simpler dependencies.
+Python 3 module to setup, discover and control WeMo devices.
 
 Dependencies
 ------------
@@ -18,7 +16,7 @@ How to use
     >>> print(devices)
     [<WeMo Insight "AC Insight">]
 
-    >> devices[0].toggle()
+    >>> devices[0].toggle()
 
 If discovery doesn't work on your network
 -----------------------------------------
@@ -78,6 +76,10 @@ Setup and builds are fully automated. You can run build pipeline locally by runn
     # Setup, build, lint and test the code:
 
     ./scripts/build.sh
+
+History
+-------
+This started as a stripped down version of `ouimeaux <https://github.com/iancmcc/ouimeaux>`_, but has since taken its own path.
 
 License
 -------

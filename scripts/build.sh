@@ -49,6 +49,10 @@ echo "===Test with pytest==="
 pytest
 
 echo
+echo "===Validate with rstcheck==="
+rstcheck README.rst
+
+echo
 echo "===Building package==="
 poetry build
 
