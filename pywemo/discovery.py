@@ -59,8 +59,11 @@ def discover_devices(
 def device_from_description(description_url, mac, rediscovery_enabled=True):
     """Return object representing WeMo device running at host, else None."""
     xml = requests.get(description_url, timeout=10)
-    uuid = deviceParser.parseString(xml.content).device.UDN
-    device_mac = mac or deviceParser.parseString(xml.content).device.macAddress
+    parsed = deviceParser.parseString(
+        xml.content, silence=True, print_warnings=False
+    )
+    uuid = parsed.device.UDN
+    device_mac = mac or parsed.device.macAddress
 
     if device_mac is None:
         LOG.debug(

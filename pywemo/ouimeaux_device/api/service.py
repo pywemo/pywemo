@@ -116,7 +116,9 @@ class Service:
         if xml.status_code != 200:
             return
 
-        self._svc_config = serviceParser.parseString(xml.content).actionList
+        self._svc_config = serviceParser.parseString(
+            xml.content, silence=True, print_warnings=False
+        ).actionList
         for action in self._svc_config.get_action():
             act = Action(device, self, action)
             name = action.get_name()
