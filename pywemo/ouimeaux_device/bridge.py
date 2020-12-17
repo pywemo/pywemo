@@ -1,16 +1,11 @@
 """Representation of a WeMo Bridge (Link) device."""
+import io
 import time
+from html import escape
 from xml.etree import cElementTree as et
 
-import six
-
-six.add_move(six.MovedAttribute('html_escape', 'cgi', 'html', 'escape'))
-
-# pylint: disable=wrong-import-position
-from six.moves import html_escape  # noqa E402
-
-from ..color import get_profiles, limit_to_gamut  # noqa E402
-from . import Device  # noqa E402
+from ..color import get_profiles, limit_to_gamut
+from . import Device
 
 CAPABILITY_ID2NAME = dict(
     (
@@ -106,9 +101,9 @@ class Bridge(Device):
         et.SubElement(req, 'CapabilityID').text = ','.join(capids)
         et.SubElement(req, 'CapabilityValue').text = ','.join(values)
 
-        buf = six.BytesIO()
+        buf = io.BytesIO()
         et.ElementTree(req).write(buf, encoding='utf-8', xml_declaration=True)
-        send_state = html_escape(buf.getvalue().decode(), quote=True)
+        send_state = escape(buf.getvalue().decode(), quote=True)
 
         # pylint: disable=maybe-no-member
         return self.bridge.SetDeviceStatus(DeviceStatusList=send_state)
