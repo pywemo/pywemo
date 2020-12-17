@@ -701,3 +701,22 @@ class Device:
     def serialnumber(self):
         """Return the serial number of the device."""
         return self._config.get_serialNumber()
+
+
+class UnsupportedDevice(Device):
+    """Representation of a WeMo device without a definition in pywemo.
+
+    This class is used if an apparent WeMo device is found on the network via
+    upnp discovery, but the device does not yet exist in pywemo.  This will
+    allow a user to see that something is discovered and manually interact with
+    it as well as aide in creating a permenant class for the new product.
+    """
+
+    def __repr__(self):
+        """Return a string representation of the device."""
+        return '<WeMo UnsupportedDevice "{name}">'.format(name=self.name)
+
+    @property
+    def device_type(self):
+        """Return what kind of WeMo this device is."""
+        return 'UnsupportedDevice'
