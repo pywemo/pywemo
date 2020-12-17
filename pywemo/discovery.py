@@ -16,6 +16,7 @@ from .ouimeaux_device.insight import Insight
 from .ouimeaux_device.lightswitch import LightSwitch
 from .ouimeaux_device.maker import Maker
 from .ouimeaux_device.motion import Motion
+from .ouimeaux_device.outdoor_plug import OutdoorPlug
 from .ouimeaux_device.switch import Switch
 
 LOG = logging.getLogger(__name__)
@@ -118,6 +119,10 @@ def device_from_uuid_and_location(
         return Humidifier(
             url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
         )
+    if uuid.startswith('uuid:OutdoorPlug'):
+        return OutdoorPlug(
+            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
+        )
 
     return None
 
@@ -125,8 +130,8 @@ def device_from_uuid_and_location(
 def hostname_lookup(hostname):
     """Resolve a hostname into an IP address."""
     try:
-        # The {host} must be resolved to an IP address; if this fails, this will
-        # throw a socket.gaierror.
+        # The {host} must be resolved to an IP address; if this fails, this
+        # will throw a socket.gaierror.
         host_address = gethostbyname(hostname)
 
         # Reset {host} to the resolved address.
@@ -146,8 +151,8 @@ def setup_url_for_address(host, port):
 
     # Force hostnames into IP addresses
     try:
-        # Attempt to register {host} as an IP address; if this fails ({host} is not an IP address),
-        # this will throw a ValueError.
+        # Attempt to register {host} as an IP address; if this fails ({host} is
+        # not an IP address), this will throw a ValueError.
         ip_address(host)
     except ValueError:
         # The provided {host} should be treated as a hostname.
