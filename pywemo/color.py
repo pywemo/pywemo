@@ -15,7 +15,7 @@ COLOR_PROFILES = dict(
     (model, gamut)
     for models, gamut in (
         # Lightify RGBW, 1900-6500K
-        # http://flow-morewithless.blogspot.com/2015/01/osram-lightify-color-gamut-and-spectrum.html
+        # https://flow-morewithless.blogspot.com/2015/01/osram-lightify-color-gamut-and-spectrum.html
         (
             ["LIGHTIFY A19 RGBW"],
             ((0.683924, 0.315904), (0.391678, 0.501414), (0.136990, 0.051035)),

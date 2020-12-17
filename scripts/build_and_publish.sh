@@ -14,7 +14,6 @@ echo
 echo "===Settting up venv==="
 enterVenv
 
-
 echo
 echo "===Publishing package==="
 poetry publish --username __token__ --password "$PUBLISH_PASSWORD"

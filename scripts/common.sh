@@ -1,6 +1,7 @@
+#!/usr/bin/env bash
+
 VENV_DIR=".venv"
 PYTHON_BIN="python3"
-LINT_PATHS="./pywemo"
 
 function assertPython() {
   if ! [[ $(which "$PYTHON_BIN") ]]; then
@@ -33,5 +34,4 @@ function enterVenv() {
   else
     echo Already in venv.
   fi
-
 }

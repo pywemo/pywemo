@@ -21,6 +21,10 @@ echo "===Installing dependencies==="
 poetry install
 
 echo
+echo "===Validate with rstcheck==="
+rstcheck README.rst
+
+echo
 echo "===Sort imports with isort==="
 ISORT_ARGS=""
 if [[ "${CI:-}" = "1" ]]; then
@@ -42,15 +46,11 @@ flake8
 
 echo
 echo "===Lint with pylint==="
-pylint $LINT_PATHS
+pylint pywemo
 
 echo
 echo "===Test with pytest==="
 pytest
-
-echo
-echo "===Validate with rstcheck==="
-rstcheck README.rst
 
 echo
 echo "===Building package==="
