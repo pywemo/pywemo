@@ -6,7 +6,7 @@ from socket import gaierror, gethostbyname
 import requests
 
 from . import ssdp
-from .ouimeaux_device import probe_wemo
+from .ouimeaux_device import UnsupportedDevice, probe_wemo
 from .ouimeaux_device.api.xsd import device as deviceParser
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
@@ -121,6 +121,19 @@ def device_from_uuid_and_location(
         )
     if uuid.startswith('uuid:OutdoorPlug'):
         return OutdoorPlug(
+            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
+        )
+    if uuid.startswith('uuid:'):
+        # unsupported device, but if this function was called from
+        # discover_devices then this should be a Belkin product and is probably
+        # a WeMo product without a custom class yet.  So attempt to return a
+        # basic object to allow manual interaction.
+        LOG.info(
+            'Device with %s is not supported by pywemo, returning '
+            'UnsupportedDevice object to allow manual interaction',
+            uuid,
+        )
+        return UnsupportedDevice(
             url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
         )
 
