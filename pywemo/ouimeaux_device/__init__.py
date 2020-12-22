@@ -704,6 +704,11 @@ class Device:
         """Return the serial number of the device."""
         return self._config.get_serialNumber()
 
+    @property
+    def udn(self):
+        """Return the uPnP unique device name of the device."""
+        return self._config.get_UDN()
+
 
 class UnsupportedDevice(Device):
     """Representation of a WeMo device without a definition in pywemo.
