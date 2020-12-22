@@ -484,7 +484,7 @@ class RulesDb:
         self.add_rule(new_rule)
         self.add_rule_devices(
             RuleDevicesRow(
-                RuleID=new_rule.RuleID, # pylint: disable=no-member
+                RuleID=new_rule.RuleID,  # pylint: disable=no-member
                 DeviceID=device_udn,
                 GroupID=0,
                 DayID=-1,
