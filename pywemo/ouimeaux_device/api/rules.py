@@ -7,7 +7,7 @@ import logging
 import sqlite3
 import tempfile
 import zipfile
-from typing import FrozenSet, List, Optional, Tuple
+from typing import Any, Callable, Dict, FrozenSet, List, Optional, Tuple
 
 import requests
 
@@ -25,15 +25,17 @@ VIRTUAL_DEVICE_UDN = "uuid:Socket-1_0-PyWemoVirtualDevice"
 class DatabaseRow:
     """Base class for sqlite Row schemas."""
 
+    TABLE_NAME: str
+    FIELDS: Dict[str, Callable[[Any], Any]]
+
     def __init__(self, **kwargs):
         """Initialize a row with the supplied values."""
-        self.__slots__ = list(self.FIELDS.values())
-        for k, v in kwargs.items():
-            if k not in self.FIELDS:
+        for key, value in kwargs.items():
+            if key not in self.FIELDS:
                 raise AttributeError(
-                    f"{k} is not a valid attribute of {type(self).__name__}"
+                    f"{key} is not a valid attribute of {type(self).__name__}"
                 )
-            setattr(self, k, v)
+            setattr(self, key, value)
         self._modified = False
 
     def __setattr__(self, name, value):
@@ -57,7 +59,7 @@ class DatabaseRow:
 
     def __eq__(self, other):
         """Test for quality between two instances."""
-        return type(self) == type(other) and repr(self) == repr(other)
+        return isinstance(other, self.__class__) and repr(self) == repr(other)
 
     @property
     def modified(self):
@@ -121,7 +123,10 @@ class DatabaseRow:
                 values.append(getattr(self, name))
         column_list_str = ", ".join(column_list)
         value_placeholders = ", ".join(["?"] * len(values))
-        sql = f"INSERT OR REPLACE INTO {self.TABLE_NAME} ({column_list_str}) VALUES ({value_placeholders})"
+        sql = (
+            f"INSERT OR REPLACE INTO {self.TABLE_NAME} ({column_list_str}) "
+            f"VALUES ({value_placeholders})"
+        )
         try:
             cursor.execute(sql, values)
         except sqlite3.Error:
@@ -132,8 +137,8 @@ class DatabaseRow:
         except RuntimeError:
             pass
         else:
-            pk = self.FIELDS[pk_name]
-            if pk.auto_increment and not hasattr(self, pk_name):
+            pk_type = self.FIELDS[pk_name]
+            if pk_type.auto_increment and not hasattr(self, pk_name):
                 setattr(self, pk_name, cursor.lastrowid)
 
     def remove_from_db(self, cursor):
@@ -455,7 +460,7 @@ class RulesDb:
         current_rules = self.rules_for_device(
             device_udn=device_udn, rule_type=RULE_TYPE_LONG_PRESS
         )
-        for (rule, device) in current_rules:
+        for (rule, _) in current_rules:
             if rule.State != "1":
                 LOG.info("Enabling long press rule for device %s", device_udn)
                 rule.State = "1"
@@ -479,7 +484,7 @@ class RulesDb:
         self.add_rule(new_rule)
         self.add_rule_devices(
             RuleDevicesRow(
-                RuleID=new_rule.RuleID,
+                RuleID=new_rule.RuleID, # pylint: disable=no-member
                 DeviceID=device_udn,
                 GroupID=0,
                 DayID=-1,
@@ -555,8 +560,8 @@ def rules_db_from_device(device) -> RulesDb:
     """
     fetch = device.rules.FetchRules()
     version = int(fetch["ruleDbVersion"])
-    ruleDbPath = fetch["ruleDbPath"]
-    response = requests.get(ruleDbPath)
+    rule_db_url = fetch["ruleDbPath"]
+    response = requests.get(rule_db_url)
 
     with tempfile.NamedTemporaryFile(
         prefix="wemorules", suffix=".db"
