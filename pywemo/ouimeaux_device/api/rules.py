@@ -422,6 +422,8 @@ class RulesDb:
         update(self._target_devices.values())
         return modified
 
+    # pylint: disable=unsubscriptable-object
+    # https://github.com/PyCQA/pylint/issues/3882#issuecomment-745148724
     def rules_for_device(
         self,
         *,
