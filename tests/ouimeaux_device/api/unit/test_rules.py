@@ -1,9 +1,10 @@
 import base64
-import pytest
-import requests
 import sqlite3
 import tempfile
 from unittest.mock import create_autospec, patch
+
+import pytest
+import requests
 
 from pywemo.ouimeaux_device.api import rules
 

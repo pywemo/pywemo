@@ -3,12 +3,13 @@
 import base64
 import contextlib
 import io
-import requests
 import logging
 import sqlite3
 import tempfile
-from typing import FrozenSet, List, Optional, Tuple
 import zipfile
+from typing import FrozenSet, List, Optional, Tuple
+
+import requests
 
 ACTION_TOGGLE = 2.0
 ACTION_ON = 1.0
