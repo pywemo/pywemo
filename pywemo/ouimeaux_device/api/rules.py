@@ -374,7 +374,7 @@ class RulesDb:
         )
 
     @property
-    def db(self) -> sqlite3.Connection:
+    def db(self) -> sqlite3.Connection:  # pylint: disable=invalid-name
         """Return the sqlite3 connection instance."""
         return self._db
 
@@ -382,6 +382,8 @@ class RulesDb:
         """Return a cursor for the underlying sqlite3 database."""
         return self.db.cursor()
 
+    # pylint: disable=unsubscriptable-object
+    # https://github.com/PyCQA/pylint/issues/3882#issuecomment-745148724
     @property
     def rules(self) -> Mapping[int, RulesRow]:
         """Contents of the RULES table, keyed by RuleID."""
@@ -460,8 +462,6 @@ class RulesDb:
         update(self._target_devices.values())
         return modified
 
-    # pylint: disable=unsubscriptable-object
-    # https://github.com/PyCQA/pylint/issues/3882#issuecomment-745148724
     def rules_for_device(
         self,
         *,
