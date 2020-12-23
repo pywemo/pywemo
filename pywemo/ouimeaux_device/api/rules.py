@@ -7,16 +7,28 @@ import logging
 import sqlite3
 import tempfile
 import zipfile
-from typing import Any, Callable, Dict, FrozenSet, List, Optional, Tuple
+from types import MappingProxyType
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    FrozenSet,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+)
 
 import requests
 
+# RuleDevicesRow.*Action values.
 ACTION_TOGGLE = 2.0
 ACTION_ON = 1.0
 ACTION_OFF = 0.0
 
 LOG = logging.getLogger(__name__)
 
+# RulesRow.Type values.
 RULE_TYPE_LONG_PRESS = "Long Press"
 
 VIRTUAL_DEVICE_UDN = "uuid:Socket-1_0-PyWemoVirtualDevice"
@@ -221,6 +233,8 @@ class RulesRow(DatabaseRow):
         "StartDate": str,
         "EndDate": str,
         "State": str,
+        # Sync has type INTEGER in the database, but contains the
+        # value 'NOSYNC', it is represented as a string in Python.
         "Sync": SQLType(str, sql_type="INTEGER"),
     }
 
@@ -349,7 +363,7 @@ class RulesDb:
         self._db = sql_db
         self._default_udn = default_udn
         self._device_name = device_name
-        self._modified = False
+        self.modified = False
         cursor = sql_db.cursor()
         self._rules = _index_by_primary_key(RulesRow.select_all(cursor))
         self._rule_devices = _index_by_primary_key(
@@ -359,56 +373,80 @@ class RulesDb:
             TargetDevicesRow.select_all(cursor)
         )
 
+    @property
+    def db(self) -> sqlite3.Connection:
+        """Return the sqlite3 connection instance."""
+        return self._db
+
+    def cursor(self) -> sqlite3.Cursor:
+        """Return a cursor for the underlying sqlite3 database."""
+        return self.db.cursor()
+
+    @property
+    def rules(self) -> Mapping[int, RulesRow]:
+        """Contents of the RULES table, keyed by RuleID."""
+        return MappingProxyType(self._rules)
+
     def add_rule(self, rule: RulesRow) -> RulesRow:
         """Add a new entry to the RULES table."""
-        if not hasattr(rule, 'RuleID'):
+        if not hasattr(rule, "RuleID"):
             rule.RuleID = max(self._rules.keys(), default=1)
-        rule.update_db(self._db.cursor())
+        rule.update_db(self.cursor())
         self._rules[rule.RuleID] = rule
-        self._modified = True
+        self.modified = True
         return rule
 
     def remove_rule(self, rule: RulesRow) -> None:
         """Remove an entry to the RULES table."""
         del self._rules[rule.RuleID]
-        rule.remove_from_db(self._db.cursor())
-        self._modified = True
+        rule.remove_from_db(self.cursor())
+        self.modified = True
+
+    @property
+    def rule_devices(self) -> Mapping[int, RuleDevicesRow]:
+        """Contents of the RULEDEVICES table, keyed by RuleDevicePK."""
+        return MappingProxyType(self._rule_devices)
 
     def add_rule_devices(self, rule_devices: RuleDevicesRow) -> RuleDevicesRow:
         """Add a new entry to the RULEDEVICES table."""
-        rule_devices.update_db(self._db.cursor())
+        rule_devices.update_db(self.cursor())
         self._rule_devices[rule_devices.RuleDevicePK] = rule_devices
-        self._modified = True
+        self.modified = True
         return rule_devices
 
     def remove_rule_devices(self, rule_devices: RuleDevicesRow) -> None:
         """Remove an entry to the RULEDEVICES table."""
         del self._rule_devices[rule_devices.RuleDevicePK]
-        rule_devices.remove_from_db(self._db.cursor())
-        self._modified = True
+        rule_devices.remove_from_db(self.cursor())
+        self.modified = True
+
+    @property
+    def target_devices(self) -> Mapping[int, TargetDevicesRow]:
+        """Contents of the TARGETDEVICES table, keyed by TargetDevicesPK."""
+        return MappingProxyType(self._target_devices)
 
     def add_target_devices(
         self, target_devices: TargetDevicesRow
     ) -> TargetDevicesRow:
         """Add a new entry to the TARGETDEVICES table."""
-        target_devices.update_db(self._db.cursor())
+        target_devices.update_db(self.cursor())
         self._target_devices[target_devices.TargetDevicesPK] = target_devices
-        self._modified = True
+        self.modified = True
         return target_devices
 
     def remove_target_devices(self, target_devices: TargetDevicesRow) -> None:
         """Remove an entry to the TARGETDEVICES table."""
         del self._target_devices[target_devices.TargetDevicesPK]
-        target_devices.remove_from_db(self._db.cursor())
-        self._modified = True
+        target_devices.remove_from_db(self.cursor())
+        self.modified = True
 
     def update_if_modified(self) -> bool:
         """Sync the contents with the sqlite database.
 
         Return True if the database was modified.
         """
-        modified = self._modified
-        cursor = self._db.cursor()
+        modified = self.modified
+        cursor = self.cursor()
 
         def update(rows):
             nonlocal modified
@@ -434,10 +472,10 @@ class RulesDb:
         if device_udn is None:
             device_udn = self._default_udn
         values = []
-        for device in self._rule_devices.values():
+        for device in self.rule_devices.values():
             if device_udn and device.DeviceID != device_udn:
                 continue
-            rule = self._rules[device.RuleID]
+            rule = self.rules[device.RuleID]
             if rule_type and rule.Type != rule_type:
                 continue
             values.append((rule, device))
@@ -466,20 +504,20 @@ class RulesDb:
             if rule.State != "1":
                 LOG.info("Enabling long press rule for device %s", device_udn)
                 rule.State = "1"
-                rule.update_db(self._db.cursor())
+                rule.update_db(self.cursor())
             return rule
 
         LOG.info("Adding long press rule for device %s", device_udn)
         current_rules = self.rules_for_device(device_udn=device_udn)
         max_order = max(
-            self._rules.values(), key=lambda r: r.RuleOrder, default=-1
+            self.rules.values(), key=lambda r: r.RuleOrder, default=-1
         )
         new_rule = RulesRow(
             Name=f"{device_name} Long Press Rule",
             Type=RULE_TYPE_LONG_PRESS,
             RuleOrder=max_order + 1,
-            StartDate='12201982',
-            EndDate='07301982',
+            StartDate="12201982",
+            EndDate="07301982",
             State="1",
             Sync="NOSYNC",
         )
@@ -497,8 +535,8 @@ class RulesDb:
                 Type=-1,
                 Value=-1,
                 Level=-1,
-                ZBCapabilityStart='',
-                ZBCapabilityEnd='',
+                ZBCapabilityStart="",
+                ZBCapabilityEnd="",
                 OnModeOffset=-1,
                 OffModeOffset=-1,
                 CountdownTime=-1,
@@ -512,7 +550,7 @@ class RulesDb:
         return frozenset(
             [
                 target.DeviceID
-                for target in self._target_devices.values()
+                for target in self.target_devices.values()
                 if target.RuleID == rule.RuleID
             ]
         )
@@ -528,7 +566,7 @@ class RulesDb:
         if device_index is None:
             target_device_index = (
                 target.DeviceIndex
-                for target in self._target_devices.values()
+                for target in self.target_devices.values()
                 if target.RuleID == rule.RuleID
             )
             device_index = max(target_device_index, default=-1) + 1
@@ -544,7 +582,7 @@ class RulesDb:
         """Remove a target DeviceID from a rule."""
         targets = [
             target
-            for target in self._target_devices.values()
+            for target in self.target_devices.values()
             if target.RuleID == rule.RuleID and target.DeviceID == device_id
         ]
         if len(targets) != 1:
@@ -558,7 +596,11 @@ class RulesDb:
 def rules_db_from_device(device) -> RulesDb:
     """Return a RuleDb instance for the rules on a device.
 
-    Will also update the rules on the device if RuleDb is modified.
+    The sqlite3.Connection object can be accessed via the '.db' property in the
+    returned RulesDb instance. If the database is modified directly, setting the
+    `.modified` attribute to True will cause the database to be sent to the WeMo
+    device. Any updates that take place via the RulesDb helper methods will also
+    be propogated back to the WeMo device.
     """
     fetch = device.rules.FetchRules()
     version = int(fetch["ruleDbVersion"])
@@ -592,7 +634,7 @@ def rules_db_from_device(device) -> RulesDb:
                 device.rules.StoreRules(
                     ruleDbVersion=version + 1,
                     processDb=1,
-                    ruleDbBody='&lt;![CDATA[' + body + ']]&gt;',
+                    ruleDbBody="&lt;![CDATA[" + body + "]]&gt;",
                 )
         finally:
             if conn is not None:
@@ -614,10 +656,10 @@ def _pack_db(db_file, inner_file_name):
     """Pack the sqlite database as a base64(zipped(db))."""
     zip_contents = io.BytesIO()
     with zipfile.ZipFile(
-        zip_contents, mode='w', compression=zipfile.ZIP_DEFLATED
+        zip_contents, mode="w", compression=zipfile.ZIP_DEFLATED
     ) as zip_file:
         zip_file.write(db_file.name, arcname=inner_file_name)
-    return base64.b64encode(zip_contents.getvalue()).decode('utf-8')
+    return base64.b64encode(zip_contents.getvalue()).decode("utf-8")
 
 
 def _index_by_primary_key(rows):
@@ -650,4 +692,4 @@ def _create_empty_db(file_name):
         conn.commit()
     finally:
         conn.close()
-    return 'temppluginRules.db'
+    return "temppluginRules.db"

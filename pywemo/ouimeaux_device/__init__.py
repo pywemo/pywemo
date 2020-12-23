@@ -705,7 +705,7 @@ class Device:
         return self._config.get_serialNumber()
 
     @property
-    def udn(self):
+    def udn(self) -> str:
         """Return the uPnP unique device name of the device."""
         return self._config.get_UDN()
 
