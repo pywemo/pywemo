@@ -58,6 +58,6 @@ exclude = '''
 '''
 
 [tool.isort]
-profile = "hug"
+profile = "black"
 src_paths = ["pywemo", "tests"]
 
