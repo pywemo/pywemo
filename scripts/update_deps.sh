@@ -8,26 +8,17 @@ source "$SELF_DIR/common.sh"
 
 assertPython
 
-
 echo
 echo "===Settting up venv==="
 enterVenv
-
 
 echo
 echo "===Installing poetry==="
 pip install poetry
 
-
 echo
 echo "===Installing dependencies==="
 poetry install
-
-
-echo
-echo "===Installing black==="
-pip install black
-
 
 echo
 echo "===Updating poetry lock file==="

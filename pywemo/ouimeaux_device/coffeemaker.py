@@ -1,4 +1,4 @@
-"""Representation of a WeMo CofeeMaker device."""
+"""Representation of a WeMo CoffeeMaker device."""
 import sys
 from xml.etree import cElementTree as et
 
@@ -70,7 +70,7 @@ def attribute_xml_to_dict(xml_blob):
 
 
 class CoffeeMaker(Switch):
-    """Representation of a WeMo CofeeMaker device."""
+    """Representation of a WeMo CoffeeMaker device."""
 
     def __init__(self, *args, **kwargs):
         """Create a WeMo CoffeeMaker device."""
@@ -114,8 +114,8 @@ class CoffeeMaker(Switch):
 
     def get_state(self, force_update=False):
         """Return 0 if off and 1 if on."""
-        # The base implementation using GetBinaryState doesn't
-        # work for CoffeeMaker (always returns 0), so use mode instead.
+        # The base implementation using GetBinaryState doesn't work for
+        # CoffeeMaker (always returns 0), so use mode instead.
         if force_update or self._state is None:
             self.update_attributes()
 
@@ -124,12 +124,11 @@ class CoffeeMaker(Switch):
 
     def set_state(self, state):
         """Set the state of this device to on or off."""
-        # CoffeeMaker cannot be turned off remotely,
-        # so ignore the request if state is "falsey"
+        # CoffeeMaker cannot be turned off remotely, so ignore the request if
+        # state is "falsey"
         if state:
-            # Coffee Maker always responds with an error if
-            # SetBinaryState is called. Use SetAttributes
-            # to change the Mode to "Brewing"
+            # Coffee Maker always responds with an error if SetBinaryState is
+            # called. Use SetAttributes to change the Mode to "Brewing"
 
             # pylint: disable=maybe-no-member
             self.deviceevent.SetAttributes(
@@ -138,7 +137,6 @@ class CoffeeMaker(Switch):
                 )
             )
 
-        # The Coffee Maker might not be ready - so it's not safe
-        # to assume the state is what you just set,
-        # so re-read it from the device
+        # The Coffee Maker might not be ready - so it's not safe to assume the
+        # state is what you just set, so re-read it from the device
         self.get_state(True)

@@ -6,7 +6,7 @@ from socket import gaierror, gethostbyname
 import requests
 
 from . import ssdp
-from .ouimeaux_device import probe_wemo
+from .ouimeaux_device import UnsupportedDevice, probe_wemo
 from .ouimeaux_device.api.xsd import device as deviceParser
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
@@ -16,6 +16,7 @@ from .ouimeaux_device.insight import Insight
 from .ouimeaux_device.lightswitch import LightSwitch
 from .ouimeaux_device.maker import Maker
 from .ouimeaux_device.motion import Motion
+from .ouimeaux_device.outdoor_plug import OutdoorPlug
 from .ouimeaux_device.switch import Switch
 
 LOG = logging.getLogger(__name__)
@@ -121,6 +122,23 @@ def device_from_uuid_and_location(
         return Humidifier(
             url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
         )
+    if uuid.startswith('uuid:OutdoorPlug'):
+        return OutdoorPlug(
+            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
+        )
+    if uuid.startswith('uuid:'):
+        # unsupported device, but if this function was called from
+        # discover_devices then this should be a Belkin product and is probably
+        # a WeMo product without a custom class yet.  So attempt to return a
+        # basic object to allow manual interaction.
+        LOG.info(
+            'Device with %s is not supported by pywemo, returning '
+            'UnsupportedDevice object to allow manual interaction',
+            uuid,
+        )
+        return UnsupportedDevice(
+            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
+        )
 
     return None
 
@@ -128,8 +146,8 @@ def device_from_uuid_and_location(
 def hostname_lookup(hostname):
     """Resolve a hostname into an IP address."""
     try:
-        # The {host} must be resolved to an IP address; if this fails, this will
-        # throw a socket.gaierror.
+        # The {host} must be resolved to an IP address; if this fails, this
+        # will throw a socket.gaierror.
         host_address = gethostbyname(hostname)
 
         # Reset {host} to the resolved address.
@@ -149,8 +167,8 @@ def setup_url_for_address(host, port):
 
     # Force hostnames into IP addresses
     try:
-        # Attempt to register {host} as an IP address; if this fails ({host} is not an IP address),
-        # this will throw a ValueError.
+        # Attempt to register {host} as an IP address; if this fails ({host} is
+        # not an IP address), this will throw a ValueError.
         ip_address(host)
     except ValueError:
         # The provided {host} should be treated as a hostname.
