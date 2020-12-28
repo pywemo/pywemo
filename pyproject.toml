@@ -16,7 +16,6 @@ keywords = ['wemo', 'api']
 python = "^3.7"
 ifaddr = ">=0.1.0"
 requests = ">=2.0"
-six = ">=1.10.0"
 lxml = "^4.6"
 
 [tool.poetry.dev-dependencies]
