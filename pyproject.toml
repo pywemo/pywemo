@@ -61,5 +61,6 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
+line_length = 79
 src_paths = ["pywemo", "tests"]
 skip_glob = "*/xsd/*"
