@@ -114,7 +114,9 @@ class Device:
         self.mac = mac
         self.rediscovery_enabled = rediscovery_enabled
         xml = requests.get(url, timeout=10)
-        self._config = deviceParser.parseString(xml.content).device
+        self._config = deviceParser.parseString(
+            xml.content, silence=True, print_warnings=False
+        ).device
         service_list = self._config.serviceList
         self.services = {}
         for svc in service_list.service:

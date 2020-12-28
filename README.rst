@@ -4,7 +4,7 @@ Python 3 module to setup, discover and control WeMo devices.
 
 Dependencies
 ------------
-pyWeMo depends on Python packages: requests and ifaddr
+pyWeMo depends on Python packages: requests, ifaddr, lxml
 
 How to use
 ----------
