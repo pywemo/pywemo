@@ -149,6 +149,19 @@ class SensorNotificationRow(DatabaseRow):
     }
 
 
+ALL_TABLES = [
+    RulesRow,
+    RuleDevicesRow,
+    DeviceCombinationRow,
+    GroupDevicesRow,
+    LocationInfoRow,
+    BlockedRulesRow,
+    RulesNotifyMessageRow,
+    SensorNotificationRow,
+    TargetDevicesRow,
+]
+
+
 class RulesDb:
     """Methods to access and manipulate the `rules` sqlite database."""
 
@@ -324,6 +337,21 @@ class RulesDb:
             )
         self.remove_target_devices(targets[0])
 
+    def clear_all(self) -> None:
+        """Clear all data from the database."""
+        cursor = self.cursor()
+        for table in ALL_TABLES:
+            # pylint: disable=no-member
+            cursor.execute(f"DELETE FROM {table.TABLE_NAME}")
+        self.modified = True
+        self._rules = _index_by_primary_key(RulesRow.select_all(cursor))
+        self._rule_devices = _index_by_primary_key(
+            RuleDevicesRow.select_all(cursor)
+        )
+        self._target_devices = _index_by_primary_key(
+            TargetDevicesRow.select_all(cursor)
+        )
+
 
 @contextlib.contextmanager
 def rules_db_from_device(device) -> RulesDb:
@@ -414,17 +442,7 @@ def _create_empty_db(file_name):
     """
     conn = sqlite3.connect(file_name)
     try:
-        for row_class in [
-            RulesRow,
-            RuleDevicesRow,
-            DeviceCombinationRow,
-            GroupDevicesRow,
-            LocationInfoRow,
-            BlockedRulesRow,
-            RulesNotifyMessageRow,
-            SensorNotificationRow,
-            TargetDevicesRow,
-        ]:
+        for row_class in ALL_TABLES:
             row_class.create_sqlite_table_from_row_schema(conn.cursor())
         conn.commit()
     finally:

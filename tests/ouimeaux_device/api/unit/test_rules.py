@@ -85,17 +85,6 @@ def test_auto_primary_key(sqldb):
 
 
 def test_add_remove(sqldb):
-    rule = rules_db.RulesRow(
-        RuleID=501,
-        Name="Long Press Rule",
-        Type=MOCK_RULE_TYPE,
-        State=1,
-    )
-    devices = rules_db.RuleDevicesRow(
-        RuleDevicePK=1, RuleID=501, DeviceID=MOCK_UDN
-    )
-    target = rules_db.TargetDevicesRow
-
     db = rules_db.RulesDb(sqldb, MOCK_UDN, MOCK_NAME)
 
     # Rules
@@ -128,6 +117,38 @@ def test_add_remove(sqldb):
     )
     assert len(db._target_devices) == 1
     db.remove_target_devices(target)
+    assert len(db._target_devices) == 0
+
+
+def test_clear_all(sqldb):
+    db = rules_db.RulesDb(sqldb, MOCK_UDN, MOCK_NAME)
+    rule = db.add_rule(
+        rules_db.RulesRow(
+            RuleID=501,
+            Name="Long Press Rule",
+            Type=MOCK_RULE_TYPE,
+            State=1,
+        )
+    )
+    assert len(db._rules) == 1
+
+    # RuleDevices
+    assert len(db._rule_devices) == 0
+    device = db.add_rule_devices(
+        rules_db.RuleDevicesRow(RuleDevicePK=1, RuleID=501, DeviceID=MOCK_UDN)
+    )
+    assert len(db._rule_devices) == 1
+
+    # TargetDevices
+    assert len(db._target_devices) == 0
+    target = db.add_target_devices(
+        rules_db.TargetDevicesRow(RuleID=501, DeviceID=MOCK_TARGET_UDN)
+    )
+    assert len(db._target_devices) == 1
+
+    db.clear_all()
+    assert len(db._rules) == 0
+    assert len(db._rule_devices) == 0
     assert len(db._target_devices) == 0
 
 
