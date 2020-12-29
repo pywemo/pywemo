@@ -264,7 +264,7 @@ class RulesDb:
         device_udn: Optional[str] = None,
         rule_type: Optional[str] = None,
     ) -> List[Tuple[RulesRow, RuleDevicesRow]]:
-        """Fetch the current rules for a partular device."""
+        """Fetch the current rules for a particular device."""
         if device_udn is None:
             device_udn = self._default_udn
         values = []
@@ -337,7 +337,7 @@ def rules_db_from_device(device) -> RulesDb:
     returned RulesDb instance. If the database is modified directly, setting the
     `.modified` attribute to True will cause the database to be sent to the WeMo
     device. Any updates that take place via the RulesDb helper methods will also
-    be propogated back to the WeMo device.
+    be propagated back to the WeMo device.
     """
     fetch = device.rules.FetchRules()
     version = int(fetch["ruleDbVersion"])
