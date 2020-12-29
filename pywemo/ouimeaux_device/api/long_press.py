@@ -67,6 +67,7 @@ def ensure_long_press_rule_exists(
             StartTime=60,
             RuleDuration=86340,
             StartAction=ActionType.TOGGLE.value,
+            EndAction=-1.0,
             SensorDuration=-1,
             Type=-1,
             Value=-1,
