@@ -42,7 +42,7 @@ class DatabaseRow:
         return f"{class_name}({values_str})"
 
     def __eq__(self, other):
-        """Test for quality between two instances."""
+        """Test for equality between two instances."""
         return isinstance(other, self.__class__) and repr(self) == repr(other)
 
     @property

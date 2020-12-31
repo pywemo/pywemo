@@ -63,7 +63,7 @@ class RuleDevicesRow(DatabaseRow):
 
 
 class TargetDevicesRow(DatabaseRow):
-    """Row schema for the RULEDEVICES table."""
+    """Row schema for the TARGETDEVICES table."""
 
     TABLE_NAME = "TARGETDEVICES"
     FIELDS = {
@@ -75,7 +75,7 @@ class TargetDevicesRow(DatabaseRow):
 
 
 class DeviceCombinationRow(DatabaseRow):
-    """Row schema for the RULEDEVICES table."""
+    """Row schema for the DEVICECOMBINATION table."""
 
     TABLE_NAME = "DEVICECOMBINATION"
     FIELDS = {
