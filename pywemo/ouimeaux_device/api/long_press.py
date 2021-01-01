@@ -9,8 +9,9 @@ controlled by a long press.
 """
 import logging
 from enum import Enum
+from typing import FrozenSet, Iterable, Optional
 
-from .rules_db import RuleDevicesRow, RulesDb, RulesRow
+from .rules_db import RuleDevicesRow, RulesDb, RulesRow, rules_db_from_device
 
 LOG = logging.getLogger(__name__)
 
@@ -81,3 +82,73 @@ def ensure_long_press_rule_exists(
         )
     )
     return new_rule
+
+
+class LongPressMixin:
+    """Methods to make changes to the long press rules for a device."""
+
+    # pylint: disable=unsubscriptable-object
+    # https://github.com/PyCQA/pylint/issues/3882#issuecomment-745148724
+    def list_long_press_udns(self) -> FrozenSet[str]:
+        """Return a list of device UDNs that are configured for long press."""
+        devices = []
+        with rules_db_from_device(self) as rules_db:
+            for rule, _ in rules_db.rules_for_device(
+                rule_type=RULE_TYPE_LONG_PRESS
+            ):
+                devices.extend(rules_db.get_target_devices_for_rule(rule))
+        return frozenset(devices)
+
+    def add_long_press_udns(self, device_udns: Iterable[str]) -> None:
+        """Add a list of device UDNs to be configured for long press."""
+        with rules_db_from_device(self) as rules_db:
+            rule = ensure_long_press_rule_exists(rules_db, self.name, self.udn)
+            for udn in device_udns:
+                if not udn:
+                    continue
+                if udn not in rules_db.get_target_devices_for_rule(rule):
+                    rules_db.add_target_device_to_rule(rule, udn)
+
+    def remove_long_press_udns(self, device_udns: Iterable[str]) -> None:
+        """Remove a list of device UDNs from the long press configuration."""
+        with rules_db_from_device(self) as rules_db:
+            for rule, _ in rules_db.rules_for_device(
+                rule_type=RULE_TYPE_LONG_PRESS
+            ):
+                for udn in device_udns:
+                    if udn in rules_db.get_target_devices_for_rule(rule):
+                        rules_db.remove_target_device_from_rule(rule, udn)
+
+    def get_long_press_action(self) -> Optional[ActionType]:
+        """Fetch the ActionType for the long press rule.
+
+        Will return None if no long press rule is configured for the device.
+        """
+        with rules_db_from_device(self) as rules_db:
+            for _, device in rules_db.rules_for_device(
+                rule_type=RULE_TYPE_LONG_PRESS
+            ):
+                return ActionType(device.StartAction)
+        return None
+
+    def set_long_press_action(self, action: ActionType) -> None:
+        """Set the ActionType for the long press rule."""
+        with rules_db_from_device(self) as rules_db:
+            ensure_long_press_rule_exists(rules_db, self.name, self.udn)
+            for _, device in rules_db.rules_for_device(
+                rule_type=RULE_TYPE_LONG_PRESS
+            ):
+                device.StartAction = action.value
+
+    def ensure_long_press_virtual_device(self) -> None:
+        """Configure the device to notify pywemo when a long-press happens.
+
+        The ensure_long_press_virtual_device method ensures that the pywemo
+        virtual device is configured in the rules database for when a long press
+        rule is triggered.
+        """
+        self.add_long_press_udns([VIRTUAL_DEVICE_UDN])
+
+    def remove_long_press_virtual_device(self) -> None:
+        """Remove the pywemo virtual device from the long press."""
+        self.remove_long_press_udns([VIRTUAL_DEVICE_UDN])

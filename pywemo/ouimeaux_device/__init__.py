@@ -12,6 +12,7 @@ except ImportError:
 
 import requests
 
+from .api.long_press import LongPressMixin
 from .api.service import ActionException, Service
 from .api.xsd import device as deviceParser
 
@@ -683,6 +684,11 @@ class Device:
             )
 
         return status, close_status
+
+    @classmethod
+    def supports_long_press(cls) -> bool:
+        """Return True of the device supports long press events."""
+        return issubclass(cls, LongPressMixin)
 
     @property
     def model(self):

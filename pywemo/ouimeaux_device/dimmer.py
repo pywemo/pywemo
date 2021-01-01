@@ -1,8 +1,9 @@
 """Representation of a WeMo Dimmer device."""
+from .api.long_press import LongPressMixin
 from .switch import Switch
 
 
-class Dimmer(Switch):
+class Dimmer(Switch, LongPressMixin):
     """Representation of a WeMo Dimmer device."""
 
     def __init__(self, *args, **kwargs):

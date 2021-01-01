@@ -369,3 +369,7 @@ class TestDevice:
         )
         device.setup('ap_open', 'password', timeout=20, connection_attempts=2)
         assert device.WiFiSetup.ConnectHomeNetwork.call_count == 4
+
+    def test_supports_long_press_is_false(self, lightspeed, device):
+        """Test that the base Device does not have support for long press."""
+        assert device.supports_long_press() == False
