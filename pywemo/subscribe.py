@@ -10,6 +10,8 @@ from xml.etree import cElementTree
 
 import requests
 
+from .util import get_ip_address
+
 LOG = logging.getLogger(__name__)
 NS = "{urn:schemas-upnp-org:event-1-0}"
 SUCCESS = '<html><body><h1>200 OK</h1></body></html>'
@@ -20,18 +22,6 @@ class SubscriptionRegistryFailed(Exception):
     """General exceptions related to the subscription registry."""
 
     pass
-
-
-def get_ip_address(host='1.2.3.4'):
-    """Return IP from hostname or IP."""
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        sock.connect((host, 9))
-        return sock.getsockname()[0]
-    except socket.error:
-        return None
-    finally:
-        del sock
 
 
 class RequestHandler(BaseHTTPRequestHandler):
