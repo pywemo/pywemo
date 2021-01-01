@@ -10,10 +10,48 @@ from xml.etree import cElementTree
 
 import requests
 
+from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
+
+# Subscription event types.
+EVENT_TYPE_BINARY_STATE = "BinaryState"
+EVENT_TYPE_LONG_PRESS = "LongPress"
+
 LOG = logging.getLogger(__name__)
 NS = "{urn:schemas-upnp-org:event-1-0}"
-SUCCESS = '<html><body><h1>200 OK</h1></body></html>'
+RESPONSE_SUCCESS = '<html><body><h1>200 OK</h1></body></html>'
+RESPONSE_NOT_FOUND = '<html><body><h1>404 Not Found</h1></body></html>'
 SUBSCRIPTION_RETRY = 60
+
+VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
+<root xmlns="urn:Belkin:device-1-0">
+  <specVersion>
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+  <device>
+    <deviceType>urn:Belkin:device:switch:1</deviceType>
+    <friendlyName>pywemo virtual device</friendlyName>
+    <manufacturer>pywemo</manufacturer>
+    <manufacturerURL>https://github.com/pavoni/pywemo</manufacturerURL>
+    <modelDescription>pywemo virtual device</modelDescription>
+    <modelName>LightSwitch</modelName>
+    <modelNumber>1.0</modelNumber>
+    <hwVersion>v1</hwVersion>
+    <modelURL>http://www.belkin.com/plugin/</modelURL>
+    <serialNumber>VirtualDevice</serialNumber>
+    <UDN>{VIRTUAL_DEVICE_UDN}</UDN>
+    <binaryState>0</binaryState>
+    <serviceList>
+      <service>
+        <serviceType>urn:Belkin:service:basicevent:1</serviceType>
+        <serviceId>urn:Belkin:serviceId:basicevent1</serviceId>
+        <controlURL>/upnp/control/basicevent1</controlURL>
+        <eventSubURL>/upnp/event/basicevent1</eventSubURL>
+        <SCPDURL>/eventservice.xml</SCPDURL>
+      </service>
+    </serviceList>
+</device>
+</root>"""
 
 
 class SubscriptionRegistryFailed(Exception):
@@ -35,32 +73,124 @@ def get_ip_address(host='1.2.3.4'):
 
 
 class RequestHandler(BaseHTTPRequestHandler):
-    """Handles subscription responses received from devices."""
+    """Handles subscription responses and long press actions from devices.
 
-    def do_NOTIFY(self):
+    Subscription responses:
+      Pywemo can subscribe to Wemo devices. When subscribed, the Wemo device
+      will send notifications when the state of the device changes. The
+      do_NOTIFY method below is called when a Wemo device changes state.
+
+    Long press actions:
+      Wemo devices can control the state of other Wemo devices based on the
+      rules configured for the device. A long press rule is activated whenever
+      the button on the Wemo device is pressed for 2 seconds. The long press
+      rule is meant to be used to control the state of another device (turn
+      on/off/toggle). However for pywemo's use, a long press rule can be used to
+      trigger an event notification. This is implemented by configuring the
+      Wemo device to "control the state" of a virtual Wemo device. The virtual
+      device is implemented by this class.
+
+      The do_GET/do_POST/do_SUBSCRIBE methods below implement a virtual Wemo
+      device. The virtual device receives requests to change its state from
+      other Wemo devices on the network. When a Wemo device is configured to
+      change the state of the virutal device via a long press rule the following
+      sequence occurs:
+
+      1. The Wemo device will attempt to locate the virtual device on the
+      network. This is handled by the pywemo.ssdp.DiscoveryResponder class. See
+      the documentation there for more information about this step.
+
+      2. The Wemo device will fetch /setup.xml from do_GET to learn of the
+      virtual device details.
+
+      3. The Wemo device will subscribe to BinaryState notifications from the
+      virtual device. The virtual device does not send any BinaryState
+      notifications, but this step seems to be necessary before the next step
+      can happen. This step is implemented by the do_SUBSCRIBE method.
+
+      4. When a person presses the button on the Wemo for 2 seconds a long press
+      rule is triggered. If the long press rule is configured with an action
+      for the virtual device, the Wemo device will then call the do_POST method
+      to update the BinaryState of the virtual device. This doesn't actually
+      update any state, rather the virtual device then delivers the event
+      notification to any event listeners configured to receive events from the
+      pywemo SubscriptionRegistry. The event type for a long press action is
+      EVENT_TYPE_LONG_PRESS.
+    """
+
+    def do_NOTIFY(self):  # pylint: disable=invalid-name
         """Handle subscription responses received from devices."""
         sender_ip, _ = self.client_address
         outer = self.server.outer
         device = outer.devices.get(sender_ip)
-        content_len = int(self.headers.get('content-length', 0))
-        data = self.rfile.read(content_len)
         if device is None:
             LOG.warning('Received event for unregistered device %s', sender_ip)
         else:
-            # trim garbage from end, if any
-            data = data.decode("UTF-8").split("\n\n")[0]
-            doc = cElementTree.fromstring(data)
+            doc = self._get_xml_from_http_body()
             for propnode in doc.findall('./{0}property'.format(NS)):
                 for property_ in list(propnode):
                     text = property_.text
                     outer.event(device, property_.tag, text)
 
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/html')
-        self.send_header('Content-Length', len(SUCCESS))
+        self._send_response(200, RESPONSE_SUCCESS)
+
+    def do_GET(self):  # pylint: disable=invalid-name
+        """Handle GET requests for a Virtual WeMo device."""
+        if self.path.endswith("/setup.xml"):
+            self._send_response(
+                200, VIRTUAL_SETUP_XML, content_type="text/xml"
+            )
+        else:
+            self._send_response(404, RESPONSE_NOT_FOUND)
+
+    def do_POST(self):  # pylint: disable=invalid-name
+        """Handle POST requests for a Virtual WeMo device."""
+        if self.path.endswith("/upnp/control/basicevent1"):
+            sender_ip, _ = self.client_address
+            outer = self.server.outer
+            device = outer.devices.get(sender_ip)
+            if device is None:
+                LOG.warning(
+                    'Received event for unregistered device %s', sender_ip
+                )
+            else:
+                doc = self._get_xml_from_http_body()
+                binary_state = doc.find('.//BinaryState')
+                if binary_state is not None:
+                    text = binary_state.text
+                    outer.event(device, EVENT_TYPE_LONG_PRESS, text)
+            self._send_response(200, RESPONSE_SUCCESS)
+        else:
+            self._send_response(404, RESPONSE_NOT_FOUND)
+
+    def do_SUBSCRIBE(self):  # pylint: disable=invalid-name
+        """Handle SUBSCRIBE requests for a Virtual WeMo device."""
+        if self.path.endswith("/upnp/event/basicevent1"):
+            self.send_response(200)
+            self.send_header("CONTENT-LENGTH", "0")
+            self.send_header("TIMEOUT", "Second-1801")
+            self.send_header("SID", "uuid:virtual-device-uuid")
+            self.send_header('Connection', 'close')
+            self.end_headers()
+        else:
+            self._send_response(404, RESPONSE_NOT_FOUND)
+
+    def _send_response(self, code, body, *, content_type="text/html"):
+        self.send_response(code)
+        self.send_header('Content-Type', content_type)
+        self.send_header('Content-Length', len(body))
         self.send_header('Connection', 'close')
         self.end_headers()
-        self.wfile.write(SUCCESS.encode("UTF-8"))
+        if body:
+            self.wfile.write(body.encode("UTF-8"))
+
+    def _get_xml_from_http_body(self):
+        """Build the cElementTree root from the body of the http request."""
+        content_len = int(self.headers.get('content-length', 0))
+        data = self.rfile.read(content_len)
+        # trim garbage from end, if any
+        data = data.decode("UTF-8").strip()
+        return cElementTree.fromstring(data)
 
     # pylint: disable=redefined-builtin
     def log_message(self, format, *args):
@@ -90,6 +220,11 @@ class SubscriptionRegistry:
         self._http_thread = None
         self._httpd = None
         self._port = None
+
+    @property
+    def port(self) -> int:
+        """Return the port that the http server is listening on."""
+        return self._httpd.server_address[1]
 
     def register(self, device):
         """Register a device for subscription updates."""
