@@ -5,12 +5,8 @@ import sched
 import socket
 import threading
 import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from xml.etree import cElementTree
-
-try:
-    import BaseHTTPServer
-except ImportError:
-    import http.server as BaseHTTPServer
 
 import requests
 
@@ -38,7 +34,7 @@ def get_ip_address(host='1.2.3.4'):
         del sock
 
 
-class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class RequestHandler(BaseHTTPRequestHandler):
     """Handles subscription responses received from devices."""
 
     def do_NOTIFY(self):
@@ -218,9 +214,7 @@ class SubscriptionRegistry:
         for i in range(0, 128):
             port = 8989 + i
             try:
-                self._httpd = BaseHTTPServer.HTTPServer(
-                    ('', port), RequestHandler
-                )
+                self._httpd = HTTPServer(('', port), RequestHandler)
                 self._port = port
                 break
             except (OSError, socket.error):
