@@ -404,7 +404,7 @@ class DiscoveryResponder:
         self._thread = None
         self._exit = threading.Event()
         self._thread_exception = None
-        self._notify_enabled = True  # For tests.
+        self._notify_enabled = True  # Only ever set to False in tests.
 
     def send_notify(self) -> None:
         """Send a UPnP NOTIFY message containing the virtual device URL."""
