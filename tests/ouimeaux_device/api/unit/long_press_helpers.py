@@ -1,7 +1,7 @@
 import contextlib
 import sqlite3
 import tempfile
-from unittest.mock import create_autospec, patch
+from unittest.mock import patch
 
 import pytest
 
