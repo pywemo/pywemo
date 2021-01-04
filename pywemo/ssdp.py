@@ -240,10 +240,10 @@ def build_ssdp_request(ssdp_st, ssdp_mx):
     return "\r\n".join(
         [
             'M-SEARCH * HTTP/1.1',
-            'ST: {}'.format(ssdp_st),
-            'MX: {:d}'.format(ssdp_mx),
+            f'ST: {ssdp_st}',
+            f'MX: {ssdp_mx}',
             'MAN: "ssdp:discover"',
-            'HOST: {}:{}'.format(MULTICAST_GROUP, MULTICAST_PORT),
+            f'HOST: {MULTICAST_GROUP}:{MULTICAST_PORT}',
             '',
             '',
         ]
