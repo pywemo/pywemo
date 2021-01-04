@@ -385,8 +385,8 @@ class DiscoveryResponder:
     Wemo devices are informed of the pywemo virtual Wemo device in two ways:
 
     1. Wemo devices periodically send UPnP M-SEARCH discovery requests for the
-    to locate other devices on the network. DiscoveryResponder responds to these
-    requests with the URL for the virtual device.
+    to locate other devices on the network. DiscoveryResponder responds to
+    these requests with the URL for the virtual device.
 
     2. A UPnP NOTIFY message is periodically multicasted by DiscoveryResponder
     to inform Wemo devices on the network of the URL for the virtual device.
@@ -451,7 +451,7 @@ class DiscoveryResponder:
 
                 # Check for new discovery requests.
                 if not select.select([sock], [], [], 1)[0]:
-                    continue  # Timeout, no data. Loop again and check for exit.
+                    continue  # Timeout, no data. Loop again and check for exit
                 msg, addr = sock.recvfrom(1024)
                 lines = msg.splitlines()
                 if len(lines) < 3 or not lines[0].startswith(
