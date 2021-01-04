@@ -452,7 +452,7 @@ class DiscoveryResponder:
                 # Check for new discovery requests.
                 if not select.select([sock], [], [], 1)[0]:
                     continue  # Timeout, no data. Loop again and check for exit
-                msg, addr = sock.recvfrom(1024)
+                msg, sock_addr = sock.recvfrom(1024)
                 lines = msg.splitlines()
                 if len(lines) < 3 or not lines[0].startswith(
                     b"M-SEARCH * HTTP"
@@ -463,13 +463,16 @@ class DiscoveryResponder:
                     or EXPECTED_MAN_HEADER not in lines
                 ):
                     continue
-                callback_addr = (get_ip_address(addr[0]), self.callback_port)
+                callback_addr = (
+                    get_ip_address(sock_addr[0]),
+                    self.callback_port,
+                )
                 try:
                     sock.sendto(
-                        (SSDP_REPLY % callback_addr).encode("UTF-8"), addr
+                        (SSDP_REPLY % callback_addr).encode("UTF-8"), sock_addr
                     )
                 except socket.error:
-                    LOG.exception("Failed to send SSDP reply to %r", addr)
+                    LOG.exception("Failed to send SSDP reply to %r", sock_addr)
         except Exception as exp:
             self._thread_exception = exp  # Used in the stop() method.
             raise
