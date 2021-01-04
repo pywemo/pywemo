@@ -372,4 +372,4 @@ class TestDevice:
 
     def test_supports_long_press_is_false(self, lightspeed, device):
         """Test that the base Device does not have support for long press."""
-        assert device.supports_long_press() == False
+        assert device.supports_long_press() is False
