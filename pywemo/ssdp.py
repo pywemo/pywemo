@@ -35,6 +35,7 @@ ST: {ST}
 USN: {VIRTUAL_DEVICE_UDN}::{ST}
 
 """  # Newline characters at the the end of SSDP_REPLY are intentional.
+SSDP_REPLY = SSDP_REPLY.replace('\n', '\r\n')
 
 SSDP_NOTIFY = f"""NOTIFY * HTTP/1.1
 HOST: {MULTICAST_GROUP}:{MULTICAST_PORT}
@@ -46,6 +47,7 @@ NTS: ssdp:alive
 USN: {VIRTUAL_DEVICE_UDN}::{ST}
 
 """  # Newline characters at the the end of SSDP_NOTIFY are intentional.
+SSDP_NOTIFY = SSDP_NOTIFY.replace('\n', '\r\n')
 
 EXPECTED_ST_HEADER = ("ST: " + ST).encode("UTF-8")
 EXPECTED_MAN_HEADER = b'MAN: "ssdp:discover"'
