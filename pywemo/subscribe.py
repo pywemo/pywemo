@@ -72,6 +72,17 @@ def get_ip_address(host='1.2.3.4'):
         del sock
 
 
+def _start_server():
+    """Find a valid open port and start the HTTP server."""
+    for i in range(0, 128):
+        port = 8989 + i
+        try:
+            return HTTPServer(('', port), RequestHandler)
+        except (OSError, socket.error):
+            continue
+    return None
+
+
 class RequestHandler(BaseHTTPRequestHandler):
     """Handles subscription responses and long press actions from devices.
 
@@ -221,7 +232,6 @@ class SubscriptionRegistry:
 
         self._http_thread = None
         self._httpd = None
-        self._port = None
 
     @property
     def port(self) -> int:
@@ -271,7 +281,7 @@ class SubscriptionRegistry:
             host = get_ip_address(host=device.host)
             headers.update(
                 {
-                    "CALLBACK": '<http://%s:%d>' % (host, self._port),
+                    "CALLBACK": '<http://%s:%d>' % (host, self.port),
                     "NT": "upnp:event",
                 }
             )
@@ -346,22 +356,10 @@ class SubscriptionRegistry:
         """Add an event callback for a device."""
         self._callbacks[device.serialnumber].append((type_filter, callback))
 
-    def _find_port(self):
-        """Find a valid open port to run the HTTP server on."""
-        for i in range(0, 128):
-            port = 8989 + i
-            try:
-                self._httpd = HTTPServer(('', port), RequestHandler)
-                self._port = port
-                break
-            except (OSError, socket.error):
-                continue
-
     def start(self):
         """Start the subscription registry."""
-        self._port = None
-        self._find_port()
-        if self._port is None:
+        self._httpd = _start_server()
+        if self._httpd is None:
             raise SubscriptionRegistryFailed(
                 'Unable to bind a port for listening'
             )
@@ -407,7 +405,7 @@ class SubscriptionRegistry:
         """Start the HTTP server."""
         self._httpd.allow_reuse_address = True
         self._httpd.outer = self
-        LOG.info("Listening on port %d", self._port)
+        LOG.info("Listening on port %d", self.port)
         self._httpd.serve_forever()
 
     def _run_event_loop(self):
