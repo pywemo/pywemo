@@ -36,6 +36,7 @@ good-names=
   k,
   s,
   st,
+  db,
   eventSubURL,
   uniqueID,
   do_NOTIFY,
