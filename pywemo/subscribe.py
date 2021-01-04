@@ -85,16 +85,16 @@ class RequestHandler(BaseHTTPRequestHandler):
       rules configured for the device. A long press rule is activated whenever
       the button on the Wemo device is pressed for 2 seconds. The long press
       rule is meant to be used to control the state of another device (turn
-      on/off/toggle). However for pywemo's use, a long press rule can be used to
-      trigger an event notification. This is implemented by configuring the
+      on/off/toggle). However for pywemo's use, a long press rule can be used
+      to trigger an event notification. This is implemented by configuring the
       Wemo device to "control the state" of a virtual Wemo device. The virtual
       device is implemented by this class.
 
       The do_GET/do_POST/do_SUBSCRIBE methods below implement a virtual Wemo
       device. The virtual device receives requests to change its state from
       other Wemo devices on the network. When a Wemo device is configured to
-      change the state of the virutal device via a long press rule the following
-      sequence occurs:
+      change the state of the virtual device via a long press rule the
+      following sequence occurs:
 
       1. The Wemo device will attempt to locate the virtual device on the
       network. This is handled by the pywemo.ssdp.DiscoveryResponder class. See
@@ -108,14 +108,14 @@ class RequestHandler(BaseHTTPRequestHandler):
       notifications, but this step seems to be necessary before the next step
       can happen. This step is implemented by the do_SUBSCRIBE method.
 
-      4. When a person presses the button on the Wemo for 2 seconds a long press
-      rule is triggered. If the long press rule is configured with an action
-      for the virtual device, the Wemo device will then call the do_POST method
-      to update the BinaryState of the virtual device. This doesn't actually
-      update any state, rather the virtual device then delivers the event
-      notification to any event listeners configured to receive events from the
-      pywemo SubscriptionRegistry. The event type for a long press action is
-      EVENT_TYPE_LONG_PRESS.
+      4. When a person presses the button on the Wemo for 2 seconds a long
+      press rule is triggered. If the long press rule is configured with an
+      action for the virtual device, the Wemo device will then call the do_POST
+      method to update the BinaryState of the virtual device. This doesn't
+      actually update any state, rather the virtual device then delivers the
+      event notification to any event listeners configured to receive events
+      from the pywemo SubscriptionRegistry. The event type for a long press
+      action is EVENT_TYPE_LONG_PRESS.
     """
 
     def do_NOTIFY(self):  # pylint: disable=invalid-name
