@@ -150,7 +150,9 @@ def test_SUBSCRIBE_state(server_url):
     assert response.content == b""
     assert response.headers["CONTENT-LENGTH"] == "0"
     assert response.headers["TIMEOUT"] == "Second-1801"
-    assert response.headers["SID"] == "uuid:virtual-device-uuid"
+    assert (
+        response.headers["SID"] == "uuid:a74b23d5-34b9-4f71-9f87-bed24353f304"
+    )
 
 
 def test_SUBSCRIBE_default_404(server_url):

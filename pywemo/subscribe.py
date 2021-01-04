@@ -169,7 +169,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("CONTENT-LENGTH", "0")
             self.send_header("TIMEOUT", "Second-1801")
-            self.send_header("SID", "uuid:virtual-device-uuid")
+            self.send_header(
+                "SID", "uuid:a74b23d5-34b9-4f71-9f87-bed24353f304"
+            )
             self.send_header('Connection', 'close')
             self.end_headers()
         else:
