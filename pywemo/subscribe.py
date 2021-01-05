@@ -180,6 +180,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("CONTENT-LENGTH", "0")
             self.send_header("TIMEOUT", "Second-1801")
+            # Using a randomly generated valid UUID (uuid.uuid4()).
             self.send_header(
                 "SID", "uuid:a74b23d5-34b9-4f71-9f87-bed24353f304"
             )
