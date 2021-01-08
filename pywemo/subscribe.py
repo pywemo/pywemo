@@ -10,8 +10,8 @@ from xml.etree import cElementTree
 
 import requests
 
-from .util import get_ip_address
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
+from .util import get_ip_address
 
 # Subscription event types.
 EVENT_TYPE_BINARY_STATE = "BinaryState"
