@@ -9,16 +9,48 @@ from datetime import datetime, timedelta
 
 import requests
 
-from .util import etree_to_dict, interface_addresses
+from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
+from .util import etree_to_dict, get_ip_address, interface_addresses
 
 DISCOVER_TIMEOUT = 5
+
+LOG = logging.getLogger(__name__)
 
 RESPONSE_REGEX = re.compile(r'\n(.*)\: (.*)\r')
 
 MIN_TIME_BETWEEN_SCANS = timedelta(seconds=59)
 
+MULTICAST_GROUP = "239.255.255.250"
+MULTICAST_PORT = 1900
+
 # Wemo specific urn:
 ST = "urn:Belkin:service:basicevent:1"
+
+SSDP_REPLY = f"""HTTP/1.1 200 OK
+CACHE-CONTROL: max-age=86400
+EXT:
+LOCATION: http://%s:%d/setup.xml
+OPT: "http://schemas.upnp.org/upnp/1/0/"; ns=01
+ST: {ST}
+USN: {VIRTUAL_DEVICE_UDN}::{ST}
+
+"""  # Newline characters at the the end of SSDP_REPLY are intentional.
+SSDP_REPLY = SSDP_REPLY.replace('\n', '\r\n')
+
+SSDP_NOTIFY = f"""NOTIFY * HTTP/1.1
+HOST: {MULTICAST_GROUP}:{MULTICAST_PORT}
+CACHE-CONTROL: max-age=1800
+LOCATION: http://%s:%d/setup.xml
+SERVER: Unspecified, UPnP/1.0, Unspecified
+NT: {ST}
+NTS: ssdp:alive
+USN: {VIRTUAL_DEVICE_UDN}::{ST}
+
+"""  # Newline characters at the the end of SSDP_NOTIFY are intentional.
+SSDP_NOTIFY = SSDP_NOTIFY.replace('\n', '\r\n')
+
+EXPECTED_ST_HEADER = ("ST: " + ST).encode("UTF-8")
+EXPECTED_MAN_HEADER = b'MAN: "ssdp:discover"'
 
 
 class SSDP:
@@ -210,10 +242,10 @@ def build_ssdp_request(ssdp_st, ssdp_mx):
     return "\r\n".join(
         [
             'M-SEARCH * HTTP/1.1',
-            'ST: {}'.format(ssdp_st),
-            'MX: {:d}'.format(ssdp_mx),
+            f'ST: {ssdp_st}',
+            f'MX: {ssdp_mx}',
             'MAN: "ssdp:discover"',
-            'HOST: 239.255.255.250:1900',
+            f'HOST: {MULTICAST_GROUP}:{MULTICAST_PORT}',
             '',
             '',
         ]
@@ -255,7 +287,7 @@ def scan(
     Inspired by Crimsdings
     https://github.com/crimsdings/ChromeCast/blob/master/cc_discovery.py
     """
-    ssdp_target = ("239.255.255.250", 1900)
+    ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
 
     entries = []
 
@@ -336,14 +368,138 @@ def scan(
                     if len(entries) == max_entries:
                         return entries
     except socket.error:
-        logging.getLogger(__name__).exception(
-            "Socket error while discovering SSDP devices"
-        )
+        LOG.exception("Socket error while discovering SSDP devices")
     finally:
         for s in sockets:
             s.close()
 
     return entries
+
+
+class DiscoveryResponder:
+    """Inform Wemo devices of the pywemo virtual Wemo device.
+
+    The DiscoveryResponder informs Wemo devices of the /setup.xml URL for the
+    pywemo virtual Wemo device. The virtual device is used for receiving long
+    press actions from Wemo devices and is integrated into the
+    SubscriptionRegistry HTTP server.
+
+    Wemo devices are informed of the pywemo virtual Wemo device in two ways:
+
+    1. Wemo devices periodically send UPnP M-SEARCH discovery requests for the
+    to locate other devices on the network. DiscoveryResponder responds to
+    these requests with the URL for the virtual device.
+
+    2. A UPnP NOTIFY message is periodically multicasted by DiscoveryResponder
+    to inform Wemo devices on the network of the URL for the virtual device.
+    """
+
+    def __init__(self, callback_port: int):
+        """Create a server that will respond to WeMo discovery requests.
+
+        Args:
+            callback_port: The port for the SubscriptionRegistry HTTP server.
+        """
+        self.callback_port = callback_port
+        self._thread = None
+        self._exit = threading.Event()
+        self._thread_exception = None
+        self._notify_enabled = True  # Only ever set to False in tests.
+
+    def send_notify(self) -> None:
+        """Send a UPnP NOTIFY message containing the virtual device URL."""
+        ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
+        for addr in interface_addresses():  # Send on all interfaces.
+            callback_addr = (addr, self.callback_port)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            try:
+                sock.bind((addr, 0))
+                sock.sendto(
+                    (SSDP_NOTIFY % callback_addr).encode("UTF-8"), ssdp_target
+                )
+            except socket.error:
+                pass
+            finally:
+                sock.close()
+
+    def respond_to_discovery(self) -> None:
+        """Respond to a WeMo discovery request with the virtual device URL."""
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+            # Join the multicast group on all interfaces.
+            group = socket.inet_aton(MULTICAST_GROUP)
+            for addr in interface_addresses():
+                try:
+                    local = socket.inet_aton(addr)
+                    sock.setsockopt(
+                        socket.IPPROTO_IP,
+                        socket.IP_ADD_MEMBERSHIP,
+                        group + local,
+                    )
+                except socket.error:
+                    pass
+
+            sock.bind((MULTICAST_GROUP, MULTICAST_PORT))
+
+            next_notify = datetime.min
+            while not self._exit.is_set():
+                # Periodically send NOTIFY messages.
+                now = datetime.now()
+                if now > next_notify and self._notify_enabled:
+                    next_notify = now + timedelta(minutes=2)
+                    self.send_notify()
+
+                # Check for new discovery requests.
+                if not select.select([sock], [], [], 1)[0]:
+                    continue  # Timeout, no data. Loop again and check for exit
+                msg, sock_addr = sock.recvfrom(1024)
+                lines = msg.splitlines()
+                if len(lines) < 3 or not lines[0].startswith(
+                    b"M-SEARCH * HTTP"
+                ):
+                    continue
+                if (
+                    EXPECTED_ST_HEADER not in lines
+                    or EXPECTED_MAN_HEADER not in lines
+                ):
+                    continue
+                callback_addr = (
+                    get_ip_address(sock_addr[0]),
+                    self.callback_port,
+                )
+                try:
+                    sock.sendto(
+                        (SSDP_REPLY % callback_addr).encode("UTF-8"), sock_addr
+                    )
+                except socket.error:
+                    LOG.exception("Failed to send SSDP reply to %r", sock_addr)
+        except Exception as exp:
+            self._thread_exception = exp  # Used in the stop() method.
+            raise
+        finally:
+            sock.close()
+
+    def start(self) -> None:
+        """Start the server."""
+        self._exit.clear()
+        self._thread_exception = None
+        self._thread = threading.Thread(
+            target=self.respond_to_discovery,
+            name='Wemo DiscoveryResponder Thread',
+        )
+        self._thread.start()
+
+    def stop(self) -> None:
+        """Stop the server."""
+        if self._thread:
+            self._exit.set()
+            self._thread.join()
+            self._thread = None
+            # Improve visibility of any exceptions that occurred on the thread.
+            if self._thread_exception is not None:
+                raise self._thread_exception  # pylint: disable=raising-bad-type
 
 
 if __name__ == "__main__":

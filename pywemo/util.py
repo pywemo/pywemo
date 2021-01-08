@@ -1,4 +1,5 @@
 """Miscellaneous utility functions."""
+import socket
 from collections import defaultdict
 
 import ifaddr
@@ -54,3 +55,15 @@ def interface_addresses():
             addresses.append(addr.ip)
 
     return addresses
+
+
+def get_ip_address(host='1.2.3.4'):
+    """Return IP from hostname or IP."""
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        sock.connect((host, 9))
+        return sock.getsockname()[0]
+    except socket.error:
+        return None
+    finally:
+        del sock

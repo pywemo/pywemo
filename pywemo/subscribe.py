@@ -11,6 +11,7 @@ from xml.etree import cElementTree
 import requests
 
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
+from .util import get_ip_address
 
 # Subscription event types.
 EVENT_TYPE_BINARY_STATE = "BinaryState"
@@ -58,18 +59,6 @@ class SubscriptionRegistryFailed(Exception):
     """General exceptions related to the subscription registry."""
 
     pass
-
-
-def get_ip_address(host='1.2.3.4'):
-    """Return IP from hostname or IP."""
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        sock.connect((host, 9))
-        return sock.getsockname()[0]
-    except socket.error:
-        return None
-    finally:
-        del sock
 
 
 def _start_server():
