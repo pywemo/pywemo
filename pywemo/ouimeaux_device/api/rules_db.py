@@ -183,7 +183,7 @@ class RulesDb:
         )
 
     @property
-    def db(self) -> sqlite3.Connection:  # pylint: disable=invalid-name
+    def db(self) -> sqlite3.Connection:
         """Return the sqlite3 connection instance."""
         return self._db
 
