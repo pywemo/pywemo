@@ -499,7 +499,8 @@ class DiscoveryResponder:
             self._thread = None
             # Improve visibility of any exceptions that occurred on the thread.
             if self._thread_exception is not None:
-                raise self._thread_exception  # pylint: disable=raising-bad-type
+                # pylint: disable=raising-bad-type
+                raise self._thread_exception
 
 
 if __name__ == "__main__":

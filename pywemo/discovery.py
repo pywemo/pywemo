@@ -164,7 +164,6 @@ def hostname_lookup(hostname):
 
 def setup_url_for_address(host, port):
     """Determine setup.xml url for a given host and port pair."""
-
     # Force hostnames into IP addresses
     try:
         # Attempt to register {host} as an IP address; if this fails ({host} is

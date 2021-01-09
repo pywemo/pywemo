@@ -362,10 +362,10 @@ def rules_db_from_device(device) -> RulesDb:
             ...
 
     The sqlite3.Connection object can be accessed via the '.db' property in the
-    returned RulesDb instance. If the database is modified directly, setting the
-    `.modified` attribute to True will cause the database to be sent to the WeMo
-    device. Any updates that take place via the RulesDb helper methods will also
-    be propagated back to the WeMo device.
+    returned RulesDb instance. If the database is modified directly, setting
+    the `.modified` attribute to True will cause the database to be sent to the
+    WeMo device. Any updates that take place via the RulesDb helper methods
+    will also be propagated back to the WeMo device.
     """
     fetch = device.rules.FetchRules()
     version = int(fetch["ruleDbVersion"])
