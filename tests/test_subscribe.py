@@ -1,4 +1,5 @@
 """Tests for the subscription registry and http server module."""
+
 import threading
 import unittest.mock as mock
 from http.server import HTTPServer
@@ -65,7 +66,7 @@ def mock_light_switch():
 
 
 def test_NOTIFY_unknown_device(server_url):
-    """NOTIFY returns sucess status for unknown devices."""
+    """NOTIFY returns success status for unknown devices."""
     response = requests.request("NOTIFY", f"{server_url}")
     assert response.status_code == 200
     assert response.content == subscribe.RESPONSE_SUCCESS.encode("UTF-8")
@@ -106,7 +107,7 @@ def test_GET_default_404(server_url):
 
 
 def test_POST_unknown_device(server_url):
-    """POST returns sucess status for unknown devices."""
+    """POST returns success status for unknown devices."""
     response = requests.post(f"{server_url}/upnp/control/basicevent1")
     assert response.status_code == 200
     assert response.content == subscribe.RESPONSE_SUCCESS.encode("UTF-8")

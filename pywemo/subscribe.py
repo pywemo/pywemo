@@ -6,9 +6,9 @@ import socket
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from xml.etree import cElementTree
 
 import requests
+from lxml import etree as et
 
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
 from .util import get_ip_address
@@ -188,12 +188,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(body.encode("UTF-8"))
 
     def _get_xml_from_http_body(self):
-        """Build the cElementTree root from the body of the http request."""
+        """Build the element tree root from the body of the http request."""
         content_len = int(self.headers.get('content-length', 0))
         data = self.rfile.read(content_len)
         # trim garbage from end, if any
-        data = data.decode("UTF-8").strip()
-        return cElementTree.fromstring(data)
+        data = data.decode('UTF-8').strip().encode('UTF-8')
+        return et.fromstring(data)
 
     # pylint: disable=redefined-builtin
     def log_message(self, format, *args):

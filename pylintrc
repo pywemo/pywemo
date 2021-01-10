@@ -1,6 +1,7 @@
 [MASTER]
 ignore=xsd
 reports=no
+extension-pkg-whitelist=lxml
 
 disable=
   abstract-class-little-used,

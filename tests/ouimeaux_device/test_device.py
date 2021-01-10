@@ -141,7 +141,6 @@ APLIST = (
 
 def mocked_requests_get(*args, **kwargs):
     """Mock a response from request.get()."""
-
     class MockResponse:
         """Mocked requests response."""
 

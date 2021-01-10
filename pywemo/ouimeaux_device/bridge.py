@@ -2,7 +2,8 @@
 import io
 import time
 from html import escape
-from xml.etree import cElementTree as et
+
+from lxml import etree as et
 
 from ..color import get_profiles, limit_to_gamut
 from . import Device

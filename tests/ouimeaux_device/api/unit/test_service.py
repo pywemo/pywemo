@@ -1,11 +1,10 @@
 """Tests for pywemo.ouimeaux_device.api.service."""
 
 import unittest.mock as mock
-from xml.etree import ElementTree
-from xml.etree import cElementTree as cet
 
 import pytest
 import requests
+from lxml import etree as et
 
 import pywemo.ouimeaux_device.api.service as svc
 
@@ -43,13 +42,13 @@ class TestAction:
 
     @staticmethod
     def get_et_mock():
-        resp = cet.fromstring(MOCK_RESPONSE)
+        resp = et.fromstring(MOCK_RESPONSE)
         return mock.MagicMock(return_value=resp)
 
     def test_call_post_request_is_made_exactly_once_when_successful(self):
         action = self.get_mock_action()
         requests.post = post_mock = mock.Mock()
-        cet.fromstring = self.get_et_mock()
+        et.fromstring = self.get_et_mock()
 
         action()
 
@@ -58,12 +57,12 @@ class TestAction:
     def test_call_request_has_well_formed_xml_body(self):
         action = self.get_mock_action(name="cool_name", service_type="service")
         requests.post = post_mock = mock.Mock()
-        cet.fromstring = self.get_et_mock()
+        et.fromstring = self.get_et_mock()
 
         action()
 
         body = post_mock.call_args[MOCK_ARGS_ORDERED][1]
-        ElementTree.fromstring(body)  # will raise error if xml is malformed
+        et.fromstring(body)  # will raise error if xml is malformed
 
     def test_call_request_has_correct_header_keys(self):
         action = self.get_mock_action()
@@ -135,9 +134,9 @@ class TestAction:
         action = self.get_mock_action()
         requests.post = mock.Mock()
 
-        envelope = cet.Element("soapEnvelope")
-        body = cet.SubElement(envelope, "soapBody")
-        response = cet.SubElement(body, "soapResponse")
+        envelope = et.Element("soapEnvelope")
+        body = et.SubElement(envelope, "soapBody")
+        response = et.SubElement(body, "soapResponse")
 
         response_content = {
             "key1": "value1",
@@ -146,10 +145,10 @@ class TestAction:
         }
 
         for key, value in response_content.items():
-            element = cet.SubElement(response, key)
+            element = et.SubElement(response, key)
             element.text = value
 
-        cet.fromstring = mock.MagicMock(return_value=envelope)
+        et.fromstring = mock.MagicMock(return_value=envelope)
 
         actual_responses = action()
 
