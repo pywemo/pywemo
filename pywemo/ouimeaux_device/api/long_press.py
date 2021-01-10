@@ -144,8 +144,8 @@ class LongPressMixin:
         """Configure the device to notify pywemo when a long-press happens.
 
         The ensure_long_press_virtual_device method ensures that the pywemo
-        virtual device is configured in the rules database for when a long press
-        rule is triggered.
+        virtual device is configured in the rules database for when a long
+        press rule is triggered.
         """
         self.add_long_press_udns([VIRTUAL_DEVICE_UDN])
 
