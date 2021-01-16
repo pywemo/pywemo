@@ -312,13 +312,13 @@ class SubscriptionRegistry:
     def _url_resubscribe(self, device, headers, sid, url):
         request_headers = headers.copy()
         response = requests.request(
-            method="SUBSCRIBE", url=url, headers=request_headers
+            method="SUBSCRIBE", url=url, headers=request_headers, timeout=10
         )
         if response.status_code == 412 and sid:
             # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
             # start over.
             requests.request(
-                method='UNSUBSCRIBE', url=url, headers={'SID': sid}
+                method='UNSUBSCRIBE', url=url, headers={'SID': sid}, timeout=10
             )
             return self._resubscribe(device)
         timeout = int(
