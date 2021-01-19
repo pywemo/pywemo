@@ -1,7 +1,8 @@
 """Representation of a WeMo Humidifier device."""
 
 import sys
-from xml.etree import cElementTree as et
+
+from lxml import etree as et
 
 from pywemo.ouimeaux_device.api.xsd.device import quote_xml
 

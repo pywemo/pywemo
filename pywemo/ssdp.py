@@ -4,10 +4,10 @@ import re
 import select
 import socket
 import threading
-import xml.etree.ElementTree as XMLElementTree
 from datetime import datetime, timedelta
 
 import requests
+from lxml import etree as et
 
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
 from .util import etree_to_dict, get_ip_address, interface_addresses
@@ -169,11 +169,11 @@ class UPNPEntry:
             try:
                 for _ in range(3):
                     try:
-                        xml = requests.get(url, timeout=10).text
+                        xml = requests.get(url, timeout=10).content
 
                         tree = None
                         if xml is not None:
-                            tree = XMLElementTree.fromstring(xml)
+                            tree = et.fromstring(xml)
 
                         if tree is not None:
                             UPNPEntry.DESCRIPTION_CACHE[url] = etree_to_dict(
@@ -189,7 +189,7 @@ class UPNPEntry:
                         )
                         UPNPEntry.DESCRIPTION_CACHE[url] = {}
 
-            except XMLElementTree.ParseError:
+            except et.ParseError:
                 # There used to be a log message here to record an error about
                 # malformed XML, but this only happens on non-WeMo devices
                 # and can be safely ignored.
@@ -273,7 +273,6 @@ def entry_in_entries(entry, entries, mac, serial):
     return False
 
 
-# pylint: disable=too-many-nested-blocks
 def scan(
     st=None,
     timeout=DISCOVER_TIMEOUT,
@@ -287,6 +286,7 @@ def scan(
     Inspired by Crimsdings
     https://github.com/crimsdings/ChromeCast/blob/master/cc_discovery.py
     """
+    # pylint: disable=too-many-nested-blocks
     ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
 
     entries = []

@@ -1,9 +1,9 @@
 """Representation of Services and Actions for WeMo devices."""
 # flake8: noqa E501
 import logging
-from xml.etree import cElementTree as et
 
 import requests
+from lxml import etree as et
 
 from .xsd import service as serviceParser
 
@@ -69,7 +69,7 @@ class Action:
                 response_dict = {}
 
                 for response_item in list(
-                    list(list(et.fromstring(response.content)))[0]
+                    list(et.fromstring(response.content))[0]
                 )[0]:
                     response_dict[response_item.tag] = response_item.text
                 return response_dict
