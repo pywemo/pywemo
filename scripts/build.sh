@@ -50,7 +50,7 @@ pylint pywemo
 
 echo
 echo "===Test with pytest==="
-pytest
+pytest --vcr-record=none
 
 echo
 echo "===Building package==="
