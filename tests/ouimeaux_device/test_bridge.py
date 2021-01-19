@@ -1,8 +1,7 @@
 """Tests for the Bridge class."""
-import os
-from xml.etree import cElementTree as et
 
 import pytest
+from lxml import etree as et
 
 from pywemo import Bridge
 
