@@ -118,7 +118,7 @@ def test_discovery_responder_notify(mock_socket, mock_interface_addresses):
     resp.send_notify()
     for addr in mock_interface_addresses:
         mock_socket.sendto.assert_called_with(
-            (ssdp.SSDP_NOTIFY % (addr, MOCK_CALLBACK_PORT)).encode('UTF-8'),
+            (ssdp.SSDP_NOTIFY % (addr, MOCK_CALLBACK_PORT)).encode('utf-8'),
             ('239.255.255.250', 1900),
         )
 
