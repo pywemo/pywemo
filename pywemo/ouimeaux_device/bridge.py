@@ -68,7 +68,9 @@ class Bridge(Device):
                     DevUDN=plugin_udn, ReqListType='PAIRED_LIST'
                 )
 
-            end_device_list = et.fromstring(end_devices.get('DeviceLists'))
+            end_device_list = et.fromstring(
+                end_devices.get('DeviceLists').encode('utf-8')
+            )
 
             for light in end_device_list.iter('DeviceInfo'):
                 uniqueID = light.find('DeviceID').text
@@ -90,7 +92,9 @@ class Bridge(Device):
         """Return the list of device statuses for the bridge's lights."""
         # pylint: disable=maybe-no-member
         status_list = self.bridge.GetDeviceStatus(DeviceIDs=deviceid)
-        device_status_list = et.fromstring(status_list.get('DeviceStatusList'))
+        device_status_list = et.fromstring(
+            status_list.get('DeviceStatusList').encode('utf-8')
+        )
 
         return device_status_list.find('DeviceStatus')
 

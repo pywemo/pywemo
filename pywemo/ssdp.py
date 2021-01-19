@@ -169,7 +169,7 @@ class UPNPEntry:
             try:
                 for _ in range(3):
                     try:
-                        xml = requests.get(url, timeout=10).text
+                        xml = requests.get(url, timeout=10).content
 
                         tree = None
                         if xml is not None:

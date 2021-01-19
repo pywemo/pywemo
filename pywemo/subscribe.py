@@ -192,7 +192,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         data = self.rfile.read(content_len)
         # trim garbage from end, if any
-        data = data.decode('UTF-8').strip().encode('UTF-8')
+        data = data.strip()
         return et.fromstring(data)
 
     # pylint: disable=redefined-builtin
