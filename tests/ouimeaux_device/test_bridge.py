@@ -8,10 +8,14 @@ from pywemo import Bridge
 LIGHT_ID = '0017880108DA898B'
 
 
-@pytest.mark.vcr()
-def test_light_turn_on():
-    bridge = Bridge('http://192.168.1.100:49153/setup.xml', '')
+@pytest.fixture
+def bridge(vcr):
+    with vcr.use_cassette('WeMo_WW_2.00.11057.PVT-OWRT-Link.yaml'):
+        return Bridge('http://192.168.1.100:49153/setup.xml', '')
 
+
+@pytest.mark.vcr()
+def test_light_turn_on(bridge):
     lights, _ = bridge.bridge_update()
     assert LIGHT_ID in lights
     light = lights[LIGHT_ID]
@@ -22,9 +26,7 @@ def test_light_turn_on():
 
 
 @pytest.mark.vcr()
-def test_light_turn_off():
-    bridge = Bridge('http://192.168.1.100:49153/setup.xml', '')
-
+def test_light_turn_off(bridge):
     lights, _ = bridge.bridge_update()
     assert LIGHT_ID in lights
     light = lights[LIGHT_ID]
@@ -35,9 +37,7 @@ def test_light_turn_off():
 
 
 @pytest.mark.vcr()
-def test_bridge_getdevicestatus():
-    bridge = Bridge('http://192.168.1.100:49153/setup.xml', '')
-
+def test_bridge_getdevicestatus(bridge):
     status = bridge.bridge_getdevicestatus(LIGHT_ID)
     expected = b''.join(
         [
