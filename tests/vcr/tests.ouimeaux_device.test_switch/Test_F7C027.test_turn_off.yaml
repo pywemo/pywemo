@@ -1,0 +1,84 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '306'
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:basicevent:1#SetBinaryState"'
+      User-Agent:
+      - python-requests/2.25.1
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/basicevent1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"\
+        http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:SetBinaryStateResponse\
+        \ xmlns:u=\"urn:Belkin:service:basicevent:1\">\r\n<BinaryState>0</BinaryState>\r\
+        \n</u:SetBinaryStateResponse>\r\n</s:Body> </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '285'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Sat, 23 Jan 2021 00:03:35 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '278'
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:basicevent:1#GetBinaryState"'
+      User-Agent:
+      - python-requests/2.25.1
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/basicevent1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"\
+        http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:GetBinaryStateResponse\
+        \ xmlns:u=\"urn:Belkin:service:basicevent:1\">\r\n<BinaryState>0</BinaryState>\r\
+        \n</u:GetBinaryStateResponse>\r\n</s:Body> </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '285'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Sat, 23 Jan 2021 00:03:35 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+version: 1
