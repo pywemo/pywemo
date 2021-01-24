@@ -190,6 +190,17 @@ class Test_SubscriptionRegistry:
             'sid': 'uuid:84915076-1dd2-11b2-b5fd-dcf7b6ec9aaa'
         }
 
+        insight = subscription_registry._sched.queue[1]
+        assert insight.time == pytest.approx(time.time() + 225, abs=2)
+        assert insight.action == subscription_registry._resubscribe
+        assert insight.argument == (
+            device,
+            subscribe._insight_event_subscription_url,
+        )
+        assert insight.kwargs == {
+            'sid': 'uuid:849c1a56-1dd2-11b2-b5fd-dcf7b6ec9aaa'
+        }
+
         subscription_registry.unregister(device)
 
         assert len(subscription_registry._sched.queue) == 0

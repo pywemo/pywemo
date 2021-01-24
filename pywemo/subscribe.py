@@ -17,6 +17,7 @@ from .util import get_ip_address
 
 # Subscription event types.
 EVENT_TYPE_BINARY_STATE = "BinaryState"
+EVENT_TYPE_INSIGHT_PARAMS = "InsightParams"
 EVENT_TYPE_LONG_PRESS = "LongPress"
 
 LOG = logging.getLogger(__name__)
@@ -79,6 +80,11 @@ def _start_server():
 def _basic_event_subscription_url(device: Device) -> str:
     """Return the basic event subscription URL."""
     return device.basicevent.eventSubURL
+
+
+def _insight_event_subscription_url(device: Device) -> str:
+    """Return the insight event subscription URL."""
+    return device.insight.eventSubURL
 
 
 def _cancel_events(
@@ -266,6 +272,9 @@ class SubscriptionRegistry:
             self._events[device.serialnumber] = {}
             # Basic events
             self._schedule(0, device, _basic_event_subscription_url)
+            # Insight events
+            if hasattr(device, 'insight'):
+                self._schedule(0, device, _insight_event_subscription_url)
             self._event_thread_cond.notify()
 
     def unregister(self, device):
@@ -311,10 +320,6 @@ class SubscriptionRegistry:
             )
         try:
             self._url_resubscribe(device, headers, sid, url_fn)
-            # Insight events
-            # if hasattr(device, 'insight'):
-            #     self._url_resubscribe(
-            #         device, headers, sid, device.insight.eventSubURL)
         except requests.exceptions.RequestException as exc:
             LOG.warning(
                 "Resubscribe error for %s %s (%s), will retry in %ss",

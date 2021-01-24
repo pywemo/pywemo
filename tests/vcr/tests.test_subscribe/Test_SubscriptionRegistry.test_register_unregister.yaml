@@ -39,4 +39,44 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      CALLBACK:
+      - <http://192.168.1.1:8989/insight1>
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      NT:
+      - upnp:event
+      TIMEOUT:
+      - Second-300
+      User-Agent:
+      - python-requests/2.25.1
+    method: SUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/insight1
+  response:
+    body:
+      string: ''
+    headers:
+      CONTENT-LENGTH:
+      - '0'
+      DATE:
+      - Tue, 26 Jan 2021 02:16:36 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      SID:
+      - uuid:849c1a56-1dd2-11b2-b5fd-dcf7b6ec9aaa
+      TIMEOUT:
+      - Second-300
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
 version: 1
