@@ -1,0 +1,366 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: http://192.168.1.100:49153/setup.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?><root xmlns=\"urn:Belkin:device-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion><device><rtos>1</rtos><deviceType>urn:Belkin:device:controllee:1</deviceType><friendlyName>WeMo\
+        \ Device</friendlyName><presentationURL>/pluginpres.html</presentationURL><serialNumber>SERIALNUMBER</serialNumber><modelName>Socket</modelName><modelNumber>1.0</modelNumber><modelURL>http://www.belkin.com/plugin/</modelURL><manufacturer>Belkin\
+        \ International Inc.</manufacturer><manufacturerURL>http://www.belkin.com</manufacturerURL><modelDescription>Belkin\
+        \ Plugin Socket 1.0</modelDescription><UDN>uuid:Socket-1_0-SERIALNUMBER</UDN><UPC>123456789</UPC><hwVersion>v4</hwVersion><macAddress>001122334455</macAddress><firmwareVersion>WEMO_WW_4.00.20101902.PVT-RTOS-SNSV4</firmwareVersion><iconVersion>1|49152</iconVersion><hkSetupCode>012-34-567</hkSetupCode><binaryState>0</binaryState><new_algo>1</new_algo><iconList><icon><mimetype>jpg</mimetype><width>100</width><height>100</height><depth>100</depth><url>icon.jpg</url></icon></iconList><serviceList><service><serviceType>urn:Belkin:service:WiFiSetup:1</serviceType><serviceId>urn:Belkin:serviceId:WiFiSetup1</serviceId><controlURL>/upnp/control/WiFiSetup1</controlURL><eventSubURL>/upnp/event/WiFiSetup1</eventSubURL><SCPDURL>/setupservice.xml</SCPDURL></service><service><serviceType>urn:Belkin:service:smartsetup:1</serviceType><serviceId>urn:Belkin:serviceId:smartsetup1</serviceId><controlURL>/upnp/control/smartsetup1</controlURL><eventSubURL>/upnp/event/smartsetup1</eventSubURL><SCPDURL>/smartsetup.xml</SCPDURL></service><service><serviceType>urn:Belkin:service:metainfo:1</serviceType><serviceId>urn:Belkin:serviceId:metainfo1</serviceId><controlURL>/upnp/control/metainfo1</controlURL><eventSubURL>/upnp/event/metainfo1</eventSubURL><SCPDURL>/metainfoservice.xml</SCPDURL></service><service><serviceType>urn:Belkin:service:timesync:1</serviceType><serviceId>urn:Belkin:serviceId:timesync1</serviceId><controlURL>/upnp/control/timesync1</controlURL><eventSubURL>/upnp/event/timesync1</eventSubURL><SCPDURL>/timesyncservice.xml</SCPDURL></service><service><serviceType>urn:Belkin:service:basicevent:1</serviceType><serviceId>urn:Belkin:serviceId:basicevent1</serviceId><controlURL>/upnp/control/basicevent1</controlURL><eventSubURL>/upnp/event/basicevent1</eventSubURL><SCPDURL>/eventservice.xml</SCPDURL></service><service><serviceType>urn:Belkin:service:rules:1</serviceType><serviceId>urn:Belkin:serviceId:rules1</serviceId><controlURL>/upnp/control/rules1</controlURL><eventSubURL>/upnp/event/rules1</eventSubURL><SCPDURL>/rulesservice.xml</SCPDURL></service><service><serviceType>urn:Belkin:service:deviceinfo:1</serviceType><serviceId>urn:Belkin:serviceId:deviceinfo1</serviceId><controlURL>/upnp/control/deviceinfo1</controlURL><eventSubURL>/upnp/event/deviceinfo1</eventSubURL><SCPDURL>/deviceinfoservice.xml</SCPDURL></service><service><serviceType>urn:Belkin:service:firmwareupdate:1</serviceType><serviceId>urn:Belkin:serviceId:firmwareupdate1</serviceId><controlURL>/upnp/control/firmwareupdate1</controlURL><eventSubURL>/upnp/event/firmwareupdate1</eventSubURL><SCPDURL>/firmwareupdate.xml</SCPDURL></service><service><serviceType>urn:Belkin:service:manufacture:1</serviceType><serviceId>urn:Belkin:serviceId:manufacture1</serviceId><controlURL>/upnp/control/manufacture1</controlURL><eventSubURL>/upnp/event/manufacture1</eventSubURL><SCPDURL>/manufacture.xml</SCPDURL></service></serviceList></device></root>\r\
+        \n\r\n"
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '3503'
+      Content-Type:
+      - text/xml
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: http://192.168.1.100:49153/setupservice.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?><scpd xmlns=\"urn:Belkin:service-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion><actionList>\r\
+        \n<action><name>GetApList</name><argumentList><argument><retval /><name>ApList</name><relatedStateVariable>ApList</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>GetNetworkList</name><argumentList><argument><retval\
+        \ /><name>NetworkList</name><relatedStateVariable>NetworkList</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>ConnectHomeNetwork</name><argumentList><argument><name>ssid</name><relatedStateVariable>ssid</relatedStateVariable><direction>in</direction></argument><argument><name>auth</name><relatedStateVariable>auth</relatedStateVariable><direction>in</direction></argument><argument><name>password</name><relatedStateVariable>password</relatedStateVariable><direction>in</direction></argument><argument><name>encrypt</name><relatedStateVariable>encrypt</relatedStateVariable><direction>in</direction></argument></argumentList></action><action><name>GetNetworkStatus</name><argumentList><argument><retval\
+        \ /><name>NetworkStatus</name><relatedStateVariable>NetworkStatus</relatedStateVariable><direction>out</direction></argument></argumentList></action></actionList>\r\
+        \n<serviceStateTable>\r\n<stateVariable sendEvents=\"yes\"><name>ApList</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>NetworkList</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>NetworkStatus</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>ssid</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>password</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>auth</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>encrypt</name><dataType>string</dataType></stateVariable></serviceStateTable>\r\
+        \n</scpd>\r\n\r\n"
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '2029'
+      Content-Type:
+      - text/xml
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: http://192.168.1.100:49153/smartsetup.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?><scpd xmlns=\"urn:Belkin:service-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion><actionList>\r\
+        \n<action><name>PairAndRegister</name><argumentList><argument><name>PairingData</name><relatedStateVariable>PairingData</relatedStateVariable><direction>in</direction></argument><argument><name>RegistrationData</name><relatedStateVariable>RegistrationData</relatedStateVariable><direction>in</direction></argument><argument><retval\
+        \ /><name>PairingStatus</name><relatedStateVariable>PairingStatus</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>GetRegistrationData</name><argumentList><argument><retval\
+        \ /><name>Authorization</name><direction>out</direction></argument><argument><retval\
+        \ /><name>X-Wemo-ALT-Token</name><direction>out</direction></argument><argument><retval\
+        \ /><name>deviceId</name><direction>out</direction></argument><argument><retval\
+        \ /><name>uniqueId</name><direction>out</direction></argument><argument><retval\
+        \ /><name>friendlyName</name><direction>out</direction></argument><argument><retval\
+        \ /><name>groupId</name><direction>out</direction></argument><argument><retval\
+        \ /><name>smartDeviceUniqueId</name><direction>out</direction></argument><argument><retval\
+        \ /><name>reRegister</name><direction>out</direction></argument><argument><retval\
+        \ /><name>provisionedBy</name><direction>out</direction></argument><argument><retval\
+        \ /><name>timeStamp</name><direction>out</direction></argument></argumentList></action><action><name>GetRegistrationStatus</name><argumentList><argument><retval\
+        \ /><name>RegistrationStatus</name><direction>out</direction></argument><argument><retval\
+        \ /><name>StatusCode</name><direction>out</direction></argument><argument><retval\
+        \ /><name>groupId</name><direction>out</direction></argument><argument><retval\
+        \ /><name>deviceId</name><direction>out</direction></argument><argument><retval\
+        \ /><name>deviceToken</name><direction>out</direction></argument><argument><retval\
+        \ /><name>timeStamp</name><direction>out</direction></argument></argumentList></action></actionList>\r\
+        \n<serviceStateTable>\r\n</serviceStateTable>\r\n</scpd>\r\n\r\n"
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '2133'
+      Content-Type:
+      - text/xml
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: http://192.168.1.100:49153/metainfoservice.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?><scpd xmlns=\"urn:Belkin:service-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion><actionList>\r\
+        \n<action><name>GetMetaInfo</name><argumentList><argument><retval /><name>MetaInfo</name><relatedStateVariable>MetaInfo</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>GetExtMetaInfo</name><argumentList><argument><retval\
+        \ /><name>ExtMetaInfo</name><relatedStateVariable>ExtMetaInfo</relatedStateVariable><direction>out</direction></argument></argumentList></action></actionList>\r\
+        \n<serviceStateTable>\r\n<stateVariable sendEvents=\"no\"><name>ExtMetaInfo</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>MetaInfo</name><dataType>string</dataType></stateVariable></serviceStateTable>\r\
+        \n</scpd>\r\n\r\n"
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '805'
+      Content-Type:
+      - text/xml
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: http://192.168.1.100:49153/timesyncservice.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?><scpd xmlns=\"urn:Belkin:service-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion><actionList>\r\
+        \n<action><name>TimeSync</name><argumentList><argument><!-- UTC value, long\
+        \ --><name>UTC</name><relatedStateVariable>UTC</relatedStateVariable><direction>in</direction></argument><argument><name>TimeZone</name><relatedStateVariable>TimeZone</relatedStateVariable><direction>in</direction></argument><argument><name>dst</name><relatedStateVariable>dst</relatedStateVariable><direction>in</direction></argument><argument><name>DstSupported</name><relatedStateVariable>DstSupported</relatedStateVariable><direction>in</direction></argument></argumentList></action></actionList>\r\
+        \n<serviceStateTable>\r\n<stateVariable sendEvents=\"no\"><name>UTC</name><dataType>long</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>TimeZone</name><dataType>int</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>dst</name><dataType>Boolean</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>DstSupported</name><dataType>Boolean</dataType></stateVariable></serviceStateTable>\r\
+        \n</scpd>\r\n\r\n"
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '1130'
+      Content-Type:
+      - text/xml
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: http://192.168.1.100:49153/eventservice.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?><scpd xmlns=\"urn:Belkin:service-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion><actionList>\r\
+        \n<action><name>SetBinaryState</name><argumentList><argument><name>BinaryState</name><relatedStateVariable>BinaryState</relatedStateVariable><direction>in</direction></argument><argument><name>Duration</name><relatedStateVariable>Duration</relatedStateVariable><direction>in</direction></argument><argument><name>EndAction</name><relatedStateVariable>EndAction</relatedStateVariable><direction>in</direction></argument><argument><name>UDN</name><relatedStateVariable>UDN</relatedStateVariable><direction>in</direction></argument><argument><retval\
+        \ /><name>CountdownEndTime</name><relatedStateVariable>CountdownEndTime</relatedStateVariable><direction>out</direction></argument><argument><retval\
+        \ /><name>deviceCurrentTime</name><relatedStateVariable>deviceCurrentTime</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>GetBinaryState</name><argumentList><argument><retval\
+        \ /><name>BinaryState</name><relatedStateVariable>BinaryState</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>SimulateOverTemp</name><argumentList><argument><name>overTemp</name><direction>in</direction><relatedStateVariable>overTemp</relatedStateVariable></argument><argument><retval\
+        \ /><name>overTempStatus</name><direction>out</direction><relatedStateVariable>overTempStatus</relatedStateVariable></argument></argumentList></action><action><name>GetFriendlyName</name><argumentList><argument><retval\
+        \ /><name>FriendlyName</name><relatedStateVariable>FriendlyName</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>ChangeFriendlyName</name><argumentList><argument><name>FriendlyName</name><relatedStateVariable>FriendlyName</relatedStateVariable><direction>in</direction></argument></argumentList></action><action><name>GetIconVersion</name><argumentList><argument><retval\
+        \ /><name>IconVersion</name><relatedStateVariable>IconVersion</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>ReSetup</name><argumentList><argument><name>Reset</name><relatedStateVariable>Reset</relatedStateVariable><direction>in</direction></argument></argumentList></action><action><name>setHKSetupState</name><argumentList><argument><name>HKSetupDone</name><relatedStateVariable>HKSetupDone</relatedStateVariable><direction>in</direction></argument></argumentList></action><action><name>getHKSetupState</name><argumentList><argument><retval\
+        \ /><name>HKSetupDone</name><relatedStateVariable>HKSetupDone</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>GetHKSetupInfo</name><argumentList><argument><retval\
+        \ /><name>HKSetupKey</name><direction>out</direction></argument><argument><retval\
+        \ /><name>HKSetupCode</name><direction>out</direction></argument></argumentList></action><action><name>removeHomekitData</name></action><action><name>SetAwayRuleTask</name><argumentList><argument><name>EnableAwayTask</name><relatedStateVariable>EnableAwayTask</relatedStateVariable><direction>in</direction></argument><argument><name>RuleID</name><relatedStateVariable>RuleID</relatedStateVariable><direction>in</direction></argument><argument><retval\
+        \ /><name>actionStatus</name><relatedStateVariable>actionStatus</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>NotifyManualToggle</name><argumentList><argument><name>UDN</name><direction>in</direction><relatedStateVariable>UDN</relatedStateVariable></argument><argument><name>ManualToggle</name><relatedStateVariable>ManualToggle</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>GetSimulatedRuleData</name><argumentList><argument><name>UDN</name><direction>in</direction><relatedStateVariable>UDN</relatedStateVariable></argument><argument><retval\
+        \ /><name>RuleData</name><relatedStateVariable>RuleData</relatedStateVariable><direction>out</direction></argument></argumentList></action></actionList>\r\
+        \n<serviceStateTable>\r\n<stateVariable sendEvents=\"yes\"><name>BinaryState</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>Duration</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>EndAction</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>UDN</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>CountdownEndTime</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>deviceCurrentTime</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>FriendlyName</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>IconVersion</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>Reset</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>overTemp</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>overTempStatus</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>HKSetupDone</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>EnableAwayTask</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>RuleID</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>actionStatus</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>ManualToggle</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>RuleData</name><dataType>string</dataType></stateVariable></serviceStateTable>\r\
+        \n</scpd>\r\n\r\n"
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '5856'
+      Content-Type:
+      - text/xml
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: http://192.168.1.100:49153/rulesservice.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?><scpd xmlns=\"urn:Belkin:service-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion><actionList>\r\
+        \n<action><name>GetRulesDBPath</name><argumentList><argument><retval /><name>RulesDBPath</name><relatedStateVariable>RulesDBPath</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>StoreRules</name><argumentList><argument><name>ruleDbVersion</name><relatedStateVariable>ruleDbVersion</relatedStateVariable><direction>in</direction></argument><argument><name>processDb</name><relatedStateVariable>processDb</relatedStateVariable><direction>in</direction></argument><argument><name>ruleDbBody</name><relatedStateVariable>ruleDbBody</relatedStateVariable><direction>in</direction></argument><argument><retval></retval><name>errorInfo</name><relatedStateVariable>errorInfo</relatedStateVariable><direction>out</direction></argument></argumentList></action></actionList>\r\
+        \n<serviceStateTable>\r\n<stateVariable sendEvents=\"no\"><name>RulesDBPath</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>ruleDbVersion</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>processDb</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>ruleDbBody</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>errorInfo</name><dataType>string</dataType></stateVariable></serviceStateTable>\r\
+        \n</scpd>\r\n\r\n"
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '1482'
+      Content-Type:
+      - text/xml
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: http://192.168.1.100:49153/deviceinfoservice.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?><scpd xmlns=\"urn:Belkin:service-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion><actionList>\r\
+        \n<action><name>GetInformation</name><argumentList><argument><retval /><name>Information</name><relatedStateVariable>Information</relatedStateVariable><direction>out</direction></argument></argumentList></action><action><name>GetDeviceInformation</name><argumentList><argument><retval\
+        \ /><name>DeviceInformation</name><relatedStateVariable>DeviceInformation</relatedStateVariable><direction>out</direction></argument><argument><retval\
+        \ /><name>Payload</name><direction>out</direction></argument><argument><retval\
+        \ /><name>HKSetupState</name><direction>out</direction></argument><argument><retval\
+        \ /><name>ProvisionedBy</name><direction>out</direction></argument></argumentList></action></actionList>\r\
+        \n<serviceStateTable>\r\n<stateVariable sendEvents=\"yes\"><name>Information</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>DeviceInformation</name><dataType>string</dataType></stateVariable></serviceStateTable>\r\
+        \n</scpd>\r\n\r\n"
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '1084'
+      Content-Type:
+      - text/xml
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: http://192.168.1.100:49153/firmwareupdate.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?><scpd xmlns=\"urn:Belkin:service-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion><actionList>\r\
+        \n<action><name>UpdateFirmware</name><argumentList><argument><name>NewFirmwareVersion</name><relatedStateVariable>NewFirmwareVersion</relatedStateVariable><direction>in</direction></argument><argument><name>ReleaseDate</name><relatedStateVariable>ReleaseDate</relatedStateVariable><direction>in</direction></argument><argument><name>URL</name><relatedStateVariable>URL</relatedStateVariable><direction>in</direction></argument><argument><name>Signature</name><relatedStateVariable>Signature</relatedStateVariable><direction>in</direction></argument><argument><name>DownloadStartTime</name><relatedStateVariable>DownloadStartTime</relatedStateVariable><direction>in</direction></argument><argument><name>WithUnsignedImage</name><relatedStateVariable>WithUnsignedImage</relatedStateVariable><direction>in</direction></argument></argumentList></action><action><name>GetFirmwareVersion</name><argumentList><argument><retval\
+        \ /><name>FirmwareVersion</name><relatedStateVariable>FirmwareVersion</relatedStateVariable><direction>out</direction></argument></argumentList></action></actionList>\r\
+        \n<serviceStateTable>\r\n<stateVariable sendEvents=\"yes\"><name>FirmwareVersion</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"yes\"><name>WithUnsignedImage</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>NewFirmwareVersion</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>ReleaseDate</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>URL</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>Signature</name><dataType>string</dataType></stateVariable><stateVariable\
+        \ sendEvents=\"no\"><name>DownloadStartTime</name><dataType>string</dataType></stateVariable></serviceStateTable>\r\
+        \n</scpd>\r\n\r\n"
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '1970'
+      Content-Type:
+      - text/xml
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: http://192.168.1.100:49153/manufacture.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?><scpd xmlns=\"urn:Belkin:service-1-0\"><specVersion><major>1</major><minor>0</minor></specVersion><actionList>\r\
+        \n<action><name>GetManufactureData</name><argumentList><argument><retval /><name>ManufactureData</name><direction>out</direction><relatedStateVariable>ManufactureData</relatedStateVariable></argument></argumentList></action></actionList>\r\
+        \n<serviceStateTable>\r\n<stateVariable sendEvents=\"no\"><name>ManufactureData</name><dataType>string</dataType></stateVariable></serviceStateTable>\r\
+        \n</scpd>\r\n\r\n"
+    headers:
+      Connection:
+      - close
+      Content-Length:
+      - '524'
+      Content-Type:
+      - text/xml
+    status:
+      code: 200
+      message: OK
+version: 1

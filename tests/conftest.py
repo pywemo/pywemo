@@ -33,10 +33,27 @@ def vcr_config():
             b'<MacAddr>001122334455</MacAddr>',
             body,
         )
+        body = re.sub(
+            b'<friendlyName>[^<]+</friendlyName>',
+            b'<friendlyName>WeMo Device</friendlyName>',
+            body,
+        )
+        body = re.sub(
+            b'<hkSetupCode>[^<]+</hkSetupCode>',
+            b'<hkSetupCode>012-34-567</hkSetupCode>',
+            body,
+        )
         response['body']['string'] = body
         return response
 
-    return {'before_record_response': scrub_identifiers}
+    def remove_request_body(request):
+        request.body = None
+        return request
+
+    return {
+        'before_record_request': remove_request_body,
+        'before_record_response': scrub_identifiers,
+    }
 
 
 @pytest.fixture(scope='module')
