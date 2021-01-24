@@ -15,6 +15,7 @@ from .util import get_ip_address
 
 # Subscription event types.
 EVENT_TYPE_BINARY_STATE = "BinaryState"
+EVENT_TYPE_INSIGHT_PARAMS = "InsightParams"
 EVENT_TYPE_LONG_PRESS = "LongPress"
 
 LOG = logging.getLogger(__name__)
@@ -238,9 +239,17 @@ class SubscriptionRegistry:
         self.devices[device.host] = device
 
         with self._event_thread_cond:
-            self._events[device.serialnumber] = self._sched.enter(
-                0, 0, self._resubscribe, [device]
-            )
+            # Basic events
+            url = device.basicevent.eventSubURL
+            self._events[device.serialnumber] = {
+                url: self._sched.enter(0, 0, self._resubscribe, [device, url])
+            }
+            # Insight events
+            if hasattr(device, 'insight'):
+                url = device.insight.eventSubURL
+                self._events[device.serialnumber][url] = self._sched.enter(
+                    0, 0, self._resubscribe, [device, url]
+                )
             self._event_thread_cond.notify()
 
     def unregister(self, device):
@@ -255,15 +264,24 @@ class SubscriptionRegistry:
             # Remove any events, callbacks, and the device itself
             if self._callbacks[device.serialnumber] is not None:
                 del self._callbacks[device.serialnumber]
-            if self._events[device.serialnumber] is not None:
+            events = self._events.get(device.serialnumber, None)
+            if events is not None:
+                for event in events.values():
+                    try:
+                        self._sched.cancel(event)
+                    except ValueError:
+                        # event might execute and be removed from queue
+                        # concurrently.  Safe to ignore
+                        pass
                 del self._events[device.serialnumber]
             if self.devices[device.host] is not None:
                 del self.devices[device.host]
 
             self._event_thread_cond.notify()
 
-    def _resubscribe(self, device, sid=None, retry=0):
-        LOG.info("Resubscribe for %s", device)
+    def _resubscribe(self, device, url, sid=None, retry=0):
+        path = url.rsplit('/')[-1]
+        LOG.info("Resubscribe for %s %s", path, device)
         headers = {'TIMEOUT': '300'}
         if sid is not None:
             headers['SID'] = sid
@@ -271,23 +289,16 @@ class SubscriptionRegistry:
             host = get_ip_address(host=device.host)
             headers.update(
                 {
-                    "CALLBACK": '<http://%s:%d>' % (host, self.port),
+                    "CALLBACK": '<http://%s:%d/%s>' % (host, self.port, path),
                     "NT": "upnp:event",
                 }
             )
         try:
-            # Basic events
-            self._url_resubscribe(
-                device, headers, sid, device.basicevent.eventSubURL
-            )
-            # Insight events
-            # if hasattr(device, 'insight'):
-            #     self._url_resubscribe(
-            #         device, headers, sid, device.insight.eventSubURL)
-
+            self._url_resubscribe(device, headers, sid, url)
         except requests.exceptions.RequestException as exc:
             LOG.warning(
-                "Resubscribe error for %s (%s), will retry in %ss",
+                "Resubscribe error for %s %s (%s), will retry in %ss",
+                path,
                 device,
                 exc,
                 SUBSCRIPTION_RETRY,
@@ -299,11 +310,11 @@ class SubscriptionRegistry:
                 if device.rediscovery_enabled:
                     device.reconnect_with_device()
             with self._event_thread_cond:
-                self._events[device.serialnumber] = self._sched.enter(
+                self._events[device.serialnumber][url] = self._sched.enter(
                     SUBSCRIPTION_RETRY,
                     0,
                     self._resubscribe,
-                    [device, sid, retry],
+                    [device, url, sid, retry],
                 )
 
     def _url_resubscribe(self, device, headers, sid, url):
@@ -317,14 +328,14 @@ class SubscriptionRegistry:
             requests.request(
                 method='UNSUBSCRIBE', url=url, headers={'SID': sid}, timeout=10
             )
-            return self._resubscribe(device)
+            return self._resubscribe(device, url)
         timeout = int(
             response.headers.get('timeout', '1801').replace('Second-', '')
         )
         sid = response.headers.get('sid', sid)
         with self._event_thread_cond:
-            self._events[device.serialnumber] = self._sched.enter(
-                int(timeout * 0.75), 0, self._resubscribe, [device, sid]
+            self._events[device.serialnumber][url] = self._sched.enter(
+                int(timeout * 0.75), 0, self._resubscribe, [device, url, sid]
             )
 
     def event(self, device, type_, value):
@@ -373,13 +384,14 @@ class SubscriptionRegistry:
             self._exiting = True
 
             # Remove any pending events
-            for event in self._events.values():
-                try:
-                    self._sched.cancel(event)
-                except ValueError:
-                    # event might execute and be removed from queue
-                    # concurrently.  Safe to ignore
-                    pass
+            for device_events in self._events.values():
+                for event in device_events.values():
+                    try:
+                        self._sched.cancel(event)
+                    except ValueError:
+                        # event might execute and be removed from queue
+                        # concurrently.  Safe to ignore
+                        pass
 
             # Wake up event thread if its sleeping
             self._event_thread_cond.notify()
