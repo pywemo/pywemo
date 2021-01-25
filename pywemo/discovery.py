@@ -7,6 +7,7 @@ import requests
 
 from . import ssdp
 from .ouimeaux_device import UnsupportedDevice, probe_wemo
+from .ouimeaux_device.api.service import ActionException
 from .ouimeaux_device.api.xsd import device as deviceParser
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
@@ -45,12 +46,17 @@ def discover_devices(
             {'manufacturer': 'Belkin International Inc.'}
         ):
             mac = entry.description.get('device').get('macAddress')
-            device = device_from_description(
-                description_url=entry.location,
-                mac=mac,
-                rediscovery_enabled=rediscovery_enabled,
-            )
-
+            try:
+                device = device_from_description(
+                    description_url=entry.location,
+                    mac=mac,
+                    rediscovery_enabled=rediscovery_enabled,
+                )
+            except (requests.RequestException, ActionException) as exc:
+                LOG.warning(
+                    'Could not connect to device %s (%s)', entry.location, exc
+                )
+                device = None
             if device is not None:
                 wemos.append(device)
 
