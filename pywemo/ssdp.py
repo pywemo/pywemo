@@ -223,6 +223,11 @@ class UPNPEntry:
             }
         )
 
+    @classmethod
+    def reset_cache(cls):
+        """Clear the internal cache of device descriptions."""
+        cls.DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
+
     def __eq__(self, other):
         """Equality operator."""
         return (
@@ -290,6 +295,7 @@ def scan(
     ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
 
     entries = []
+    UPNPEntry.reset_cache()
 
     calc_now = datetime.now
 
