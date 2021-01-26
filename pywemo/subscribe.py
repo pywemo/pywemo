@@ -310,12 +310,13 @@ class SubscriptionRegistry:
                 if device.rediscovery_enabled:
                     device.reconnect_with_device()
             with self._event_thread_cond:
-                self._events[device.serialnumber] = self._sched.enter(
-                    SUBSCRIPTION_RETRY,
-                    0,
-                    self._resubscribe,
-                    [device, sid, retry],
-                )
+                if self._events.get(device.serialnumber, None):
+                    self._events[device.serialnumber] = self._sched.enter(
+                        SUBSCRIPTION_RETRY,
+                        0,
+                        self._resubscribe,
+                        [device, sid, retry],
+                    )
 
     def _url_resubscribe(self, device, headers, sid, url):
         request_headers = headers.copy()
@@ -336,9 +337,10 @@ class SubscriptionRegistry:
         )
         sid = response.headers.get('sid', sid)
         with self._event_thread_cond:
-            self._events[device.serialnumber] = self._sched.enter(
-                int(timeout * 0.75), 0, self._resubscribe, [device, sid]
-            )
+            if self._events.get(device.serialnumber, None):
+                self._events[device.serialnumber] = self._sched.enter(
+                    int(timeout * 0.75), 0, self._resubscribe, [device, sid]
+                )
 
     def event(self, device, type_, value):
         """Execute the callback for a received event."""
