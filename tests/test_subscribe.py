@@ -1,13 +1,14 @@
 """Tests for the subscription registry and http server module."""
 
 import threading
+import time
 import unittest.mock as mock
 from http.server import HTTPServer
 
 import pytest
 import requests
 
-from pywemo import LightSwitch, subscribe
+from pywemo import Insight, LightSwitch, subscribe
 
 
 class Test_RequestHandler:
@@ -154,3 +155,78 @@ class Test_RequestHandler:
         """SUBSCRIBE request for unrecognized path returns 404 error."""
         response = requests.request("SUBSCRIBE", f"{server_url}/")
         assert response.status_code == 404
+
+
+class Test_SubscriptionRegistry:
+    """Test the SubscriptionRegistry."""
+
+    @pytest.fixture
+    def device(self, vcr):
+        """Mock WeMo Insight device."""
+        with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml'):
+            return Insight('http://192.168.1.100:49153/setup.xml', '')
+
+    def _wait_for_registry(self, subscription_registry):
+        # Wait for registry to be ready to make sure the Insight device has
+        # been registered.
+        ready = threading.Event()
+        subscription_registry._sched.enter(0, 100, ready.set)
+        ready.wait()
+
+    @pytest.mark.vcr()
+    def test_register_unregister(self, device, subscription_registry):
+        """Test that the device can be registered and unregistered."""
+        subscription_registry.register(device)
+        self._wait_for_registry(subscription_registry)
+
+        basic = subscription_registry._sched.queue[0]
+        assert basic.time == pytest.approx(time.time() + 225, abs=2)
+        assert basic.action == subscription_registry._resubscribe
+        assert basic.argument == [
+            device,
+            'uuid:84915076-1dd2-11b2-b5fd-dcf7b6ec9aaa',
+        ]
+
+        subscription_registry.unregister(device)
+
+        assert len(subscription_registry._sched.queue) == 0
+
+    @mock.patch(
+        'requests.request', side_effect=requests.exceptions.ReadTimeout
+    )
+    def test_subscribe_read_timeout_and_reconnect(
+        self, mock_request, device, subscription_registry
+    ):
+        """Test that retries happen on failure and reconnect works."""
+        subscription_registry.register(device)
+        self._wait_for_registry(subscription_registry)
+
+        basic = subscription_registry._sched.queue[0]
+        assert basic.time == pytest.approx(
+            time.time() + subscribe.SUBSCRIPTION_RETRY, abs=2
+        )
+        assert basic.action == subscription_registry._resubscribe
+        assert basic.argument == [device, None, 1]
+
+        # Simulate a second failure to trigger a reconnect with the device.
+        subscription_registry._sched.cancel(basic)
+        with mock.patch.object(device, 'reconnect_with_device') as reconnect:
+
+            def change_url():
+                device.basicevent.eventSubURL = 'http://192.168.1.100:1234/'
+
+            reconnect.side_effect = change_url
+
+            basic.action(*basic.argument)
+
+            # Fail one more time to see that the correct changed URL is used.
+            basic = subscription_registry._sched.queue[-1]
+            subscription_registry._sched.cancel(basic)
+            basic.action(*basic.argument)
+
+        mock_request.assert_called_with(
+            method='SUBSCRIBE',
+            url='http://192.168.1.100:1234/',
+            headers=mock.ANY,
+            timeout=10,
+        )

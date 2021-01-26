@@ -1,7 +1,11 @@
 import os
 import re
+import unittest.mock as mock
+from http.server import HTTPServer
 
 import pytest
+
+from pywemo import SubscriptionRegistry
 
 
 @pytest.fixture(scope='module')
@@ -64,3 +68,16 @@ def vcr_config():
 def vcr_cassette_dir(request):
     # Put all cassettes in tests/vcr/{module}/{test}.yaml
     return os.path.join('tests/vcr', request.module.__name__)
+
+
+@pytest.fixture
+def subscription_registry():
+    registry = SubscriptionRegistry()
+
+    server = mock.create_autospec(HTTPServer, instance=True)
+    server.server_address = ('localhost', 8989)
+    with mock.patch("pywemo.subscribe._start_server", return_value=server):
+        registry.start()
+        yield registry
+
+    registry.stop()
