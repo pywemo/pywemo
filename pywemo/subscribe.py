@@ -267,7 +267,7 @@ class SubscriptionRegistry:
 
     def _resubscribe(self, device, sid=None, retry=0):
         LOG.info("Resubscribe for %s", device)
-        headers = {'TIMEOUT': '300'}
+        headers = {'TIMEOUT': 'Second-300'}
         if sid is not None:
             headers['SID'] = sid
         else:
@@ -322,7 +322,9 @@ class SubscriptionRegistry:
             )
             return self._resubscribe(device)
         timeout = int(
-            response.headers.get('timeout', '1801').replace('Second-', '')
+            response.headers.get('TIMEOUT', headers.get('TIMEOUT')).replace(
+                'Second-', ''
+            )
         )
         sid = response.headers.get('sid', sid)
         with self._event_thread_cond:
