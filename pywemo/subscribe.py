@@ -258,7 +258,15 @@ class SubscriptionRegistry:
             # Remove any events, callbacks, and the device itself
             if self._callbacks[device.serialnumber] is not None:
                 del self._callbacks[device.serialnumber]
-            if self._events[device.serialnumber] is not None:
+            event = self._events.get(device.serialnumber, None)
+            if event is not None:
+                # Remove pending event
+                try:
+                    self._sched.cancel(event)
+                except ValueError:
+                    # event might execute and be removed from queue
+                    # concurrently.  Safe to ignore
+                    pass
                 del self._events[device.serialnumber]
             if self.devices[device.host] is not None:
                 del self.devices[device.host]
