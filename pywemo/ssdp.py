@@ -25,6 +25,7 @@ MULTICAST_PORT = 1900
 
 # Wemo specific urn:
 ST = "urn:Belkin:service:basicevent:1"
+VIRTUAL_DEVICE_USN = f'{VIRTUAL_DEVICE_UDN}::{ST}'
 
 SSDP_REPLY = f"""HTTP/1.1 200 OK
 CACHE-CONTROL: max-age=86400
@@ -32,7 +33,7 @@ EXT:
 LOCATION: http://%s:%d/setup.xml
 OPT: "http://schemas.upnp.org/upnp/1/0/"; ns=01
 ST: {ST}
-USN: {VIRTUAL_DEVICE_UDN}::{ST}
+USN: {VIRTUAL_DEVICE_USN}
 
 """  # Newline characters at the the end of SSDP_REPLY are intentional.
 SSDP_REPLY = SSDP_REPLY.replace('\n', '\r\n')
@@ -44,7 +45,7 @@ LOCATION: http://%s:%d/setup.xml
 SERVER: Unspecified, UPnP/1.0, Unspecified
 NT: {ST}
 NTS: ssdp:alive
-USN: {VIRTUAL_DEVICE_UDN}::{ST}
+USN: {VIRTUAL_DEVICE_USN}
 
 """  # Newline characters at the the end of SSDP_NOTIFY are intentional.
 SSDP_NOTIFY = SSDP_NOTIFY.replace('\n', '\r\n')
@@ -159,6 +160,11 @@ class UPNPEntry:
     def location(self):
         """Return location value."""
         return self.values.get('location')
+
+    @property
+    def usn(self):
+        """Return usn value."""
+        return self.values.get('usn')
 
     @property
     def description(self):
@@ -329,6 +335,8 @@ def scan(
                 # description. It is possible that fetching the results for a
                 # single device will take longer than the requested timeout.
                 entry = UPNPEntry.from_response(response)
+                if entry.usn == VIRTUAL_DEVICE_USN:
+                    continue  # Don't return the virtual device.
                 if entry.description is not None:
                     device = entry.description.get('device', {})
                     mac = device.get('macAddress')
