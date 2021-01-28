@@ -5,7 +5,7 @@ import sched
 import socket
 import threading
 import time
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import requests
 from lxml import etree as et
@@ -66,7 +66,7 @@ def _start_server():
     for i in range(0, 128):
         port = 8989 + i
         try:
-            return HTTPServer(('', port), RequestHandler)
+            return ThreadingHTTPServer(('', port), RequestHandler)
         except (OSError, socket.error):
             continue
     return None
@@ -117,6 +117,9 @@ class RequestHandler(BaseHTTPRequestHandler):
       from the pywemo SubscriptionRegistry. The event type for a long press
       action is EVENT_TYPE_LONG_PRESS.
     """
+
+    # Do not wait for more than 10 seconds for any request to complete.
+    timeout = 10
 
     def do_NOTIFY(self):  # pylint: disable=invalid-name
         """Handle subscription responses received from devices."""
