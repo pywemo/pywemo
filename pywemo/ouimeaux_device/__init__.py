@@ -584,7 +584,7 @@ class Device:
                 except KeyError:
                     # print entire dictionary if PairingStatus doesn't exist
                     status = result
-                LOG.debug('pairing status (second %s): %s', result, i + 1)
+                LOG.debug('pairing status (send %s): %s', i + 1, status)
                 if i == 0:
                     # only delay on the first call
                     time.sleep(0.10)
