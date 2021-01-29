@@ -49,8 +49,9 @@ echo "===Lint with pylint==="
 pylint pywemo
 
 echo
-echo "===Test with pytest==="
-pytest --vcr-record=none
+echo "===Test with pytest and coverage==="
+coverage run -m pytest --vcr-record=none
+coverage report --skip-covered
 
 echo
 echo "===Building package==="
