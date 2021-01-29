@@ -191,13 +191,20 @@ class Device:
             LOG.error('Unable to re-probe wemo at %s', self.host)
             return False
 
+        url = f'http://{self.host}:{port}/setup.xml'
+        device = self.__class__(url, None)
+        if self.udn != device.udn:
+            LOG.error(
+                'Reconnected to a different WeMo. Expected %s / Received %s',
+                self.udn,
+                device.udn,
+            )
+            return False
+
         LOG.info('Reconnected to wemo at %s on port %i', self.host, port)
 
-        self.port = port
-        url = 'http://{}:{}/setup.xml'.format(self.host, self.port)
-
         # pylint: disable=attribute-defined-outside-init
-        self.__dict__ = self.__class__(url, None).__dict__
+        self.__dict__ = device.__dict__
 
         return True
 

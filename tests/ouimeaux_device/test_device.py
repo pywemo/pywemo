@@ -8,6 +8,7 @@ import unittest.mock as mock
 from subprocess import CalledProcessError
 
 import pytest
+import requests
 
 from pywemo.ouimeaux_device import (
     APNotFound,
@@ -139,17 +140,20 @@ APLIST = (
 )
 
 
+class MockResponse:
+    """Mocked requests response."""
+
+    def __init__(self, content, status_code):
+        self.content = content
+        self.text = content.decode('utf-8') if content else ''
+        self.status_code = status_code
+
+
 def mocked_requests_get(*args, **kwargs):
     """Mock a response from request.get()."""
     # mocked class
-    class MockResponse:
-        """Mocked requests response."""
 
-        def __init__(self, content, status_code):
-            self.content = content
-            self.status_code = status_code
-
-    if args[0] == 'http://192.168.1.100:49153/setup.xml':
+    if args[0] == 'http://192.168.1.100:49158/setup.xml':
         return MockResponse(RESPONSE_SETUP.encode('utf-8'), 200)
     return MockResponse(None, 404)
 
@@ -160,7 +164,7 @@ def device(mock_get):
     """Return a Device as created by some actual XML."""
     # Note that the actions on the services will not be created since the
     # URL(s) for them will return a 404.
-    device = Device('http://192.168.1.100:49153/setup.xml', '')
+    device = Device('http://192.168.1.100:49158/setup.xml', '')
     device.WiFiSetup.GetApList = mock.Mock(return_value={'ApList': APLIST})
     device.WiFiSetup.ConnectHomeNetwork = mock.Mock(
         return_value={'PairingStatus': 'Connecting'}
@@ -190,7 +194,7 @@ class TestDevice:
         assert device.name == 'Wemo Mini'
         assert device.serialnumber == 'XXXXXXXXXXXXXX'
         assert device.host == '192.168.1.100'
-        assert device.port == 49153
+        assert device.port == 49158
         assert device._config.macAddress == 'XXXXXXXXXXXX'
 
     def test_services(self, device):
@@ -373,3 +377,73 @@ class TestDevice:
     def test_supports_long_press_is_false(self, lightspeed, device):
         """Test that the base Device does not have support for long press."""
         assert device.supports_long_press() is False
+
+    @mock.patch('requests.get', side_effect=requests.ConnectTimeout)
+    def test_reconnect_with_device_by_probing_ConnectTimeout(
+        self, get, device
+    ):
+        with mock.patch.object(device, '_reconnect_with_device_by_discovery'):
+            device.reconnect_with_device()
+        get.assert_called_once()
+
+    @mock.patch('requests.get', side_effect=requests.Timeout)
+    def test_reconnect_with_device_by_probing_ConnectTimeout(
+        self, get, device
+    ):
+        with mock.patch.object(device, '_reconnect_with_device_by_discovery'):
+            device.reconnect_with_device()
+        assert get.mock_calls == [
+            # First call should have the original port.
+            mock.call(f'http://{device.host}:49158/setup.xml', timeout=10),
+            mock.call(f'http://{device.host}:49153/setup.xml', timeout=10),
+            mock.call(f'http://{device.host}:49152/setup.xml', timeout=10),
+            mock.call(f'http://{device.host}:49154/setup.xml', timeout=10),
+            mock.call(f'http://{device.host}:49151/setup.xml', timeout=10),
+            mock.call(f'http://{device.host}:49155/setup.xml', timeout=10),
+            mock.call(f'http://{device.host}:49156/setup.xml', timeout=10),
+            mock.call(f'http://{device.host}:49157/setup.xml', timeout=10),
+            mock.call(f'http://{device.host}:49159/setup.xml', timeout=10),
+        ]
+
+    @mock.patch('requests.get', side_effect=requests.ConnectionError)
+    def test_reconnect_with_device_by_probing_ConnectionError(
+        self, get, device
+    ):
+        with mock.patch.object(device, '_reconnect_with_device_by_discovery'):
+            device.reconnect_with_device()
+        assert len(get.mock_calls) == 9
+
+    @mock.patch('requests.get')
+    def test_reconnect_with_device_by_probing_PortChanged(self, get, device):
+        new_port = 49155
+
+        def get_resp(url, *args, **kwargs):
+            if url == f'http://{device.host}:{new_port}/setup.xml':
+                return MockResponse(RESPONSE_SETUP.encode('utf-8'), 200)
+            return MockResponse(None, 404)
+
+        get.side_effect = get_resp
+        device.sentinel = 'SeNtInEl'  # Should not exist in the new device.
+        device.reconnect_with_device()
+
+        assert device.port == new_port
+        assert getattr(device, 'sentinel', None) is None
+
+    @mock.patch('requests.get')
+    def test_reconnect_with_device_by_probing_WrongDevice(self, get, device):
+        new_response = RESPONSE_SETUP.replace(
+            'XXXXXXXXXXXXXX', 'YYYYYYYYYYYYYY'
+        )
+
+        def get_resp(url, *args, **kwargs):
+            if url == f'http://{device.host}:{device.port}/setup.xml':
+                return MockResponse(new_response.encode('utf-8'), 200)
+            return MockResponse(None, 404)
+
+        get.side_effect = get_resp
+
+        device.sentinel = 'SeNtInEl'  # Make sure this still exists.
+        with mock.patch.object(device, '_reconnect_with_device_by_discovery'):
+            device.reconnect_with_device()
+
+        assert getattr(device, 'sentinel', None) == 'SeNtInEl'
