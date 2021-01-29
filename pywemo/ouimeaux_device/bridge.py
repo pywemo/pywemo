@@ -107,7 +107,7 @@ class Bridge(Device):
         et.SubElement(req, 'CapabilityValue').text = ','.join(values)
 
         buf = io.BytesIO()
-        et.ElementTree(req).write(buf, encoding='utf-8', xml_declaration=True)
+        et.ElementTree(req).write(buf, encoding='UTF-8', xml_declaration=True)
         send_state = escape(buf.getvalue().decode(), quote=True)
 
         # pylint: disable=maybe-no-member
