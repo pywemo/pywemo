@@ -42,8 +42,11 @@ class Dimmer(Switch, LongPressMixin):
         self._brightness = int(brightness)
 
     def subscription_update(self, _type, _param):
-        """Disable subscription updates."""
-        return False
+        """Update the dimmer attributes due to a subscription update event."""
+        if _type == "Brightness":
+            self._brightness = int(_param)
+            return True
+        return super().subscription_update(_type, _param)
 
     def __repr__(self):
         """Return a string representation of the device."""

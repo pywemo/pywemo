@@ -21,6 +21,13 @@ class Base:
         dimmer.off()
         assert dimmer.get_state(force_update=True) == 0
 
+    def test_subscription_update_brightness(self, dimmer):
+        assert dimmer.subscription_update('Brightness', '23') == True
+        assert dimmer.get_brightness() == 23
+
+        assert dimmer.subscription_update('BinaryState', '1') == True
+        assert dimmer.get_state() == 1
+
 
 class Test_PVT_OWRT_Dimmer_v1(Base, long_press_helpers.TestLongPress):
     """Tests for the WeMo Dimmer, hardware version v1."""
