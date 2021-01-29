@@ -86,9 +86,10 @@ License
 The code in pywemo/ouimeaux_device is written and copyright by Ian McCracken and released under the BSD license. The rest is released under the MIT license.
 
 .. |Build Badge| image:: https://github.com/pavoni/pywemo/workflows/Build/badge.svg
-.. |PyPI Version Badge| image:: https://pypip.in/v/pywemo/badge.png
+.. |PyPI Version Badge| image:: https://img.shields.io/pypi/v/pywemo
     :target: https://pypi.org/project/pywemo/
     :alt: Latest PyPI version
-.. |PyPI Downloads Badge| image:: https://pypip.in/d/pywemo/badge.png
+.. |PyPI Downloads Badge| image:: https://img.shields.io/pypi/dm/pywemo
     :target: https://pypi.org/project/pywemo/
-    :alt: Number of PyPI downloads
+    :alt: Number of PyPI downloads  
+    
