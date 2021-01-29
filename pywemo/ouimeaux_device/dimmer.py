@@ -43,7 +43,7 @@ class Dimmer(Switch, LongPressMixin):
 
     def subscription_update(self, _type, _param):
         """Update the dimmer attributes due to a subscription update event."""
-        if _type == "Brightness":
+        if _type == "Brightness" and self._state:
             self._brightness = int(_param)
             return True
         return super().subscription_update(_type, _param)
