@@ -46,13 +46,9 @@ def vcr_config():
         response['body']['string'] = body
         return response
 
-    def remove_request_body(request):
-        request.body = None
-        return request
-
     return {
-        'before_record_request': remove_request_body,
         'before_record_response': scrub_identifiers,
+        'match_on': ['method', 'path', 'body'],
     }
 
 

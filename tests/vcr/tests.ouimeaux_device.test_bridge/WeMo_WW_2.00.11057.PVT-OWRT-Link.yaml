@@ -1281,7 +1281,7 @@ interactions:
 
       <u:GetEndDevicesWithStatus xmlns:u="urn:Belkin:service:bridge:1">
 
-      <DevUDN>uuid:Bridge-1_0-231438B01000D9</DevUDN>
+      <DevUDN>uuid:Bridge-1_0-SERIALNUMBER</DevUDN>
 
       <ReqListType>PAIRED_LIST</ReqListType>
 
