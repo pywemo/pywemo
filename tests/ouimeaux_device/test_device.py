@@ -387,9 +387,7 @@ class TestDevice:
         get.assert_called_once()
 
     @mock.patch('requests.get', side_effect=requests.Timeout)
-    def test_reconnect_with_device_by_probing_ConnectTimeout(
-        self, get, device
-    ):
+    def test_reconnect_with_device_by_probing_Timeout(self, get, device):
         with mock.patch.object(device, '_reconnect_with_device_by_discovery'):
             device.reconnect_with_device()
         assert get.mock_calls == [
