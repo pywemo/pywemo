@@ -48,7 +48,15 @@ def vcr_config():
 
     return {
         'before_record_response': scrub_identifiers,
-        'match_on': ['method', 'path', 'body'],
+        'match_on': [
+            'method',
+            'scheme',
+            'host',
+            'port',
+            'path',
+            'query',
+            'body',
+        ],
     }
 
 
