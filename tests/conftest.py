@@ -19,7 +19,7 @@ def vcr_config():
             body,
         )
         body = re.sub(
-            b'uuid:([A-Z][a-z]+-\d_\d)-[A-Za-z0-9]+',
+            br'uuid:([A-Z][a-z]+-\d_\d)-[A-Za-z0-9]+',
             br'uuid:\1-SERIALNUMBER',
             body,
         )
