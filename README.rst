@@ -83,7 +83,8 @@ This started as a stripped down version of `ouimeaux <https://github.com/iancmcc
 
 License
 -------
-The code in pywemo/ouimeaux_device is written and copyright by Ian McCracken and released under the BSD license. The rest is released under the MIT license.
+The code in pywemo/ouimeaux_device was originally written by by Ian McCracken (and is copyright). It was released under the BSD license.
+The overall library is released under the MIT license.
 
 .. |Build Badge| image:: https://github.com/pavoni/pywemo/workflows/Build/badge.svg
     :target: https://github.com/pavoni/pywemo/actions?query=workflow%3ABuild
