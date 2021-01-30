@@ -1,9 +1,7 @@
 name: Publish
-
 on:
   release:
     types: [created]
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -17,6 +15,4 @@ jobs:
       - name: Build and publish
         env:
           CI: 1
-        run: |
-          ./scripts/build_and_publish.sh ${{ secrets.PYPI_PASSWORD }}
-          coveralls
+        run: ./scripts/build_and_publish.sh ${{ secrets.PYPI_PASSWORD }}
