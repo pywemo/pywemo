@@ -1,3 +1,5 @@
+"""Helper(s) for longer press testing on supported devices."""
+
 import contextlib
 import sqlite3
 import tempfile
@@ -13,6 +15,7 @@ class TestLongPress:
 
     @pytest.fixture
     def rules_db_from_device(self, device):
+        """Fixture for rules database tests."""
         with tempfile.NamedTemporaryFile(
             prefix="wemorules", suffix=".db"
         ) as temp_file:

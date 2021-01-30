@@ -49,6 +49,10 @@ echo "===Lint with pylint==="
 pylint pywemo
 
 echo
+echo "===Lint with pydocstyle==="
+pydocstyle
+
+echo
 echo "===Test with pytest and coverage==="
 coverage run -m pytest --vcr-record=none
 coverage report --skip-covered

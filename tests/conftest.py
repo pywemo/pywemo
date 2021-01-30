@@ -1,3 +1,4 @@
+"""Configuration file for VCR."""
 import os
 import re
 
@@ -6,6 +7,8 @@ import pytest
 
 @pytest.fixture(scope='module')
 def vcr_config():
+    """VCR configuration."""
+
     def scrub_identifiers(response):
         body = response['body']['string']
         body = re.sub(
@@ -62,5 +65,6 @@ def vcr_config():
 
 @pytest.fixture(scope='module')
 def vcr_cassette_dir(request):
+    """Specify the location for the VCR cassettes."""
     # Put all cassettes in tests/vcr/{module}/{test}.yaml
     return os.path.join('tests/vcr', request.module.__name__)
