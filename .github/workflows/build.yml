@@ -38,6 +38,6 @@ jobs:
           COVERALLS_SERVICE_NAME: github-actions
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pip3 install --upgrade setuptools
-          pip3 install --upgrade coveralls
+          source scripts/common.sh
+          enterVenv
           coveralls --finish
