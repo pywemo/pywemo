@@ -31,6 +31,7 @@ jobs:
     name: Indicate completion to coveralls.io
     needs: build
     runs-on: ubuntu-latest
+    container: python:3-slim
     steps:
       - name: Finished
         env:
@@ -38,6 +39,5 @@ jobs:
           COVERALLS_SERVICE_NAME: github-actions
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          source scripts/common.sh
-          enterVenv
+          pip3 install --upgrade coveralls
           coveralls --finish
