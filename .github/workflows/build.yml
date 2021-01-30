@@ -38,5 +38,5 @@ jobs:
           COVERALLS_SERVICE_NAME: github-actions
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pip3 install --upgrade coveralls
+          pip3 install --upgrade coveralls setuptools
           coveralls --finish
