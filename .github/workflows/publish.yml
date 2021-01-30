@@ -4,6 +4,7 @@ on:
     types: [created]
 jobs:
   deploy:
+    name: Build, test, and deploy to PyPI
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -16,5 +17,21 @@ jobs:
         env:
           CI: 1
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          COVERALLS_SERVICE_NAME: github-actions
+          COVERALLS_PARALLEL: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./scripts/build_and_publish.sh ${{ secrets.PYPI_PASSWORD }}
+  coveralls:
+    name: Indicate completion to coveralls.io
+    needs: deploy
+    runs-on: ubuntu-latest
+    container: python:3-slim
+    steps:
+      - name: Finished
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          COVERALLS_SERVICE_NAME: github-actions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pip3 install --upgrade coveralls
+          coveralls --finish
