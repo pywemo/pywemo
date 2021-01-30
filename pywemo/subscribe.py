@@ -258,7 +258,15 @@ class SubscriptionRegistry:
             # Remove any events, callbacks, and the device itself
             if self._callbacks[device.serialnumber] is not None:
                 del self._callbacks[device.serialnumber]
-            if self._events[device.serialnumber] is not None:
+            event = self._events.get(device.serialnumber, None)
+            if event is not None:
+                # Remove pending event
+                try:
+                    self._sched.cancel(event)
+                except ValueError:
+                    # event might execute and be removed from queue
+                    # concurrently.  Safe to ignore
+                    pass
                 del self._events[device.serialnumber]
             if self.devices[device.host] is not None:
                 del self.devices[device.host]
@@ -267,7 +275,7 @@ class SubscriptionRegistry:
 
     def _resubscribe(self, device, sid=None, retry=0):
         LOG.info("Resubscribe for %s", device)
-        headers = {'TIMEOUT': '300'}
+        headers = {'TIMEOUT': 'Second-300'}
         if sid is not None:
             headers['SID'] = sid
         else:
@@ -312,17 +320,19 @@ class SubscriptionRegistry:
     def _url_resubscribe(self, device, headers, sid, url):
         request_headers = headers.copy()
         response = requests.request(
-            method="SUBSCRIBE", url=url, headers=request_headers
+            method="SUBSCRIBE", url=url, headers=request_headers, timeout=10
         )
         if response.status_code == 412 and sid:
             # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
             # start over.
             requests.request(
-                method='UNSUBSCRIBE', url=url, headers={'SID': sid}
+                method='UNSUBSCRIBE', url=url, headers={'SID': sid}, timeout=10
             )
             return self._resubscribe(device)
         timeout = int(
-            response.headers.get('timeout', '1801').replace('Second-', '')
+            response.headers.get('TIMEOUT', headers.get('TIMEOUT')).replace(
+                'Second-', ''
+            )
         )
         sid = response.headers.get('sid', sid)
         with self._event_thread_cond:
