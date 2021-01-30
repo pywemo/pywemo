@@ -1,5 +1,5 @@
 pyWeMo |Build Badge| |PyPI Version Badge| |Coverage| |PyPI Downloads Badge|
-================================================================
+===========================================================================
 Python 3 module to setup, discover and control WeMo devices.
 
 Dependencies
