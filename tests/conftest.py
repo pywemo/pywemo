@@ -1,4 +1,4 @@
-"""Configuration file for VCR."""
+"""Shared pytest fixtures."""
 import os
 import re
 
