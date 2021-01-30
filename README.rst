@@ -1,4 +1,4 @@
-pyWeMo |Build Badge| |PyPI Version Badge| |PyPI Downloads Badge|
+pyWeMo |Build Badge| |PyPI Version Badge| |Coverage| |PyPI Downloads Badge|
 ================================================================
 Python 3 module to setup, discover and control WeMo devices.
 
@@ -87,10 +87,13 @@ The code in pywemo/ouimeaux_device is written and copyright by Ian McCracken and
 
 .. |Build Badge| image:: https://github.com/pavoni/pywemo/workflows/Build/badge.svg
     :target: https://github.com/pavoni/pywemo/actions?query=workflow%3ABuild
+    :alt: GitHub build status
 .. |PyPI Version Badge| image:: https://img.shields.io/pypi/v/pywemo
     :target: https://pypi.org/project/pywemo/
     :alt: Latest PyPI version
+.. |Coverage| image:: https://coveralls.io/repos/github/pavoni/pywemo/badge.svg?branch=master
+    :target: https://coveralls.io/github/pavoni/pywemo?branch=master
+    :alt: Coveralls coverage
 .. |PyPI Downloads Badge| image:: https://img.shields.io/pypi/dm/pywemo
     :target: https://pypi.org/project/pywemo/
-    :alt: Number of PyPI downloads  
-    
+    :alt: Number of PyPI downloads
