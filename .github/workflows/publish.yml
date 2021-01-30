@@ -16,7 +16,6 @@ jobs:
       - name: Build and publish
         env:
           CI: 1
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
           COVERALLS_SERVICE_NAME: github
           COVERALLS_PARALLEL: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -29,7 +28,6 @@ jobs:
     steps:
       - name: Finished
         env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
           COVERALLS_SERVICE_NAME: github
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
