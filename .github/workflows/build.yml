@@ -21,4 +21,5 @@ jobs:
       - name: Build
         env:
           CI: 1
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: ./scripts/build.sh

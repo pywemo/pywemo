@@ -15,4 +15,5 @@ jobs:
       - name: Build and publish
         env:
           CI: 1
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
         run: ./scripts/build_and_publish.sh ${{ secrets.PYPI_PASSWORD }}
