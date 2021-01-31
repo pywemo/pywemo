@@ -1,3 +1,5 @@
+"""Helper(s) for long press testing on supported devices."""
+
 import contextlib
 import sqlite3
 import tempfile
