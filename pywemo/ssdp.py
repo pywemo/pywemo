@@ -284,7 +284,7 @@ def entry_in_entries(entry, entries, mac, serial):
     return False
 
 
-def scan(
+def scan(  # noqa: C901
     st=None,
     timeout=DISCOVER_TIMEOUT,
     max_entries=None,
@@ -294,8 +294,8 @@ def scan(
     """
     Send a message over the network to discover upnp devices.
 
-    Inspired by Crimsdings
-    https://github.com/crimsdings/ChromeCast/blob/master/cc_discovery.py
+    Inspired by Crimsdings ChromeCast code
+    https://github.com/crimsdings/  [ChromeCast repository since removed]
     """
     # pylint: disable=too-many-nested-blocks
     ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
@@ -314,14 +314,13 @@ def scan(
                 s.bind((addr, 0))
                 s.sendto(ssdp_request, ssdp_target)
                 sockets.append(s)
-            except socket.error:
+            except OSError:
                 pass
 
         start = calc_now()
         while sockets:
             time_diff = calc_now() - start
 
-            # pylint: disable=maybe-no-member
             seconds_left = max(timeout - time_diff.seconds, 0)
 
             ready = select.select(sockets, [], [], min(1, seconds_left))[0]
@@ -359,11 +358,7 @@ def scan(
                     service_types = []
 
                 # Search for devices
-                if (
-                    st is not None
-                    or match_mac is not None
-                    or match_serial is not None
-                ):
+                if any(i is not None for i in [st, match_mac, match_serial]):
                     if not entry_in_entries(entry, entries, mac, serial):
                         if match_mac is not None:
                             if match_mac == mac:
@@ -381,7 +376,7 @@ def scan(
                 if max_entries:
                     if len(entries) == max_entries:
                         return entries
-    except socket.error:
+    except OSError:
         LOG.exception("Socket error while discovering SSDP devices")
     finally:
         for s in sockets:
@@ -431,7 +426,7 @@ class DiscoveryResponder:
                 sock.sendto(
                     (SSDP_NOTIFY % callback_addr).encode("UTF-8"), ssdp_target
                 )
-            except socket.error:
+            except OSError:
                 pass
             finally:
                 sock.close()
@@ -452,7 +447,7 @@ class DiscoveryResponder:
                         socket.IP_ADD_MEMBERSHIP,
                         group + local,
                     )
-                except socket.error:
+                except OSError:
                     pass
 
             sock.bind((MULTICAST_GROUP, MULTICAST_PORT))
@@ -487,7 +482,7 @@ class DiscoveryResponder:
                     sock.sendto(
                         (SSDP_REPLY % callback_addr).encode("UTF-8"), sock_addr
                     )
-                except socket.error:
+                except OSError:
                     LOG.exception("Failed to send SSDP reply to %r", sock_addr)
         except Exception as exp:
             self._thread_exception = exp  # Used in the stop() method.

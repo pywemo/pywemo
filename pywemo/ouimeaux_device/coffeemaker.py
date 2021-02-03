@@ -84,7 +84,6 @@ class CoffeeMaker(Switch):
 
     def update_attributes(self):
         """Request state from device."""
-        # pylint: disable=maybe-no-member
         resp = self.deviceevent.GetAttributes().get('attributeList')
         self._attributes = attribute_xml_to_dict(resp)
         self._state = self.mode
@@ -130,8 +129,6 @@ class CoffeeMaker(Switch):
         if state:
             # Coffee Maker always responds with an error if SetBinaryState is
             # called. Use SetAttributes to change the Mode to "Brewing"
-
-            # pylint: disable=maybe-no-member
             self.deviceevent.SetAttributes(
                 attributeList=quote_xml(
                     "<attribute><name>Mode</name><value>4</value></attribute>"

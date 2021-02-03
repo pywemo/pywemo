@@ -25,7 +25,7 @@ class Test_RequestHandler:
 
     @pytest.fixture
     def http_server(self, outer):
-        """RequestHandler http server."""
+        """Fixture for RequestHandler http server."""
         server = HTTPServer(("localhost", 0), subscribe.RequestHandler)
         server.outer = outer
         exception = None
@@ -124,7 +124,7 @@ class Test_RequestHandler:
 <BinaryState>0</BinaryState>
 </u:SetBinaryState>
 </s:Body>
-</s:Envelope>''',
+</s:Envelope>''',  # noqa: E501
         )
         assert response.status_code == 200
         assert response.content == subscribe.RESPONSE_SUCCESS.encode("UTF-8")

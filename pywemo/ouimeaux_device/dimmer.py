@@ -15,7 +15,6 @@ class Dimmer(Switch, LongPressMixin):
         """Get brightness from device."""
         if force_update or self._brightness is None:
             try:
-                # pylint: disable=maybe-no-member
                 brightness = self.basicevent.GetBinaryState().get('brightness')
             except ValueError:
                 brightness = 0
@@ -37,7 +36,6 @@ class Dimmer(Switch, LongPressMixin):
             if self.get_state() == 0:
                 self.on()
 
-        # pylint: disable=maybe-no-member
         self.basicevent.SetBinaryState(brightness=int(brightness))
         self._brightness = int(brightness)
 

@@ -1,3 +1,5 @@
+"""Tests for SSDP and discovery."""
+
 import queue
 import socket
 import unittest.mock as mock
@@ -57,14 +59,14 @@ def mock_select():
 def discovery_responder(
     mock_select, mock_socket, mock_interface_addresses, mock_get_ip_address
 ):
-    """DiscoveryResponder instance.
+    """Fixture for DiscoveryResponder instance.
 
     Returns a callable(msg, addr). When called, (msg, addr) will be the
     return value from the mock sock.recvfrom. If it is expected that mock
     sock.sendto is called, the arguments to that mock will be returned from the
     callable. Example:
 
-    (sendto_msg, sendto_addr) = discovery_responder(recvfrom_msg, recvfrom_addr)
+    sendto_msg, sendto_addr = discovery_responder(recvfrom_msg, recvfrom_addr)
 
     Within the DiscoveryResponder instance, the mock recvfrom/sendto will map
     to the values from the example callable above:

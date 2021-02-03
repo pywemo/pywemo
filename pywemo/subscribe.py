@@ -2,7 +2,6 @@
 import collections
 import logging
 import sched
-import socket
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -67,7 +66,7 @@ def _start_server():
         port = 8989 + i
         try:
             return ThreadingHTTPServer(('', port), RequestHandler)
-        except (OSError, socket.error):
+        except OSError:
             continue
     return None
 

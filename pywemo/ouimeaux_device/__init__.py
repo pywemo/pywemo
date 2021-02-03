@@ -239,7 +239,6 @@ class Device:
 
     def update_binary_state(self):
         """Update the cached copy of the basic state response."""
-        # pylint: disable=maybe-no-member
         self.basic_state_params = self.basicevent.GetBinaryState()
 
     def subscription_update(self, _type, _params):
@@ -260,7 +259,6 @@ class Device:
     def get_state(self, force_update=False):
         """Return 0 if off and 1 if on."""
         if force_update or self._state is None:
-            # pylint: disable=maybe-no-member
             state = self.basicevent.GetBinaryState() or {}
 
             try:
@@ -502,7 +500,7 @@ class Device:
                 'required.'
             ) from exc
 
-    def _setup(
+    def _setup(  # noqa: C901
         self,
         ssid,
         password,

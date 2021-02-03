@@ -1,4 +1,5 @@
-"""Tests for the Dimmer class."""
+"""Integration tests for the Dimmer class."""
+
 import pytest
 
 from pywemo import Dimmer
@@ -11,24 +12,22 @@ class Base:
 
     @pytest.mark.vcr()
     def test_turn_on(self, dimmer):
-        """Turn on the dimmer."""
         dimmer.on()
         assert dimmer.get_state(force_update=True) == 1
 
     @pytest.mark.vcr()
     def test_turn_off(self, dimmer):
-        """Turn off the dimmer."""
         dimmer.off()
         assert dimmer.get_state(force_update=True) == 0
 
     def test_subscription_update_brightness(self, dimmer):
         # Does not update when the light is off.
-        assert dimmer.subscription_update('Brightness', '23') == False
+        assert dimmer.subscription_update('Brightness', '23') is False
 
-        assert dimmer.subscription_update('BinaryState', '1') == True
+        assert dimmer.subscription_update('BinaryState', '1') is True
         assert dimmer.get_state() == 1
 
-        assert dimmer.subscription_update('Brightness', '52') == True
+        assert dimmer.subscription_update('Brightness', '52') is True
         assert dimmer.get_brightness() == 52
 
 
@@ -37,7 +36,6 @@ class Test_PVT_OWRT_Dimmer_v1(Base, long_press_helpers.TestLongPress):
 
     @pytest.fixture
     def dimmer(self, vcr):
-        """The test fixture."""
         with vcr.use_cassette('WeMo_WW_2.00.11453.PVT-OWRT-Dimmer'):
             return Dimmer('http://192.168.1.100:49153/setup.xml', '')
 

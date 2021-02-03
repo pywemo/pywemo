@@ -1,3 +1,5 @@
+"""Tests for working with the rules database."""
+
 import base64
 import sqlite3
 import tempfile
@@ -37,6 +39,7 @@ def test_create_empty_db(sqldb):
     statements = set(
         line for line in sqldb.iterdump() if line.startswith('CREATE TABLE')
     )
+    # flake8: noqa: E501 (long lines)
     assert statements == set(
         [
             # https://github.com/pavoni/pywemo/issues/61#issuecomment-748693894
@@ -169,7 +172,7 @@ def test_update_if_modified_field_changed(sqldb):
     rule, device = db.rules_for_device()[0]
     assert db.update_if_modified() is False
 
-    # Modifying an entry in the db should cause update_if_modified() == True.
+    # Modifying an entry in the db should cause update_if_modified() to be True
     rule.State = 0
     assert db.update_if_modified() is True
 
@@ -179,7 +182,7 @@ def test_update_if_modified_new_entry(sqldb):
     db = rules_db.RulesDb(sqldb, MOCK_UDN, MOCK_NAME)
     assert db.update_if_modified() is False
 
-    # Adding a new entry  in the db should cause update_if_modified() == True.
+    # Adding a new entry in the db should cause update_if_modified() to be True
     db.add_target_device_to_rule(rule, MOCK_TARGET_UDN)
     assert db.update_if_modified() is True
 

@@ -7,7 +7,6 @@ class Switch(Device):
 
     def set_state(self, state):
         """Set the state of this device to on or off."""
-        # pylint: disable=maybe-no-member
         self.basicevent.SetBinaryState(BinaryState=int(state))
         self._state = int(state)
 

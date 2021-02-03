@@ -1,6 +1,4 @@
-"""Tests for the Device class."""
-# pylint: disable=protected-access, no-self-use, no-member
-# pylint: disable=redefined-outer-name
+"""Integration tests for the Device class."""
 
 import itertools
 import logging

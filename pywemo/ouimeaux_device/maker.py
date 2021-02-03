@@ -14,7 +14,6 @@ class Maker(Switch):
     @property
     def maker_params(self):
         """Get and parse the device attributes."""
-        # pylint: disable=maybe-no-member
         makerresp = self.deviceevent.GetAttributes().get('attributeList')
         makerresp = "<attributes>" + makerresp + "</attributes>"
         makerresp = makerresp.replace("&gt;", ">")
@@ -54,8 +53,6 @@ class Maker(Switch):
         """Set the state of this device to on or off."""
         # The Maker has a momentary mode - so it's not safe to assume
         # the state is what you just set, so re-read it from the device
-
-        # pylint: disable=maybe-no-member
         self.basicevent.SetBinaryState(BinaryState=int(state))
         self.get_state(True)
 
