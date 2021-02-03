@@ -94,7 +94,6 @@ skip_glob = "*/xsd/*"
   jobs = 0
   max-line-length = 79
   ignore = "xsd"
-  reports = "no"
   extension-pkg-whitelist = "lxml"
 
   [tool.pylint.message_control]
