@@ -23,7 +23,6 @@ class Insight(Switch):
 
     def update_insight_params(self):
         """Get and parse the device attributes."""
-        # pylint: disable=maybe-no-member
         params = self.insight.GetInsightParams().get('InsightParams')
         self.insight_params = self.parse_insight_params(params)
 
@@ -44,7 +43,7 @@ class Insight(Switch):
             onfor,  # seconds
             ontoday,  # seconds
             ontotal,  # seconds
-            timeperiod,  # pylint: disable=unused-variable
+            _timeperiod,
             wifipower,  # wifi rssi signal strength
             currentmw,
             todaymw,

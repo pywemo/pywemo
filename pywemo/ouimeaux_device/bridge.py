@@ -55,7 +55,6 @@ class Bridge(Device):
 
     def bridge_update(self, force_update=True):
         """Get updated status information for the bridge and its lights."""
-        # pylint: disable=maybe-no-member
         if force_update or self.Lights is None or self.Groups is None:
             plugin_udn = self.basicevent.GetMacAddr().get('PluginUDN')
 
@@ -90,7 +89,6 @@ class Bridge(Device):
 
     def bridge_getdevicestatus(self, deviceid):
         """Return the list of device statuses for the bridge's lights."""
-        # pylint: disable=maybe-no-member
         status_list = self.bridge.GetDeviceStatus(DeviceIDs=deviceid)
         device_status_list = et.fromstring(
             status_list.get('DeviceStatusList').encode('utf-8')
@@ -110,7 +108,6 @@ class Bridge(Device):
         et.ElementTree(req).write(buf, encoding='UTF-8', xml_declaration=True)
         send_state = escape(buf.getvalue().decode(), quote=True)
 
-        # pylint: disable=maybe-no-member
         return self.bridge.SetDeviceStatus(DeviceStatusList=send_state)
 
     @property
@@ -134,6 +131,7 @@ class LinkedDevice:
         self._last_err = None
         self.mac = self.bridge.mac
         self.serialnumber = self.bridge.serialnumber
+        self.uniqueID = None
 
     def get_state(self, force_update=False):
         """Return the status of the device."""
@@ -193,7 +191,6 @@ class LinkedDevice:
                 val = (val,)
             values.append(':'.join(str(v) for v in val))
 
-        # pylint: disable=maybe-no-member
         self._last_err = self.bridge.bridge_setdevicestatus(
             isgroup, self.uniqueID, capids, values
         )

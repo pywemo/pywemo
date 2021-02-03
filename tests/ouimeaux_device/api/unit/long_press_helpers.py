@@ -13,6 +13,8 @@ from pywemo.ouimeaux_device.api import long_press, rules_db
 class TestLongPress:
     """Test methods that are shared between devices that support long press."""
 
+    method = "pywemo.ouimeaux_device.api.long_press.rules_db_from_device"
+
     @pytest.fixture
     def rules_db_from_device(self, device):
         with tempfile.NamedTemporaryFile(
@@ -29,7 +31,7 @@ class TestLongPress:
                     yield rdb
 
                 with patch(
-                    "pywemo.ouimeaux_device.api.long_press.rules_db_from_device",
+                    TestLongPress.method,
                     side_effect=yield_rdb,
                 ):
                     yield rdb

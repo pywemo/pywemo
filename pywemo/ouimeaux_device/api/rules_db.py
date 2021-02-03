@@ -341,7 +341,6 @@ class RulesDb:
         """Clear all data from the database."""
         cursor = self.cursor()
         for table in ALL_TABLES:
-            # pylint: disable=no-member
             cursor.execute(f"DELETE FROM {table.TABLE_NAME}")
         self.modified = True
         self._rules = _index_by_primary_key(RulesRow.select_all(cursor))

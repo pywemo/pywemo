@@ -1,4 +1,4 @@
-"""Tests for the Bridge class."""
+"""Integration tests for the Bridge class."""
 
 import pytest
 from lxml import etree as et

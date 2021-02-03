@@ -1,3 +1,5 @@
+"""Shared pytest fixtures."""
+
 import os
 import re
 import unittest.mock as mock
@@ -10,6 +12,8 @@ from pywemo import SubscriptionRegistry
 
 @pytest.fixture(scope='module')
 def vcr_config():
+    """VCR Configuration."""
+
     def scrub_identifiers(response):
         body = response['body']['string']
         body = re.sub(
@@ -66,12 +70,14 @@ def vcr_config():
 
 @pytest.fixture(scope='module')
 def vcr_cassette_dir(request):
+    """Specify the location for the VCR cassettes."""
     # Put all cassettes in tests/vcr/{module}/{test}.yaml
     return os.path.join('tests/vcr', request.module.__name__)
 
 
 @pytest.fixture
 def subscription_registry():
+    """Fixture to simulate HTTPServer for the SubscriptionRegistry."""
     registry = SubscriptionRegistry()
 
     server = mock.create_autospec(HTTPServer, instance=True)

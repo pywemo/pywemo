@@ -63,7 +63,7 @@ def get_ip_address(host='1.2.3.4'):
     try:
         sock.connect((host, 9))
         return sock.getsockname()[0]
-    except socket.error:
+    except OSError:
         return None
     finally:
         del sock
