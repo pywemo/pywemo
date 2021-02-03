@@ -30,10 +30,7 @@ class TestLongPress:
                 def yield_rdb(*_):
                     yield rdb
 
-                with patch(
-                    TestLongPress.method,
-                    side_effect=yield_rdb,
-                ):
+                with patch(TestLongPress.method, side_effect=yield_rdb):
                     yield rdb
             finally:
                 conn.close()
