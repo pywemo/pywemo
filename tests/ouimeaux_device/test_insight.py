@@ -1,13 +1,17 @@
+"""Integration tests for the Insight class."""
+
 import datetime
 import threading
 
 import pytest
 
-from pywemo import Insight, SubscriptionRegistry
+from pywemo import Insight
 from pywemo.subscribe import EVENT_TYPE_BINARY_STATE, EVENT_TYPE_INSIGHT_PARAMS
 
 
 class Test_Insight:
+    """Integration tests for the Insight class."""
+
     @pytest.fixture
     def insight(self, vcr):
         with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml'):
