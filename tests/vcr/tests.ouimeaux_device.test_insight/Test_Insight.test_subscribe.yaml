@@ -7,7 +7,7 @@ interactions:
       Accept-Encoding:
       - gzip, deflate
       CALLBACK:
-      - <http://192.168.1.1:8989/basicevent1>
+      - <http://192.168.100.1:8989/basicevent1>
       Connection:
       - keep-alive
       Content-Length:
@@ -15,7 +15,7 @@ interactions:
       NT:
       - upnp:event
       TIMEOUT:
-      - Second-300
+      - '300'
       User-Agent:
       - python-requests/2.25.1
     method: SUBSCRIBE
@@ -27,13 +27,13 @@ interactions:
       CONTENT-LENGTH:
       - '0'
       DATE:
-      - Tue, 26 Jan 2021 02:16:36 GMT
+      - Mon, 25 Jan 2021 00:22:58 GMT
       SERVER:
       - Unspecified, UPnP/1.0, Unspecified
       SID:
-      - uuid:84915076-1dd2-11b2-b5fd-dcf7b6ec9aaa
+      - uuid:7a5218fe-1dd2-11b2-849c-b527ba18a01e
       TIMEOUT:
-      - Second-300
+      - Second-1801
       X-User-Agent:
       - redsonic
     status:
@@ -47,7 +47,7 @@ interactions:
       Accept-Encoding:
       - gzip, deflate
       CALLBACK:
-      - <http://192.168.1.1:8989/insight1>
+      - <http://192.168.100.1:8989/insight1>
       Connection:
       - keep-alive
       Content-Length:
@@ -55,7 +55,7 @@ interactions:
       NT:
       - upnp:event
       TIMEOUT:
-      - Second-300
+      - '300'
       User-Agent:
       - python-requests/2.25.1
     method: SUBSCRIBE
@@ -67,13 +67,13 @@ interactions:
       CONTENT-LENGTH:
       - '0'
       DATE:
-      - Tue, 26 Jan 2021 02:16:36 GMT
+      - Mon, 25 Jan 2021 00:22:59 GMT
       SERVER:
       - Unspecified, UPnP/1.0, Unspecified
       SID:
-      - uuid:849c1a56-1dd2-11b2-b5fd-dcf7b6ec9aaa
+      - uuid:7a59e192-1dd2-11b2-849c-b527ba18a01e
       TIMEOUT:
-      - Second-300
+      - Second-1801
       X-User-Agent:
       - redsonic
     status:

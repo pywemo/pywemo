@@ -182,10 +182,24 @@ class Test_SubscriptionRegistry:
         basic = subscription_registry._sched.queue[0]
         assert basic.time == pytest.approx(time.time() + 225, abs=2)
         assert basic.action == subscription_registry._resubscribe
-        assert basic.argument == [
+        assert basic.argument == (
             device,
-            'uuid:84915076-1dd2-11b2-b5fd-dcf7b6ec9aaa',
-        ]
+            subscribe._basic_event_subscription_url,
+        )
+        assert basic.kwargs == {
+            'sid': 'uuid:84915076-1dd2-11b2-b5fd-dcf7b6ec9aaa'
+        }
+
+        insight = subscription_registry._sched.queue[1]
+        assert insight.time == pytest.approx(time.time() + 225, abs=2)
+        assert insight.action == subscription_registry._resubscribe
+        assert insight.argument == (
+            device,
+            subscribe._insight_event_subscription_url,
+        )
+        assert insight.kwargs == {
+            'sid': 'uuid:849c1a56-1dd2-11b2-b5fd-dcf7b6ec9aaa'
+        }
 
         subscription_registry.unregister(device)
 
@@ -206,7 +220,11 @@ class Test_SubscriptionRegistry:
             time.time() + subscribe.SUBSCRIPTION_RETRY, abs=2
         )
         assert basic.action == subscription_registry._resubscribe
-        assert basic.argument == [device, None, 1]
+        assert basic.argument == (
+            device,
+            subscribe._basic_event_subscription_url,
+        )
+        assert basic.kwargs == {'retry': 1, 'sid': None}
 
         # Simulate a second failure to trigger a reconnect with the device.
         subscription_registry._sched.cancel(basic)
@@ -217,12 +235,12 @@ class Test_SubscriptionRegistry:
 
             reconnect.side_effect = change_url
 
-            basic.action(*basic.argument)
+            basic.action(*basic.argument, **basic.kwargs)
 
             # Fail one more time to see that the correct changed URL is used.
             basic = subscription_registry._sched.queue[-1]
             subscription_registry._sched.cancel(basic)
-            basic.action(*basic.argument)
+            basic.action(*basic.argument, **basic.kwargs)
 
         mock_request.assert_called_with(
             method='SUBSCRIBE',

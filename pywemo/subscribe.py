@@ -5,15 +5,18 @@ import sched
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import Callable, Dict, Iterable, Optional
 
 import requests
 from lxml import etree as et
 
+from .ouimeaux_device import Device
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
 from .util import get_ip_address
 
 # Subscription event types.
 EVENT_TYPE_BINARY_STATE = "BinaryState"
+EVENT_TYPE_INSIGHT_PARAMS = "InsightParams"
 EVENT_TYPE_LONG_PRESS = "LongPress"
 
 LOG = logging.getLogger(__name__)
@@ -53,6 +56,8 @@ VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
 </device>
 </root>"""
 
+SubscribeUrlFn = Callable[[Device], str]
+
 
 class SubscriptionRegistryFailed(Exception):
     """General exceptions related to the subscription registry."""
@@ -69,6 +74,29 @@ def _start_server():
         except OSError:
             continue
     return None
+
+
+def _basic_event_subscription_url(device: Device) -> str:
+    """Return the basic event subscription URL."""
+    return device.basicevent.eventSubURL
+
+
+def _insight_event_subscription_url(device: Device) -> str:
+    """Return the insight event subscription URL."""
+    return device.insight.eventSubURL
+
+
+def _cancel_events(
+    scheduler: sched.scheduler, events: Iterable[sched.Event]
+) -> None:
+    """Cancel pending scheduler events."""
+    for event in events:
+        try:
+            scheduler.cancel(event)
+        except ValueError:
+            # event might execute and be removed from queue
+            # concurrently.  Safe to ignore
+            pass
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -214,7 +242,7 @@ class SubscriptionRegistry:
 
         self._event_thread = None
         self._event_thread_cond = threading.Condition()
-        self._events = {}
+        self._events: Dict[str, Dict[SubscribeUrlFn, sched.Event]] = {}
 
         def sleep(secs):
             with self._event_thread_cond:
@@ -240,9 +268,12 @@ class SubscriptionRegistry:
         self.devices[device.host] = device
 
         with self._event_thread_cond:
-            self._events[device.serialnumber] = self._sched.enter(
-                0, 0, self._resubscribe, [device]
-            )
+            self._events[device.serialnumber] = {}
+            # Basic events
+            self._schedule(0, device, _basic_event_subscription_url)
+            # Insight events
+            if hasattr(device, 'insight'):
+                self._schedule(0, device, _insight_event_subscription_url)
             self._event_thread_cond.notify()
 
     def unregister(self, device):
@@ -257,23 +288,24 @@ class SubscriptionRegistry:
             # Remove any events, callbacks, and the device itself
             if self._callbacks[device.serialnumber] is not None:
                 del self._callbacks[device.serialnumber]
-            event = self._events.get(device.serialnumber, None)
-            if event is not None:
-                # Remove pending event
-                try:
-                    self._sched.cancel(event)
-                except ValueError:
-                    # event might execute and be removed from queue
-                    # concurrently.  Safe to ignore
-                    pass
+            events = self._events.get(device.serialnumber, None)
+            if events is not None:
+                _cancel_events(self._sched, events.values())
                 del self._events[device.serialnumber]
             if self.devices[device.host] is not None:
                 del self.devices[device.host]
 
             self._event_thread_cond.notify()
 
-    def _resubscribe(self, device, sid=None, retry=0):
-        LOG.info("Resubscribe for %s", device)
+    def _resubscribe(
+        self,
+        device: Device,
+        url_fn: SubscribeUrlFn,
+        sid: Optional[str] = None,  # pylint: disable=unsubscriptable-object
+        retry: int = 0,
+    ) -> None:
+        path = url_fn(device).rsplit('/')[-1]
+        LOG.info("Resubscribe for %s %s", path, device)
         headers = {'TIMEOUT': 'Second-300'}
         if sid is not None:
             headers['SID'] = sid
@@ -281,23 +313,16 @@ class SubscriptionRegistry:
             host = get_ip_address(host=device.host)
             headers.update(
                 {
-                    "CALLBACK": '<http://%s:%d>' % (host, self.port),
+                    "CALLBACK": '<http://%s:%d/%s>' % (host, self.port, path),
                     "NT": "upnp:event",
                 }
             )
         try:
-            # Basic events
-            self._url_resubscribe(
-                device, headers, sid, device.basicevent.eventSubURL
-            )
-            # Insight events
-            # if hasattr(device, 'insight'):
-            #     self._url_resubscribe(
-            #         device, headers, sid, device.insight.eventSubURL)
-
+            self._url_resubscribe(device, headers, sid, url_fn)
         except requests.exceptions.RequestException as exc:
             LOG.warning(
-                "Resubscribe error for %s (%s), will retry in %ss",
+                "Resubscribe error for %s %s (%s), will retry in %ss",
+                path,
                 device,
                 exc,
                 SUBSCRIPTION_RETRY,
@@ -309,15 +334,24 @@ class SubscriptionRegistry:
                 if device.rediscovery_enabled:
                     device.reconnect_with_device()
             with self._event_thread_cond:
-                self._events[device.serialnumber] = self._sched.enter(
-                    SUBSCRIPTION_RETRY,
-                    0,
-                    self._resubscribe,
-                    [device, sid, retry],
-                )
+                if url_fn in self._events.get(device.serialnumber, {}):
+                    self._schedule(
+                        SUBSCRIPTION_RETRY,
+                        device,
+                        url_fn,
+                        sid=sid,
+                        retry=retry,
+                    )
 
-    def _url_resubscribe(self, device, headers, sid, url):
+    def _url_resubscribe(
+        self,
+        device: Device,
+        headers: Dict[str, str],
+        sid: Optional[str],  # pylint: disable=unsubscriptable-object
+        url_fn: SubscribeUrlFn,
+    ) -> None:
         request_headers = headers.copy()
+        url = url_fn(device)
         response = requests.request(
             method="SUBSCRIBE", url=url, headers=request_headers, timeout=10
         )
@@ -327,7 +361,7 @@ class SubscriptionRegistry:
             requests.request(
                 method='UNSUBSCRIBE', url=url, headers={'SID': sid}, timeout=10
             )
-            return self._resubscribe(device)
+            return self._resubscribe(device, url_fn)
         timeout = int(
             response.headers.get('TIMEOUT', headers.get('TIMEOUT')).replace(
                 'Second-', ''
@@ -335,9 +369,24 @@ class SubscriptionRegistry:
         )
         sid = response.headers.get('sid', sid)
         with self._event_thread_cond:
-            self._events[device.serialnumber] = self._sched.enter(
-                int(timeout * 0.75), 0, self._resubscribe, [device, sid]
-            )
+            if url_fn in self._events.get(device.serialnumber, {}):
+                self._schedule(int(timeout * 0.75), device, url_fn, sid=sid)
+
+    def _schedule(
+        self,
+        delay: int,
+        device: Device,
+        url_fn: SubscribeUrlFn,
+        **kwargs,
+    ) -> None:
+        """Schedule a subscription."""
+        self._events[device.serialnumber][url_fn] = self._sched.enter(
+            delay,
+            0,
+            self._resubscribe,
+            argument=(device, url_fn),
+            kwargs=kwargs,
+        )
 
     def event(self, device, type_, value):
         """Execute the callback for a received event."""
@@ -385,13 +434,8 @@ class SubscriptionRegistry:
             self._exiting = True
 
             # Remove any pending events
-            for event in self._events.values():
-                try:
-                    self._sched.cancel(event)
-                except ValueError:
-                    # event might execute and be removed from queue
-                    # concurrently.  Safe to ignore
-                    pass
+            for device_events in self._events.values():
+                _cancel_events(self._sched, device_events.values())
 
             # Wake up event thread if its sleeping
             self._event_thread_cond.notify()
