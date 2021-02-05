@@ -9,6 +9,7 @@ from .xsd import service as serviceParser
 
 LOG = logging.getLogger(__name__)
 MAX_RETRIES = 3
+REQUESTS_TIMEOUT = 10
 
 REQUEST_TEMPLATE = """
 <?xml version="1.0" encoding="utf-8"?>
@@ -64,7 +65,7 @@ class Action:
                     self.controlURL,
                     body.strip(),
                     headers=self.headers,
-                    timeout=10,
+                    timeout=REQUESTS_TIMEOUT,
                 )
                 response_dict = {}
 
@@ -112,7 +113,7 @@ class Service:
         self.actions = {}
 
         url = '%s/%s' % (base_url, service.get_SCPDURL().strip('/'))
-        xml = requests.get(url, timeout=10)
+        xml = requests.get(url, timeout=REQUESTS_TIMEOUT)
         if xml.status_code != 200:
             return
 

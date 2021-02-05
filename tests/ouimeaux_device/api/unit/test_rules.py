@@ -9,6 +9,7 @@ import pytest
 import requests
 
 from pywemo.ouimeaux_device.api import rules_db
+from pywemo.ouimeaux_device.api.service import REQUESTS_TIMEOUT
 
 MOCK_NAME = "WemoDeviceName"
 MOCK_UDN = "WemoDeviceUDN"
@@ -239,7 +240,9 @@ def test_rules_db_from_device(temp_file, sqldb):
 
     with patch("requests.get", return_value=mock_response) as mock_get:
         with rules_db.rules_db_from_device(Device) as db:
-            mock_get.assert_called_once_with("http://localhost/rules.db")
+            mock_get.assert_called_once_with(
+                "http://localhost/rules.db", timeout=REQUESTS_TIMEOUT
+            )
             # Make a modification to trigger StoreRules.
             assert len(db._rules) == 1
             db._rules[501].State = 1

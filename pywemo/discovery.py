@@ -7,7 +7,7 @@ import requests
 
 from . import ssdp
 from .ouimeaux_device import UnsupportedDevice, probe_wemo
-from .ouimeaux_device.api.service import ActionException
+from .ouimeaux_device.api.service import REQUESTS_TIMEOUT, ActionException
 from .ouimeaux_device.api.xsd import device as deviceParser
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
@@ -65,7 +65,7 @@ def discover_devices(
 
 def device_from_description(description_url, mac, rediscovery_enabled=True):
     """Return object representing WeMo device running at host, else None."""
-    xml = requests.get(description_url, timeout=10)
+    xml = requests.get(description_url, timeout=REQUESTS_TIMEOUT)
     parsed = deviceParser.parseString(
         xml.content, silence=True, print_warnings=False
     )
