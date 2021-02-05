@@ -113,7 +113,7 @@ class Service:
         self.actions = {}
 
         url = '%s/%s' % (base_url, service.get_SCPDURL().strip('/'))
-        xml = requests.get(url, timeout=10)
+        xml = requests.get(url, timeout=REQUESTS_TIMEOUT)
         if xml.status_code != 200:
             return
 

@@ -13,6 +13,7 @@ from typing import FrozenSet, List, Mapping, Optional, Tuple
 import requests
 
 from .db_orm import DatabaseRow, PrimaryKey, SQLType
+from .service import REQUESTS_TIMEOUT
 
 LOG = logging.getLogger(__name__)
 
@@ -369,7 +370,7 @@ def rules_db_from_device(device) -> RulesDb:
     fetch = device.rules.FetchRules()
     version = int(fetch["ruleDbVersion"])
     rule_db_url = fetch["ruleDbPath"]
-    response = requests.get(rule_db_url)
+    response = requests.get(rule_db_url, timeout=REQUESTS_TIMEOUT)
 
     with tempfile.NamedTemporaryFile(
         prefix="wemorules", suffix=".db"
