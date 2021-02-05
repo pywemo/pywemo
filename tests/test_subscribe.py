@@ -248,3 +248,32 @@ class Test_SubscriptionRegistry:
             headers=mock.ANY,
             timeout=10,
         )
+
+    @pytest.mark.vcr()
+    @mock.patch('time.time')
+    def test_is_subscribed(self, mock_time, device, subscription_registry):
+        curr_time = 1000.0
+
+        def get_time():
+            nonlocal curr_time
+            curr_time += 1.0
+            return curr_time
+
+        mock_time.side_effect = get_time
+        subscription_registry.register(device)
+        self._wait_for_registry(subscription_registry)
+
+        # Not subscribed until after the first event.
+        assert subscription_registry.is_subscribed(device) is False
+
+        subscription_registry.event(device, 'type', 'params')
+        assert subscription_registry.is_subscribed(device) is True
+
+        # No event received before timeout.
+        curr_time += 300
+        assert subscription_registry.is_subscribed(device) is False
+
+        # Trigger the UNSUBSCRIBE behavior.
+        with mock.patch.object(subscription_registry, '_schedule'):
+            event = subscription_registry._sched.queue[0]
+            event.action(*event.argument, **event.kwargs)

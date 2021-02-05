@@ -235,6 +235,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 class SubscriptionRegistry:
     """Class for subscribing to wemo events."""
 
+    subscription_timeout_seconds = 300
+
     def __init__(self):
         """Create the subscription registry object."""
         self.devices = {}
@@ -244,6 +246,8 @@ class SubscriptionRegistry:
         self._event_thread = None
         self._event_thread_cond = threading.Condition()
         self._events: Dict[str, Dict[SubscribeUrlFn, sched.Event]] = {}
+        self._subscription_timeout: Dict[Device, float] = {}
+        self._last_event_time: Dict[Device, float] = {}
 
         def sleep(secs):
             with self._event_thread_cond:
@@ -307,20 +311,16 @@ class SubscriptionRegistry:
     ) -> None:
         path = url_fn(device).rsplit('/')[-1]
         LOG.info("Resubscribe for %s %s", path, device)
-        headers = {'TIMEOUT': 'Second-300'}
-        if sid is not None:
-            headers['SID'] = sid
-        else:
-            host = get_ip_address(host=device.host)
-            headers.update(
-                {
-                    "CALLBACK": '<http://%s:%d/%s>' % (host, self.port, path),
-                    "NT": "upnp:event",
-                }
-            )
+        self.devices[device.host] = device  # If rediscovered with a new IP.
+        host = get_ip_address(host=device.host)
+        headers = {
+            'TIMEOUT': f'Second-{self.subscription_timeout_seconds}',
+            "CALLBACK": '<http://%s:%d/%s>' % (host, self.port, path),
+            "NT": "upnp:event",
+        }
         try:
             self._url_resubscribe(device, headers, sid, url_fn)
-        except requests.exceptions.RequestException as exc:
+        except (requests.RequestException, ValueError) as exc:
             LOG.warning(
                 "Resubscribe error for %s %s (%s), will retry in %ss",
                 path,
@@ -351,24 +351,33 @@ class SubscriptionRegistry:
         sid: Optional[str],  # pylint: disable=unsubscriptable-object
         url_fn: SubscribeUrlFn,
     ) -> None:
-        request_headers = headers.copy()
         url = url_fn(device)
+        if sid:
+            # The device will trigger a notification for each new subscription.
+            # A subscription renewal will not trigger this notification. The
+            # notification confirms that the device is subscribed and can
+            # connect to the RequestHandler. Clients can therefore use the
+            # is_subscribed method to confirm that the subscription is alive
+            # and working properly.
+            try:
+                requests.request(
+                    method='UNSUBSCRIBE',
+                    url=url,
+                    headers={'SID': sid},
+                    timeout=REQUESTS_TIMEOUT,
+                )
+            except requests.RequestException:
+                pass
         response = requests.request(
             method="SUBSCRIBE",
             url=url,
-            headers=request_headers,
+            headers=headers,
             timeout=REQUESTS_TIMEOUT,
         )
-        if response.status_code == 412 and sid:
-            # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
-            # start over.
-            requests.request(
-                method='UNSUBSCRIBE',
-                url=url,
-                headers={'SID': sid},
-                timeout=REQUESTS_TIMEOUT,
+        if response.status_code != 200:
+            raise ValueError(
+                f'Invalid http code {response.status_code}: {url}'
             )
-            return self._resubscribe(device, url_fn)
         timeout = int(
             response.headers.get('TIMEOUT', headers.get('TIMEOUT')).replace(
                 'Second-', ''
@@ -378,6 +387,7 @@ class SubscriptionRegistry:
         with self._event_thread_cond:
             if url_fn in self._events.get(device.serialnumber, {}):
                 self._schedule(int(timeout * 0.75), device, url_fn, sid=sid)
+                self._subscription_timeout[device] = timeout
 
     def _schedule(
         self,
@@ -404,6 +414,7 @@ class SubscriptionRegistry:
             type_,
             value,
         )
+        self._last_event_time[device] = time.time()
         for type_filter, callback in self._callbacks.get(
             device.serialnumber, ()
         ):
@@ -413,6 +424,12 @@ class SubscriptionRegistry:
     def on(self, device, type_filter, callback):
         """Add an event callback for a device."""
         self._callbacks[device.serialnumber].append((type_filter, callback))
+
+    def is_subscribed(self, device: Device) -> bool:
+        """Return true if the device has an active subscription."""
+        timeout = self._subscription_timeout.get(device, 0.0)
+        last_event = self._last_event_time.get(device, 0.0)
+        return last_event + timeout > time.time()
 
     def start(self):
         """Start the subscription registry."""

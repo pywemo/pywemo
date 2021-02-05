@@ -1,0 +1,154 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      CALLBACK:
+      - <http://192.168.1.1:8989/basicevent1>
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      NT:
+      - upnp:event
+      TIMEOUT:
+      - Second-300
+      User-Agent:
+      - python-requests/2.25.1
+    method: SUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/basicevent1
+  response:
+    body:
+      string: ''
+    headers:
+      CONTENT-LENGTH:
+      - '0'
+      DATE:
+      - Fri, 05 Feb 2021 05:52:21 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      SID:
+      - uuid:50237b0a-1dd2-11b2-a7fc-88cf3619b408
+      TIMEOUT:
+      - Second-300
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      CALLBACK:
+      - <http://192.168.1.1:8989/insight1>
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      NT:
+      - upnp:event
+      TIMEOUT:
+      - Second-300
+      User-Agent:
+      - python-requests/2.25.1
+    method: SUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/insight1
+  response:
+    body:
+      string: ''
+    headers:
+      CONTENT-LENGTH:
+      - '0'
+      DATE:
+      - Fri, 05 Feb 2021 05:52:21 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      SID:
+      - uuid:5027d696-1dd2-11b2-a7fc-88cf3619b408
+      TIMEOUT:
+      - Second-300
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      SID:
+      - uuid:50237b0a-1dd2-11b2-a7fc-88cf3619b408
+      User-Agent:
+      - python-requests/2.25.1
+    method: UNSUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/basicevent1
+  response:
+    body:
+      string: <html><body><h1>200 OK</h1></body></html>
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '41'
+      CONTENT-TYPE:
+      - text/html
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      CALLBACK:
+      - <http://192.168.1.1:8989/basicevent1>
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      NT:
+      - upnp:event
+      TIMEOUT:
+      - Second-300
+      User-Agent:
+      - python-requests/2.25.1
+    method: SUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/basicevent1
+  response:
+    body:
+      string: ''
+    headers:
+      CONTENT-LENGTH:
+      - '0'
+      DATE:
+      - Fri, 05 Feb 2021 05:52:21 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      SID:
+      - uuid:50342798-1dd2-11b2-a7fc-88cf3619b408
+      TIMEOUT:
+      - Second-300
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+version: 1
