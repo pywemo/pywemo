@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 import requests
 
 from .api.long_press import LongPressMixin
-from .api.service import ActionException, Service
+from .api.service import REQUESTS_TIMEOUT, ActionException, Service
 from .api.xsd import device as deviceParser
 
 LOG = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ LOG = logging.getLogger(__name__)
 PROBE_PORTS = (49153, 49152, 49154, 49151, 49155, 49156, 49157, 49158, 49159)
 
 
-def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=10):
+def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=REQUESTS_TIMEOUT):
     """
     Probe a host for the current port.
 
@@ -110,7 +110,7 @@ class Device:
         self.retrying = False
         self.mac = mac
         self.rediscovery_enabled = rediscovery_enabled
-        xml = requests.get(url, timeout=10)
+        xml = requests.get(url, timeout=REQUESTS_TIMEOUT)
         self._config = deviceParser.parseString(
             xml.content, silence=True, print_warnings=False
         ).device

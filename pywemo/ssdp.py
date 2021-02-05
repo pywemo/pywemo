@@ -10,6 +10,7 @@ import requests
 from lxml import etree as et
 
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
+from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
 from .util import etree_to_dict, get_ip_address, interface_addresses
 
 DISCOVER_TIMEOUT = 5
@@ -175,7 +176,9 @@ class UPNPEntry:
             try:
                 for _ in range(3):
                     try:
-                        xml = requests.get(url, timeout=10).content
+                        xml = requests.get(
+                            url, timeout=REQUESTS_TIMEOUT
+                        ).content
 
                         tree = None
                         if xml is not None:

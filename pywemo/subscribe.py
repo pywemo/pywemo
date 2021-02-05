@@ -12,6 +12,7 @@ from lxml import etree as et
 
 from .ouimeaux_device import Device
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
+from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
 from .util import get_ip_address
 
 # Subscription event types.
@@ -353,13 +354,19 @@ class SubscriptionRegistry:
         request_headers = headers.copy()
         url = url_fn(device)
         response = requests.request(
-            method="SUBSCRIBE", url=url, headers=request_headers, timeout=10
+            method="SUBSCRIBE",
+            url=url,
+            headers=request_headers,
+            timeout=REQUESTS_TIMEOUT,
         )
         if response.status_code == 412 and sid:
             # Invalid subscription ID. Send an UNSUBSCRIBE for safety and
             # start over.
             requests.request(
-                method='UNSUBSCRIBE', url=url, headers={'SID': sid}, timeout=10
+                method='UNSUBSCRIBE',
+                url=url,
+                headers={'SID': sid},
+                timeout=REQUESTS_TIMEOUT,
             )
             return self._resubscribe(device, url_fn)
         timeout = int(
