@@ -353,12 +353,13 @@ class SubscriptionRegistry:
     ) -> None:
         url = url_fn(device)
         if sid:
-            # The device will trigger a notification for each new subscription.
-            # A subscription renewal will not trigger this notification. The
-            # notification confirms that the device is subscribed and can
-            # connect to the RequestHandler. Clients can therefore use the
-            # is_subscribed method to confirm that the subscription is alive
-            # and working properly.
+            # The SUBSCRIBE request below creates a new subscription each
+            # time. Unsubscribe the current subscription before requesting a
+            # new subscription. This is done to avoid tying up resources on the
+            # WeMo device associated with a subscription that is no longer in
+            # use. See the following comment for background on why this is
+            # being done vs using subscription renewals:
+            # https://github.com/pavoni/pywemo/pull/236#issuecomment-774325545
             try:
                 requests.request(
                     method='UNSUBSCRIBE',
