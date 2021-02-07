@@ -11,6 +11,13 @@ import requests
 from pywemo import Insight, LightSwitch, subscribe
 
 
+@pytest.fixture
+def device(vcr):
+    """Mock WeMo Insight device."""
+    with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml'):
+        return Insight('http://192.168.1.100:49153/setup.xml', '')
+
+
 class Test_RequestHandler:
     """Test the server request handler."""
 
@@ -80,7 +87,7 @@ class Test_RequestHandler:
         outer.devices[server_address] = mock_light_switch
         response = requests.request(
             "NOTIFY",
-            f"{server_url}",
+            f"{server_url}/path",
             data='''<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">
 <e:property>
 <BinaryState>0</BinaryState>
@@ -90,7 +97,10 @@ class Test_RequestHandler:
         assert response.status_code == 200
         assert response.content == subscribe.RESPONSE_SUCCESS.encode("UTF-8")
         outer.event.assert_called_once_with(
-            mock_light_switch, subscribe.EVENT_TYPE_BINARY_STATE, '0'
+            mock_light_switch,
+            subscribe.EVENT_TYPE_BINARY_STATE,
+            '0',
+            path='/path',
         )
 
     def test_GET_setup_xml(self, server_url):
@@ -157,14 +167,151 @@ class Test_RequestHandler:
         assert response.status_code == 404
 
 
+class Test_Subscription:
+    """Base class for subscription tests."""
+
+    http_port = 8989
+
+    @pytest.fixture(autouse=True)
+    def get_ip_address(self):
+        with mock.patch('pywemo.subscribe.get_ip_address') as mock_ip_address:
+            mock_ip_address.return_value = '192.168.1.1'
+            yield mock_ip_address
+
+    @pytest.fixture(params=['basicevent', 'insight'])
+    def subscription(self, request, device):
+        return subscribe.Subscription(device, self.http_port, request.param)
+
+    def test_url(self, subscription):
+        base_url = 'http://192.168.1.100:49153/upnp/event'
+        assert subscription.url == f'{base_url}/{subscription.service_name}1'
+
+    @mock.patch('requests.request')
+    def test_maintain(self, mock_request, subscription):
+        mock_response = mock.create_autospec(requests.Response, instance=True)
+        mock_response.headers = {'SID': 'uuid:123', 'TIMEOUT': 'Second-567'}
+        mock_response.status_code = requests.codes.ok
+        mock_request.return_value = mock_response
+
+        assert subscription.maintain() == 567
+        assert subscription.subscription_id == 'uuid:123'
+        assert subscription.expiration_time == pytest.approx(
+            time.time() + 567, abs=2
+        )
+        mock_request.assert_called_once_with(
+            method='SUBSCRIBE',
+            url=subscription.url,
+            headers={
+                'CALLBACK': f'<http://192.168.1.1:8989{subscription.path}>',
+                'NT': 'upnp:event',
+                'TIMEOUT': 'Second-300',
+            },
+            timeout=subscribe.REQUESTS_TIMEOUT,
+        )
+
+        # Now test subscription renewal.
+        mock_request.reset_mock()
+        mock_response.headers = {'SID': 'uuid:321', 'TIMEOUT': 'Second-765'}
+        mock_response.status_code = requests.codes.ok
+        mock_request.return_value = mock_response
+
+        assert subscription.maintain() == 765
+        assert subscription.subscription_id == 'uuid:321'
+        assert subscription.expiration_time == pytest.approx(
+            time.time() + 765, abs=2
+        )
+        mock_request.assert_called_once_with(
+            method='SUBSCRIBE',
+            url=subscription.url,
+            headers={'SID': 'uuid:123', 'TIMEOUT': 'Second-300'},
+            timeout=subscribe.REQUESTS_TIMEOUT,
+        )
+
+        # Now test with the renewal failing with code 412.
+        mock_request.reset_mock()
+        mock_response = mock.Mock()
+        mock_response.headers = {'SID': 'uuid:222', 'TIMEOUT': 'Second-333'}
+        type(mock_response).status_code = mock.PropertyMock(
+            side_effect=[412, requests.codes.ok, requests.codes.ok]
+        )
+        mock_request.return_value = mock_response
+
+        assert subscription.maintain() == 333
+        assert subscription.subscription_id == 'uuid:222'
+        assert subscription.expiration_time == pytest.approx(
+            time.time() + 333, abs=2
+        )
+        mock_request.assert_any_call(
+            method='SUBSCRIBE',
+            url=subscription.url,
+            headers={'SID': 'uuid:321', 'TIMEOUT': 'Second-300'},
+            timeout=subscribe.REQUESTS_TIMEOUT,
+        )
+        mock_request.assert_any_call(
+            method='UNSUBSCRIBE',
+            url=subscription.url,
+            headers={'SID': 'uuid:321'},
+            timeout=subscribe.REQUESTS_TIMEOUT,
+        )
+        mock_request.assert_called_with(
+            method='SUBSCRIBE',
+            url=subscription.url,
+            headers={
+                'CALLBACK': f'<http://192.168.1.1:8989{subscription.path}>',
+                'NT': 'upnp:event',
+                'TIMEOUT': 'Second-300',
+            },
+            timeout=subscribe.REQUESTS_TIMEOUT,
+        )
+
+    @mock.patch('requests.request', side_effect=requests.ReadTimeout)
+    def test_maintain_requests_exception(self, mock_request, subscription):
+        with pytest.raises(requests.ReadTimeout):
+            subscription.maintain()
+
+    @pytest.mark.vcr()
+    def test_maintain_bad_status_code(self, subscription):
+        with pytest.raises(requests.HTTPError):
+            subscription.maintain()
+
+    @mock.patch('requests.request')
+    def test_unsubscribe(self, mock_request, subscription):
+        subscription.subscription_id = 'uuid:321'
+        subscription._unsubscribe()
+        mock_request.called_once_with(
+            method='UNSUBSCRIBE',
+            url=subscription.url,
+            headers={'SID': 'uuid:321'},
+            timeout=subscribe.REQUESTS_TIMEOUT,
+        )
+        assert subscription.subscription_id is None
+
+        mock_request.reset_mock()
+        subscription._unsubscribe()
+        mock_request.assert_not_called()
+
+    def test_update_subscription(self, subscription):
+        subscription._update_subscription({})
+        assert subscription.subscription_id is None
+        assert subscription.expiration_time == pytest.approx(
+            time.time() + 300, abs=2
+        )
+
+        subscription._update_subscription({'SID': 'uuid:123'})
+        assert subscription.subscription_id == 'uuid:123'
+        assert subscription.expiration_time == pytest.approx(
+            time.time() + 300, abs=2
+        )
+
+        subscription._update_subscription({'TIMEOUT': 'Second-200'})
+        assert subscription.subscription_id == 'uuid:123'
+        assert subscription.expiration_time == pytest.approx(
+            time.time() + 200, abs=2
+        )
+
+
 class Test_SubscriptionRegistry:
     """Test the SubscriptionRegistry."""
-
-    @pytest.fixture
-    def device(self, vcr):
-        """Mock WeMo Insight device."""
-        with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml'):
-            return Insight('http://192.168.1.100:49153/setup.xml', '')
 
     def _wait_for_registry(self, subscription_registry):
         # Wait for registry to be ready to make sure the Insight device has
@@ -182,24 +329,19 @@ class Test_SubscriptionRegistry:
         basic = subscription_registry._sched.queue[0]
         assert basic.time == pytest.approx(time.time() + 225, abs=2)
         assert basic.action == subscription_registry._resubscribe
-        assert basic.argument == (
-            device,
-            subscribe._basic_event_subscription_url,
-        )
-        assert basic.kwargs == {
-            'sid': 'uuid:84915076-1dd2-11b2-b5fd-dcf7b6ec9aaa'
-        }
 
         insight = subscription_registry._sched.queue[1]
         assert insight.time == pytest.approx(time.time() + 225, abs=2)
         assert insight.action == subscription_registry._resubscribe
-        assert insight.argument == (
-            device,
-            subscribe._insight_event_subscription_url,
-        )
-        assert insight.kwargs == {
-            'sid': 'uuid:849c1a56-1dd2-11b2-b5fd-dcf7b6ec9aaa'
-        }
+
+        assert subscription_registry.is_subscribed(device) is False
+        subscription_registry.event(device, '', '', path='/sub/insight')
+        assert subscription_registry.is_subscribed(device) is False
+        subscription_registry.event(device, '', '', path='/sub/basicevent')
+        assert subscription_registry.is_subscribed(device) is True
+        subscription_registry.event(device, '', '', path='invalid_path')
+
+        assert subscription_registry.devices['192.168.1.100'] == device
 
         subscription_registry.unregister(device)
 
@@ -220,11 +362,6 @@ class Test_SubscriptionRegistry:
             time.time() + subscribe.SUBSCRIPTION_RETRY, abs=2
         )
         assert basic.action == subscription_registry._resubscribe
-        assert basic.argument == (
-            device,
-            subscribe._basic_event_subscription_url,
-        )
-        assert basic.kwargs == {'retry': 1, 'sid': None}
 
         # Simulate a second failure to trigger a reconnect with the device.
         subscription_registry._sched.cancel(basic)
@@ -248,32 +385,3 @@ class Test_SubscriptionRegistry:
             headers=mock.ANY,
             timeout=10,
         )
-
-    @pytest.mark.vcr()
-    @mock.patch('time.time')
-    def test_is_subscribed(self, mock_time, device, subscription_registry):
-        curr_time = 1000.0
-
-        def get_time():
-            nonlocal curr_time
-            curr_time += 1.0
-            return curr_time
-
-        mock_time.side_effect = get_time
-        subscription_registry.register(device)
-        self._wait_for_registry(subscription_registry)
-
-        # Not subscribed until after the first event.
-        assert subscription_registry.is_subscribed(device) is False
-
-        subscription_registry.event(device, 'type', 'params')
-        assert subscription_registry.is_subscribed(device) is True
-
-        # No event received before timeout.
-        curr_time += 300
-        assert subscription_registry.is_subscribed(device) is False
-
-        # Trigger the UNSUBSCRIBE behavior.
-        with mock.patch.object(subscription_registry, '_schedule'):
-            event = subscription_registry._sched.queue[0]
-            event.action(*event.argument, **event.kwargs)
