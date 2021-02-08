@@ -385,6 +385,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 class SubscriptionRegistry:
     """Holds device subscriptions and callbacks for wemo events."""
 
+    # Potential service endpoints for subscriptions. A Subscription will be
+    # created for each entry as long as the service is supported by the device.
+    subscription_service_names: Iterable[str] = ('basicevent', 'insight')
+
     def __init__(self):
         """Create the subscription registry object."""
         self.devices = {}
@@ -420,7 +424,7 @@ class SubscriptionRegistry:
 
         with self._event_thread_cond:
             subscriptions = self._subscriptions[device] = []
-            for service in ('basicevent', 'insight'):
+            for service in self.subscription_service_names:
                 if service in device.services:
                     subscription = Subscription(device, self.port, service)
                     subscriptions.append(subscription)

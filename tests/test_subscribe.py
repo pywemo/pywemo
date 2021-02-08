@@ -178,7 +178,9 @@ class Test_Subscription:
             mock_ip_address.return_value = '192.168.1.1'
             yield mock_ip_address
 
-    @pytest.fixture(params=['basicevent', 'insight'])
+    @pytest.fixture(
+        params=subscribe.SubscriptionRegistry.subscription_service_names
+    )
     def subscription(self, request, device):
         return subscribe.Subscription(device, self.http_port, request.param)
 
