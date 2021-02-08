@@ -63,12 +63,7 @@ class SubscriptionRegistryFailed(Exception):
 
 
 class Subscription:
-    """UPnP event subscription base class.
-
-    Represents a subscription to a single UPnP endpoint.
-
-    Subclasses are required to implement the `url` property.
-    """
+    """Subscription to a single UPnP service endpoint."""
 
     # Scheduler Event used to periodically maintain the subscription.
     # pylint: disable=unsubscriptable-object
