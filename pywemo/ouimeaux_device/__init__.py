@@ -8,6 +8,7 @@ import time
 import warnings
 
 import requests
+from lxml import etree as et
 
 from ..exceptions import (
     ActionException,
@@ -109,6 +110,13 @@ class Device:
         self._config = deviceParser.parseString(
             xml.content, silence=True, print_warnings=False
         ).device
+        # The 'xs:any' values for the xs:complexType DeviceType in device.xsd.
+        xs_any = (et.fromstring(extra) for extra in self._config.anytypeobjs_)
+        self._config_any = {
+            et.QName(tag).localname: tag.text.strip()
+            for tag in xs_any
+            if tag.text and tag.text.strip()
+        }
         self.services = {}
         for svc in self._config.serviceList.service:
             service = Service(self, svc)
