@@ -128,6 +128,15 @@ RESPONSE_SETUP = '''<?xml version="1.0"?>
 </device>
 </root>'''
 
+EMPTY_SERVICE = '''<?xml version="1.0"?>
+<scpd xmlns="urn:Belkin:service-1-0">
+  <specVersion>
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+  <actionList></actionList>
+</scpd>'''
+
 ENC_PASSWORD = b'Salted__XXXXXX12\xc0\xd4\xd4v4\xfep\rikEmk\xf8\xe0\x12'
 
 APLIST = (
@@ -136,6 +145,15 @@ APLIST = (
     'ap_tkip|6|50|WPA2PSK/TKIP,\n'
     'ap_open|1|85|OPEN/NONE,\n'
 )
+
+
+class MockUrllib3Response:
+    """Mocked urllib3 response."""
+
+    def __init__(self, content, status):
+        self.content = content
+        self.data = content
+        self.status = status
 
 
 class MockResponse:
@@ -147,17 +165,19 @@ class MockResponse:
         self.status_code = status_code
 
 
-def mocked_requests_get(*args, **kwargs):
+def mocked_requests_get(*args, url=None, **kwargs):
     """Mock a response from request.get()."""
     # mocked class
 
-    if args[0] == 'http://192.168.1.100:49158/setup.xml':
-        return MockResponse(RESPONSE_SETUP.encode('utf-8'), 200)
-    return MockResponse(None, 404)
+    if url == 'http://192.168.1.100:49158/setup.xml':
+        return MockUrllib3Response(RESPONSE_SETUP.encode('utf-8'), 200)
+    elif url.endswith('.xml'):
+        return MockUrllib3Response(EMPTY_SERVICE.encode(), 200)
+    return MockUrllib3Response(None, 404)
 
 
 @pytest.fixture
-@mock.patch('requests.get', side_effect=mocked_requests_get)
+@mock.patch('urllib3.PoolManager.request', side_effect=mocked_requests_get)
 def device(mock_get):
     """Return a Device as created by some actual XML."""
     # Note that the actions on the services will not be created since the
@@ -409,34 +429,58 @@ class TestDevice:
             device.reconnect_with_device()
         assert len(get.mock_calls) == 9
 
+    @mock.patch('urllib3.PoolManager.request')
     @mock.patch('requests.get')
-    def test_reconnect_with_device_by_probing_PortChanged(self, get, device):
+    def test_reconnect_with_device_by_probing_PortChanged(
+        self, requests_get, mock_request, device
+    ):
         new_port = 49155
+
+        def get_urllib3_resp(url, *args, **kwargs):
+            if url == f'http://{device.host}:{new_port}/setup.xml':
+                return MockUrllib3Response(RESPONSE_SETUP.encode('utf-8'), 200)
+            elif url.endswith('.xml'):
+                return MockUrllib3Response(EMPTY_SERVICE.encode(), 200)
+            return MockUrllib3Response(None, 404)
+
+        mock_request.side_effect = get_urllib3_resp
 
         def get_resp(url, *args, **kwargs):
             if url == f'http://{device.host}:{new_port}/setup.xml':
                 return MockResponse(RESPONSE_SETUP.encode('utf-8'), 200)
             return MockResponse(None, 404)
 
-        get.side_effect = get_resp
+        requests_get.side_effect = get_resp
         device.sentinel = 'SeNtInEl'  # Should not exist in the new device.
         device.reconnect_with_device()
 
         assert device.port == new_port
         assert getattr(device, 'sentinel', None) is None
 
+    @mock.patch('urllib3.PoolManager.request')
     @mock.patch('requests.get')
-    def test_reconnect_with_device_by_probing_WrongDevice(self, get, device):
+    def test_reconnect_with_device_by_probing_WrongDevice(
+        self, requests_get, mock_request, device
+    ):
         new_response = RESPONSE_SETUP.replace(
             'XXXXXXXXXXXXXX', 'YYYYYYYYYYYYYY'
         )
+
+        def get_urllib3_resp(url, *args, **kwargs):
+            if url == f'http://{device.host}:{device.port}/setup.xml':
+                return MockUrllib3Response(new_response.encode('utf-8'), 200)
+            elif url.endswith('.xml'):
+                return MockUrllib3Response(EMPTY_SERVICE.encode(), 200)
+            return MockUrllib3Response(None, 404)
+
+        mock_request.side_effect = get_urllib3_resp
 
         def get_resp(url, *args, **kwargs):
             if url == f'http://{device.host}:{device.port}/setup.xml':
                 return MockResponse(new_response.encode('utf-8'), 200)
             return MockResponse(None, 404)
 
-        get.side_effect = get_resp
+        requests_get.side_effect = get_resp
 
         device.sentinel = 'SeNtInEl'  # Make sure this still exists.
         with mock.patch.object(device, '_reconnect_with_device_by_discovery'):

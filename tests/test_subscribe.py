@@ -370,7 +370,7 @@ class Test_SubscriptionRegistry:
         with mock.patch.object(device, 'reconnect_with_device') as reconnect:
 
             def change_url():
-                device.basicevent.eventSubURL = 'http://192.168.1.100:1234/'
+                device.session.url = 'http://192.168.1.100:1234/'
 
             reconnect.side_effect = change_url
 
@@ -383,7 +383,7 @@ class Test_SubscriptionRegistry:
 
         mock_request.assert_called_with(
             method='SUBSCRIBE',
-            url='http://192.168.1.100:1234/',
+            url='http://192.168.1.100:1234/upnp/event/basicevent1',
             headers=mock.ANY,
             timeout=10,
         )
