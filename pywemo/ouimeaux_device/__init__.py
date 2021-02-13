@@ -99,7 +99,7 @@ class ShortPassword(SetupException):
 class Device:
     """Base object for WeMo devices."""
 
-    def __init__(self, url, mac, rediscovery_enabled=True):
+    def __init__(self, url, mac=None, rediscovery_enabled=True):
         """Create a WeMo device."""
         self._state = None
         self.basic_state_params = {}
@@ -108,12 +108,12 @@ class Device:
         self.host = parsed_url.hostname
         self.port = parsed_url.port
         self.retrying = False
-        self.mac = mac
         self.rediscovery_enabled = rediscovery_enabled
         xml = requests.get(url, timeout=REQUESTS_TIMEOUT)
         self._config = deviceParser.parseString(
             xml.content, silence=True, print_warnings=False
         ).device
+        self.mac = mac or self._config.macAddress
         service_list = self._config.serviceList
         self.services = {}
         for svc in service_list.service:
@@ -133,7 +133,7 @@ class Device:
         """
         # Put here to avoid circular dependency
         # pylint: disable=import-outside-toplevel
-        from ..discovery import discover_devices
+        from ..ssdp import ST, scan
 
         # Avoid retrying from multiple threads
         if self.retrying:
@@ -145,21 +145,22 @@ class Device:
         try_no = 0
 
         while True:
-            found = discover_devices(
-                ssdp_st=None,
-                max_devices=1,
-                match_mac=self.mac,
-                match_serial=self.serialnumber,
-            )
+            found = scan(st=ST, match_udn=self.udn)
 
-            if found:
-                LOG.info("Found %s again, updating local values", self.name)
-
-                # pylint: disable=attribute-defined-outside-init
-                self.__dict__ = found[0].__dict__
-                self.retrying = False
-
-                return
+            if found and found[0].location:
+                try:
+                    device = self.__class__(found[0].location)
+                except (requests.RequestException, ActionException) as exc:
+                    LOG.warning('Could not connect to wemo %s (%s)', self, exc)
+                else:
+                    LOG.info(
+                        "Found %s again, updating local values", self.name
+                    )
+                    # pylint: disable=attribute-defined-outside-init
+                    self.__dict__ = device.__dict__
+                    return
+                finally:
+                    self.retrying = False
 
             wait_time = try_no * 5
 
@@ -193,7 +194,7 @@ class Device:
 
         url = f'http://{self.host}:{port}/setup.xml'
         try:
-            device = self.__class__(url, None)
+            device = self.__class__(url)
         except (requests.RequestException, ActionException) as exc:
             LOG.warning('Could not connect to wemo %s (%s)', self, exc)
             return False

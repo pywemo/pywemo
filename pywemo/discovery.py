@@ -24,20 +24,11 @@ LOG = logging.getLogger(__name__)
 
 
 def discover_devices(
-    ssdp_st=None,
-    max_devices=None,
-    match_mac=None,
-    match_serial=None,
-    rediscovery_enabled=True,
+    ssdp_st=None, max_devices=None, rediscovery_enabled=True, **kwargs
 ):
     """Find WeMo devices on the local network."""
     ssdp_st = ssdp_st or ssdp.ST
-    ssdp_entries = ssdp.scan(
-        ssdp_st,
-        max_entries=max_devices,
-        match_mac=match_mac,
-        match_serial=match_serial,
-    )
+    ssdp_entries = ssdp.scan(ssdp_st, max_entries=max_devices, **kwargs)
 
     wemos = []
 
@@ -45,25 +36,26 @@ def discover_devices(
         if entry.match_device_description(
             {'manufacturer': 'Belkin International Inc.'}
         ):
-            mac = entry.description.get('device').get('macAddress')
             try:
-                device = device_from_description(
-                    description_url=entry.location,
-                    mac=mac,
+                device = device_from_uuid_and_location(
+                    entry.udn,
+                    entry.mac_address,
+                    entry.location,
                     rediscovery_enabled=rediscovery_enabled,
                 )
             except (requests.RequestException, ActionException) as exc:
                 LOG.warning(
                     'Could not connect to device %s (%s)', entry.location, exc
                 )
-                device = None
-            if device is not None:
+            else:
                 wemos.append(device)
 
     return wemos
 
 
-def device_from_description(description_url, mac, rediscovery_enabled=True):
+def device_from_description(
+    description_url, mac=None, rediscovery_enabled=True
+):
     """Return object representing WeMo device running at host, else None."""
     xml = requests.get(description_url, timeout=REQUESTS_TIMEOUT)
     parsed = deviceParser.parseString(

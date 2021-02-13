@@ -164,8 +164,14 @@ class UPNPEntry:
 
     @property
     def usn(self):
-        """Return usn value."""
+        """Return unique service name."""
         return self.values.get('usn')
+
+    @property
+    def udn(self):
+        """Return unique device name."""
+        usn = self.usn or ''
+        return usn.split('::')[0]
 
     @property
     def description(self):
@@ -206,6 +212,31 @@ class UPNPEntry:
 
         return UPNPEntry.DESCRIPTION_CACHE[url]
 
+    @property
+    def device(self):
+        """Device xml element."""
+        return self.description.get('device', {})
+
+    @property
+    def mac_address(self):
+        """Device mac address."""
+        return self.device.get('macAddress')
+
+    @property
+    def serial_number(self):
+        """Device serial number."""
+        return self.device.get('serialNumber')
+
+    @property
+    def service_types(self):
+        """Services types supported by the device."""
+        services = self.device.get("serviceList", {}).get("service", [])
+        return frozenset(
+            service.get("serviceType")
+            for service in services
+            if isinstance(service, dict)
+        )
+
     def match_device_description(self, values):
         """
         Fetch description and match against it.
@@ -237,17 +268,21 @@ class UPNPEntry:
         """Clear the internal cache of device descriptions."""
         cls.DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
 
+    @property
+    def _key(self):
+        """Tuple of values that uniquely identify the UPNPEntry instance."""
+        return (self.udn, self.location)
+
     def __eq__(self, other):
         """Equality operator."""
-        return (
-            self.__class__ == other.__class__ and self.values == other.values
-        )
+        return isinstance(other, type(self)) and self._key == other._key
 
     def __repr__(self):
         """Return the string representation of the object."""
-        return "<UPNPEntry {} - {}>".format(
-            self.values.get('st', ''), self.values.get('location', '')
-        )
+        st = self.st or ''
+        location = self.location or ''
+        udn = self.udn or ''
+        return f"<UPNPEntry {st} - {location} - {udn}>"
 
 
 def build_ssdp_request(ssdp_st, ssdp_mx):
@@ -266,33 +301,14 @@ def build_ssdp_request(ssdp_st, ssdp_mx):
     ).encode('ascii')
 
 
-def entry_in_entries(entry, entries, mac, serial):
-    """Check if a device entry is in a list of device entries."""
-    # If we don't have a mac or serial, let's just compare objects instead:
-    if mac is None and serial is None:
-        return entry in entries
-
-    for item in entries:
-        if item.description is not None:
-            e_device = item.description.get('device', {})
-            e_mac = e_device.get('macAddress')
-            e_serial = e_device.get('serialNumber')
-        else:
-            e_mac = None
-            e_serial = None
-
-        if e_mac == mac and e_serial == serial and item.st == entry.st:
-            return True
-
-    return False
-
-
 def scan(  # noqa: C901
     st=None,
     timeout=DISCOVER_TIMEOUT,
     max_entries=None,
+    match_udn=None,
     match_mac=None,
     match_serial=None,
+    match_st=None,
 ):
     """
     Send a message over the network to discover upnp devices.
@@ -345,39 +361,29 @@ def scan(  # noqa: C901
                 entry = UPNPEntry.from_response(response)
                 if entry.usn == VIRTUAL_DEVICE_USN:
                     continue  # Don't return the virtual device.
-                if entry.description is not None:
-                    device = entry.description.get('device', {})
-                    mac = device.get('macAddress')
-                    serial = device.get('serialNumber')
-                    services = device.get("serviceList", {}).get("service", [])
-                    service_types = [
-                        service.get("serviceType")
-                        for service in services
-                        if isinstance(service, dict)
-                    ]
-                else:
-                    mac = None
-                    serial = None
-                    service_types = []
 
                 # Search for devices
-                if any(i is not None for i in [st, match_mac, match_serial]):
-                    if not entry_in_entries(entry, entries, mac, serial):
-                        if match_mac is not None:
-                            if match_mac == mac:
-                                entries.append(entry)
-                        elif match_serial is not None:
-                            if match_serial == serial:
-                                entries.append(entry)
-                        elif st is not None:
-                            if st == entry.st or st in service_types:
-                                entries.append(entry)
-                elif not entry_in_entries(entry, entries, mac, serial):
-                    entries.append(entry)
+                if entry not in entries:
+                    if match_udn is not None:
+                        if match_udn == entry.udn:
+                            entries.append(entry)
+                    elif match_mac is not None:
+                        if match_mac == entry.mac_address:
+                            entries.append(entry)
+                    elif match_serial is not None:
+                        if match_serial == entry.serial_number:
+                            entries.append(entry)
+                    elif match_st is not None:
+                        if (
+                            match_st == entry.st
+                            or match_st in entry.service_types
+                        ):
+                            entries.append(entry)
+                    else:
+                        entries.append(entry)
 
-                # Return if we've found the max number of devices
-                if max_entries:
-                    if len(entries) == max_entries:
+                    # Return if we've found the max number of devices
+                    if max_entries and len(entries) == max_entries:
                         return entries
     except OSError:
         LOG.exception("Socket error while discovering SSDP devices")

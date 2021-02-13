@@ -5,8 +5,11 @@ import socket
 import unittest.mock as mock
 
 import pytest
+import requests
 
 from pywemo import ssdp
+
+from .ouimeaux_device.test_device import mocked_requests_get
 
 MOCK_CALLBACK_PORT = 8989
 MOCK_IP_ADDRESS = "5.6.7.8"
@@ -190,3 +193,87 @@ HOST: 239.255.255.250:1900
 
     # Verify that the DiscoveryResponder is still working.
     test_discovery_responder_responds_to_wemo(discovery_responder)
+
+
+class TestScan:
+    """Tests for the ssdp.scan method."""
+
+    _R1 = '\r\n'.join(
+        [
+            'HTTP/1.1 200 OK',
+            'HOST: 239.255.255.250:1900',
+            'CACHE-CONTROL: max-age=1800',
+            'LOCATION: http://192.168.1.100:49158/setup.xml',
+            'SERVER: Unspecified, UPnP/1.0, Unspecified',
+            'ST: urn:Belkin:service:basicevent:1',
+            'USN: uuid:Socket-1_0-SERIAL::urn:Belkin:service:basicevent:1',
+            '',
+        ]
+    ).encode()
+    _R2 = '\r\n'.join(
+        [
+            'HTTP/1.1 200 OK',
+            'HOST: 239.255.255.250:1900',
+            'CACHE-CONTROL: max-age=1800',
+            'LOCATION: http://192.168.1.100:49158/setup.xml',
+            'SERVER: Unspecified, UPnP/1.0, Unspecified',
+            'ST: upnp:rootdevice',
+            'USN: uuid:Socket-1_0-SERIAL2::upnp:rootdevice',
+            '',
+        ]
+    ).encode()
+
+    @pytest.mark.parametrize(
+        "kwargs,expected_count",
+        [
+            ({'match_udn': 'no_match'}, 0),
+            ({'match_mac': 'no_match'}, 0),
+            ({'match_serial': 'no_match'}, 0),
+            ({'match_st': 'no_match'}, 0),
+            ({}, 2),
+            ({'match_udn': 'uuid:Socket-1_0-SERIAL'}, 1),
+            ({'match_udn': 'uuid:Socket-1_0-SERIAL2'}, 1),
+            ({'match_mac': 'XXXXXXXXXXXX'}, 2),
+            ({'match_serial': 'XXXXXXXXXXXXXX'}, 2),
+            ({'match_st': 'urn:Belkin:service:basicevent:1'}, 2),
+        ],
+    )
+    @mock.patch('requests.get', side_effect=mocked_requests_get)
+    def test_scan(
+        self,
+        mock_get,
+        mock_interface_addresses,
+        mock_socket,
+        mock_select,
+        kwargs,
+        expected_count,
+    ):
+        mock_socket.recv.side_effect = [self._R1, self._R1, self._R2]
+        mock_select.put(([mock_socket],))  # _R1.
+        mock_select.put(([mock_socket],))  # _R1 is received twice.
+        mock_select.put(([mock_socket],))  # _R2.
+        mock_select.put(([],))  # Exit.
+
+        entries = ssdp.scan(st=ssdp.ST, timeout=0, **kwargs)
+        assert len(entries) == expected_count
+
+    @mock.patch('requests.get', side_effect=requests.RequestException)
+    def test_scan_no_setup_xml(
+        self, mock_get, mock_interface_addresses, mock_socket, mock_select
+    ):
+        mock_socket.recv.return_value = self._R1
+        mock_select.put(([mock_socket],))
+        mock_select.put(([],))
+
+        entries = ssdp.scan(st=ssdp.ST, timeout=0)
+        assert len(entries) == 1
+
+        entry = entries[0]
+        assert entry.udn == 'uuid:Socket-1_0-SERIAL'
+        assert entry.mac_address is None
+        assert entry.serial_number is None
+        assert entry.st == 'urn:Belkin:service:basicevent:1'
+        assert repr(entry) == (
+            '<UPNPEntry urn:Belkin:service:basicevent:1 - '
+            'http://192.168.1.100:49158/setup.xml - uuid:Socket-1_0-SERIAL>'
+        )
