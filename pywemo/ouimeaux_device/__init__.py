@@ -139,7 +139,7 @@ class Device:
         """
         # Put here to avoid circular dependency
         # pylint: disable=import-outside-toplevel
-        from ..ssdp import ST, scan
+        from ..discovery import discover_devices
 
         # Avoid retrying from multiple threads
         if self.retrying:
@@ -151,22 +151,18 @@ class Device:
         try_no = 0
 
         while True:
-            found = scan(st=ST, max_entries=1, match_udn=self.udn)
+            found = discover_devices(
+                ssdp_st=None, max_devices=1, match_udn=self.udn
+            )
 
-            if found and found[0].location:
-                try:
-                    device = self.__class__(found[0].location)
-                except (requests.RequestException, ActionException) as exc:
-                    LOG.warning('Could not connect to wemo %s (%s)', self, exc)
-                else:
-                    LOG.info(
-                        "Found %s again, updating local values", self.name
-                    )
-                    # pylint: disable=attribute-defined-outside-init
-                    self.__dict__ = device.__dict__
-                    return
-                finally:
-                    self.retrying = False
+            if found:
+                LOG.info("Found %s again, updating local values", self.name)
+
+                # pylint: disable=attribute-defined-outside-init
+                self.__dict__ = found[0].__dict__
+                self.retrying = False
+
+                return
 
             wait_time = try_no * 5
 
