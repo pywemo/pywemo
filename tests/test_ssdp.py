@@ -227,15 +227,9 @@ class TestScan:
         "kwargs,expected_count",
         [
             ({'match_udn': 'no_match'}, 0),
-            ({'match_mac': 'no_match'}, 0),
-            ({'match_serial': 'no_match'}, 0),
-            ({'match_st': 'no_match'}, 0),
             ({}, 2),
             ({'match_udn': 'uuid:Socket-1_0-SERIAL'}, 1),
             ({'match_udn': 'uuid:Socket-1_0-SERIAL2'}, 1),
-            ({'match_mac': 'XXXXXXXXXXXX'}, 2),
-            ({'match_serial': 'XXXXXXXXXXXXXX'}, 2),
-            ({'match_st': 'urn:Belkin:service:basicevent:1'}, 2),
         ],
     )
     @mock.patch('requests.get', side_effect=mocked_requests_get)
@@ -270,8 +264,7 @@ class TestScan:
 
         entry = entries[0]
         assert entry.udn == 'uuid:Socket-1_0-SERIAL'
-        assert entry.mac_address is None
-        assert entry.serial_number is None
+        assert entry.description == {}
         assert entry.st == 'urn:Belkin:service:basicevent:1'
         assert repr(entry) == (
             '<UPNPEntry urn:Belkin:service:basicevent:1 - '

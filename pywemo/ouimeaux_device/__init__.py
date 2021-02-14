@@ -4,6 +4,7 @@ import base64
 import logging
 import subprocess
 import time
+import warnings
 from urllib.parse import urlparse
 
 import requests
@@ -99,8 +100,14 @@ class ShortPassword(SetupException):
 class Device:
     """Base object for WeMo devices."""
 
-    def __init__(self, url, mac=None, rediscovery_enabled=True):
+    def __init__(self, url, mac=None, *, rediscovery_enabled=True):
         """Create a WeMo device."""
+        if mac:
+            warnings.warn(
+                "The mac argument to Device is deprecated and will be removed "
+                "in a future release.",
+                DeprecationWarning,
+            )
         self._state = None
         self.basic_state_params = {}
         base_url = url.rsplit('/', 1)[0]
@@ -113,7 +120,6 @@ class Device:
         self._config = deviceParser.parseString(
             xml.content, silence=True, print_warnings=False
         ).device
-        self.mac = mac or self._config.macAddress
         service_list = self._config.serviceList
         self.services = {}
         for svc in service_list.service:
@@ -145,7 +151,7 @@ class Device:
         try_no = 0
 
         while True:
-            found = scan(st=ST, match_udn=self.udn)
+            found = scan(st=ST, max_entries=1, match_udn=self.udn)
 
             if found and found[0].location:
                 try:
@@ -697,6 +703,11 @@ class Device:
     def supports_long_press(cls) -> bool:
         """Return True of the device supports long press events."""
         return issubclass(cls, LongPressMixin)
+
+    @property
+    def mac(self):
+        """Return the mac address from the device description."""
+        return self._config.get_macAddress()
 
     @property
     def model(self):

@@ -1,5 +1,6 @@
 """Module to discover WeMo devices."""
 import logging
+import warnings
 from ipaddress import ip_address
 from socket import gaierror, gethostbyname
 
@@ -24,11 +25,13 @@ LOG = logging.getLogger(__name__)
 
 
 def discover_devices(
-    ssdp_st=None, max_devices=None, rediscovery_enabled=True, **kwargs
+    ssdp_st=None, max_devices=None, rediscovery_enabled=True, match_udn=None
 ):
     """Find WeMo devices on the local network."""
     ssdp_st = ssdp_st or ssdp.ST
-    ssdp_entries = ssdp.scan(ssdp_st, max_entries=max_devices, **kwargs)
+    ssdp_entries = ssdp.scan(
+        ssdp_st, max_entries=max_devices, match_udn=match_udn
+    )
 
     wemos = []
 
@@ -39,7 +42,6 @@ def discover_devices(
             try:
                 device = device_from_uuid_and_location(
                     entry.udn,
-                    entry.mac_address,
                     entry.location,
                     rediscovery_enabled=rediscovery_enabled,
                 )
@@ -54,76 +56,53 @@ def discover_devices(
 
 
 def device_from_description(
-    description_url, mac=None, rediscovery_enabled=True
+    description_url, mac=None, *, rediscovery_enabled=True
 ):
     """Return object representing WeMo device running at host, else None."""
+    if mac:
+        warnings.warn(
+            "The mac argument to device_from_description is deprecated and "
+            "will be removed in a future release.",
+            DeprecationWarning,
+        )
     xml = requests.get(description_url, timeout=REQUESTS_TIMEOUT)
     parsed = deviceParser.parseString(
         xml.content, silence=True, print_warnings=False
     )
     uuid = parsed.device.UDN
-    device_mac = mac or parsed.device.macAddress
-
-    if device_mac is None:
-        LOG.debug(
-            'No MAC address was supplied or found in setup xml at: %s.',
-            description_url,
-        )
 
     return device_from_uuid_and_location(
         uuid,
-        device_mac,
         description_url,
         rediscovery_enabled=rediscovery_enabled,
     )
 
 
-def device_from_uuid_and_location(
-    uuid, mac, location, rediscovery_enabled=True
-):
+def device_from_uuid_and_location(uuid, location, *, rediscovery_enabled=True):
     """Determine device class based on the device uuid."""
-    if uuid is None:
+    if not (uuid and location):
         return None
+    kwargs = {'url': location, 'rediscovery_enabled': rediscovery_enabled}
     if uuid.startswith('uuid:Socket'):
-        return Switch(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return Switch(**kwargs)
     if uuid.startswith('uuid:Lightswitch'):
-        return LightSwitch(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return LightSwitch(**kwargs)
     if uuid.startswith('uuid:Dimmer'):
-        return Dimmer(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return Dimmer(**kwargs)
     if uuid.startswith('uuid:Insight'):
-        return Insight(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return Insight(**kwargs)
     if uuid.startswith('uuid:Sensor'):
-        return Motion(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return Motion(**kwargs)
     if uuid.startswith('uuid:Maker'):
-        return Maker(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return Maker(**kwargs)
     if uuid.startswith('uuid:Bridge'):
-        return Bridge(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return Bridge(**kwargs)
     if uuid.startswith('uuid:CoffeeMaker'):
-        return CoffeeMaker(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return CoffeeMaker(**kwargs)
     if uuid.startswith('uuid:Humidifier'):
-        return Humidifier(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return Humidifier(**kwargs)
     if uuid.startswith('uuid:OutdoorPlug'):
-        return OutdoorPlug(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return OutdoorPlug(**kwargs)
     if uuid.startswith('uuid:'):
         # unsupported device, but if this function was called from
         # discover_devices then this should be a Belkin product and is probably
@@ -134,9 +113,7 @@ def device_from_uuid_and_location(
             'UnsupportedDevice object to allow manual interaction',
             uuid,
         )
-        return UnsupportedDevice(
-            url=location, mac=mac, rediscovery_enabled=rediscovery_enabled
-        )
+        return UnsupportedDevice(**kwargs)
 
     return None
 

@@ -133,8 +133,6 @@ class SSDP:
 class UPNPEntry:
     """Found uPnP entry."""
 
-    DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
-
     def __init__(self, values):
         """Create a UPNPEntry object."""
         self.values = values
@@ -177,65 +175,29 @@ class UPNPEntry:
     def description(self):
         """Return the description from the uPnP entry."""
         url = self.values.get('location', '_NO_LOCATION')
+        try:
+            for _ in range(3):
+                try:
+                    xml = requests.get(url, timeout=REQUESTS_TIMEOUT).content
 
-        if url not in UPNPEntry.DESCRIPTION_CACHE:
-            try:
-                for _ in range(3):
-                    try:
-                        xml = requests.get(
-                            url, timeout=REQUESTS_TIMEOUT
-                        ).content
-
-                        tree = None
-                        if xml is not None:
-                            tree = et.fromstring(xml)
-
+                    if xml is not None:
+                        tree = et.fromstring(xml)
                         if tree is not None:
-                            UPNPEntry.DESCRIPTION_CACHE[url] = etree_to_dict(
-                                tree
-                            ).get('root', {})
-                        else:
-                            UPNPEntry.DESCRIPTION_CACHE[url] = {}
-                        break
+                            return etree_to_dict(tree).get('root', {})
+                    break
 
-                    except requests.RequestException:
-                        logging.getLogger(__name__).warning(
-                            "Error fetching description at %s", url
-                        )
-                        UPNPEntry.DESCRIPTION_CACHE[url] = {}
+                except requests.RequestException:
+                    logging.getLogger(__name__).warning(
+                        "Error fetching description at %s", url
+                    )
 
-            except et.ParseError:
-                # There used to be a log message here to record an error about
-                # malformed XML, but this only happens on non-WeMo devices
-                # and can be safely ignored.
-                UPNPEntry.DESCRIPTION_CACHE[url] = {}
+        except et.ParseError:
+            # There used to be a log message here to record an error about
+            # malformed XML, but this only happens on non-WeMo devices
+            # and can be safely ignored.
+            pass
 
-        return UPNPEntry.DESCRIPTION_CACHE[url]
-
-    @property
-    def device(self):
-        """Device xml element."""
-        return self.description.get('device', {})
-
-    @property
-    def mac_address(self):
-        """Device mac address."""
-        return self.device.get('macAddress')
-
-    @property
-    def serial_number(self):
-        """Device serial number."""
-        return self.device.get('serialNumber')
-
-    @property
-    def service_types(self):
-        """Services types supported by the device."""
-        services = self.device.get("serviceList", {}).get("service", [])
-        return frozenset(
-            service.get("serviceType")
-            for service in services
-            if isinstance(service, dict)
-        )
+        return {}
 
     def match_device_description(self, values):
         """
@@ -262,11 +224,6 @@ class UPNPEntry:
                 for key, item in RESPONSE_REGEX.findall(response)
             }
         )
-
-    @classmethod
-    def reset_cache(cls):
-        """Clear the internal cache of device descriptions."""
-        cls.DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
 
     @property
     def _key(self):
@@ -306,9 +263,6 @@ def scan(  # noqa: C901
     timeout=DISCOVER_TIMEOUT,
     max_entries=None,
     match_udn=None,
-    match_mac=None,
-    match_serial=None,
-    match_st=None,
 ):
     """
     Send a message over the network to discover upnp devices.
@@ -320,7 +274,6 @@ def scan(  # noqa: C901
     ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
 
     entries = []
-    UPNPEntry.reset_cache()
 
     calc_now = datetime.now
 
@@ -355,31 +308,15 @@ def scan(  # noqa: C901
             for sock in ready:
                 response = sock.recv(1024).decode("UTF-8", "replace")
 
-                # The device could be slow to respond when fetching the
-                # description. It is possible that fetching the results for a
-                # single device will take longer than the requested timeout.
                 entry = UPNPEntry.from_response(response)
                 if entry.usn == VIRTUAL_DEVICE_USN:
                     continue  # Don't return the virtual device.
 
                 # Search for devices
                 if entry not in entries:
-                    if match_udn is not None:
-                        if match_udn == entry.udn:
-                            entries.append(entry)
-                    elif match_mac is not None:
-                        if match_mac == entry.mac_address:
-                            entries.append(entry)
-                    elif match_serial is not None:
-                        if match_serial == entry.serial_number:
-                            entries.append(entry)
-                    elif match_st is not None:
-                        if (
-                            match_st == entry.st
-                            or match_st in entry.service_types
-                        ):
-                            entries.append(entry)
-                    else:
+                    if match_udn is None:
+                        entries.append(entry)
+                    elif match_udn == entry.udn:
                         entries.append(entry)
 
                     # Return if we've found the max number of devices
