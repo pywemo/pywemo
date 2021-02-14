@@ -9,8 +9,6 @@ import requests
 
 from pywemo import ssdp
 
-from .ouimeaux_device.test_device import mocked_requests_get
-
 MOCK_CALLBACK_PORT = 8989
 MOCK_IP_ADDRESS = "5.6.7.8"
 
@@ -232,10 +230,8 @@ class TestScan:
             ({'match_udn': 'uuid:Socket-1_0-SERIAL2'}, 1),
         ],
     )
-    @mock.patch('requests.get', side_effect=mocked_requests_get)
     def test_scan(
         self,
-        mock_get,
         mock_interface_addresses,
         mock_socket,
         mock_select,
@@ -251,9 +247,8 @@ class TestScan:
         entries = ssdp.scan(st=ssdp.ST, timeout=0, **kwargs)
         assert len(entries) == expected_count
 
-    @mock.patch('requests.get', side_effect=requests.RequestException)
     def test_scan_no_setup_xml(
-        self, mock_get, mock_interface_addresses, mock_socket, mock_select
+        self, mock_interface_addresses, mock_socket, mock_select
     ):
         mock_socket.recv.return_value = self._R1
         mock_select.put(([mock_socket],))
@@ -264,9 +259,10 @@ class TestScan:
 
         entry = entries[0]
         assert entry.udn == 'uuid:Socket-1_0-SERIAL'
-        assert entry.description == {}
         assert entry.st == 'urn:Belkin:service:basicevent:1'
         assert repr(entry) == (
             '<UPNPEntry urn:Belkin:service:basicevent:1 - '
             'http://192.168.1.100:49158/setup.xml - uuid:Socket-1_0-SERIAL>'
         )
+        with mock.patch('requests.get', side_effect=requests.RequestException):
+            assert entry.description == {}
