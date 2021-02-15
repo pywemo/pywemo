@@ -174,7 +174,10 @@ class UPNPEntry:
     @property
     def description(self):
         """Return the description from the uPnP entry."""
-        url = self.values.get('location', '_NO_LOCATION')
+        url = self.location
+        if not url:
+            return {}
+
         try:
             for _ in range(3):
                 try:
