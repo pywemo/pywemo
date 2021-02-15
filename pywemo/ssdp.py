@@ -182,9 +182,7 @@ class UPNPEntry:
                     tree = et.fromstring(xml or b'')
                     return etree_to_dict(tree).get('root', {})
                 except requests.RequestException:
-                    logging.getLogger(__name__).warning(
-                        "Error fetching description at %s", url
-                    )
+                    LOG.warning("Error fetching description at %s", url)
 
         except et.ParseError:
             # There used to be a log message here to record an error about
