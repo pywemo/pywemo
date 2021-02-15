@@ -179,13 +179,8 @@ class UPNPEntry:
             for _ in range(3):
                 try:
                     xml = requests.get(url, timeout=REQUESTS_TIMEOUT).content
-
-                    if xml is not None:
-                        tree = et.fromstring(xml)
-                        if tree is not None:
-                            return etree_to_dict(tree).get('root', {})
-                    break
-
+                    tree = et.fromstring(xml)
+                    return etree_to_dict(tree).get('root', {})
                 except requests.RequestException:
                     logging.getLogger(__name__).warning(
                         "Error fetching description at %s", url
