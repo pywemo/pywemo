@@ -165,7 +165,7 @@ class Action:
         "urn:Belkin:service:WiFiSetup:1#GetApList": 10,
     }
 
-    max_rediscovery_retries = 3
+    max_rediscovery_attempts = 3
 
     def __init__(self, service, action_config):
         """Create an instance of an Action."""
@@ -197,7 +197,7 @@ class Action:
         )
         last_exception = None
 
-        for attempt in range(self.max_rediscovery_retries):
+        for attempt in range(self.max_rediscovery_attempts):
             session = self.service.device.session
             try:
                 response = session.post(
@@ -230,7 +230,7 @@ class Action:
 
         msg = (
             f"Error communicating with {self.service.device.name} after "
-            f"{self.max_rediscovery_retries} attempts. Giving up."
+            f"{self.max_rediscovery_attempts} attempts. Giving up."
         )
         LOG.error(msg)
         raise ActionException(msg) from last_exception

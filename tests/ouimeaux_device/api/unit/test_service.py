@@ -181,7 +181,7 @@ class TestAction:
         except svc.ActionException:
             pass
 
-        assert mock_request.call_count == svc.Action.max_rediscovery_retries
+        assert mock_request.call_count == svc.Action.max_rediscovery_attempts
 
     @mock.patch(
         'urllib3.PoolManager.request', side_effect=urllib3.exceptions.HTTPError
