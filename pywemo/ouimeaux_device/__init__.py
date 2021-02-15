@@ -3,6 +3,7 @@
 import base64
 import logging
 import subprocess
+import threading
 import time
 import warnings
 
@@ -18,7 +19,9 @@ LOG = logging.getLogger(__name__)
 PROBE_PORTS = (49153, 49152, 49154, 49151, 49155, 49156, 49157, 49158, 49159)
 
 
-def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=REQUESTS_TIMEOUT):
+def probe_wemo(
+    host, ports=PROBE_PORTS, probe_timeout=REQUESTS_TIMEOUT, match_udn=None
+):
     """
     Probe a host for the current port.
 
@@ -29,10 +32,23 @@ def probe_wemo(host, ports=PROBE_PORTS, probe_timeout=REQUESTS_TIMEOUT):
     for port in ports:
         try:
             response = requests.get(
-                'http://%s:%i/setup.xml' % (host, port), timeout=probe_timeout
+                f'http://{host}:{port}/setup.xml', timeout=probe_timeout
             )
-            if ('WeMo' in response.text) or ('Belkin' in response.text):
-                return port
+            if not (('WeMo' in response.text) or ('Belkin' in response.text)):
+                continue
+            if match_udn:
+                device = deviceParser.parseString(
+                    response.content, silence=True, print_warnings=False
+                ).device
+                if match_udn != device.get_UDN():
+                    LOG.error(
+                        'Reconnected to a different WeMo. '
+                        'Expected %s / Received %s',
+                        match_udn,
+                        device.get_UDN(),
+                    )
+                    continue
+            return port
         except requests.ConnectTimeout:
             # If we timed out connecting, then the wemo is gone,
             # no point in trying further.
@@ -63,7 +79,7 @@ def probe_device(device):
         ports.remove(device.port)
     ports.insert(0, device.port)
 
-    return probe_wemo(device.host, ports)
+    return probe_wemo(device.host, ports, match_udn=device.udn)
 
 
 class UnknownService(Exception):
@@ -109,7 +125,7 @@ class Device:
             )
         self._state = None
         self.basic_state_params = {}
-        self.retrying = False
+        self._reconnect_lock = threading.Lock()
         self.rediscovery_enabled = rediscovery_enabled
         self.session = Session(url)
         xml = self.session.get(url)
@@ -132,50 +148,16 @@ class Device:
         """
         # Put here to avoid circular dependency
         # pylint: disable=import-outside-toplevel
-        from ..discovery import discover_devices
+        from ..ssdp import scan
 
-        # Avoid retrying from multiple threads
-        if self.retrying:
-            return
-
-        self.retrying = True
         LOG.info("Trying to reconnect with %s", self.name)
-        # We will try to find it 5 times, each time we wait a bigger interval
-        try_no = 0
 
-        while True:
-            found = discover_devices(max_entries=1, match_udn=self.udn)
-
-            if found:
-                LOG.info("Found %s again, updating local values", self.name)
-
-                # pylint: disable=attribute-defined-outside-init
-                self.__dict__ = found[0].__dict__
-                self.retrying = False
-
-                return
-
-            wait_time = try_no * 5
-
-            LOG.info(
-                "%s Not found in try %i. Trying again in %i seconds",
-                self.name,
-                try_no,
-                wait_time,
-            )
-
-            if try_no == 5:
-                LOG.error(
-                    "Unable to reconnect with %s in 5 tries. Stopping.",
-                    self.name,
-                )
-                self.retrying = False
-
-                return
-
-            time.sleep(wait_time)
-
-            try_no += 1
+        found = scan(max_entries=1, match_udn=self.udn)
+        if found and found[0].location:
+            LOG.info("Found %s again, updating location", self.name)
+            self.session.url = found[0].location
+        else:
+            LOG.error("Unable to reconnect with %s", self.name)
 
     def _reconnect_with_device_by_probing(self):
         """Attempt to reconnect to the device on the existing port."""
@@ -185,35 +167,21 @@ class Device:
             LOG.error('Unable to re-probe wemo %s at %s', self, self.host)
             return False
 
-        url = f'http://{self.host}:{port}/setup.xml'
-        try:
-            device = self.__class__(url)
-        except (requests.RequestException, ActionException) as exc:
-            LOG.warning('Could not connect to wemo %s (%s)', self, exc)
-            return False
-
-        if self.udn != device.udn:
-            LOG.error(
-                'Reconnected to a different WeMo. Expected %s / Received %s',
-                self.udn,
-                device.udn,
-            )
-            return False
-
         LOG.info('Reconnected to wemo %s on port %i', self, port)
-
-        # pylint: disable=attribute-defined-outside-init
-        self.__dict__ = device.__dict__
-
+        self.session.url = f'http://{self.host}:{port}/setup.xml'
         return True
 
     def reconnect_with_device(self):
         """Re-probe & scan network to rediscover a disconnected device."""
         if self.rediscovery_enabled:
-            if not self._reconnect_with_device_by_probing() and (
-                self.mac or self.serialnumber
-            ):
-                self._reconnect_with_device_by_discovery()
+            # Avoid retrying from multiple threads
+            if not self._reconnect_lock.acquire(blocking=False):
+                return
+            try:
+                if not self._reconnect_with_device_by_probing():
+                    self._reconnect_with_device_by_discovery()
+            finally:
+                self._reconnect_lock.release()
         else:
             LOG.warning(
                 "Rediscovery was requested for device %s, "
