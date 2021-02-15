@@ -179,7 +179,7 @@ class UPNPEntry:
             for _ in range(3):
                 try:
                     xml = requests.get(url, timeout=REQUESTS_TIMEOUT).content
-                    tree = et.fromstring(xml)
+                    tree = et.fromstring(xml or b'')
                     return etree_to_dict(tree).get('root', {})
                 except requests.RequestException:
                     logging.getLogger(__name__).warning(
