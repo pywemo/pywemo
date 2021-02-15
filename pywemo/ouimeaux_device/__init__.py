@@ -100,9 +100,9 @@ class ShortPassword(SetupException):
 class Device:
     """Base object for WeMo devices."""
 
-    def __init__(self, url, mac=None, *, rediscovery_enabled=True):
+    def __init__(self, url, mac='deprecated', *, rediscovery_enabled=True):
         """Create a WeMo device."""
-        if mac:
+        if mac != 'deprecated':
             warnings.warn(
                 "The mac argument to Device is deprecated and will be removed "
                 "in a future release.",

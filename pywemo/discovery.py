@@ -56,10 +56,10 @@ def discover_devices(
 
 
 def device_from_description(
-    description_url, mac=None, *, rediscovery_enabled=True
+    description_url, mac='deprecated', *, rediscovery_enabled=True
 ):
     """Return object representing WeMo device running at host, else None."""
-    if mac:
+    if mac != 'deprecated':
         warnings.warn(
             "The mac argument to device_from_description is deprecated and "
             "will be removed in a future release.",

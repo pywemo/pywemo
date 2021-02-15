@@ -35,4 +35,4 @@ class Test_Maker:
     @pytest.fixture
     def maker(self, vcr):
         with vcr.use_cassette('WeMo_WW_2.00.11423.PVT-OWRT-Maker.yaml'):
-            return Maker('http://192.168.1.100:49153/setup.xml', '')
+            return Maker('http://192.168.1.100:49153/setup.xml')

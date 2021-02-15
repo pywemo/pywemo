@@ -11,7 +11,7 @@ LIGHT_ID = '0017880108DA898B'
 @pytest.fixture
 def bridge(vcr):
     with vcr.use_cassette('WeMo_WW_2.00.11057.PVT-OWRT-Link.yaml'):
-        return Bridge('http://192.168.1.100:49153/setup.xml', '')
+        return Bridge('http://192.168.1.100:49153/setup.xml')
 
 
 @pytest.mark.vcr()

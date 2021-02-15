@@ -162,7 +162,7 @@ def device(mock_get):
     """Return a Device as created by some actual XML."""
     # Note that the actions on the services will not be created since the
     # URL(s) for them will return a 404.
-    device = Device('http://192.168.1.100:49158/setup.xml', '')
+    device = Device('http://192.168.1.100:49158/setup.xml')
     device.WiFiSetup.GetApList = mock.Mock(return_value={'ApList': APLIST})
     device.WiFiSetup.ConnectHomeNetwork = mock.Mock(
         return_value={'PairingStatus': 'Connecting'}

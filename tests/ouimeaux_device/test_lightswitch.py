@@ -27,6 +27,6 @@ class Test_PVT_OWRT_LS_v1(Base, long_press_helpers.TestLongPress):
     @pytest.fixture
     def lightswitch(self, vcr):
         with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-LS'):
-            return LightSwitch('http://192.168.1.100:49153/setup.xml', '')
+            return LightSwitch('http://192.168.1.100:49153/setup.xml')
 
     device = lightswitch  # for TestLongPress
