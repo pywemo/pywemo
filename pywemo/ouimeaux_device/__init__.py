@@ -705,6 +705,7 @@ class Device:
     def mac(self):
         """Return the mac address from the device description."""
         return self._config.get_macAddress()
+
     @property
     def model(self):
         """Return the model description of the device."""
