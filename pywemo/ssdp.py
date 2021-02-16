@@ -133,8 +133,6 @@ class SSDP:
 class UPNPEntry:
     """Found uPnP entry."""
 
-    DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
-
     def __init__(self, values):
         """Create a UPNPEntry object."""
         self.values = values
@@ -164,47 +162,38 @@ class UPNPEntry:
 
     @property
     def usn(self):
-        """Return usn value."""
+        """Return unique service name."""
         return self.values.get('usn')
+
+    @property
+    def udn(self):
+        """Return unique device name."""
+        usn = self.usn or ''
+        return usn.split('::')[0]
 
     @property
     def description(self):
         """Return the description from the uPnP entry."""
-        url = self.values.get('location', '_NO_LOCATION')
+        url = self.location
+        if not url:
+            return {}
 
-        if url not in UPNPEntry.DESCRIPTION_CACHE:
-            try:
-                for _ in range(3):
-                    try:
-                        xml = requests.get(
-                            url, timeout=REQUESTS_TIMEOUT
-                        ).content
+        try:
+            for _ in range(3):
+                try:
+                    xml = requests.get(url, timeout=REQUESTS_TIMEOUT).content
+                    tree = et.fromstring(xml or b'')
+                    return etree_to_dict(tree).get('root', {})
+                except requests.RequestException:
+                    LOG.warning("Error fetching description at %s", url)
 
-                        tree = None
-                        if xml is not None:
-                            tree = et.fromstring(xml)
+        except et.ParseError:
+            # There used to be a log message here to record an error about
+            # malformed XML, but this only happens on non-WeMo devices
+            # and can be safely ignored.
+            pass
 
-                        if tree is not None:
-                            UPNPEntry.DESCRIPTION_CACHE[url] = etree_to_dict(
-                                tree
-                            ).get('root', {})
-                        else:
-                            UPNPEntry.DESCRIPTION_CACHE[url] = {}
-                        break
-
-                    except requests.RequestException:
-                        logging.getLogger(__name__).warning(
-                            "Error fetching description at %s", url
-                        )
-                        UPNPEntry.DESCRIPTION_CACHE[url] = {}
-
-            except et.ParseError:
-                # There used to be a log message here to record an error about
-                # malformed XML, but this only happens on non-WeMo devices
-                # and can be safely ignored.
-                UPNPEntry.DESCRIPTION_CACHE[url] = {}
-
-        return UPNPEntry.DESCRIPTION_CACHE[url]
+        return {}
 
     def match_device_description(self, values):
         """
@@ -232,27 +221,25 @@ class UPNPEntry:
             }
         )
 
-    @classmethod
-    def reset_cache(cls):
-        """Clear the internal cache of device descriptions."""
-        cls.DESCRIPTION_CACHE = {'_NO_LOCATION': {}}
+    @property
+    def _key(self):
+        """Tuple of values that uniquely identify the UPNPEntry instance."""
+        return (self.udn, self.location)
 
     def __eq__(self, other):
         """Equality operator."""
-        return (
-            self.__class__ == other.__class__ and self.values == other.values
-        )
+        return isinstance(other, type(self)) and self._key == other._key
 
     def __repr__(self):
         """Return the string representation of the object."""
-        return "<UPNPEntry {} - {}>".format(
-            self.values.get('st', ''), self.values.get('location', '')
-        )
+        st = self.st or ''
+        location = self.location or ''
+        udn = self.udn or ''
+        return f"<UPNPEntry {st} - {location} - {udn}>"
 
 
 def build_ssdp_request(ssdp_st, ssdp_mx):
     """Build the standard request to send during SSDP discovery."""
-    ssdp_st = ssdp_st or ST
     return "\r\n".join(
         [
             'M-SEARCH * HTTP/1.1',
@@ -266,34 +253,7 @@ def build_ssdp_request(ssdp_st, ssdp_mx):
     ).encode('ascii')
 
 
-def entry_in_entries(entry, entries, mac, serial):
-    """Check if a device entry is in a list of device entries."""
-    # If we don't have a mac or serial, let's just compare objects instead:
-    if mac is None and serial is None:
-        return entry in entries
-
-    for item in entries:
-        if item.description is not None:
-            e_device = item.description.get('device', {})
-            e_mac = e_device.get('macAddress')
-            e_serial = e_device.get('serialNumber')
-        else:
-            e_mac = None
-            e_serial = None
-
-        if e_mac == mac and e_serial == serial and item.st == entry.st:
-            return True
-
-    return False
-
-
-def scan(  # noqa: C901
-    st=None,
-    timeout=DISCOVER_TIMEOUT,
-    max_entries=None,
-    match_mac=None,
-    match_serial=None,
-):
+def scan(st=ST, timeout=DISCOVER_TIMEOUT, max_entries=None, match_udn=None):
     """
     Send a message over the network to discover upnp devices.
 
@@ -304,7 +264,6 @@ def scan(  # noqa: C901
     ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
 
     entries = []
-    UPNPEntry.reset_cache()
 
     calc_now = datetime.now
 
@@ -339,45 +298,19 @@ def scan(  # noqa: C901
             for sock in ready:
                 response = sock.recv(1024).decode("UTF-8", "replace")
 
-                # The device could be slow to respond when fetching the
-                # description. It is possible that fetching the results for a
-                # single device will take longer than the requested timeout.
                 entry = UPNPEntry.from_response(response)
                 if entry.usn == VIRTUAL_DEVICE_USN:
                     continue  # Don't return the virtual device.
-                if entry.description is not None:
-                    device = entry.description.get('device', {})
-                    mac = device.get('macAddress')
-                    serial = device.get('serialNumber')
-                    services = device.get("serviceList", {}).get("service", [])
-                    service_types = [
-                        service.get("serviceType")
-                        for service in services
-                        if isinstance(service, dict)
-                    ]
-                else:
-                    mac = None
-                    serial = None
-                    service_types = []
 
                 # Search for devices
-                if any(i is not None for i in [st, match_mac, match_serial]):
-                    if not entry_in_entries(entry, entries, mac, serial):
-                        if match_mac is not None:
-                            if match_mac == mac:
-                                entries.append(entry)
-                        elif match_serial is not None:
-                            if match_serial == serial:
-                                entries.append(entry)
-                        elif st is not None:
-                            if st == entry.st or st in service_types:
-                                entries.append(entry)
-                elif not entry_in_entries(entry, entries, mac, serial):
-                    entries.append(entry)
+                if entry not in entries:
+                    if match_udn is None:
+                        entries.append(entry)
+                    elif match_udn == entry.udn:
+                        entries.append(entry)
 
-                # Return if we've found the max number of devices
-                if max_entries:
-                    if len(entries) == max_entries:
+                    # Return if we've found the max number of devices
+                    if max_entries and len(entries) == max_entries:
                         return entries
     except OSError:
         LOG.exception("Socket error while discovering SSDP devices")

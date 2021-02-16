@@ -4,6 +4,7 @@ import base64
 import logging
 import subprocess
 import time
+import warnings
 from urllib.parse import urlparse
 
 import requests
@@ -99,8 +100,14 @@ class ShortPassword(SetupException):
 class Device:
     """Base object for WeMo devices."""
 
-    def __init__(self, url, mac, rediscovery_enabled=True):
+    def __init__(self, url, mac='deprecated', *, rediscovery_enabled=True):
         """Create a WeMo device."""
+        if mac != 'deprecated':
+            warnings.warn(
+                "The mac argument to Device is deprecated and will be removed "
+                "in a future release.",
+                DeprecationWarning,
+            )
         self._state = None
         self.basic_state_params = {}
         base_url = url.rsplit('/', 1)[0]
@@ -108,7 +115,6 @@ class Device:
         self.host = parsed_url.hostname
         self.port = parsed_url.port
         self.retrying = False
-        self.mac = mac
         self.rediscovery_enabled = rediscovery_enabled
         xml = requests.get(url, timeout=REQUESTS_TIMEOUT)
         self._config = deviceParser.parseString(
@@ -145,12 +151,7 @@ class Device:
         try_no = 0
 
         while True:
-            found = discover_devices(
-                ssdp_st=None,
-                max_devices=1,
-                match_mac=self.mac,
-                match_serial=self.serialnumber,
-            )
+            found = discover_devices(max_entries=1, match_udn=self.udn)
 
             if found:
                 LOG.info("Found %s again, updating local values", self.name)
@@ -193,7 +194,7 @@ class Device:
 
         url = f'http://{self.host}:{port}/setup.xml'
         try:
-            device = self.__class__(url, None)
+            device = self.__class__(url)
         except (requests.RequestException, ActionException) as exc:
             LOG.warning('Could not connect to wemo %s (%s)', self, exc)
             return False
@@ -696,6 +697,11 @@ class Device:
     def supports_long_press(cls) -> bool:
         """Return True of the device supports long press events."""
         return issubclass(cls, LongPressMixin)
+
+    @property
+    def mac(self):
+        """Return the mac address from the device description."""
+        return self._config.get_macAddress()
 
     @property
     def model(self):

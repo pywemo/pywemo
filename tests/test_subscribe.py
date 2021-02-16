@@ -15,7 +15,7 @@ from pywemo import Insight, LightSwitch, subscribe
 def device(vcr):
     """Mock WeMo Insight device."""
     with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml'):
-        return Insight('http://192.168.1.100:49153/setup.xml', '')
+        return Insight('http://192.168.1.100:49153/setup.xml')
 
 
 class Test_RequestHandler:

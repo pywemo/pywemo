@@ -37,6 +37,6 @@ class Test_PVT_OWRT_Dimmer_v1(Base, long_press_helpers.TestLongPress):
     @pytest.fixture
     def dimmer(self, vcr):
         with vcr.use_cassette('WeMo_WW_2.00.11453.PVT-OWRT-Dimmer'):
-            return Dimmer('http://192.168.1.100:49153/setup.xml', '')
+            return Dimmer('http://192.168.1.100:49153/setup.xml')
 
     device = dimmer  # for TestLongPress

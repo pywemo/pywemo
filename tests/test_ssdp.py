@@ -5,6 +5,7 @@ import socket
 import unittest.mock as mock
 
 import pytest
+import requests
 
 from pywemo import ssdp
 
@@ -190,3 +191,78 @@ HOST: 239.255.255.250:1900
 
     # Verify that the DiscoveryResponder is still working.
     test_discovery_responder_responds_to_wemo(discovery_responder)
+
+
+class TestScan:
+    """Tests for the ssdp.scan method."""
+
+    _R1 = '\r\n'.join(
+        [
+            'HTTP/1.1 200 OK',
+            'HOST: 239.255.255.250:1900',
+            'CACHE-CONTROL: max-age=1800',
+            'LOCATION: http://192.168.1.100:49158/setup.xml',
+            'SERVER: Unspecified, UPnP/1.0, Unspecified',
+            'ST: urn:Belkin:service:basicevent:1',
+            'USN: uuid:Socket-1_0-SERIAL::urn:Belkin:service:basicevent:1',
+            '',
+        ]
+    ).encode()
+    _R2 = '\r\n'.join(
+        [
+            'HTTP/1.1 200 OK',
+            'HOST: 239.255.255.250:1900',
+            'CACHE-CONTROL: max-age=1800',
+            'LOCATION: http://192.168.1.100:49158/setup.xml',
+            'SERVER: Unspecified, UPnP/1.0, Unspecified',
+            'ST: upnp:rootdevice',
+            'USN: uuid:Socket-1_0-SERIAL2::upnp:rootdevice',
+            '',
+        ]
+    ).encode()
+
+    @pytest.mark.parametrize(
+        "kwargs,expected_count",
+        [
+            ({'match_udn': 'no_match'}, 0),
+            ({}, 2),
+            ({'match_udn': 'uuid:Socket-1_0-SERIAL'}, 1),
+            ({'match_udn': 'uuid:Socket-1_0-SERIAL2'}, 1),
+        ],
+    )
+    def test_scan(
+        self,
+        mock_interface_addresses,
+        mock_socket,
+        mock_select,
+        kwargs,
+        expected_count,
+    ):
+        mock_socket.recv.side_effect = [self._R1, self._R1, self._R2]
+        mock_select.put(([mock_socket],))  # _R1.
+        mock_select.put(([mock_socket],))  # _R1 is received twice.
+        mock_select.put(([mock_socket],))  # _R2.
+        mock_select.put(([],))  # Exit.
+
+        entries = ssdp.scan(st=ssdp.ST, timeout=0, **kwargs)
+        assert len(entries) == expected_count
+
+    def test_scan_no_setup_xml(
+        self, mock_interface_addresses, mock_socket, mock_select
+    ):
+        mock_socket.recv.return_value = self._R1
+        mock_select.put(([mock_socket],))
+        mock_select.put(([],))
+
+        entries = ssdp.scan(st=ssdp.ST, timeout=0)
+        assert len(entries) == 1
+
+        entry = entries[0]
+        assert entry.udn == 'uuid:Socket-1_0-SERIAL'
+        assert entry.st == 'urn:Belkin:service:basicevent:1'
+        assert repr(entry) == (
+            '<UPNPEntry urn:Belkin:service:basicevent:1 - '
+            'http://192.168.1.100:49158/setup.xml - uuid:Socket-1_0-SERIAL>'
+        )
+        with mock.patch('requests.get', side_effect=requests.RequestException):
+            assert entry.description == {}
