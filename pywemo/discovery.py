@@ -26,7 +26,7 @@ LOG = logging.getLogger(__name__)
 
 def discover_devices(*, rediscovery_enabled=True, **kwargs):
     """Find WeMo devices on the local network."""
-    ssdp_st = kwargs.get('st', ssdp.ST)
+    ssdp_st = kwargs.pop('st', ssdp.ST)
     wemos = []
 
     for entry in ssdp.scan(st=ssdp_st, **kwargs):
