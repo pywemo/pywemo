@@ -254,12 +254,7 @@ def build_ssdp_request(ssdp_st, ssdp_mx):
     ).encode('ascii')
 
 
-def scan(  # noqa: C901
-    st=None,
-    timeout=DISCOVER_TIMEOUT,
-    max_entries=None,
-    match_udn=None,
-):
+def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_udn=None):
     """
     Send a message over the network to discover upnp devices.
 
