@@ -240,7 +240,6 @@ class UPNPEntry:
 
 def build_ssdp_request(ssdp_st, ssdp_mx):
     """Build the standard request to send during SSDP discovery."""
-    ssdp_st = ssdp_st or ST
     return "\r\n".join(
         [
             'M-SEARCH * HTTP/1.1',
@@ -254,7 +253,7 @@ def build_ssdp_request(ssdp_st, ssdp_mx):
     ).encode('ascii')
 
 
-def scan(st=None, timeout=DISCOVER_TIMEOUT, max_entries=None, match_udn=None):
+def scan(st=ST, timeout=DISCOVER_TIMEOUT, max_entries=None, match_udn=None):
     """
     Send a message over the network to discover upnp devices.
 
