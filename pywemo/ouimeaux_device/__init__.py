@@ -114,7 +114,7 @@ class Device:
         self.session = Session(url)
         xml = self.session.get(url)
         self._config = deviceParser.parseString(
-            xml.data, silence=True, print_warnings=False
+            xml.content, silence=True, print_warnings=False
         ).device
         self.services = {}
         for svc in self._config.serviceList.service:

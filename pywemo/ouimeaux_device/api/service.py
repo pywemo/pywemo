@@ -54,7 +54,8 @@ class Session:
     takes longer than the timeout.
 
     Since much of pywemo is built atop the requests library, any urllib3
-    exceptions will be raised as requests.RequestException.
+    exceptions will be raised as requests.RequestException. A `content`
+    field on HTTPResponse will also be populated from the `data` field.
     """
 
     # Retry strategy for requests that fail.
@@ -115,6 +116,7 @@ class Session:
                     )
             except urllib3.exceptions.HTTPError as err:
                 raise requests.RequestException(err)
+            response.content = response.data  # For `requests` compatibility.
             return response
 
     def get(self, url: str, **kwargs) -> urllib3.HTTPResponse:
@@ -220,7 +222,7 @@ class Action:
                 response_dict = {}
 
                 for response_item in list(
-                    list(et.fromstring(response.data))[0]
+                    list(et.fromstring(response.content))[0]
                 )[0]:
                     response_dict[response_item.tag] = response_item.text
                 return response_dict
@@ -253,7 +255,7 @@ class Service:
         xml = device.session.get(device.session.urljoin(service.get_SCPDURL()))
 
         self._svc_config = serviceParser.parseString(
-            xml.data, silence=True, print_warnings=False
+            xml.content, silence=True, print_warnings=False
         ).actionList
         for action in self._svc_config.get_action():
             act = Action(self, action)
