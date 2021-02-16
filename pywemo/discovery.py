@@ -24,18 +24,12 @@ from .ouimeaux_device.switch import Switch
 LOG = logging.getLogger(__name__)
 
 
-def discover_devices(
-    ssdp_st=None, max_devices=None, rediscovery_enabled=True, match_udn=None
-):
+def discover_devices(*, rediscovery_enabled=True, **kwargs):
     """Find WeMo devices on the local network."""
-    ssdp_st = ssdp_st or ssdp.ST
-    ssdp_entries = ssdp.scan(
-        ssdp_st, max_entries=max_devices, match_udn=match_udn
-    )
-
+    ssdp_st = kwargs.get('st', ssdp.ST)
     wemos = []
 
-    for entry in ssdp_entries:
+    for entry in ssdp.scan(st=ssdp_st, **kwargs):
         if entry.match_device_description(
             {'manufacturer': 'Belkin International Inc.'}
         ):

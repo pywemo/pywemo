@@ -151,9 +151,7 @@ class Device:
         try_no = 0
 
         while True:
-            found = discover_devices(
-                ssdp_st=None, max_devices=1, match_udn=self.udn
-            )
+            found = discover_devices(max_entries=1, match_udn=self.udn)
 
             if found:
                 LOG.info("Found %s again, updating local values", self.name)
