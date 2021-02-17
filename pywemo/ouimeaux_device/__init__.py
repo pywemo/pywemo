@@ -5,12 +5,11 @@ import logging
 import subprocess
 import time
 import warnings
-from urllib.parse import urlparse
 
 import requests
 
 from .api.long_press import LongPressMixin
-from .api.service import REQUESTS_TIMEOUT, ActionException, Service
+from .api.service import REQUESTS_TIMEOUT, ActionException, Service, Session
 from .api.xsd import device as deviceParser
 
 LOG = logging.getLogger(__name__)
@@ -110,24 +109,18 @@ class Device:
             )
         self._state = None
         self.basic_state_params = {}
-        base_url = url.rsplit('/', 1)[0]
-        parsed_url = urlparse(url)
-        self.host = parsed_url.hostname
-        self.port = parsed_url.port
         self.retrying = False
         self.rediscovery_enabled = rediscovery_enabled
-        xml = requests.get(url, timeout=REQUESTS_TIMEOUT)
+        self.session = Session(url)
+        xml = self.session.get(url)
         self._config = deviceParser.parseString(
             xml.content, silence=True, print_warnings=False
         ).device
-        service_list = self._config.serviceList
         self.services = {}
-        for svc in service_list.service:
-            svcname = svc.get_serviceType().split(':')[-2]
-            service = Service(self, svc, base_url)
-            service.eventSubURL = base_url + svc.get_eventSubURL()
-            self.services[svcname] = service
-            setattr(self, svcname, service)
+        for svc in self._config.serviceList.service:
+            service = Service(self, svc)
+            self.services[service.name] = service
+            setattr(self, service.name, service)
 
     def _reconnect_with_device_by_discovery(self):
         """
@@ -697,6 +690,16 @@ class Device:
     def supports_long_press(cls) -> bool:
         """Return True of the device supports long press events."""
         return issubclass(cls, LongPressMixin)
+
+    @property
+    def host(self) -> str:
+        """Host name of the device's UPnP web server."""
+        return self.session.host
+
+    @property
+    def port(self) -> int:
+        """TCP port for the device's UPnP web server."""
+        return self.session.port
 
     @property
     def mac(self):
