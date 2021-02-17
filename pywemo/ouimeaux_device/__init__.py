@@ -8,6 +8,13 @@ import warnings
 
 import requests
 
+from ..exceptions import (
+    APNotFound,
+    ResetException,
+    SetupException,
+    ShortPassword,
+    UnknownService,
+)
 from .api.long_press import LongPressMixin
 from .api.service import REQUESTS_TIMEOUT, ActionException, Service, Session
 from .api.xsd import device as deviceParser
@@ -64,36 +71,6 @@ def probe_device(device):
     ports.insert(0, device.port)
 
     return probe_wemo(device.host, ports)
-
-
-class UnknownService(Exception):
-    """Exception raised when a non-existent service is called."""
-
-    pass
-
-
-class ResetException(Exception):
-    """Exception raised when reset fails."""
-
-    pass
-
-
-class SetupException(Exception):
-    """Exception raised when setup fails."""
-
-    pass
-
-
-class APNotFound(SetupException):
-    """Exception raised when the AP requested is not found."""
-
-    pass
-
-
-class ShortPassword(SetupException):
-    """Exception raised when a password is too short (<8 characters)."""
-
-    pass
 
 
 class Device:

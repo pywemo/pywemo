@@ -10,6 +10,7 @@ from typing import Dict, Iterable, List, Optional
 import requests
 from lxml import etree as et
 
+from .exceptions import SubscriptionRegistryFailed
 from .ouimeaux_device import Device
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
 from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
@@ -56,10 +57,6 @@ VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
     </serviceList>
 </device>
 </root>"""
-
-
-class SubscriptionRegistryFailed(Exception):
-    """General exceptions related to the subscription registry."""
 
 
 class Subscription:
