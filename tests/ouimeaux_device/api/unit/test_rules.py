@@ -3,13 +3,14 @@
 import base64
 import sqlite3
 import tempfile
-from unittest.mock import create_autospec, patch
+from unittest.mock import Mock, create_autospec, patch
 
 import pytest
-import requests
+import urllib3
 
+from pywemo.exceptions import HTTPException
 from pywemo.ouimeaux_device.api import rules_db
-from pywemo.ouimeaux_device.api.service import REQUESTS_TIMEOUT
+from pywemo.ouimeaux_device.api.service import REQUESTS_TIMEOUT, Session
 
 MOCK_NAME = "WemoDeviceName"
 MOCK_UDN = "WemoDeviceUDN"
@@ -217,14 +218,15 @@ def test_rules_db_from_device(temp_file, sqldb):
     sqldb.commit()
     sqldb.close()
     zip_content = base64.b64decode(rules_db._pack_db(temp_file, "inner.db"))
-    mock_response = create_autospec(requests.Response, instance=True)
-    mock_response.status_code = 200
-    mock_response.content = zip_content
+    mock_response = create_autospec(urllib3.HTTPResponse, instance=True)
+    mock_response.status = 200
+    mock_response.data = zip_content
     store_rules = []
 
     class Device:
         name = MOCK_NAME
         udn = MOCK_UDN
+        session = Session("http://localhost/")
 
         class rules:
             @staticmethod
@@ -238,10 +240,12 @@ def test_rules_db_from_device(temp_file, sqldb):
             def StoreRules(**kwargs):
                 store_rules.append(kwargs)
 
-    with patch("requests.get", return_value=mock_response) as mock_get:
+    with patch(
+        "urllib3.PoolManager.request", return_value=mock_response
+    ) as mock_request:
         with rules_db.rules_db_from_device(Device) as db:
-            mock_get.assert_called_once_with(
-                "http://localhost/rules.db", timeout=REQUESTS_TIMEOUT
+            mock_request.assert_called_once_with(
+                method="GET", url="http://localhost/rules.db"
             )
             # Make a modification to trigger StoreRules.
             assert len(db._rules) == 1
@@ -250,3 +254,19 @@ def test_rules_db_from_device(temp_file, sqldb):
     assert len(store_rules) == 1
     assert store_rules[0]["ruleDbVersion"] == 2
     assert len(store_rules[0]["ruleDbBody"]) > 1000
+
+
+def test_rules_db_from_device_raises_http_exception():
+    device = Mock()
+    device.session = Session("http://localhost/")
+    device.rules = Mock()
+    device.rules.FetchRules.return_value = {
+        'ruleDbVersion': 1,
+        'ruleDbPath': 'http://localhost/',
+    }
+    with patch(
+        'urllib3.PoolManager.request', side_effect=urllib3.exceptions.HTTPError
+    ):
+        with pytest.raises(HTTPException):
+            with rules_db.rules_db_from_device(device):
+                pass

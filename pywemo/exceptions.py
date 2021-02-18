@@ -31,3 +31,7 @@ class APNotFound(SetupException):
 
 class ShortPassword(SetupException):
     """Exception raised when a password is too short (<8 characters)."""
+
+
+class HTTPException(PyWeMoException):
+    """HTTP request to the device failed."""

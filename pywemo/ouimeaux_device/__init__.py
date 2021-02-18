@@ -10,6 +10,7 @@ import warnings
 import requests
 
 from ..exceptions import (
+    ActionException,
     APNotFound,
     ResetException,
     SetupException,
@@ -17,7 +18,7 @@ from ..exceptions import (
     UnknownService,
 )
 from .api.long_press import LongPressMixin
-from .api.service import REQUESTS_TIMEOUT, ActionException, Service, Session
+from .api.service import REQUESTS_TIMEOUT, Service, Session
 from .api.xsd import device as deviceParser
 
 LOG = logging.getLogger(__name__)

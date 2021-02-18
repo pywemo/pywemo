@@ -3,11 +3,11 @@
 import unittest.mock as mock
 
 import pytest
-import requests
 import urllib3
 from lxml import etree as et
 
 import pywemo.ouimeaux_device.api.service as svc
+from pywemo.exceptions import HTTPException
 
 BODY_KWARG_KEY = "body"
 HEADERS_KWARG_KEY = "headers"
@@ -55,15 +55,15 @@ class TestSession:
         mock_request.return_value = response
 
         session = svc.Session('http://1.2.3.4')
-        with pytest.raises(requests.RequestException):
+        with pytest.raises(HTTPException):
             session.get('/')
 
     @mock.patch(
         'urllib3.PoolManager.request', side_effect=urllib3.exceptions.HTTPError
     )
-    def test_urllib_raises_requests_exception(self, mock_request):
+    def test_urllib_raises_http_exception(self, mock_request):
         session = svc.Session('http://1.2.3.4')
-        with pytest.raises(requests.RequestException):
+        with pytest.raises(HTTPException):
             session.get('/')
 
     @mock.patch('urllib3.PoolManager')
