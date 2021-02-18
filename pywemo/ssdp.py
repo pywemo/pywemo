@@ -133,6 +133,9 @@ class SSDP:
 class UPNPEntry:
     """Found uPnP entry."""
 
+    # Use functools.cached_property if Python < 3.8 support is dropped.
+    _description = None
+
     def __init__(self, values):
         """Create a UPNPEntry object."""
         self.values = values
@@ -174,6 +177,13 @@ class UPNPEntry:
     @property
     def description(self):
         """Return the description from the uPnP entry."""
+        # The description property may be referenced multiple times. Cache the
+        # description to avoid needing to fetch it each time the property is
+        # accessed.
+        if self._description is not None:
+            return self._description
+        self._description = {}
+
         url = self.location
         if not url:
             return {}
@@ -183,7 +193,8 @@ class UPNPEntry:
                 try:
                     xml = requests.get(url, timeout=REQUESTS_TIMEOUT).content
                     tree = et.fromstring(xml or b'')
-                    return etree_to_dict(tree).get('root', {})
+                    self._description = etree_to_dict(tree).get('root', {})
+                    break
                 except requests.RequestException:
                     LOG.warning("Error fetching description at %s", url)
 
@@ -193,7 +204,7 @@ class UPNPEntry:
             # and can be safely ignored.
             pass
 
-        return {}
+        return self._description
 
     def match_device_description(self, values):
         """
