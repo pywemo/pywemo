@@ -464,8 +464,7 @@ class SubscriptionRegistry:
             if retry > 1:
                 # If this wasn't a one-off, try rediscovery
                 # in case the device has changed.
-                if subscription.device.rediscovery_enabled:
-                    subscription.device.reconnect_with_device()
+                subscription.device.reconnect_with_device()
             with self._event_thread_cond:
                 self._schedule(SUBSCRIPTION_RETRY, subscription, retry=retry)
 
