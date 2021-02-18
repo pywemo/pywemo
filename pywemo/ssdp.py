@@ -230,6 +230,10 @@ class UPNPEntry:
         """Equality operator."""
         return isinstance(other, type(self)) and self._key == other._key
 
+    def __hash__(self):
+        """Generate hash of instance."""
+        return hash(('UPNPEntry', self._key))
+
     def __repr__(self):
         """Return the string representation of the object."""
         st = self.st or ''
