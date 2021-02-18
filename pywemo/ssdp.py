@@ -212,11 +212,7 @@ class UPNPEntry:
 
         Values should only contain lowercase keys.
         """
-        device = self.description.get('device')
-
-        if device is None:
-            return False
-
+        device = self.description.get('device', {})
         return all(val == device.get(key) for key, val in values.items())
 
     @classmethod
