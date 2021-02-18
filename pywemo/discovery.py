@@ -7,8 +7,9 @@ from socket import gaierror, gethostbyname
 import requests
 
 from . import ssdp
+from .exceptions import ActionException, HTTPException
 from .ouimeaux_device import UnsupportedDevice, probe_wemo
-from .ouimeaux_device.api.service import REQUESTS_TIMEOUT, ActionException
+from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
 from .ouimeaux_device.api.xsd import device as deviceParser
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
@@ -38,7 +39,7 @@ def discover_devices(*, rediscovery_enabled=True, **kwargs):
                     entry.location,
                     rediscovery_enabled=rediscovery_enabled,
                 )
-            except (requests.RequestException, ActionException) as exc:
+            except (HTTPException, ActionException) as exc:
                 LOG.warning(
                     'Could not connect to device %s (%s)', entry.location, exc
                 )
@@ -58,7 +59,10 @@ def device_from_description(
             "will be removed in a future release.",
             DeprecationWarning,
         )
-    xml = requests.get(description_url, timeout=REQUESTS_TIMEOUT)
+    try:
+        xml = requests.get(description_url, timeout=REQUESTS_TIMEOUT)
+    except requests.RequestException as err:
+        raise HTTPException(err) from err
     parsed = deviceParser.parseString(
         xml.content, silence=True, print_warnings=False
     )

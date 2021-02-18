@@ -3,11 +3,10 @@
 import logging
 from urllib.parse import urljoin, urlparse
 
-import requests
 import urllib3
 from lxml import etree as et
 
-from pywemo.exceptions import ActionException
+from pywemo.exceptions import ActionException, HTTPException
 
 from .xsd import service as serviceParser
 
@@ -49,9 +48,8 @@ class Session:
     response body and will raise an exception if fetching the response body
     takes longer than the timeout.
 
-    Since much of pywemo is built atop the requests library, any urllib3
-    exceptions will be raised as requests.RequestException. A `content`
-    field on HTTPResponse will also be populated from the `data` field.
+    Since much of pywemo is built atop the requests library, a `content`
+    field on HTTPResponse is populated from the `data` field.
     """
 
     # Retry strategy for requests that fail.
@@ -80,7 +78,7 @@ class Session:
     ) -> urllib3.HTTPResponse:
         """Send request and gather response.
 
-        A non-200 response code will result in a requests.RequestException
+        A non-200 response code will result in a HTTPException
         exception.
 
         Args:
@@ -91,8 +89,8 @@ class Session:
             kwargs: Additional arguments for urllib3 pool.request(**kwargs).
 
         Raises:
-            requests.RequestException for any urllib3 exception or if the
-            response code is not 200.
+            HTTPException for any urllib3 exception or if the response code is
+            not 200.
         """
         if retries is None:
             retries = self.retries
@@ -111,7 +109,7 @@ class Session:
                         f"Received status {response.status} for {url}"
                     )
             except urllib3.exceptions.HTTPError as err:
-                raise requests.RequestException(err)
+                raise HTTPException(err) from err
             response.content = response.data  # For `requests` compatibility.
             return response
 
@@ -204,7 +202,7 @@ class Action:
                     body=body,
                     timeout=timeout,
                 )
-            except requests.exceptions.RequestException as err:
+            except HTTPException as err:
                 LOG.warning(
                     "Error communicating with %s at %s:%i, %r retry %i",
                     self.service.device.name,
