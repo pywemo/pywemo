@@ -451,11 +451,9 @@ class TestDevice:
             return MockResponse(None, 404)
 
         requests_get.side_effect = get_resp
-        device.sentinel = 'SeNtInEl'  # Should not exist in the new device.
         device.reconnect_with_device()
 
         assert device.port == new_port
-        assert getattr(device, 'sentinel', None) is None
 
     @mock.patch('urllib3.PoolManager.request')
     @mock.patch('requests.get')
@@ -482,8 +480,11 @@ class TestDevice:
 
         requests_get.side_effect = get_resp
 
-        device.sentinel = 'SeNtInEl'  # Make sure this still exists.
-        with mock.patch.object(device, '_reconnect_with_device_by_discovery'):
+        with mock.patch.object(
+            device, '_reconnect_with_device_by_discovery'
+        ), mock.patch(
+            'pywemo.ouimeaux_device.api.service.Session.url',
+            new_callable=mock.PropertyMock,
+        ) as url_mock:
             device.reconnect_with_device()
-
-        assert getattr(device, 'sentinel', None) == 'SeNtInEl'
+            url_mock.assert_not_called()
