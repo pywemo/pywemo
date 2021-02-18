@@ -7,6 +7,8 @@ import requests
 import urllib3
 from lxml import etree as et
 
+from pywemo.exceptions import ActionException
+
 from .xsd import service as serviceParser
 
 LOG = logging.getLogger(__name__)
@@ -22,12 +24,6 @@ REQUEST_TEMPLATE = """
 </s:Body>
 </s:Envelope>
 """
-
-
-class ActionException(Exception):
-    """Generic exceptions when dealing with Actions."""
-
-    pass
 
 
 class Session:
