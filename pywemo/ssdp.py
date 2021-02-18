@@ -212,9 +212,6 @@ class UPNPEntry:
 
         Values should only contain lowercase keys.
         """
-        if self.description is None:
-            return False
-
         device = self.description.get('device')
 
         if device is None:
