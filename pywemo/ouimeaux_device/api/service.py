@@ -221,8 +221,7 @@ class Action:
                     response_dict[response_item.tag] = response_item.text
                 return response_dict
 
-            if self.service.device.rediscovery_enabled:
-                self.service.device.reconnect_with_device()
+            self.service.device.reconnect_with_device()
 
         msg = (
             f"Error communicating with {self.service.device.name} after "

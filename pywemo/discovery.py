@@ -25,7 +25,7 @@ from .ouimeaux_device.switch import Switch
 LOG = logging.getLogger(__name__)
 
 
-def discover_devices(*, rediscovery_enabled=True, **kwargs):
+def discover_devices(**kwargs):
     """Find WeMo devices on the local network."""
     wemos = []
 
@@ -35,9 +35,7 @@ def discover_devices(*, rediscovery_enabled=True, **kwargs):
         ):
             try:
                 device = device_from_uuid_and_location(
-                    entry.udn,
-                    entry.location,
-                    rediscovery_enabled=rediscovery_enabled,
+                    entry.udn, entry.location
                 )
             except (HTTPException, ActionException) as exc:
                 LOG.warning(
@@ -49,9 +47,7 @@ def discover_devices(*, rediscovery_enabled=True, **kwargs):
     return wemos
 
 
-def device_from_description(
-    description_url, mac='deprecated', *, rediscovery_enabled=True
-):
+def device_from_description(description_url, mac='deprecated'):
     """Return object representing WeMo device running at host, else None."""
     if mac != 'deprecated':
         warnings.warn(
@@ -68,38 +64,33 @@ def device_from_description(
     )
     uuid = parsed.device.UDN
 
-    return device_from_uuid_and_location(
-        uuid,
-        description_url,
-        rediscovery_enabled=rediscovery_enabled,
-    )
+    return device_from_uuid_and_location(uuid, description_url)
 
 
-def device_from_uuid_and_location(uuid, location, *, rediscovery_enabled=True):
+def device_from_uuid_and_location(uuid, location):
     """Determine device class based on the device uuid."""
     if not (uuid and location):
         return None
-    kwargs = {'url': location, 'rediscovery_enabled': rediscovery_enabled}
     if uuid.startswith('uuid:Socket'):
-        return Switch(**kwargs)
+        return Switch(location)
     if uuid.startswith('uuid:Lightswitch'):
-        return LightSwitch(**kwargs)
+        return LightSwitch(location)
     if uuid.startswith('uuid:Dimmer'):
-        return Dimmer(**kwargs)
+        return Dimmer(location)
     if uuid.startswith('uuid:Insight'):
-        return Insight(**kwargs)
+        return Insight(location)
     if uuid.startswith('uuid:Sensor'):
-        return Motion(**kwargs)
+        return Motion(location)
     if uuid.startswith('uuid:Maker'):
-        return Maker(**kwargs)
+        return Maker(location)
     if uuid.startswith('uuid:Bridge'):
-        return Bridge(**kwargs)
+        return Bridge(location)
     if uuid.startswith('uuid:CoffeeMaker'):
-        return CoffeeMaker(**kwargs)
+        return CoffeeMaker(location)
     if uuid.startswith('uuid:Humidifier'):
-        return Humidifier(**kwargs)
+        return Humidifier(location)
     if uuid.startswith('uuid:OutdoorPlug'):
-        return OutdoorPlug(**kwargs)
+        return OutdoorPlug(location)
     if uuid.startswith('uuid:'):
         # unsupported device, but if this function was called from
         # discover_devices then this should be a Belkin product and is probably
@@ -110,7 +101,7 @@ def device_from_uuid_and_location(uuid, location, *, rediscovery_enabled=True):
             'UnsupportedDevice object to allow manual interaction',
             uuid,
         )
-        return UnsupportedDevice(**kwargs)
+        return UnsupportedDevice(location)
 
     return None
 

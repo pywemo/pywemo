@@ -93,7 +93,7 @@ def probe_device(device):
 class Device:
     """Base object for WeMo devices."""
 
-    def __init__(self, url, mac='deprecated', *, rediscovery_enabled=True):
+    def __init__(self, url, mac='deprecated'):
         """Create a WeMo device."""
         if mac != 'deprecated':
             warnings.warn(
@@ -104,7 +104,6 @@ class Device:
         self._state = None
         self.basic_state_params = {}
         self._reconnect_lock = threading.Lock()
-        self.rediscovery_enabled = rediscovery_enabled
         self.session = Session(url)
         xml = self.session.get(url)
         self._config = deviceParser.parseString(
@@ -151,21 +150,14 @@ class Device:
 
     def reconnect_with_device(self):
         """Re-probe & scan network to rediscover a disconnected device."""
-        if self.rediscovery_enabled:
-            # Avoid retrying from multiple threads
-            if not self._reconnect_lock.acquire(blocking=False):
-                return
-            try:
-                if not self._reconnect_with_device_by_probing():
-                    self._reconnect_with_device_by_discovery()
-            finally:
-                self._reconnect_lock.release()
-        else:
-            LOG.warning(
-                "Rediscovery was requested for device %s, "
-                "but rediscovery is disabled. Ignoring request.",
-                self.name,
-            )
+        # Avoid retrying from multiple threads
+        if not self._reconnect_lock.acquire(blocking=False):
+            return
+        try:
+            if not self._reconnect_with_device_by_probing():
+                self._reconnect_with_device_by_discovery()
+        finally:
+            self._reconnect_lock.release()
 
     @staticmethod
     def parse_basic_state(params):
