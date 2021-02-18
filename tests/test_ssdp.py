@@ -266,3 +266,29 @@ class TestScan:
         )
         with mock.patch('requests.get', side_effect=requests.RequestException):
             assert entry.description == {}
+
+
+class TestUPNPEntry:
+    """Tests for the UPNPEntry class."""
+
+    _R1 = TestScan._R1.decode()
+    _R2 = TestScan._R2.decode()
+
+    def test_properties(self):
+        r1 = ssdp.UPNPEntry.from_response(self._R1)
+        assert r1.st == "urn:Belkin:service:basicevent:1"
+        assert (
+            r1.usn == "uuid:Socket-1_0-SERIAL::urn:Belkin:service:basicevent:1"
+        )
+        assert r1.udn == "uuid:Socket-1_0-SERIAL"
+        assert r1.location == "http://192.168.1.100:49158/setup.xml"
+        assert r1.is_expired is False
+
+        r2 = ssdp.UPNPEntry.from_response(self._R2)
+        assert r1 != r2
+
+        r1_2 = ssdp.UPNPEntry.from_response(self._R1)
+        assert r1_2 == r1
+
+        items = set((r1, r2, r1_2))
+        assert len(items) == 2
