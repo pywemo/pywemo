@@ -21,6 +21,10 @@ echo "===Installing dependencies==="
 poetry install
 
 echo
+echo "===Installing pre-commit hooks==="
+pre-commit install
+
+echo
 echo "===Validate with rstcheck==="
 rstcheck README.rst
 
