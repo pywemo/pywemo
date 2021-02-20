@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pywemo"
-version = "0.6.2"
+version = "0.6.3"
 description = "Lightweight Python module to discover and control WeMo devices"
 authors = ["Greg Dowling <mail@gregdowling.com>"]
 license = "MIT"
