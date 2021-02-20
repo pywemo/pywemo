@@ -124,6 +124,19 @@ class Subscription:
                 # invalid. Send an UNSUBSCRIBE for safety and then attempt to
                 # subscribe again.
                 self._unsubscribe()
+
+                # Also reset the `event_received` boolean at this point. A 412
+                # response code to a subscription renewal also happens when a
+                # device restarts. When a device loses power and power is
+                # restored it's possible that the device's state has changed.
+                # We need to reconfirm that the initial event is received again
+                # so that the device state is reported properly. And for
+                # devices that don't report their initial state, it's important
+                # that clients are aware that they should begin polling the
+                # device again.
+                self.event_received = False
+
+                # Try the subscription again.
                 response = self._subscribe()
             response.raise_for_status()
         except requests.RequestException:
@@ -177,7 +190,10 @@ class Subscription:
         self.subscription_id = headers.get('SID', self.subscription_id)
         timeout_header = headers.get('TIMEOUT', None)
         if timeout_header:
-            timeout = int(timeout_header.replace('Second-', ''))
+            timeout = min(
+                int(timeout_header.replace('Second-', '')),
+                self.default_timeout_seconds,
+            )
         else:
             timeout = self.default_timeout_seconds
         self.expiration_time = timeout + time.time()
