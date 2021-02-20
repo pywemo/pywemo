@@ -190,7 +190,10 @@ class Subscription:
         self.subscription_id = headers.get('SID', self.subscription_id)
         timeout_header = headers.get('TIMEOUT', None)
         if timeout_header:
-            timeout = int(timeout_header.replace('Second-', ''))
+            timeout = min(
+                int(timeout_header.replace('Second-', '')),
+                self.default_timeout_seconds,
+            )
         else:
             timeout = self.default_timeout_seconds
         self.expiration_time = timeout + time.time()

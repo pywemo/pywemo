@@ -191,14 +191,14 @@ class Test_Subscription:
     @mock.patch('requests.request')
     def test_maintain(self, mock_request, subscription):
         mock_response = mock.create_autospec(requests.Response, instance=True)
-        mock_response.headers = {'SID': 'uuid:123', 'TIMEOUT': 'Second-567'}
+        mock_response.headers = {'SID': 'uuid:123', 'TIMEOUT': 'Second-222'}
         mock_response.status_code = requests.codes.ok
         mock_request.return_value = mock_response
 
-        assert subscription.maintain() == 567
+        assert subscription.maintain() == 222
         assert subscription.subscription_id == 'uuid:123'
         assert subscription.expiration_time == pytest.approx(
-            time.time() + 567, abs=2
+            time.time() + 222, abs=2
         )
         mock_request.assert_called_once_with(
             method='SUBSCRIBE',
@@ -217,10 +217,10 @@ class Test_Subscription:
         mock_response.status_code = requests.codes.ok
         mock_request.return_value = mock_response
 
-        assert subscription.maintain() == 765
+        assert subscription.maintain() == 300
         assert subscription.subscription_id == 'uuid:321'
         assert subscription.expiration_time == pytest.approx(
-            time.time() + 765, abs=2
+            time.time() + 300, abs=2
         )
         mock_request.assert_called_once_with(
             method='SUBSCRIBE',
@@ -238,10 +238,10 @@ class Test_Subscription:
         )
         mock_request.return_value = mock_response
 
-        assert subscription.maintain() == 333
+        assert subscription.maintain() == 300
         assert subscription.subscription_id == 'uuid:222'
         assert subscription.expiration_time == pytest.approx(
-            time.time() + 333, abs=2
+            time.time() + 300, abs=2
         )
         mock_request.assert_any_call(
             method='SUBSCRIBE',
