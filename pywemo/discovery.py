@@ -125,7 +125,7 @@ def hostname_lookup(hostname):
         return hostname
 
 
-def setup_url_for_address(host, port):
+def setup_url_for_address(host, port=None):
     """Determine setup.xml url for a given host and port pair."""
     # Force hostnames into IP addresses
     try:
