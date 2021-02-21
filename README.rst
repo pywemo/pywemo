@@ -28,7 +28,7 @@ On some networks discovery doesn't work reliably, in that case if you can find t
     >>> url = pywemo.setup_url_for_address("192.168.1.192", None)
     >>> print(url)
     http://192.168.1.192:49153/setup.xml
-    >>> device = pywemo.discovery.device_from_description(url, None)
+    >>> device = pywemo.discovery.device_from_description(url)
     >>> print(device)
     <WeMo Maker "Hi Fi Systemline Sensor">
 
