@@ -43,6 +43,8 @@ coverage = "^5.4"
 coveralls = "^3.0.0"
 # version of generateDS used to create device.py and service.py in .../api/xsd
 generateDS = "2.37.11"
+# other
+pre-commit = "^2.10"
 
 [tool.coverage]
   [tool.coverage.run]
