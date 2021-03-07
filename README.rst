@@ -23,7 +23,7 @@ For advanced usage, the ``device.explain()`` method will print all known actions
 If discovery doesn't work on your network
 -----------------------------------------
 Automatic discovery may not work reliably on some networks.
-In that case, you can find the device based on an IP or hostname:
+In that case, you can use the device with an IP or hostname:
 
 .. code-block:: python
 
@@ -65,7 +65,7 @@ Setup
 
 Device setup is through the ``setup`` method, which has two required arguments: ``ssid`` and ``password``.
 The user must first connect to the devices locally broadcast access point, which typically starts with "WeMo.", and then discover the device there.
-Once done, pass the desired SSID and password (AES encryption only) to the ``setup`` method to connect it to your wifi network.
+Once done, pass the desired SSID and password (WPA2/AES encryption only) to the ``setup`` method to connect it to your wifi network.
 
 ``device.setup(ssid='wifi_name', password='special_secret')``
 
@@ -75,7 +75,7 @@ A few important notes:
 - WeMo requires a password of at least 8 characters long.
 - For a WeMo without internet access, see `this guide <https://github.com/pavoni/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 - If connecting to an open network, the password argument is ignored and you can provide anything, e.g. ``password=None``.
-- If connecting to an AES-encrypted network, OpenSSL is used to encrypt the password by the ``pywemo`` library.
+- If connecting to a WPA2/AES-encrypted network, OpenSSL is used to encrypt the password by the ``pywemo`` library.
   It must be installed and available on your ``PATH`` via calling ``openssl`` from a terminal or command prompt.
 
 Firmware Warning
@@ -111,8 +111,10 @@ This started as a stripped down version of `ouimeaux <https://github.com/iancmcc
 
 License
 -------
-Some of the code in `pywemo/ouimeaux_device` was originally written, copyright, and released under the BSD license by Ian McCracken.
-The overall library is released under the MIT license.
+The code in `pywemo/ouimeaux_device` is released under the BSD LICENSE file in that directory.
+Some of this code was originally written and copyright by Ian McCracken.
+The rest of pyWeMo is released under the MIT license.
+
 
 .. |Build Badge| image:: https://github.com/pavoni/pywemo/workflows/Build/badge.svg
     :target: https://github.com/pavoni/pywemo/actions?query=workflow%3ABuild
