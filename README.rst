@@ -38,11 +38,11 @@ The `setup_url_for_address` function will lookup a hostname and provide a suitab
 
 Testing new products
 --------------------
-If both methods above are not successful, then pyWeMo may not support your WeMo product yet.
-This may be particularly true if it is a new device.
+If both methods above are not successful, then ``pywemo`` may not support your WeMo product yet.
+This may be particularly true if it is a new WeMo product.
 To test this, you can use a debug flag, ``pywemo.discover_devices(debug=True)`` or ``pywemo.discovery.device_from_description(url, debug=True)``.
 If an ``UnsupportedDevice`` is found, then it is highly likely that the product can be added to ``pywemo``.
-This ``UnsupportedDevice`` will allow manual interation, but please open an issue to get first class support for the device.
+This ``UnsupportedDevice`` will allow manual interaction, but please open an issue to get first class support for the device.
 
 Device Reset and Setup
 ----------------------
