@@ -98,7 +98,7 @@ You can run the build pipeline locally via:
     ./scripts/build.sh
 
 Note that this will install a git ``pre-commit`` hook.
-For this hook to work correctly, ``poetry`` needs to be globally accessible on your ``PATH`` and/or the local virtual environment must be activated.
+For this hook to work correctly, ``poetry`` needs to be globally accessible on your ``PATH`` or the local virtual environment must be activated.
 This virtual environment can be activated with:
 
 .. code-block::
