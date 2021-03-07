@@ -79,8 +79,7 @@ Once done, pass the desired SSID and password (WPA2/AES encryption only) to the 
 
 A few important notes:
 
-- Not all devices are supported for setup.
-- WeMo requires a password of at least 8 characters long.
+- Not all devices are currently supported for setup.
 - For a WeMo without internet access, see `this guide <https://github.com/pavoni/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 - If connecting to an open network, the password argument is ignored and you can provide anything, e.g. ``password=None``.
 - If connecting to a WPA2/AES-encrypted network, OpenSSL is used to encrypt the password by the ``pywemo`` library.
