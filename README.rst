@@ -97,6 +97,14 @@ You can run the build pipeline locally via:
     # setup, install, format, lint, test and build:
     ./scripts/build.sh
 
+Note that this will install a git ``pre-commit`` hook.
+For this hook to work correctly, ``poetry`` needs to be globally accessible on your ``PATH`` and/or the local virtual environment must be activated.
+This virtual environment can be activated with:
+
+.. code-block::
+
+    . .venv/bin/activate
+
 History
 -------
 This started as a stripped down version of `ouimeaux <https://github.com/iancmcc/ouimeaux>`_, but has since taken its own path.
