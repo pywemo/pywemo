@@ -25,7 +25,7 @@ from .ouimeaux_device.switch import Switch
 LOG = logging.getLogger(__name__)
 
 
-def discover_devices(**kwargs):
+def discover_devices(debug=False, **kwargs):
     """Find WeMo devices on the local network."""
     wemos = []
 
@@ -35,7 +35,7 @@ def discover_devices(**kwargs):
         ):
             try:
                 device = device_from_uuid_and_location(
-                    entry.udn, entry.location
+                    entry.udn, entry.location, debug
                 )
             except (HTTPException, ActionException) as exc:
                 LOG.warning(
@@ -47,7 +47,7 @@ def discover_devices(**kwargs):
     return wemos
 
 
-def device_from_description(description_url, mac='deprecated'):
+def device_from_description(description_url, mac='deprecated', debug=False):
     """Return object representing WeMo device running at host, else None."""
     if mac != 'deprecated':
         warnings.warn(
@@ -64,10 +64,10 @@ def device_from_description(description_url, mac='deprecated'):
     )
     uuid = parsed.device.UDN
 
-    return device_from_uuid_and_location(uuid, description_url)
+    return device_from_uuid_and_location(uuid, description_url, debug)
 
 
-def device_from_uuid_and_location(uuid, location):
+def device_from_uuid_and_location(uuid, location, debug=False):
     """Determine device class based on the device uuid."""
     if not (uuid and location):
         return None
@@ -91,7 +91,7 @@ def device_from_uuid_and_location(uuid, location):
         return Humidifier(location)
     if uuid.startswith('uuid:OutdoorPlug'):
         return OutdoorPlug(location)
-    if uuid.startswith('uuid:'):
+    if uuid.startswith('uuid:') and debug:
         # unsupported device, but if this function was called from
         # discover_devices then this should be a Belkin product and is probably
         # a WeMo product without a custom class yet.  So attempt to return a

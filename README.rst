@@ -36,6 +36,14 @@ Please note that `discovery.device_from_description` call requires a `url` with 
 
 The `setup_url_for_address` function will lookup a hostname and provide a suitable `url` with an IP address.
 
+Testing new products
+--------------------
+If both methods above are not successful, then pyWeMo may not support your WeMo product yet.
+This may be particularly true if it is a new device.
+To test this, you can use a debug flag, ``pywemo.discover_devices(debug=True)`` or ``pywemo.discovery.device_from_description(url, debug=True)``.
+If an ``UnsupportedDevice`` is found, then it is highly likely that the product can be added to ``pywemo``.
+This ``UnsupportedDevice`` will allow manual interation, but please open an issue to get first class support for the device.
+
 Device Reset and Setup
 ----------------------
 pywemo includes the ability to reset and setup devices, without using the Belkin app or needing to create a Belkin account.
