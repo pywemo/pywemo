@@ -53,8 +53,13 @@ class Session:
     """
 
     # Retry strategy for requests that fail.
+    # Note that `method_whitelist` was renamed to `allowed_methods` in
+    # urllib3 1.26. We should switch to `allowed_methods` once all the
+    # Home Assistant dependencies have migrated to at least that version as
+    # well (see #253). `method_whitelist` is scheduled to be removed in
+    # urllib3 2.0.
     retries = urllib3.Retry(
-        total=6, backoff_factor=1.5, allowed_methods=['GET', 'POST']
+        total=6, backoff_factor=1.5, method_whitelist=['GET', 'POST']
     )
 
     # Seconds that a request can be idle before retrying.
