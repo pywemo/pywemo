@@ -54,7 +54,7 @@ class Session:
 
     # Retry strategy for requests that fail.
     retries = urllib3.Retry(
-        total=6, backoff_factor=1.5, allowed_methods=['GET', 'POST']
+        total=6, backoff_factor=1.5, method_whitelist=['GET', 'POST']
     )
 
     # Seconds that a request can be idle before retrying.
