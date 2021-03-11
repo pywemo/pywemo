@@ -80,7 +80,7 @@ Once done, pass the desired SSID and password (WPA2/AES encryption only) to the 
 A few important notes:
 
 - Not all devices are currently supported for setup.
-- For a WeMo without internet access, see `this guide <https://github.com/pavoni/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
+- For a WeMo without internet access, see `this guide <https://github.com/pywemo/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 - If connecting to an open network, the password argument is ignored and you can provide anything, e.g. ``password=None``.
 - If connecting to a WPA2/AES-encrypted network, OpenSSL is used to encrypt the password by the ``pywemo`` library.
   It must be installed and available on your ``PATH`` via calling ``openssl`` from a terminal or command prompt.
@@ -122,14 +122,14 @@ All contents of the pywemo/ouimeaux_device directory are licensed under a BSD 3-
 The rest of pyWeMo is released under the MIT license. See the top-level LICENSE file for more details.
 
 
-.. |Build Badge| image:: https://github.com/pavoni/pywemo/workflows/Build/badge.svg
-    :target: https://github.com/pavoni/pywemo/actions?query=workflow%3ABuild
+.. |Build Badge| image:: https://github.com/pywemo/pywemo/workflows/Build/badge.svg
+    :target: https://github.com/pywemo/pywemo/actions?query=workflow%3ABuild
     :alt: GitHub build status
 .. |PyPI Version Badge| image:: https://img.shields.io/pypi/v/pywemo
     :target: https://pypi.org/project/pywemo/
     :alt: Latest PyPI version
-.. |Coverage| image:: https://coveralls.io/repos/github/pavoni/pywemo/badge.svg?branch=master
-    :target: https://coveralls.io/github/pavoni/pywemo?branch=master
+.. |Coverage| image:: https://coveralls.io/repos/github/pywemo/pywemo/badge.svg?branch=master
+    :target: https://coveralls.io/github/pywemo/pywemo?branch=master
     :alt: Coveralls coverage
 .. |PyPI Downloads Badge| image:: https://img.shields.io/pypi/dm/pywemo
     :target: https://pypi.org/project/pywemo/

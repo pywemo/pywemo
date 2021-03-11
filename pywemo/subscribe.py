@@ -37,7 +37,7 @@ VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
     <deviceType>urn:Belkin:device:switch:1</deviceType>
     <friendlyName>pywemo virtual device</friendlyName>
     <manufacturer>pywemo</manufacturer>
-    <manufacturerURL>https://github.com/pavoni/pywemo</manufacturerURL>
+    <manufacturerURL>https://github.com/pywemo/pywemo</manufacturerURL>
     <modelDescription>pywemo virtual device</modelDescription>
     <modelName>LightSwitch</modelName>
     <modelNumber>1.0</modelNumber>
