@@ -128,8 +128,8 @@ The rest of pyWeMo is released under the MIT license. See the top-level LICENSE 
 .. |PyPI Version Badge| image:: https://img.shields.io/pypi/v/pywemo
     :target: https://pypi.org/project/pywemo/
     :alt: Latest PyPI version
-.. |Coverage| image:: https://coveralls.io/repos/github/pywemo/pywemo/badge.svg?branch=master
-    :target: https://coveralls.io/github/pywemo/pywemo?branch=master
+.. |Coverage| image:: https://coveralls.io/repos/github/pywemo/pywemo/badge.svg?branch=main
+    :target: https://coveralls.io/github/pywemo/pywemo?branch=main
     :alt: Coveralls coverage
 .. |PyPI Downloads Badge| image:: https://img.shields.io/pypi/dm/pywemo
     :target: https://pypi.org/project/pywemo/
