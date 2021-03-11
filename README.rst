@@ -28,7 +28,7 @@ In that case, you can use the device with an IP or hostname:
 .. code-block:: python
 
     >>> import pywemo
-    >>> url = pywemo.setup_url_for_address("192.168.1.192", None)
+    >>> url = pywemo.setup_url_for_address("192.168.1.192")
     >>> print(url)
     http://192.168.1.192:49153/setup.xml
     >>> device = pywemo.discovery.device_from_description(url)
