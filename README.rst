@@ -114,13 +114,12 @@ This virtual environment can be activated with:
 
 History
 -------
-This started as a stripped down version of `ouimeaux <https://github.com/iancmcc/ouimeaux>`_, but has since taken its own path.
+This started as a stripped down version of `ouimeaux <https://github.com/iancmcc/ouimeaux>`_, copyright Ian McCracken, but has since taken its own path.
 
 License
 -------
-The code in `pywemo/ouimeaux_device` is released under the BSD LICENSE file in that directory.
-Some of this code was originally written and copyright by Ian McCracken.
-The rest of pyWeMo is released under the MIT license.
+All contents of the pywemo/ouimeaux_device directory are licensed under a BSD 3-Clause license. The full text of that license is maintained within the pywemo/ouimeaux_device/LICENSE file.
+The rest of pyWeMo is released under the MIT license. See the top-level LICENSE file for more details.
 
 
 .. |Build Badge| image:: https://github.com/pavoni/pywemo/workflows/Build/badge.svg
