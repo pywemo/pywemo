@@ -410,6 +410,7 @@ def _unpack_db(content, db_file):
         inner_file_name = zip_file.namelist()[0]
         with zip_file.open(inner_file_name) as zipped_db_file:
             db_file.write(zipped_db_file.read())
+            db_file.flush()
         return inner_file_name
     raise RuntimeError("Could not find database within zip file")
 
