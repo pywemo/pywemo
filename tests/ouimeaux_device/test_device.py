@@ -265,21 +265,32 @@ class TestDevice:
     def test_encryption_no_openssl(self, mock_run, device):
         """Test device encryption (openssl not found/not installed)."""
         with pytest.raises(SetupException):
-            assert device.encrypt_aes128('password', self.METAINFO)
+            assert device.encrypt_aes128('password', self.METAINFO, False)
         assert mock_run.call_count == 1
 
     @mock.patch('subprocess.run', side_effect=CalledProcessError(-1, 'error'))
     def test_encryption_openssl_error(self, mock_run, device):
         """Test device encryption (error in openssl)."""
         with pytest.raises(SetupException):
-            assert device.encrypt_aes128('password', self.METAINFO)
+            assert device.encrypt_aes128('password', self.METAINFO, False)
         assert mock_run.call_count == 1
 
     @mock.patch('subprocess.run', return_value=mock.Mock(stdout=ENC_PASSWORD))
-    def test_encryption_successful(self, mock_run, device):
+    def test_encryption_successful_non_rtos(self, mock_run, device):
         """Test device encryption (good result)."""
         correct = 'wNTUdjT+cA1pa0Vta/jgEg==1808'
-        assert device.encrypt_aes128('password', self.METAINFO) == correct
+        assert (
+            device.encrypt_aes128('password', self.METAINFO, False) == correct
+        )
+        assert mock_run.call_count == 1
+
+    @mock.patch('subprocess.run', return_value=mock.Mock(stdout=ENC_PASSWORD))
+    def test_encryption_successful_rtos(self, mock_run, device):
+        """Test device encryption (good result)."""
+        correct = 'wNTUdjT+cA1pa0Vta/jgEg=='
+        assert (
+            device.encrypt_aes128('password', self.METAINFO, True) == correct
+        )
         assert mock_run.call_count == 1
 
     def test_setup_unknown_service(self, device):
