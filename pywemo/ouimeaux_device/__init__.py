@@ -8,6 +8,7 @@ import time
 import warnings
 
 import requests
+from lxml import etree as et
 
 from ..exceptions import (
     ActionException,
@@ -109,6 +110,13 @@ class Device:
         self._config = deviceParser.parseString(
             xml.content, silence=True, print_warnings=False
         ).device
+        # The 'xs:any' values for the xs:complexType DeviceType in device.xsd.
+        xs_any = (et.fromstring(extra) for extra in self._config.anytypeobjs_)
+        self._config_any = {
+            et.QName(tag).localname: tag.text.strip()
+            for tag in xs_any
+            if tag.text and tag.text.strip()
+        }
         self.services = {}
         for svc in self._config.serviceList.service:
             service = Service(self, svc)
@@ -287,7 +295,7 @@ class Device:
         return self.reset(data=True, wifi=True)
 
     @staticmethod
-    def encrypt_aes128(password, wemo_metadata):
+    def encrypt_aes128(password, wemo_metadata, is_rtos):
         """
         Encrypt a password using OpenSSL.
 
@@ -300,6 +308,8 @@ class Device:
         # Wemo uses some meta information for salt and iv
         metainfo = wemo_metadata.split('|')
         keydata = metainfo[0][:6] + metainfo[1] + metainfo[0][6:12]
+        if is_rtos:
+            keydata += 'b3{8t;80dIN{ra83eC1s?M70?683@2Yf'
 
         salt, initialization_vector = keydata[:8], keydata[:16]
         if len(salt) != 8 or len(initialization_vector) != 16:
@@ -365,8 +375,9 @@ class Device:
                 f'{n_password} (and {n_encrypted} after encryption).'
             )
 
-        encrypted_password += f'{n_encrypted:#04x}'[2:]
-        encrypted_password += f'{n_password:#04x}'[2:]
+        if not is_rtos:
+            encrypted_password += f'{n_encrypted:#04x}'[2:]
+            encrypted_password += f'{n_password:#04x}'[2:]
         return encrypted_password
 
     def setup(self, *args, **kwargs):
@@ -495,7 +506,10 @@ class Device:
         else:
             # get the meta information of the device and encrypt the password
             metainfo = self.get_service('metainfo').GetMetaInfo()['MetaInfo']
-            encrypted_password = self.encrypt_aes128(password, metainfo)
+            is_rtos = self._config_any.get('rtos', '0') == '1'
+            encrypted_password = self.encrypt_aes128(
+                password, metainfo, is_rtos
+            )
 
         # optionally make multiple connection attempts
         start_time = time.time()
