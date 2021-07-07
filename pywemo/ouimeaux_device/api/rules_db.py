@@ -199,7 +199,7 @@ class RulesDb:
     def add_rule(self, rule: RulesRow) -> RulesRow:
         """Add a new entry to the RULES table."""
         if not hasattr(rule, "RuleID"):
-            rule.RuleID = max(self._rules.keys(), default=1)
+            rule.RuleID = max(self._rules.keys(), default=0) + 1
         rule.update_db(self.cursor())
         self._rules[rule.RuleID] = rule
         self.modified = True
