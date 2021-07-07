@@ -35,3 +35,7 @@ class ShortPassword(SetupException):
 
 class HTTPException(PyWeMoException):
     """HTTP request to the device failed."""
+
+
+class HTTPNotOkException(HTTPException):
+    """Raised when a non-200 status is returned."""
