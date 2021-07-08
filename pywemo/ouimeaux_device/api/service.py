@@ -6,7 +6,11 @@ from urllib.parse import urljoin, urlparse
 import urllib3
 from lxml import etree as et
 
-from pywemo.exceptions import ActionException, HTTPException
+from pywemo.exceptions import (
+    ActionException,
+    HTTPException,
+    HTTPNotOkException,
+)
 
 from .xsd import service as serviceParser
 
@@ -89,8 +93,8 @@ class Session:
             kwargs: Additional arguments for urllib3 pool.request(**kwargs).
 
         Raises:
-            HTTPException for any urllib3 exception or if the response code is
-            not 200.
+            HTTPNotOkException: when the response code is not 200.
+            HTTPException: for any urllib3 exception.
         """
         if retries is None:
             retries = self.retries
@@ -105,7 +109,7 @@ class Session:
             try:
                 response = pool.request(method=method, url=url, **kwargs)
                 if response.status != 200:
-                    raise urllib3.exceptions.HTTPError(
+                    raise HTTPNotOkException(
                         f"Received status {response.status} for {url}"
                     )
             except urllib3.exceptions.HTTPError as err:

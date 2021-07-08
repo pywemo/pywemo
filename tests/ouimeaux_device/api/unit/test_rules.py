@@ -256,6 +256,37 @@ def test_rules_db_from_device(temp_file, sqldb):
     assert len(store_rules[0]["ruleDbBody"]) > 1000
 
 
+def test_rules_db_from_device_404():
+    mock_response = create_autospec(urllib3.HTTPResponse, instance=True)
+    mock_response.status = 404
+
+    class Device:
+        name = MOCK_NAME
+        udn = MOCK_UDN
+        session = Session("http://localhost/")
+
+        class rules:
+            @staticmethod
+            def FetchRules():
+                return {
+                    "ruleDbVersion": "1",
+                    "ruleDbPath": "http://localhost/rules.db",
+                }
+
+    completed_with_no_exceptions = False
+    with patch(
+        "urllib3.PoolManager.request", return_value=mock_response
+    ) as mock_request:
+        with rules_db.rules_db_from_device(Device) as db:
+            mock_request.assert_called_once_with(
+                method="GET", url="http://localhost/rules.db"
+            )
+        assert len(db.rules) == 0
+        completed_with_no_exceptions = True
+
+    assert completed_with_no_exceptions
+
+
 def test_rules_db_from_device_raises_http_exception():
     device = Mock()
     device.session = Session("http://localhost/")

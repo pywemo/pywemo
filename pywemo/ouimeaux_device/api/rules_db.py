@@ -10,6 +10,8 @@ import zipfile
 from types import MappingProxyType
 from typing import FrozenSet, List, Mapping, Optional, Tuple
 
+from pywemo.exceptions import HTTPNotOkException
+
 from .db_orm import DatabaseRow, PrimaryKey, SQLType
 
 LOG = logging.getLogger(__name__)
@@ -367,13 +369,16 @@ def rules_db_from_device(device) -> RulesDb:
     fetch = device.rules.FetchRules()
     version = int(fetch["ruleDbVersion"])
     rule_db_url = fetch["ruleDbPath"]
-    response = device.session.get(rule_db_url)
+    try:
+        response = device.session.get(rule_db_url)
+    except HTTPNotOkException:
+        response = None
 
     with tempfile.NamedTemporaryFile(
         prefix="wemorules", suffix=".db"
     ) as temp_db_file:
         # Create a new db, or extract the current db.
-        if response.status != 200:
+        if response is None:
             db_file_name = _create_empty_db(temp_db_file.name)
         else:
             db_file_name = _unpack_db(response.content, temp_db_file)
