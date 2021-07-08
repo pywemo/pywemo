@@ -273,6 +273,7 @@ def test_rules_db_from_device_404():
                     "ruleDbPath": "http://localhost/rules.db",
                 }
 
+    completed_with_no_exceptions = False
     with patch(
         "urllib3.PoolManager.request", return_value=mock_response
     ) as mock_request:
@@ -281,6 +282,9 @@ def test_rules_db_from_device_404():
                 method="GET", url="http://localhost/rules.db"
             )
         assert len(db.rules) == 0
+        completed_with_no_exceptions = True
+
+    assert completed_with_no_exceptions
 
 
 def test_rules_db_from_device_raises_http_exception():
