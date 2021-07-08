@@ -111,6 +111,56 @@ MOCK_UDN = "WemoDeviceUDN"
                 )
             ],
         ),
+        # Test case 3: A rule exists, but it is not a long press rule. Expect
+        # that a new entry is generated.
+        (
+            [
+                rules_db.RulesRow(
+                    RuleID=501,
+                    Name=f"{MOCK_NAME} Timer Rule",
+                    Type="UNKNOWN_TYPE",
+                    State=0,
+                ),
+                rules_db.RuleDevicesRow(
+                    RuleDevicePK=1, RuleID=501, DeviceID=MOCK_UDN
+                ),
+            ],
+            [
+                (
+                    rules_db.RulesRow(
+                        RuleID=502,
+                        Name=f"{MOCK_NAME} Long Press Rule",
+                        Type=long_press.RULE_TYPE_LONG_PRESS,
+                        RuleOrder=0,
+                        StartDate="12201982",
+                        EndDate="07301982",
+                        State=1,
+                        Sync="NOSYNC",
+                    ),
+                    rules_db.RuleDevicesRow(
+                        RuleDevicePK=2,
+                        RuleID=502,
+                        DeviceID=MOCK_UDN,
+                        GroupID=0,
+                        DayID=-1,
+                        StartTime=60,
+                        RuleDuration=86340,
+                        StartAction=long_press.ActionType.TOGGLE.value,
+                        EndAction=-1.0,
+                        SensorDuration=-1,
+                        Type=-1,
+                        Value=-1,
+                        Level=-1,
+                        ZBCapabilityStart='',
+                        ZBCapabilityEnd='',
+                        OnModeOffset=-1,
+                        OffModeOffset=-1,
+                        CountdownTime=-1,
+                        EndTime=86400,
+                    ),
+                ),
+            ],
+        ),
     ],
 )
 def test_ensure_long_press_rule_exists(test_input, expected):

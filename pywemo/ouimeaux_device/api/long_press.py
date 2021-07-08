@@ -36,7 +36,7 @@ def ensure_long_press_rule_exists(
 
     Returns the long press rule.
     """
-    current_rules = rules_db.rules_for_device()
+    current_rules = rules_db.rules_for_device(rule_type=RULE_TYPE_LONG_PRESS)
     for (rule, _) in current_rules:
         if rule.State != "1":
             LOG.info("Enabling long press rule for device %s", device_name)
@@ -47,7 +47,8 @@ def ensure_long_press_rule_exists(
     LOG.info("Adding long press rule for device %s", device_name)
     current_rules = rules_db.rules_for_device()
     max_order = max(
-        rules_db.rules.values(), key=lambda r: r.RuleOrder, default=-1
+        map(lambda r: getattr(r, 'RuleOrder', -1), rules_db.rules.values()),
+        default=-1,
     )
     new_rule = RulesRow(
         Name=f"{device_name} Long Press Rule",
