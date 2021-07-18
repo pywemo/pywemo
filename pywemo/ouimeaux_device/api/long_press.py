@@ -47,7 +47,7 @@ def ensure_long_press_rule_exists(
     LOG.info("Adding long press rule for device %s", device_name)
     current_rules = rules_db.rules_for_device()
     max_order = max(
-        map(lambda r: getattr(r, 'RuleOrder', -1), rules_db.rules.values()),
+        map(lambda r: r.RuleOrder or -1, rules_db.rules.values()),
         default=-1,
     )
     new_rule = RulesRow(

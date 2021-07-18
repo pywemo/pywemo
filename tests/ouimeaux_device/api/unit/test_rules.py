@@ -213,6 +213,22 @@ def test_get_target_devices_for_rule(sqldb):
     assert db.get_target_devices_for_rule(rule) == frozenset([MOCK_TARGET_UDN])
 
 
+def test_entry_with_no_primary_key(sqldb):
+    # Create a RULEDEVICES table that allows NULLS for RuleDevicePK
+    # From https://github.com/pywemo/pywemo/issues/276
+    sqldb.cursor().execute("DROP TABLE RULEDEVICES")
+    sqldb.cursor().execute(
+        """CREATE TABLE RULEDEVICES (RuleDevicePK UNIQUE, RuleID INTEGER, DeviceID, GroupID, DayID INTEGER, StartTime,RuleDuration, StartAction INTEGER, EndAction INTEGER, SensorDuration,Type,Value,Level,ZBCapabilityStart TEXT DEFAULT "", ZBCapabilityEnd TEXT  DEFAULT "", OnModeOffset INTEGER  DEFAULT 0,OffModeOffset INTEGER DEFAULT 0,CountdownTime INTEGER DEFAULT 0,EndTime INTEGER DEFAULT 0, ProductName TEXT  DEFAULT "")"""
+    )
+    sqldb.cursor().execute(
+        "INSERT INTO RULEDEVICES VALUES(NULL,22,'uuid:Lightswitch-1_0','0',1,'60','86280',0,0,'0','-1','-1','-1','-1','-1',0,0,1800,86340,'')"
+    )
+    # Should not cause an exception.
+    db = rules_db.RulesDb(sqldb, MOCK_UDN, MOCK_NAME)
+    # Should not be indexed either.
+    assert len(db.rule_devices) == 0
+
+
 def test_rules_db_from_device(temp_file, sqldb):
     rules_db.RulesRow(RuleID=501, Name="", Type="").update_db(sqldb.cursor())
     sqldb.commit()
