@@ -39,3 +39,11 @@ class HTTPException(PyWeMoException):
 
 class HTTPNotOkException(HTTPException):
     """Raised when a non-200 status is returned."""
+
+
+class RulesDbError(Exception):
+    """Base class for errors related to the Rules database."""
+
+
+class RulesDbQueryError(RulesDbError):
+    """Exception when querying the rules database."""

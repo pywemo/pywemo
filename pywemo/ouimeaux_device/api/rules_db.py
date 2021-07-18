@@ -10,7 +10,7 @@ import zipfile
 from types import MappingProxyType
 from typing import FrozenSet, List, Mapping, Optional, Tuple
 
-from pywemo.exceptions import HTTPNotOkException
+from pywemo.exceptions import HTTPNotOkException, RulesDbQueryError
 
 from .db_orm import DatabaseRow, PrimaryKey, SQLType
 
@@ -387,10 +387,22 @@ def rules_db_from_device(device) -> RulesDb:
         conn = sqlite3.connect(temp_db_file.name)
         try:
             conn.row_factory = sqlite3.Row
-            rules = RulesDb(
-                conn, default_udn=device.udn, device_name=device.name
-            )
-            yield rules
+            try:
+                rules = RulesDb(
+                    conn, default_udn=device.udn, device_name=device.name
+                )
+                yield rules
+            except sqlite3.Error as err:
+                try:
+                    db_dump = list(conn.iterdump())
+                    LOG.debug("Rules: %s", repr(db_dump))
+                    fw_version = device.firmwareupdate.GetFirmwareVersion()
+                    LOG.debug("Firmware: %s", repr(fw_version))
+                except Exception:  # pylint: disable=broad-except
+                    # Ignore any additional errors that occur as a result of
+                    # outputting this debug information.
+                    pass
+                raise RulesDbQueryError(f"sqlite3 exception {err}") from err
 
             if rules.update_if_modified():
                 LOG.debug("Rules for %s updated. Storing rules.", device.name)
