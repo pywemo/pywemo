@@ -23,7 +23,7 @@ For advanced usage, the ``device.explain()`` method will print all known actions
 If discovery doesn't work on your network
 -----------------------------------------
 Automatic discovery may not work reliably on some networks.
-In that case, you can use the device with an IP or hostname:
+In that case, you can use the device with an IP or hostname from your network.
 
 .. code-block:: python
 
@@ -40,6 +40,26 @@ This is needed for the subscription update logic to work properly.
 In addition, recent versions of the WeMo firmware may not accept connections from hostnames and will return a 500 error.
 
 The ``setup_url_for_address`` function will lookup a hostname and provide a suitable ``url`` with an IP address.
+
+If the WeMo device is not on your network, you can also connect to it directly.
+After connecting, if the ``pywemo.discover_devices()`` doesn't work, you can get the IP Address by running an ``arp -a`` and use that in ``pywemo.setup_url_for_address``:
+
+.. code-block:: bash
+
+    $ arp -a
+    _gateway (10.22.22.1) at [MAC ADDRESS REMOVED] [ether]
+    
+.. code-block:: python
+
+    >>> import pywemo
+    >>> url = pywemo.setup_url_for_address("10.22.22.1")
+    >>> device = pywemo.discovery.device_from_description(url)
+    >>> print(device)
+    <WeMo Switch "Wemo Mini">
+    >>> device.setup(ssid='MY SSID', password='MY NETWORK PASSWORD')
+    ('1', 'success')
+
+
 
 Testing new products
 --------------------
