@@ -23,7 +23,7 @@ For advanced usage, the ``device.explain()`` method will print all known actions
 If discovery doesn't work on your network
 -----------------------------------------
 Automatic discovery may not work reliably on some networks.
-In that case, you can use the device with an IP or hostname from your network.
+In that case, you can use the device with an IP or hostname:
 
 .. code-block:: python
 
