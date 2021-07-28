@@ -41,6 +41,26 @@ In addition, recent versions of the WeMo firmware may not accept connections fro
 
 The ``setup_url_for_address`` function will lookup a hostname and provide a suitable ``url`` with an IP address.
 
+If the WeMo device is not on your network, you can also connect to it directly.
+After connecting, if the ``pywemo.discover_devices()`` doesn't work, you can get the IP Address by running an ``arp -a`` and use that in ``pywemo.setup_url_for_address``:
+
+.. code-block::
+
+    $ arp -a
+    _gateway (10.22.22.1) at [MAC ADDRESS REMOVED] [ether]
+    
+.. code-block:: python
+
+    >>> import pywemo
+    >>> url = pywemo.setup_url_for_address("10.22.22.1")
+    >>> device = pywemo.discovery.device_from_description(url)
+    >>> print(device)
+    <WeMo Switch "Wemo Mini">
+    >>> device.setup(ssid='MY SSID', password='MY NETWORK PASSWORD')
+    ('1', 'success')
+
+
+
 Testing new products
 --------------------
 If both methods above are not successful, then ``pywemo`` may not support your WeMo product yet.
