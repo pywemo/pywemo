@@ -44,7 +44,7 @@ The ``setup_url_for_address`` function will lookup a hostname and provide a suit
 If the WeMo device is not on your network, you can also connect to it directly.
 After connecting, if the ``pywemo.discover_devices()`` doesn't work, you can get the IP Address by running an ``arp -a`` and use that in ``pywemo.setup_url_for_address``:
 
-.. code-block:: bash
+.. code-block::
 
     $ arp -a
     _gateway (10.22.22.1) at [MAC ADDRESS REMOVED] [ether]
