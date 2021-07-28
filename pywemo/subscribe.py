@@ -508,7 +508,7 @@ class SubscriptionRegistry:
 
     def event(self, device, type_, value, path=None):
         """Execute the callback for a received event."""
-        LOG.info(
+        LOG.debug(
             "Received %s event from %s(%s) - %s %s",
             path or 'an',
             device,
