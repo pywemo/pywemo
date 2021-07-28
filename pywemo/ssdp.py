@@ -279,13 +279,16 @@ def scan(st=ST, timeout=DISCOVER_TIMEOUT, max_entries=None, match_udn=None):
     sockets = []
     try:
         for addr in interface_addresses():
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             try:
-                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                 s.bind((addr, 0))
                 s.sendto(ssdp_request, ssdp_target)
                 sockets.append(s)
             except OSError:
                 pass
+            finally:
+                if s not in sockets:
+                    s.close()
 
         start = calc_now()
         while sockets:
