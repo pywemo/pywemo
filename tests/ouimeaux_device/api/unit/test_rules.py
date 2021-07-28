@@ -8,7 +8,7 @@ from unittest.mock import Mock, create_autospec, patch
 import pytest
 import urllib3
 
-from pywemo.exceptions import HTTPException
+from pywemo.exceptions import HTTPException, RulesDbQueryError
 from pywemo.ouimeaux_device.api import rules_db
 from pywemo.ouimeaux_device.api.service import REQUESTS_TIMEOUT, Session
 
@@ -301,3 +301,28 @@ def test_rules_db_from_device_raises_http_exception():
         with pytest.raises(HTTPException):
             with rules_db.rules_db_from_device(device):
                 pass
+
+
+def test_sqlite_errors_raised():
+    mock_response = create_autospec(urllib3.HTTPResponse, instance=True)
+    mock_response.status = 404
+
+    class Device:
+        name = MOCK_NAME
+        udn = MOCK_UDN
+        session = Session("http://localhost/")
+
+        class rules:
+            @staticmethod
+            def FetchRules():
+                return {
+                    "ruleDbVersion": "1",
+                    "ruleDbPath": "http://localhost/rules.db",
+                }
+
+    with patch(
+        "urllib3.PoolManager.request", return_value=mock_response
+    ) as mock_request:
+        with pytest.raises(RulesDbQueryError):
+            with rules_db.rules_db_from_device(Device) as db:
+                raise sqlite3.OperationalError("test")
