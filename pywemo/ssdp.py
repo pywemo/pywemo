@@ -427,7 +427,7 @@ class DiscoveryResponder:
                         (SSDP_REPLY % callback_addr).encode("UTF-8"), sock_addr
                     )
                 except OSError:
-                    LOG.exception("Failed to send SSDP reply to %r", sock_addr)
+                    LOG.error("Failed to send SSDP reply to %r", sock_addr)
         except Exception as exp:
             self._thread_exception = exp  # Used in the stop() method.
             raise
