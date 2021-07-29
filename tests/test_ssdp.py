@@ -34,9 +34,8 @@ def mock_get_ip_address():
 def mock_socket():
     """Mock socket instance returned from socket.socket."""
     sock = mock.create_autospec(socket.socket, instance=True)
-    with mock.patch("socket.socket", return_value=sock) as mock_sock:
+    with mock.patch("socket.socket", return_value=sock):
         yield sock
-        assert mock_sock.call_count == 1
 
 
 @pytest.fixture()
