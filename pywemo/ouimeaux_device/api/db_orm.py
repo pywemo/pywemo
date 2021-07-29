@@ -24,7 +24,7 @@ class DatabaseRow:
 
     def __setattr__(self, name, value):
         """Update one of the attributes of the Row."""
-        if name in self.FIELDS:
+        if name in self.FIELDS and value is not None:
             super().__setattr__(name, self.FIELDS[name](value))
         else:
             super().__setattr__(name, value)
@@ -55,8 +55,6 @@ class DatabaseRow:
         """Initialize a Row from a sqllite cursor row."""
         kwargs = {}
         for key in row.keys():
-            if row[key] is None:
-                continue
             kwargs[key] = row[key]
         return cls(**kwargs)
 
@@ -129,9 +127,15 @@ class DatabaseRow:
         """Remove the Row from the sqlite database."""
         pk_name = self.primary_key_name()
         pk_value = self.primary_key_value()
-        sql = f"DELETE FROM {self.TABLE_NAME} WHERE {pk_name}=?"
+        if pk_value is None:
+            sql = f"DELETE FROM {self.TABLE_NAME} WHERE {pk_name} IS NULL"
+            values = ()
+        else:
+            sql = f"DELETE FROM {self.TABLE_NAME} WHERE {pk_name}=?"
+            values = (pk_value,)
+
         try:
-            cursor.execute(sql, (pk_value,))
+            cursor.execute(sql, values)
         except sqlite3.Error:
             LOG.exception("Query failed: %s %s", sql, pk_value)
             raise

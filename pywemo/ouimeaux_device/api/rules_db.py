@@ -446,7 +446,11 @@ def _index_by_primary_key(rows):
     """Return a dict of Rows indexed by the primary key."""
     result = {}
     for row in rows:
-        result[row.primary_key_value()] = row
+        value = row.primary_key_value()
+        if value is None:
+            LOG.debug("Skipping row with NULL primary key: %s", row)
+            continue
+        result[value] = row
     return result
 
 
