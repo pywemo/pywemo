@@ -380,24 +380,27 @@ class DiscoveryResponder:
 
     def respond_to_discovery(self) -> None:
         """Respond to a WeMo discovery request with the virtual device URL."""
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        recv_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        send_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            recv_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
             # Join the multicast group on all interfaces.
             group = socket.inet_aton(MULTICAST_GROUP)
             for addr in interface_addresses():
                 try:
                     local = socket.inet_aton(addr)
-                    sock.setsockopt(
+                    recv_sock.setsockopt(
                         socket.IPPROTO_IP,
                         socket.IP_ADD_MEMBERSHIP,
                         group + local,
                     )
-                except OSError:
-                    pass
+                except OSError as err:
+                    LOG.error(
+                        "Failed join multicast group on %s: %s", addr, err
+                    )
 
-            sock.bind((MULTICAST_GROUP, MULTICAST_PORT))
+            recv_sock.bind((MULTICAST_GROUP, MULTICAST_PORT))
 
             next_notify = datetime.min
             while not self._exit.is_set():
@@ -408,9 +411,9 @@ class DiscoveryResponder:
                     self.send_notify()
 
                 # Check for new discovery requests.
-                if not select.select([sock], [], [], 1)[0]:
+                if not select.select([recv_sock], [], [], 1)[0]:
                     continue  # Timeout, no data. Loop again and check for exit
-                msg, sock_addr = sock.recvfrom(1024)
+                msg, sock_addr = recv_sock.recvfrom(1024)
                 lines = msg.splitlines()
                 if len(lines) < 3 or not lines[0].startswith(
                     b"M-SEARCH * HTTP"
@@ -426,16 +429,19 @@ class DiscoveryResponder:
                     self.callback_port,
                 )
                 try:
-                    sock.sendto(
+                    send_sock.sendto(
                         (SSDP_REPLY % callback_addr).encode("UTF-8"), sock_addr
                     )
-                except OSError:
-                    LOG.error("Failed to send SSDP reply to %r", sock_addr)
+                except OSError as err:
+                    LOG.error(
+                        "Failed to send SSDP reply to %r: %s", sock_addr, err
+                    )
         except Exception as exp:
             self._thread_exception = exp  # Used in the stop() method.
             raise
         finally:
-            sock.close()
+            recv_sock.close()
+            send_sock.close()
 
     def start(self) -> None:
         """Start the server."""
