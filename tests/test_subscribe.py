@@ -8,7 +8,7 @@ from http.server import HTTPServer
 import pytest
 import requests
 
-from pywemo import Insight, LightSwitch, subscribe
+from pywemo import Bridge, Insight, LightSwitch, subscribe
 
 
 @pytest.fixture
@@ -16,6 +16,12 @@ def device(vcr):
     """Mock WeMo Insight device."""
     with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml'):
         return Insight('http://192.168.1.100:49153/setup.xml')
+
+
+@pytest.fixture
+def bridge(vcr):
+    with vcr.use_cassette('WeMo_WW_2.00.11057.PVT-OWRT-Link.yaml'):
+        return Bridge('http://192.168.1.100:49153/setup.xml')
 
 
 class Test_RequestHandler:
@@ -181,7 +187,11 @@ class Test_Subscription:
     @pytest.fixture(
         params=subscribe.SubscriptionRegistry.subscription_service_names
     )
-    def subscription(self, request, device):
+    def subscription(self, request, device, bridge):
+        if request.param == 'bridge':
+            return subscribe.Subscription(
+                bridge, self.http_port, request.param
+            )
         return subscribe.Subscription(device, self.http_port, request.param)
 
     def test_url(self, subscription):

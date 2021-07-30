@@ -400,7 +400,11 @@ class SubscriptionRegistry:
 
     # Potential service endpoints for subscriptions. A Subscription will be
     # created for each entry as long as the service is supported by the device.
-    subscription_service_names: Iterable[str] = ('basicevent', 'insight')
+    subscription_service_names: Iterable[str] = (
+        'basicevent',
+        'bridge',
+        'insight',
+    )
 
     def __init__(self):
         """Create the subscription registry object."""

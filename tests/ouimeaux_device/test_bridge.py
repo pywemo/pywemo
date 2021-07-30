@@ -51,3 +51,125 @@ def test_bridge_getdevicestatus(bridge):
         ]
     )
     assert et.tostring(status) == expected
+
+
+@pytest.mark.parametrize(
+    "update,expected_updated,expected_state",
+    [
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f'<DeviceID available="YES">{LIGHT_ID}</DeviceID>'
+                '<CapabilityId>10006</CapabilityId>'
+                '<Value>0</Value>'
+                '</StateEvent>'
+            ),
+            True,
+            {'available': True, 'level': 255, 'onoff': 0},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f'<DeviceID available="YES">{LIGHT_ID}</DeviceID>'
+                '<CapabilityId>10006</CapabilityId>'
+                '<Value>1</Value>'
+                '</StateEvent>'
+            ),
+            True,
+            {'available': True, 'level': 255, 'onoff': 1},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f'<DeviceID available="YES">{LIGHT_ID}</DeviceID>'
+                '<CapabilityId>10008</CapabilityId>'
+                '<Value>128:0</Value>'
+                '</StateEvent>'
+            ),
+            True,
+            {'available': True, 'level': 128, 'onoff': 1},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f'<DeviceID available="NO">{LIGHT_ID}</DeviceID>'
+                '<CapabilityId>10006</CapabilityId>'
+                '<Value>0</Value>'
+                '</StateEvent>'
+            ),
+            True,
+            {'available': False, 'level': 255, 'onoff': 0},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f'<DeviceID>{LIGHT_ID}</DeviceID>'
+                '<CapabilityId>10006</CapabilityId>'
+                '<Value>0</Value>'
+                '</StateEvent>'
+            ),
+            True,
+            {'available': True, 'level': 255, 'onoff': 0},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f'<DeviceID>{LIGHT_ID}</DeviceID>'
+                '<CapabilityId>30301</CapabilityId>'
+                '<Value>2700:0</Value>'
+                '</StateEvent>'
+            ),
+            False,
+            {},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                '<DeviceID>SomeOtherDevice</DeviceID>'
+                '<CapabilityId>10006</CapabilityId>'
+                '<Value>0</Value>'
+                '</StateEvent>'
+            ),
+            False,
+            {},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                '<MissingDevice/>'
+                '<CapabilityId>10006</CapabilityId>'
+                '<Value>0</Value>'
+                '</StateEvent>'
+            ),
+            False,
+            {},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f'<DeviceID>{LIGHT_ID}</DeviceID>'
+                '<MissingCapabilityId/>'
+                '<Value>0</Value>'
+                '</StateEvent>'
+            ),
+            False,
+            {},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f'<DeviceID>{LIGHT_ID}</DeviceID>'
+                '<CapabilityId>10006</CapabilityId>'
+                '<MissingValue/>'
+                '</StateEvent>'
+            ),
+            False,
+            {},
+        ),
+    ],
+)
+def test_subscription_update(update, expected_updated, expected_state, bridge):
+    updated = bridge.subscription_update('StatusChange', update)
+    assert updated == expected_updated
+    if updated:
+        assert bridge.Lights[LIGHT_ID].get_state() == expected_state
