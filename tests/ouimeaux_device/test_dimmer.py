@@ -20,6 +20,18 @@ class Base:
         dimmer.off()
         assert dimmer.get_state(force_update=True) == 0
 
+    @pytest.mark.vcr()
+    @pytest.mark.parametrize(
+        "brightness,expected_state,expected_brightness",
+        [(100, 1, 100), (0, 0, 100), (45, 1, 45)],
+    )
+    def test_set_brightness(
+        self, dimmer, brightness, expected_state, expected_brightness
+    ):
+        dimmer.set_brightness(brightness)
+        assert dimmer.get_state(force_update=True) == expected_state
+        assert dimmer.get_brightness() == expected_brightness
+
     def test_subscription_update_brightness(self, dimmer):
         # Invalid value fails gracefully.
         assert dimmer.subscription_update('Brightness', 'invalid') is False

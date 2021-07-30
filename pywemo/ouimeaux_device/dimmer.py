@@ -17,21 +17,16 @@ class Dimmer(Switch, LongPressMixin):
         return self._brightness
 
     def set_brightness(self, brightness):
-        """
-        Set the brightness of this device to an integer between 1-100.
-
-        Setting the brightness does not turn the light on, so we need
-        to check the state of the switch.
-        """
-        if brightness == 0:
-            if self.get_state() != 0:
-                self.off()
+        """Set the brightness of this device to an integer between 1-100."""
+        value = int(brightness)
+        # WeMo only supports values between 1-100. WeMo will ignore a 0
+        # brightness value. If 0 is requested, then turn the light off instead.
+        if brightness:
+            self.basicevent.SetBinaryState(BinaryState=1, brightness=value)
+            self._state = 1
+            self._brightness = value
         else:
-            if self.get_state() == 0:
-                self.on()
-
-        self.basicevent.SetBinaryState(brightness=int(brightness))
-        self._brightness = int(brightness)
+            self.off()
 
     def get_state(self, force_update=False):
         """Update the state & brightness for the Dimmer."""

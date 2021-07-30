@@ -1,0 +1,91 @@
+interactions:
+- request:
+    body: '<?xml version="1.0" encoding="utf-8"?>
+
+      <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+
+      <s:Body>
+
+      <u:SetBinaryState xmlns:u="urn:Belkin:service:basicevent:1">
+
+      <BinaryState>1</BinaryState>
+
+      <brightness>100</brightness>
+
+      </u:SetBinaryState>
+
+      </s:Body>
+
+      </s:Envelope>'
+    headers:
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:basicevent:1#SetBinaryState"'
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/basicevent1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:SetBinaryStateResponse
+        xmlns:u=\"urn:Belkin:service:basicevent:1\">\r\n<BinaryState>1</BinaryState>\r\n<CountdownEndTime>0</CountdownEndTime>\r\n<deviceCurrentTime>1627611121</deviceCurrentTime>\r\n<brightness>100</brightness>\r\n</u:SetBinaryStateResponse>\r\n</s:Body>
+        </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '406'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Fri, 30 Jul 2021 02:12:01 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '<?xml version="1.0" encoding="utf-8"?>
+
+      <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+
+      <s:Body>
+
+      <u:GetBinaryState xmlns:u="urn:Belkin:service:basicevent:1">
+
+
+      </u:GetBinaryState>
+
+      </s:Body>
+
+      </s:Envelope>'
+    headers:
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:basicevent:1#GetBinaryState"'
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/basicevent1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:GetBinaryStateResponse
+        xmlns:u=\"urn:Belkin:service:basicevent:1\">\r\n<BinaryState>1</BinaryState>\r\n<brightness>100</brightness>\r\n<fader>300:-1:1:0:100</fader>\r\n</u:GetBinaryStateResponse>\r\n</s:Body>
+        </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '346'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Fri, 30 Jul 2021 02:12:01 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+version: 1
