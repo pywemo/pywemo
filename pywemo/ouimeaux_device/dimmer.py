@@ -36,7 +36,7 @@ class Dimmer(Switch, LongPressMixin):
     def get_state(self, force_update=False):
         """Update the state & brightness for the Dimmer."""
         state = super().get_state(force_update)
-        if force_update:
+        if force_update or self._brightness is None:
             try:
                 brightness = int(self.basic_state_params.get("brightness", 0))
             except ValueError:
