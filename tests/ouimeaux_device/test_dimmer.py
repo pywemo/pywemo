@@ -21,8 +21,8 @@ class Base:
         assert dimmer.get_state(force_update=True) == 0
 
     def test_subscription_update_brightness(self, dimmer):
-        # Does not update when the light is off.
-        assert dimmer.subscription_update('Brightness', '23') is False
+        # Invalid value fails gracefully.
+        assert dimmer.subscription_update('Brightness', 'invalid') is False
 
         assert dimmer.subscription_update('BinaryState', '1') is True
         assert dimmer.get_state() == 1

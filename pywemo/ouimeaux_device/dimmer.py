@@ -13,13 +13,7 @@ class Dimmer(Switch, LongPressMixin):
 
     def get_brightness(self, force_update=False):
         """Get brightness from device."""
-        if force_update or self._brightness is None:
-            try:
-                brightness = self.basicevent.GetBinaryState().get('brightness')
-            except ValueError:
-                brightness = 0
-            self._brightness = brightness
-
+        self.get_state(force_update)
         return self._brightness
 
     def set_brightness(self, brightness):
@@ -39,10 +33,24 @@ class Dimmer(Switch, LongPressMixin):
         self.basicevent.SetBinaryState(brightness=int(brightness))
         self._brightness = int(brightness)
 
+    def get_state(self, force_update=False):
+        """Update the state & brightness for the Dimmer."""
+        state = super().get_state(force_update)
+        if force_update:
+            try:
+                brightness = int(self.basic_state_params.get("brightness", 0))
+            except ValueError:
+                brightness = 0
+            self._brightness = brightness
+        return state
+
     def subscription_update(self, _type, _param):
         """Update the dimmer attributes due to a subscription update event."""
-        if _type == "Brightness" and self._state:
-            self._brightness = int(_param)
+        if _type == "Brightness":
+            try:
+                self._brightness = int(_param)
+            except ValueError:
+                return False
             return True
         return super().subscription_update(_type, _param)
 
