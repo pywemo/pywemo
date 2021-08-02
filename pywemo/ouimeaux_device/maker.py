@@ -44,10 +44,6 @@ class Maker(Switch):
         self.maker_params = {}
         self.get_state(force_update=True)
 
-    def __repr__(self):
-        """Return a string representation of the device."""
-        return '<WeMo Maker "{name}">'.format(name=self.name)
-
     def update_maker_params(self):
         """Get and parse the device attributes."""
         maker_resp = self.deviceevent.GetAttributes().get('attributeList')
@@ -79,11 +75,6 @@ class Maker(Switch):
         # the state is what you just set, so re-read it from the device
         self.basicevent.SetBinaryState(BinaryState=int(state))
         self.get_state(True)
-
-    @property
-    def device_type(self):
-        """Return what kind of WeMo this device is."""
-        return "Maker"
 
     @property
     def switch_state(self) -> int:

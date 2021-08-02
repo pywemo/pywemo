@@ -132,11 +132,6 @@ class Bridge(Device):
 
         return self.bridge.SetDeviceStatus(DeviceStatusList=send_state)
 
-    @property
-    def device_type(self):
-        """Return what kind of WeMo this device is."""
-        return "Bridge"
-
 
 class LinkedDevice:
     """Representation of a device connected to the bridge."""

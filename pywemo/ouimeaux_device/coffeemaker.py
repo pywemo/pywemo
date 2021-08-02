@@ -78,10 +78,6 @@ class CoffeeMaker(Switch):
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
 
-    def __repr__(self):
-        """Return a string representation of the device."""
-        return '<WeMo CoffeeMaker "{name}">'.format(name=self.name)
-
     def update_attributes(self):
         """Request state from device."""
         resp = self.deviceevent.GetAttributes().get('attributeList')
@@ -96,11 +92,6 @@ class CoffeeMaker(Switch):
             return True
 
         return Switch.subscription_update(self, _type, _params)
-
-    @property
-    def device_type(self):
-        """Return what kind of WeMo this device is."""
-        return "CoffeeMaker"
 
     @property
     def mode(self):

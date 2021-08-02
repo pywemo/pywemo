@@ -21,12 +21,3 @@ class Switch(Device):
     def toggle(self):
         """Toggle the switch's state."""
         return self.set_state(not self.get_state())
-
-    def __repr__(self):
-        """Return a string representation of the device."""
-        return '<WeMo Switch "{name}">'.format(name=self.name)
-
-    @property
-    def device_type(self):
-        """Return what kind of WeMo this device is."""
-        return "Switch"

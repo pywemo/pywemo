@@ -17,10 +17,6 @@ class Insight(Switch):
 
         self.update_insight_params()
 
-    def __repr__(self):
-        """Return a string representation of the device."""
-        return '<WeMo Insight "{name}">'.format(name=self.name)
-
     def update_insight_params(self):
         """Get and parse the device attributes."""
         params = self.insight.GetInsightParams().get('InsightParams')
@@ -76,11 +72,6 @@ class Insight(Switch):
             self.update_insight_params()
 
         return Switch.get_state(self, force_update)
-
-    @property
-    def device_type(self):
-        """Return what kind of WeMo this device is."""
-        return "Insight"
 
     @property
     def today_kwh(self):
