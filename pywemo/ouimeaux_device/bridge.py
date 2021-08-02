@@ -141,6 +141,7 @@ class LinkedDevice:
         self.bridge = bridge
         self.host = self.bridge.host
         self.port = self.bridge.port
+        self.name = None
         self.state = {}
         self.capabilities = []
         self._values = []
@@ -255,9 +256,13 @@ class LinkedDevice:
         return self._setdevicestatus(onoff=TOGGLE)
 
     @property
-    def device_type(self):
+    def device_type(self) -> str:
         """Return what kind of WeMo this device is."""
-        return "LinkedDevice"
+        return type(self).__name__
+
+    def __repr__(self) -> str:
+        """Return a string representation of the device."""
+        return f'<{self.device_type.upper()} "{self.name}">'
 
 
 class Light(LinkedDevice):
@@ -308,10 +313,6 @@ class Light(LinkedDevice):
             self._values = currentstate.split(',')
 
         super().update_state(status)
-
-    def __repr__(self):
-        """Return a string representation of the device."""
-        return '<LIGHT "{name}">'.format(name=self.name)
 
     def turn_on(self, level=None, transition=0, force_update=False):
         """Turn on the light."""
@@ -389,11 +390,6 @@ class Light(LinkedDevice):
         """Start ramping the brightness up or down."""
         return self._setdevicestatus(levelcontrol_stop='')
 
-    @property
-    def device_type(self):
-        """Return what kind of WeMo this device is."""
-        return "Light"
-
 
 class Group(LinkedDevice):
     """Representation of a Group of lights connected to the Bridge."""
@@ -422,12 +418,3 @@ class Group(LinkedDevice):
         if currentstate is not None:
             self._values = currentstate.split(',')
         super().update_state(status)
-
-    def __repr__(self):
-        """Return a string representation of the device."""
-        return '<GROUP "{name}">'.format(name=self.name)
-
-    @property
-    def device_type(self):
-        """Return what kind of WeMo this device is."""
-        return "Group"
