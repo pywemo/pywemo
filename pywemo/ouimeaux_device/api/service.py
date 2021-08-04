@@ -225,7 +225,10 @@ class Action:
                     response_element.tag
                     == "{http://schemas.xmlsoap.org/soap/envelope/}Fault"
                 ):
-                    raise SOAPFault(response_element)
+                    raise SOAPFault(
+                        f"Error calling {self.soap_action}",
+                        fault_element=response_element,
+                    )
                 return {
                     response_item.tag: response_item.text
                     for response_item in response_element

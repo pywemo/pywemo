@@ -12,25 +12,33 @@ class ActionException(PyWeMoException):
 class SOAPFault(ActionException):
     """Raised when the SOAP response contains a Fault message."""
 
-    def __init__(self, fault_element):
+    fault_code: str = ""
+    fault_string: str = ""
+    error_code: str = ""
+    error_description: str = ""
+
+    def __init__(self, message, fault_element=None):
         """Initialize from a SOAP Fault lxml.etree Element."""
-        upnp_error_prefix = (
-            "detail"
-            "/{urn:schemas-upnp-org:control-1-0}UPnPError/"
-            "{urn:schemas-upnp-org:control-1-0}"
-        )
-        self.fault_code = fault_element.findtext("faultcode")
-        self.fault_string = fault_element.findtext("faultstring")
-        self.error_code = fault_element.findtext(
-            f"{upnp_error_prefix}errorCode"
-        )
-        self.error_description = fault_element.findtext(
-            f"{upnp_error_prefix}errorDescription"
-        )
-        super().__init__(
-            f"SOAP Fault {self.fault_code}:{self.fault_string}, "
-            f"{self.error_code}:{self.error_description}"
-        )
+        details = ""
+        if fault_element is not None:
+            upnp_error_prefix = (
+                "detail"
+                "/{urn:schemas-upnp-org:control-1-0}UPnPError/"
+                "{urn:schemas-upnp-org:control-1-0}"
+            )
+            self.fault_code = fault_element.findtext("faultcode")
+            self.fault_string = fault_element.findtext("faultstring")
+            self.error_code = fault_element.findtext(
+                f"{upnp_error_prefix}errorCode"
+            )
+            self.error_description = fault_element.findtext(
+                f"{upnp_error_prefix}errorDescription"
+            )
+            details = (
+                f" SOAP Fault {self.fault_code}:{self.fault_string}, "
+                f"{self.error_code}:{self.error_description}"
+            )
+        super().__init__(f"{message}{details}")
 
 
 class SubscriptionRegistryFailed(PyWeMoException):
