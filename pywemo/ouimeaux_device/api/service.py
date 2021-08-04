@@ -10,6 +10,7 @@ from pywemo.exceptions import (
     ActionException,
     HTTPException,
     HTTPNotOkException,
+    SOAPFault,
 )
 
 from .xsd import service as serviceParser
@@ -217,13 +218,18 @@ class Action:
                 )
                 last_exception = err
             else:
-                response_dict = {}
-
-                for response_item in list(
-                    list(et.fromstring(response.content))[0]
-                )[0]:
-                    response_dict[response_item.tag] = response_item.text
-                return response_dict
+                envelope = et.fromstring(response.content)
+                body = list(envelope)[0]
+                response_element = list(body)[0]
+                if (
+                    response_element.tag
+                    == "{http://schemas.xmlsoap.org/soap/envelope/}Fault"
+                ):
+                    raise SOAPFault(response_element)
+                return {
+                    response_item.tag: response_item.text
+                    for response_item in response_element
+                }
 
             self.service.device.reconnect_with_device()
 

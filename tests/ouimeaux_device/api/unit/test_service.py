@@ -7,7 +7,7 @@ import urllib3
 from lxml import etree as et
 
 import pywemo.ouimeaux_device.api.service as svc
-from pywemo.exceptions import HTTPException
+from pywemo.exceptions import HTTPException, SOAPFault
 
 BODY_KWARG_KEY = "body"
 HEADERS_KWARG_KEY = "headers"
@@ -20,6 +20,7 @@ MOCK_ARGS_KWARGS = 1
 
 svc.LOG = mock.Mock()
 
+original_fromstring = et.fromstring
 MOCK_RESPONSE = (
     b'<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"'
     b' s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'
@@ -217,6 +218,35 @@ class TestAction:
         actual_responses = action()
 
         assert actual_responses == response_content
+
+    def test_fault_response(self, mock_et_fromstring):
+        envelope = original_fromstring(
+            b"""<s:Envelope
+          xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"
+          s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+        <s:Body>
+        <s:Fault>
+        <faultcode>s:Client</faultcode>
+        <faultstring>UPnPError</faultstring>
+        <detail>
+        <UPnPError xmlns="urn:schemas-upnp-org:control-1-0">
+        <errorCode>-1</errorCode>
+        <errorDescription>Invalid Action</errorDescription>
+        </UPnPError>
+        </detail>
+        </s:Fault>
+        </s:Body>
+        </s:Envelope>
+        """
+        )
+        action = self.get_mock_action()
+        action.service.device.session.post = mock.Mock()
+        mock_et_fromstring.return_value = envelope
+
+        with pytest.raises(
+            SOAPFault, match="SOAP Fault s:Client:UPnPError, -1:Invalid Action"
+        ):
+            action()
 
     def test_call_with_overridden_timeout(self):
         action = self.get_mock_action(
