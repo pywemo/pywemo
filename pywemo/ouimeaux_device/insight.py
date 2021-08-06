@@ -32,7 +32,14 @@ class Insight(Switch):
         if _type == "InsightParams":
             self.insight_params = self.parse_insight_params(_params)
             return True
-        return Switch.subscription_update(self, _type, _params)
+        updated = Switch.subscription_update(self, _type, _params)
+        if _type == "BinaryState" and updated:
+            # Special case: When an Insight device turns off, it also stops
+            # sending InsightParams updates. Return False in this case to
+            # indicate that the current state of the device hasn't been fully
+            # updated.
+            return self._state != 0
+        return updated
 
     @staticmethod
     def parse_insight_params(params):

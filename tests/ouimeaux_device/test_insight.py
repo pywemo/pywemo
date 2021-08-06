@@ -88,3 +88,13 @@ class Test_Insight:
         assert insight.get_standby_state == 'standby'
 
         subscription_registry.unregister(insight)
+
+    def test_subscription_update(self, insight):
+        assert insight.subscription_update("BinaryState", "8") is True
+        assert insight.subscription_update("BinaryState", "1") is True
+        assert insight.subscription_update("BinaryState", "0") is False
+        params = (
+            "8|1611105078|2607|0|12416|1209600|328|500|457600|69632638|9500"
+        )
+        assert insight.subscription_update("InsightParams", params) is True
+        assert insight.subscription_update("UnknownParam", "1") is False
