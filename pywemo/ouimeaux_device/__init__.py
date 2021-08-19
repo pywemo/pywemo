@@ -179,7 +179,7 @@ class Device:
 
     def update_binary_state(self):
         """Update the cached copy of the basic state response."""
-        self.basic_state_params = self.basicevent.GetBinaryState()
+        self.basic_state_params = self.basicevent.GetBinaryState() or {}
 
     def subscription_update(self, _type, _params):
         """Update device state based on subscription event."""
@@ -199,10 +199,12 @@ class Device:
     def get_state(self, force_update=False):
         """Return 0 if off and 1 if on."""
         if force_update or self._state is None:
-            state = self.basicevent.GetBinaryState() or {}
+            self.update_binary_state()
 
             try:
-                self._state = int(state.get('BinaryState', 0))
+                self._state = int(
+                    self.basic_state_params.get('BinaryState', 0)
+                )
             except ValueError:
                 self._state = 0
 
