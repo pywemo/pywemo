@@ -685,6 +685,15 @@ class Device:
         """Return the uPnP unique device name of the device."""
         return self._config.get_UDN()
 
+    @property
+    def device_type(self) -> str:
+        """Return what kind of WeMo this device is."""
+        return type(self).__name__
+
+    def __repr__(self) -> str:
+        """Return a string representation of the device."""
+        return f'<WeMo {self.device_type} "{self.name}">'
+
 
 class UnsupportedDevice(Device):
     """Representation of a WeMo device without a definition in pywemo.
@@ -694,12 +703,3 @@ class UnsupportedDevice(Device):
     allow a user to see that something is discovered and manually interact with
     it as well as aide in creating a permenant class for the new product.
     """
-
-    def __repr__(self):
-        """Return a string representation of the device."""
-        return '<WeMo UnsupportedDevice "{name}">'.format(name=self.name)
-
-    @property
-    def device_type(self):
-        """Return what kind of WeMo this device is."""
-        return 'UnsupportedDevice'

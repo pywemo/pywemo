@@ -145,10 +145,6 @@ class Humidifier(Switch):
         self._attributes = {}
         self.update_attributes()
 
-    def __repr__(self):
-        """Return a string representation of the device."""
-        return '<WeMo Humidifier "{name}">'.format(name=self.name)
-
     def update_attributes(self):
         """Request state from device."""
         resp = self.deviceevent.GetAttributes().get('attributeList')
@@ -164,11 +160,6 @@ class Humidifier(Switch):
             return True
 
         return Switch.subscription_update(self, _type, _params)
-
-    @property
-    def device_type(self):
-        """Return what kind of WeMo this device is."""
-        return "Humidifier"
 
     @property
     def fan_mode(self):
