@@ -1,0 +1,82 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      CALLBACK:
+      - <http://192.168.1.1:8989/sub/bridge>
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      NT:
+      - upnp:event
+      TIMEOUT:
+      - Second-300
+      User-Agent:
+      - python-requests/2.25.1
+    method: SUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/bridge1
+  response:
+    body:
+      string: ''
+    headers:
+      CONTENT-LENGTH:
+      - '0'
+      DATE:
+      - Fri, 30 Jul 2021 06:31:32 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      SID:
+      - uuid:c78d9e56-1dd1-11b2-b91a-d8fdcdc6a3a4
+      TIMEOUT:
+      - Second-300
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 412
+      message: Invalid Parameters
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      CALLBACK:
+      - <http://192.168.1.1:8989/sub/bridge>
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      NT:
+      - upnp:event
+      TIMEOUT:
+      - Second-300
+      User-Agent:
+      - python-requests/2.25.1
+    method: SUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/bridge1
+  response:
+    body:
+      string: ''
+    headers:
+      CONTENT-LENGTH:
+      - '0'
+      DATE:
+      - Fri, 30 Jul 2021 06:31:32 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      SID:
+      - uuid:c78d9e56-1dd1-11b2-b91a-d8fdcdc6a3a4
+      TIMEOUT:
+      - Second-300
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 412
+      message: Invalid Parameters
+version: 1

@@ -87,6 +87,28 @@ class Bridge(Device):
 
         return self.Lights, self.Groups
 
+    def get_state(self, force_update=False):
+        """Update the state of the Bridge device."""
+        state = super().get_state(force_update)
+        self.bridge_update(force_update)
+        return state
+
+    def subscription_update(self, _type, _param):
+        """Update the bridge attributes due to a subscription update event."""
+        if _type == "StatusChange" and _param:
+            state_event = et.fromstring(_param.encode('utf8'))
+            key = state_event.findtext('DeviceID')
+            if not key:
+                return False
+            if key in self.Lights:
+                return self.Lights[key].subscription_update(state_event)
+
+            if key in self.Groups:
+                return self.Groups[key].subscription_update(state_event)
+
+            return False
+        return super().subscription_update(_type, _param)
+
     def bridge_getdevicestatus(self, deviceid):
         """Return the list of device statuses for the bridge's lights."""
         status_list = self.bridge.GetDeviceStatus(DeviceIDs=deviceid)
@@ -177,6 +199,35 @@ class LinkedDevice:
             colorx, colory = status['colorcontrol'][:2]
             colorx, colory = colorx / 65535.0, colory / 65535.0
             self.state['color_xy'] = colorx, colory
+
+    def subscription_update(self, state_event):
+        """Update the light values due to a subscription update event."""
+        device_id = state_event.find('DeviceID')
+        if device_id.get('available', 'YES').upper() == 'YES':
+            capability = state_event.findtext('CapabilityId')
+            value = state_event.findtext('Value')
+        else:
+            capability = CAPABILITY_NAME2ID.get('onoff')
+            value = ''  # Use an empty string to indicate an unreachable device
+
+        if capability is None or value is None:
+            return False
+        name = CAPABILITY_ID2NAME.get(capability, capability)
+        # Update only the capability/value pair that changed.
+        try:
+            index = self.capabilities.index(name)
+        except ValueError:
+            # Should't receive updates for capabilities that were not
+            # originally present.
+            return False
+        else:
+            self._values[index] = value
+
+        # Don't call the subclass. It expects to have a list of all the
+        # capability/value pairs. The subscription_update only receives a
+        # single capability/value pair.
+        LinkedDevice.update_state(self, {})
+        return True
 
     def _setdevicestatus(self, **kwargs):
         """Ask the bridge to set the device status."""
