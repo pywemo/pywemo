@@ -35,9 +35,6 @@ class CrockPot(Switch):
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
 
-    def __repr__(self):
-        return '<WeMo CrockPot "{name}">'.format(name=self.name)
-
     def update_attributes(self):
         """
         Request state from device
@@ -70,12 +67,6 @@ class CrockPot(Switch):
             return True
 
         return Switch.subscription_update(self, _type, _params)
-
-
-    @property
-    def device_type(self):
-        """Return what kind of WeMo this device is."""
-        return "SlowCooker"
 
     @property
     def mode(self):
