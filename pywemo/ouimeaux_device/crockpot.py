@@ -24,7 +24,7 @@ class CrockPotMode(IntEnum):
     High = 52
 
 MODE_NAMES = {
-    CrockPotMode.Off: "Off",
+    CrockPotMode.Off: "Turned Off",
     CrockPotMode.Warm: "Warm",
     CrockPotMode.Low: "Low",
     CrockPotMode.High: "High",
@@ -74,7 +74,7 @@ class CrockPot(Switch):
 
     @property
     def mode_string(self):
-        return MODE_NAMES.get(self._state, "Unknown")
+        return MODE_NAMES.get(int(self.mode), "Unknown")
 
     @property
     def remaining_time(self):
@@ -90,11 +90,11 @@ class CrockPot(Switch):
         """
         # The base implementation using GetBinaryState doesn't work for CrockPot (always returns 0)
         # so use mode instead.
-        if force_update or self._state is None:
+        if force_update or self.mode is None:
             self.update_attributes()
 
         # Consider the CrockPot to be "on" if it's currently set to "Warm" or higher
-        return int(self._state >= CrockPotMode.Warm)
+        return int(int(self.mode) >= CrockPotMode.Warm)
 
     def set_state(self, state):
         """
