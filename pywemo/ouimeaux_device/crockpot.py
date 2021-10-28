@@ -1,6 +1,4 @@
 """Representation of a WeMo CrockPot device."""
-import sys
-
 from lxml import etree as et
 
 from pywemo.ouimeaux_device.api.xsd.device import quote_xml
@@ -27,6 +25,7 @@ MODE_NAMES = {
 
 class CrockPot(Switch):
     def __init__(self, *args, **kwargs):
+        """Create a WeMo CrockPot device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
 
@@ -40,8 +39,6 @@ class CrockPot(Switch):
         if stateAttributes is not None and stateAttributes["mode"] is not None and stateAttributes["time"] is not None and stateAttributes["cookedTime"] is not None:
             self._attributes = stateAttributes
             self._state = self.mode
-
-        logging.getLogger(__name__).info("Updated CrockPot attributes: " + str(self._attributes))
 
     def subscription_update(self, _type, _params):
         """
@@ -65,18 +62,22 @@ class CrockPot(Switch):
 
     @property
     def mode(self) -> int:
+        """Return the mode of the device."""
         return int(self._attributes.get('mode'))
 
     @property
     def mode_string(self) -> str:
+        """Return the mode of the device as a string."""
         return MODE_NAMES.get(self.mode, "Unknown")
 
     @property
     def remaining_time(self) -> int:
+        """Return the remaining time in minutes."""
         return int(self._attributes.get('time'))
 
     @property
     def cooked_time(self) -> int:
+        """Return the cooked time in minutes."""
         return int(self._attributes.get('cookedTime'))
 
     def get_state(self, force_update=False):
@@ -88,8 +89,7 @@ class CrockPot(Switch):
         if force_update or self.mode is None:
             self.update_attributes()
 
-        # Consider the CrockPot to be "on" if it's currently set to "Warm" or higher
-        return int(int(self.mode) >= CrockPotMode.Warm)
+        return int(self.mode != CrockPotMode.Off)
 
     def set_state(self, state):
         """
