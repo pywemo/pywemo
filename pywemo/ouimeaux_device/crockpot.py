@@ -8,25 +8,20 @@ from pywemo.ouimeaux_device.api.xsd.device import quote_xml
 from .switch import Switch
 import logging
 
-if sys.version_info[0] < 3:
-    class IntEnum:
-        """Enum class."""
-        pass
-else:
-    from enum import IntEnum
+from enum import IntEnum
 
 # These enums were derived from the CrockPot.basicevent.GetCrockpotState() service call
 # Thus these names/values were not chosen randomly and the numbers have meaning.
 class CrockPotMode(IntEnum):
-    Off = 0 
+    Off  = 0 
     Warm = 50
-    Low = 51
+    Low  = 51
     High = 52
 
 MODE_NAMES = {
-    CrockPotMode.Off: "Turned Off",
+    CrockPotMode.Off:  "Turned Off",
     CrockPotMode.Warm: "Warm",
-    CrockPotMode.Low: "Low",
+    CrockPotMode.Low:  "Low",
     CrockPotMode.High: "High",
 }
 
@@ -44,7 +39,7 @@ class CrockPot(Switch):
         # Only update our state on complete updates from the device
         if stateAttributes is not None and stateAttributes["mode"] is not None and stateAttributes["time"] is not None and stateAttributes["cookedTime"] is not None:
             self._attributes = stateAttributes
-            self._state = int(self.mode)
+            self._state = self.mode
 
         logging.getLogger(__name__).info("Updated CrockPot attributes: " + str(self._attributes))
 
@@ -57,7 +52,7 @@ class CrockPot(Switch):
 
         if _type == "mode":
             self._attributes['mode'] = str(_params)
-            self._state = int(self.mode)
+            self._state = self.mode
             return True
         elif _type == "time":
             self._attributes['time'] = str(_params)
@@ -69,20 +64,20 @@ class CrockPot(Switch):
         return Switch.subscription_update(self, _type, _params)
 
     @property
-    def mode(self):
-        return self._attributes.get('mode')
+    def mode(self) -> int:
+        return int(self._attributes.get('mode'))
 
     @property
-    def mode_string(self):
-        return MODE_NAMES.get(int(self.mode), "Unknown")
+    def mode_string(self) -> str:
+        return MODE_NAMES.get(self.mode, "Unknown")
 
     @property
-    def remaining_time(self):
-        return self._attributes.get('time')
+    def remaining_time(self) -> int:
+        return int(self._attributes.get('time'))
 
     @property
-    def cooked_time(self):
-        return self._attributes.get('cookedTime')
+    def cooked_time(self) -> int:
+        return int(self._attributes.get('cookedTime'))
 
     def get_state(self, force_update=False):
         """
@@ -102,9 +97,9 @@ class CrockPot(Switch):
         """
 
         if state:
-            self.basicevent.SetCrockpotState(mode=str(int(CrockPotMode.High)), time=self._attributes.get('time'))
+            self.basicevent.SetCrockpotState(mode=str(CrockPotMode.High), time=self._attributes.get('time'))
         else:
-            self.basicevent.SetCrockpotState(mode=str(int(CrockPotMode.Off)), time=self._attributes.get('time'))
+            self.basicevent.SetCrockpotState(mode=str(CrockPotMode.Off), time=self._attributes.get('time'))
 
         # The CrockPot might not be ready - so it's not safe to assume the state is what you just set
         # so re-read it from the device
