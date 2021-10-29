@@ -95,18 +95,17 @@ class CrockPot(Switch):
         """
         Set the state of this device to on or off.
         """
-
         if state:
-            self.basicevent.SetCrockpotState(mode=str(CrockPotMode.High), time=self._attributes.get('time'))
+            self.update_settings(CrockPotMode.High, int(self._attributes.get('time')))
         else:
-            self.basicevent.SetCrockpotState(mode=str(CrockPotMode.Off), time=self._attributes.get('time'))
+            self.update_settings(CrockPotMode.Off, 0)
+    
+    def update_settings(self, mode : CrockPotMode, time : int):
+        """
+        Update mode and cooking time
+        """
+        self.basicevent.SetCrockpotState(mode=str(int(mode)), time=str(time))
 
         # The CrockPot might not be ready - so it's not safe to assume the state is what you just set
         # so re-read it from the device
         self.get_state(True)
-    
-    def update_settings(self, mode, time):
-        """
-        Update mode and cooking time
-        """
-        self.basicevent.SetCrockpotState(mode=str(mode), time=str(time))
