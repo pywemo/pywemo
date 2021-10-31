@@ -1,27 +1,29 @@
 """Representation of a WeMo CrockPot device."""
-from lxml import etree as et
+import logging
+from enum import IntEnum
 
+from lxml import etree as et
 from pywemo.ouimeaux_device.api.xsd.device import quote_xml
 
 from .switch import Switch
-import logging
 
-from enum import IntEnum
 
 # These enums were derived from the CrockPot.basicevent.GetCrockpotState() service call
 # Thus these names/values were not chosen randomly and the numbers have meaning.
 class CrockPotMode(IntEnum):
-    Off  = 0 
+    Off = 0
     Warm = 50
-    Low  = 51
+    Low = 51
     High = 52
 
+
 MODE_NAMES = {
-    CrockPotMode.Off:  "Turned Off",
+    CrockPotMode.Off: "Turned Off",
     CrockPotMode.Warm: "Warm",
-    CrockPotMode.Low:  "Low",
+    CrockPotMode.Low: "Low",
     CrockPotMode.High: "High",
 }
+
 
 class CrockPot(Switch):
     def __init__(self, *args, **kwargs):
@@ -36,7 +38,12 @@ class CrockPot(Switch):
         stateAttributes = self.basicevent.GetCrockpotState()
 
         # Only update our state on complete updates from the device
-        if stateAttributes is not None and stateAttributes["mode"] is not None and stateAttributes["time"] is not None and stateAttributes["cookedTime"] is not None:
+        if (
+            stateAttributes is not None
+            and stateAttributes["mode"] is not None
+            and stateAttributes["time"] is not None
+            and stateAttributes["cookedTime"] is not None
+        ):
             self._attributes = stateAttributes
             self._state = self.mode
 
@@ -96,11 +103,13 @@ class CrockPot(Switch):
         Set the state of this device to on or off.
         """
         if state:
-            self.update_settings(CrockPotMode.High, int(self._attributes.get('time')))
+            self.update_settings(
+                CrockPotMode.High, int(self._attributes.get('time'))
+            )
         else:
             self.update_settings(CrockPotMode.Off, 0)
-    
-    def update_settings(self, mode : CrockPotMode, time : int):
+
+    def update_settings(self, mode: CrockPotMode, time: int):
         """
         Update mode and cooking time
         """
