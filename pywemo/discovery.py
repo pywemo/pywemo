@@ -13,6 +13,7 @@ from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
 from .ouimeaux_device.api.xsd import device as deviceParser
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
+from .ouimeaux_device.crockpot import CrockPot
 from .ouimeaux_device.dimmer import Dimmer
 from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.insight import Insight
@@ -87,6 +88,8 @@ def device_from_uuid_and_location(uuid, location, debug=False):
         return Bridge(location)
     if uuid.startswith('uuid:CoffeeMaker'):
         return CoffeeMaker(location)
+    if uuid.startswith('uuid:Crockpot'):
+        return CrockPot(location)
     if uuid.startswith('uuid:Humidifier'):
         return Humidifier(location)
     if uuid.startswith('uuid:OutdoorPlug'):
