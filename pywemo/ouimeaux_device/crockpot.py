@@ -1,16 +1,15 @@
 """Representation of a WeMo CrockPot device."""
-import logging
 from enum import IntEnum
-
-from lxml import etree as et
-from pywemo.ouimeaux_device.api.xsd.device import quote_xml
 
 from .switch import Switch
 
 
-# These enums were derived from the CrockPot.basicevent.GetCrockpotState() service call
-# Thus these names/values were not chosen randomly and the numbers have meaning.
+# These enums were derived from the CrockPot.basicevent.GetCrockpotState()
+# service call. Thus these names/values were not chosen randomly and the
+# numbers have meaning.
 class CrockPotMode(IntEnum):
+    """Modes for the CrockPot."""
+
     Off = 0
     Warm = 50
     Low = 51
@@ -26,31 +25,29 @@ MODE_NAMES = {
 
 
 class CrockPot(Switch):
+    """WeMo Crockpot."""
+
     def __init__(self, *args, **kwargs):
         """Create a WeMo CrockPot device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
 
     def update_attributes(self):
-        """
-        Request state from device
-        """
-        stateAttributes = self.basicevent.GetCrockpotState()
+        """Request state from device."""
+        state_attributes = self.basicevent.GetCrockpotState()
 
         # Only update our state on complete updates from the device
         if (
-            stateAttributes is not None
-            and stateAttributes["mode"] is not None
-            and stateAttributes["time"] is not None
-            and stateAttributes["cookedTime"] is not None
+            state_attributes is not None
+            and state_attributes["mode"] is not None
+            and state_attributes["time"] is not None
+            and state_attributes["cookedTime"] is not None
         ):
-            self._attributes = stateAttributes
+            self._attributes = state_attributes
             self._state = self.mode
 
     def subscription_update(self, _type, _params):
-        """
-        Handle reports from device
-        """
+        """Handle reports from device."""
         if _params is None:
             return False
 
@@ -58,10 +55,10 @@ class CrockPot(Switch):
             self._attributes['mode'] = str(_params)
             self._state = self.mode
             return True
-        elif _type == "time":
+        if _type == "time":
             self._attributes['time'] = str(_params)
             return True
-        elif _type == "cookedTime":
+        if _type == "cookedTime":
             self._attributes['cookedTime'] = str(_params)
             return True
 
@@ -88,20 +85,16 @@ class CrockPot(Switch):
         return int(self._attributes.get('cookedTime'))
 
     def get_state(self, force_update=False):
-        """
-        Returns 0 if off and 1 if on.
-        """
-        # The base implementation using GetBinaryState doesn't work for CrockPot (always returns 0)
-        # so use mode instead.
+        """Return 0 if off and 1 if on."""
+        # The base implementation using GetBinaryState doesn't work for
+        # CrockPot (always returns 0) so use mode instead.
         if force_update or self.mode is None:
             self.update_attributes()
 
         return int(self.mode != CrockPotMode.Off)
 
     def set_state(self, state):
-        """
-        Set the state of this device to on or off.
-        """
+        """Set the state of this device to on or off."""
         if state:
             self.update_settings(
                 CrockPotMode.High, int(self._attributes.get('time'))
@@ -110,11 +103,9 @@ class CrockPot(Switch):
             self.update_settings(CrockPotMode.Off, 0)
 
     def update_settings(self, mode: CrockPotMode, time: int):
-        """
-        Update mode and cooking time
-        """
+        """Update mode and cooking time."""
         self.basicevent.SetCrockpotState(mode=str(int(mode)), time=str(time))
 
-        # The CrockPot might not be ready - so it's not safe to assume the state is what you just set
-        # so re-read it from the device
+        # The CrockPot might not be ready - so it's not safe to assume the
+        # state is what you just set so re-read it from the device.
         self.get_state(True)
