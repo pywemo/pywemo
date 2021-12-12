@@ -2,7 +2,7 @@
 
 import pytest
 
-from pywemo import Dimmer
+from pywemo import Dimmer, DimmerV1
 
 from .api.unit import long_press_helpers
 
@@ -49,6 +49,15 @@ class Test_PVT_OWRT_Dimmer_v1(Base, long_press_helpers.TestLongPress):
     @pytest.fixture
     def dimmer(self, vcr):
         with vcr.use_cassette('WeMo_WW_2.00.11453.PVT-OWRT-Dimmer'):
-            return Dimmer('http://192.168.1.100:49153/setup.xml')
+            return DimmerV1('http://192.168.1.100:49153/setup.xml')
 
     device = dimmer  # for TestLongPress
+
+
+class Test_PVT_RTOS_Dimmer_v2(Base):
+    """Tests for the WeMo Dimmer, hardware version v2."""
+
+    @pytest.fixture
+    def dimmer(self, vcr):
+        with vcr.use_cassette('WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2'):
+            return Dimmer('http://192.168.1.100:49153/setup.xml')
