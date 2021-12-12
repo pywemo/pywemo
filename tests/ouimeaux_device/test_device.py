@@ -214,6 +214,7 @@ class TestDevice:
         assert device.host == '192.168.1.100'
         assert device.port == 49158
         assert device._config.macAddress == 'XXXXXXXXXXXX'
+        assert device.firmware_version == 'WeMo_WW_2.00.11452.PVT-OWRT-SNSV2'
 
     def test_services(self, device):
         """Test device initialization."""
