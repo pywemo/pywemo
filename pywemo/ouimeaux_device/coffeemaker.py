@@ -1,22 +1,11 @@
 """Representation of a WeMo CoffeeMaker device."""
-import sys
+from enum import IntEnum
 
 from lxml import etree as et
 
 from pywemo.ouimeaux_device.api.xsd.device import quote_xml
 
 from .switch import Switch
-
-if sys.version_info[0] < 3:
-
-    class IntEnum:
-        """Enum class."""
-
-        pass
-
-
-else:
-    from enum import IntEnum
 
 
 # These enums were derived from the
