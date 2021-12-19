@@ -7,6 +7,7 @@ from lxml import etree as et
 
 from ..color import get_profiles, limit_to_gamut
 from . import Device
+from .api.service import RequiredService
 
 CAPABILITY_ID2NAME = dict(
     (
@@ -52,6 +53,21 @@ class Bridge(Device):
         ).format(
             name=self.name, lights=len(self.Lights), groups=len(self.Groups)
         )
+
+    @property
+    def _required_services(self):
+        return super()._required_services + [
+            RequiredService(name="basicevent", actions=["GetMacAddr"]),
+            RequiredService(
+                name="bridge",
+                actions=[
+                    "GetEndDevicesWithStatus",
+                    "GetEndDevices",
+                    "GetDeviceStatus",
+                    "SetDeviceStatus",
+                ],
+            ),
+        ]
 
     def bridge_update(self, force_update=True):
         """Get updated status information for the bridge and its lights."""

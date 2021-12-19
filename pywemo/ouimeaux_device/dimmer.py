@@ -1,5 +1,6 @@
 """Representation of a WeMo Dimmer device."""
 from .api.long_press import LongPressMixin
+from .api.service import RequiredService
 from .switch import Switch
 
 
@@ -10,6 +11,12 @@ class Dimmer(Switch):
         """Create a WeMo Dimmer device."""
         Switch.__init__(self, *args, **kwargs)
         self._brightness = None
+
+    @property
+    def _required_services(self):
+        return super()._required_services + [
+            RequiredService(name="basicevent", actions=["SetBinaryState"]),
+        ]
 
     def get_brightness(self, force_update=False):
         """Get brightness from device."""

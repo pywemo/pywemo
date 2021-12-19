@@ -12,6 +12,7 @@ from enum import Enum
 from typing import FrozenSet, Iterable, Optional
 
 from .rules_db import RuleDevicesRow, RulesDb, RulesRow, rules_db_from_device
+from .service import RequiredService, RequiredServicesMixin
 
 LOG = logging.getLogger(__name__)
 
@@ -83,8 +84,14 @@ def ensure_long_press_rule_exists(
     return new_rule
 
 
-class LongPressMixin:
+class LongPressMixin(RequiredServicesMixin):
     """Methods to make changes to the long press rules for a device."""
+
+    @property
+    def _required_services(self):
+        return super()._required_services + [
+            RequiredService(name="rules", actions=["FetchRules", "StoreRules"])
+        ]
 
     # pylint: disable=unsubscriptable-object
     # https://github.com/PyCQA/pylint/issues/3882#issuecomment-745148724

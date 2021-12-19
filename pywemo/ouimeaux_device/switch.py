@@ -1,9 +1,16 @@
 """Representation of a WeMo Switch device."""
 from . import Device
+from .api.service import RequiredService
 
 
 class Switch(Device):
     """Representation of a WeMo Switch device."""
+
+    @property
+    def _required_services(self):
+        return super()._required_services + [
+            RequiredService(name="basicevent", actions=["SetBinaryState"]),
+        ]
 
     def set_state(self, state):
         """Set the state of this device to on or off."""

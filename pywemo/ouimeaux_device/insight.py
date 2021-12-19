@@ -2,6 +2,7 @@
 import logging
 from datetime import datetime
 
+from .api.service import RequiredService
 from .switch import Switch
 
 LOG = logging.getLogger(__name__)
@@ -16,6 +17,12 @@ class Insight(Switch):
         self.insight_params = {}
 
         self.update_insight_params()
+
+    @property
+    def _required_services(self):
+        return super()._required_services + [
+            RequiredService(name="insight", actions=["GetInsightParams"]),
+        ]
 
     def update_insight_params(self):
         """Get and parse the device attributes."""

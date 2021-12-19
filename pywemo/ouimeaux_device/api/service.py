@@ -1,6 +1,11 @@
 """Representation of Services and Actions for WeMo devices."""
 # flake8: noqa E501
+from __future__ import annotations
+
 import logging
+from collections import defaultdict
+from dataclasses import dataclass
+from typing import List
 from urllib.parse import urljoin, urlparse
 
 import urllib3
@@ -10,6 +15,8 @@ from pywemo.exceptions import (
     ActionException,
     HTTPException,
     HTTPNotOkException,
+    InvalidSchemaError,
+    MissingServiceError,
     SOAPFault,
 )
 
@@ -156,7 +163,8 @@ class Session:
 
 
 def _is_output_arg(arg):
-    return arg.get_direction() and arg.get_direction().lower().strip() == 'out'
+    direction = arg.get_direction()
+    return isinstance(direction, str) and direction.lower().strip() == 'out'
 
 
 class Action:
@@ -174,6 +182,10 @@ class Action:
 
     def __init__(self, service, action_config):
         """Create an instance of an Action."""
+        if not action_config.get_name():
+            raise InvalidSchemaError(
+                f"action.name element is missing: {service.name}"
+            )
         self.service = service
         self._action_config = action_config
         self.name = action_config.get_name()
@@ -265,22 +277,40 @@ class Action:
 class Service:
     """Representation of a service for a WeMo device."""
 
+    _EXPECTED_ELEMENTS = (
+        "serviceType",
+        "serviceId",
+        "SCPDURL",
+        "controlURL",
+        "eventSubURL",
+    )
+
     def __init__(self, device, service):
         """Create an instance of a Service."""
+        for element in self._EXPECTED_ELEMENTS:
+            if not getattr(service, f"get_{element}")():
+                raise InvalidSchemaError(f"Missing service element: {element}")
         self.device = device
         self._config = service
         self.name = self.serviceType.split(':')[-2]
         self.actions = {}
 
-        xml = device.session.get(device.session.urljoin(service.get_SCPDURL()))
+        url = device.session.urljoin(service.get_SCPDURL())
+        xml = device.session.get(url)
 
-        self._svc_config = serviceParser.parseString(
-            xml.content, silence=True, print_warnings=False
-        ).actionList
-        for action in self._svc_config.get_action():
-            act = Action(self, action)
-            self.actions[act.name] = act
-            setattr(self, act.name, act)
+        try:
+            scpd = serviceParser.parseString(
+                xml.content, silence=True, print_warnings=False
+            )
+        except Exception as err:
+            LOG.debug("Received invalid schema: %r", xml.content)
+            raise InvalidSchemaError(f"Could not parse schema: {url}") from err
+
+        if scpd.get_actionList() and scpd.get_actionList().get_action():
+            for action in scpd.get_actionList().get_action():
+                act = Action(self, action)
+                self.actions[act.name] = act
+                setattr(self, act.name, act)
 
     @property
     def controlURL(self):
@@ -300,3 +330,43 @@ class Service:
     def __repr__(self):
         """Return a string representation of the Service."""
         return "<Service %s(%s)>" % (self.name, ", ".join(self.actions))
+
+
+@dataclass(frozen=True)
+class RequiredService:
+    """Specifies the service name and actions that are required for a class."""
+
+    name: str
+    actions: List[str]
+
+
+class RequiredServicesMixin:
+    """Provide and check for required services."""
+
+    _required_services: List[RequiredService] = []
+
+    def _check_required_services(self, services) -> None:
+        """Validates that all required services are found."""
+        all_services: dict[str, set[str]] = defaultdict(set)
+        for service in services:
+            all_services[service.name].update(service.actions)
+
+        missing_actions: dict[str, set[str]] = defaultdict(set)
+
+        for service in self._required_services:
+            if service.name not in all_services:
+                missing_actions[service.name].update(service.actions)
+                continue
+            service_actions = all_services[service.name]
+            for action in service.actions:
+                if action not in service_actions:
+                    missing_actions[service.name].add(action)
+
+        if missing_actions:
+            error_str = ", ".join(
+                f"{service}({', '.join(methods)})"
+                for service, methods in missing_actions.items()
+            )
+            raise MissingServiceError(
+                f"Missing required services/methods: {error_str}"
+            )

@@ -5,6 +5,7 @@ from lxml import etree as et
 
 from pywemo.ouimeaux_device.api.xsd.device import quote_xml
 
+from .api.service import RequiredService
 from .switch import Switch
 
 
@@ -66,6 +67,14 @@ class CoffeeMaker(Switch):
         """Create a WeMo CoffeeMaker device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
+
+    @property
+    def _required_services(self):
+        return super()._required_services + [
+            RequiredService(
+                name="deviceevent", actions=["GetAttributes", "SetAttributes"]
+            ),
+        ]
 
     def update_attributes(self):
         """Request state from device."""

@@ -80,3 +80,11 @@ class RulesDbError(Exception):
 
 class RulesDbQueryError(RulesDbError):
     """Exception when querying the rules database."""
+
+
+class InvalidSchemaError(PyWeMoException):
+    """Raised when an unexpected XML response is received."""
+
+
+class MissingServiceError(PyWeMoException):
+    """All required services were not found in the device schema."""

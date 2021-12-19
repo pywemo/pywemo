@@ -2,8 +2,9 @@
 import unittest.mock as mock
 
 import pytest
+import requests
 
-from pywemo import discovery, ssdp
+from pywemo import discovery, exceptions, ssdp
 
 
 @pytest.mark.parametrize(
@@ -40,12 +41,41 @@ def test_discover_devices(udn, wemo_class):
     assert devices == [mock_device]
 
 
+def test_discover_devices_empty():
+    mock_entry = mock.create_autospec(ssdp.UPNPEntry)
+    mock_entry.udn = "no matches"
+
+    with mock.patch("pywemo.discovery.ssdp") as mock_ssdp:
+        mock_ssdp.scan.return_value = [mock_entry]
+        devices = discovery.discover_devices()
+
+    assert devices == []
+
+
 def test_device_from_description(vcr):
     with vcr.use_cassette('WeMo_US_2.00.2769.PVT.yaml'):
         switch = discovery.device_from_description(
             "http://192.168.1.100:49153/setup.xml"
         )
     assert isinstance(switch, discovery.Switch)
+
+
+def test_device_from_description_returns_none():
+    with mock.patch("requests.get") as mock_get:
+        mock_get.side_effect = requests.HTTPError
+        assert (
+            discovery.device_from_description("http://127.0.0.1/setup.xml")
+            is None
+        )
+
+    with mock.patch("requests.get"), mock.patch(
+        "pywemo.discovery.parse_device_xsd"
+    ) as mock_parse:
+        mock_parse.side_effect = exceptions.InvalidSchemaError
+        assert (
+            discovery.device_from_description("http://127.0.0.1/setup.xml")
+            is None
+        )
 
 
 def test_device_from_uuid_and_location_returns_none():
@@ -62,6 +92,29 @@ def test_device_from_uuid_and_location_returns_none():
         )
         is None
     )
+
+    with mock.patch(
+        "pywemo.discovery.Switch", side_effect=exceptions.HTTPException
+    ):
+        assert (
+            discovery.device_from_uuid_and_location(
+                "uuid:Socket-1_0-SERIALNUMBER", "http://127.0.0.1/setup.xml"
+            )
+            is None
+        )
+
+    with mock.patch(
+        "pywemo.discovery.UnsupportedDevice",
+        side_effect=exceptions.HTTPException,
+    ):
+        assert (
+            discovery.device_from_uuid_and_location(
+                "uuid:Unsupported-1_0-SERIALNUMBER",
+                "http://127.0.0.1/setup.xml",
+                debug=True,
+            )
+            is None
+        )
 
 
 def test_device_from_uuid_and_location_returns_unsupported():
