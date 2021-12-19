@@ -60,12 +60,7 @@ class Bridge(Device):
             RequiredService(name="basicevent", actions=["GetMacAddr"]),
             RequiredService(
                 name="bridge",
-                actions=[
-                    "GetEndDevicesWithStatus",
-                    "GetEndDevices",
-                    "GetDeviceStatus",
-                    "SetDeviceStatus",
-                ],
+                actions=["GetDeviceStatus", "SetDeviceStatus"],
             ),
         ]
 
