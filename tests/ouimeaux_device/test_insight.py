@@ -5,7 +5,7 @@ import threading
 
 import pytest
 
-from pywemo import Insight
+from pywemo import Insight, StandbyState
 from pywemo.subscribe import EVENT_TYPE_BINARY_STATE, EVENT_TYPE_INSIGHT_PARAMS
 
 
@@ -33,18 +33,22 @@ class Test_Insight:
     def test_insight_params(self, insight):
         insight.update_insight_params()
         assert insight.today_kwh == pytest.approx(0.0194118)
+        assert insight.total_kwh == pytest.approx(1.6638418)
         assert insight.current_power == 0
+        assert insight.current_power_watts == 0.0
         assert insight.wifi_power == 8
         assert insight.threshold_power == 8000
+        assert insight.threshold_power_watts == pytest.approx(8.0)
         assert insight.today_on_time == 300
         assert insight.on_for == 231
+        assert insight.total_on_time == 183183
         assert insight.last_change.astimezone(datetime.timezone.utc) == (
             datetime.datetime(
                 2021, 1, 25, 0, 2, 4, tzinfo=datetime.timezone.utc
             )
         )
-        assert insight.today_standby_time == 300
-        assert insight.get_standby_state == 'off'
+        assert insight.today_on_time == 300
+        assert insight.get_standby_state == StandbyState.OFF
 
     @pytest.mark.vcr()
     def test_subscribe(self, insight, subscription_registry):
@@ -74,18 +78,22 @@ class Test_Insight:
             '8|1611105078|2607|0|12416|1209600|328|500|457600|69632638|9500',
         )
         assert insight.today_kwh == pytest.approx(0.0076266668)
+        assert insight.total_kwh == pytest.approx(1.1605439898)
         assert insight.current_power == 500
+        assert insight.current_power_watts == pytest.approx(0.5)
         assert insight.wifi_power == 328
         assert insight.threshold_power == 9500
+        assert insight.threshold_power_watts == pytest.approx(9.5)
         assert insight.today_on_time == 0
         assert insight.on_for == 2607
+        assert insight.total_on_time == 12416
         assert insight.last_change.astimezone(datetime.timezone.utc) == (
             datetime.datetime(
                 2021, 1, 20, 1, 11, 18, tzinfo=datetime.timezone.utc
             )
         )
-        assert insight.today_standby_time == 0
-        assert insight.get_standby_state == 'standby'
+        assert insight.today_on_time == 0
+        assert insight.get_standby_state == StandbyState.STANDBY
 
         subscription_registry.unregister(insight)
 
