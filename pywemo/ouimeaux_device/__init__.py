@@ -227,8 +227,13 @@ class Device:
             print(name)
             print('-' * len(name))
             for aname, action in svc.actions.items():
-                params = ', '.join(str(val) for val in action.args)
-                print("  %s(%s)" % (aname, params))
+                inputs = ', '.join(str(val) for val in action.args)
+                outputs = ', '.join(str(val) for val in action.returns)
+                if len(action.returns) > 1:
+                    outputs = '(' + outputs + ')'
+                if outputs:
+                    outputs = ' -> ' + outputs
+                print(f"  {aname}({inputs}){outputs}")
             print()
 
     def reset(self, data, wifi):

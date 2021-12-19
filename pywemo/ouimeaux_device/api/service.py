@@ -155,6 +155,10 @@ class Session:
         return self._host
 
 
+def _is_output_arg(arg):
+    return arg.get_direction() and arg.get_direction().lower().strip() == 'out'
+
+
 class Action:
     """Representation of an Action for a WeMo device."""
 
@@ -180,9 +184,19 @@ class Action:
         }
 
         self.args = []
+        self.returns = []
         arglist = action_config.get_argumentList()
         if arglist is not None:
-            self.args.extend(a.get_name() for a in arglist.get_argument())
+            self.args.extend(
+                a.get_name()
+                for a in arglist.get_argument()
+                if not _is_output_arg(a)
+            )
+            self.returns.extend(
+                a.get_name()
+                for a in arglist.get_argument()
+                if _is_output_arg(a)
+            )
 
     def __call__(self, *, pywemo_timeout=None, **kwargs):
         """Representations a method or function call."""
