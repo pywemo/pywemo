@@ -17,7 +17,7 @@ from pywemo.ouimeaux_device import (
     SetupException,
     ShortPassword,
     UnknownService,
-    parse_device_xsd,
+    parse_device_xml,
 )
 
 RESPONSE_SETUP = '''<?xml version="1.0"?>
@@ -518,15 +518,15 @@ class TestDevice:
             device.reconnect_with_device()
             url_mock.assert_not_called()
 
-    def test_parse_device_xsd_raises(self):
+    def test_parse_device_xml_raises(self):
         with pytest.raises(InvalidSchemaError, match="Could not parse schema"):
-            parse_device_xsd("invalid xml content")
+            parse_device_xml("invalid xml content")
 
         missing_device = RESPONSE_SETUP.replace("device>", "something>")
         with pytest.raises(
             InvalidSchemaError, match="Missing root.device element"
         ):
-            parse_device_xsd(missing_device.encode())
+            parse_device_xml(missing_device.encode())
 
         missing_deviceType = RESPONSE_SETUP.replace(
             "<deviceType>urn:Belkin:device:controllee:1</deviceType>", ""
@@ -534,7 +534,7 @@ class TestDevice:
         with pytest.raises(
             InvalidSchemaError, match="Missing device element: deviceType"
         ):
-            parse_device_xsd(missing_deviceType.encode())
+            parse_device_xml(missing_deviceType.encode())
 
         wrong_manufacturer = RESPONSE_SETUP.replace(
             "Belkin International Inc.", "pyWeMoTest"
@@ -542,4 +542,4 @@ class TestDevice:
         with pytest.raises(
             InvalidSchemaError, match="Unexpected manufacturer"
         ):
-            parse_device_xsd(wrong_manufacturer.encode())
+            parse_device_xml(wrong_manufacturer.encode())

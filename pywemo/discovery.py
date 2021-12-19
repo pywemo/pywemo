@@ -8,7 +8,7 @@ import requests
 
 from . import ssdp
 from .exceptions import PyWeMoException
-from .ouimeaux_device import UnsupportedDevice, parse_device_xsd, probe_wemo
+from .ouimeaux_device import UnsupportedDevice, parse_device_xml, probe_wemo
 from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
@@ -53,7 +53,7 @@ def device_from_description(description_url, mac='deprecated', debug=False):
         return None
 
     try:
-        parsed = parse_device_xsd(xml.content)
+        parsed = parse_device_xml(xml.content)
     except PyWeMoException:
         LOG.exception("Failed to parse description %s", description_url)
         return None

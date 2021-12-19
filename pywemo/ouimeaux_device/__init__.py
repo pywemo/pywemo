@@ -36,7 +36,7 @@ LOG = logging.getLogger(__name__)
 PROBE_PORTS = (49153, 49152, 49154, 49151, 49155, 49156, 49157, 49158, 49159)
 
 
-def parse_device_xsd(xml_content: bytes) -> deviceParser.root:
+def parse_device_xml(xml_content: bytes) -> deviceParser.root:
     """Parse setup.xml into a Python xsd object."""
     try:
         try:
@@ -86,7 +86,7 @@ def probe_wemo(
                 f'http://{host}:{port}/setup.xml', timeout=probe_timeout
             )
             try:
-                device = parse_device_xsd(response.content).device
+                device = parse_device_xml(response.content).device
             except InvalidSchemaError:
                 continue
             if match_udn and match_udn != device.get_UDN():
@@ -148,7 +148,7 @@ class Device(RequiredServicesMixin):
         self.session = Session(url)
 
         xml = self.session.get(url)
-        self._config = parse_device_xsd(xml.content).device
+        self._config = parse_device_xml(xml.content).device
 
         # The 'xs:any' values for the xs:complexType DeviceType in device.xsd.
         xs_any = (et.fromstring(extra) for extra in self._config.anytypeobjs_)

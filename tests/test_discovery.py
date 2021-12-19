@@ -69,7 +69,7 @@ def test_device_from_description_returns_none():
         )
 
     with mock.patch("requests.get"), mock.patch(
-        "pywemo.discovery.parse_device_xsd"
+        "pywemo.discovery.parse_device_xml"
     ) as mock_parse:
         mock_parse.side_effect = exceptions.InvalidSchemaError
         assert (
