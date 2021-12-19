@@ -62,7 +62,7 @@ def device_from_description(description_url, mac='deprecated', debug=False):
     return device_from_uuid_and_location(uuid, description_url, debug)
 
 
-def device_from_uuid_and_location(uuid, location, debug=False):
+def device_from_uuid_and_location(uuid, location, debug=False):  # noqa: C901
     """Determine device class based on the device uuid."""
     if not (uuid and location):
         return None
