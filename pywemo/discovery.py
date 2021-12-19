@@ -17,7 +17,7 @@ from .ouimeaux_device.crockpot import CrockPot
 from .ouimeaux_device.dimmer import Dimmer, DimmerV1
 from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.insight import Insight
-from .ouimeaux_device.lightswitch import LightSwitch
+from .ouimeaux_device.lightswitch import LightSwitch, LightSwitchLongPress
 from .ouimeaux_device.maker import Maker
 from .ouimeaux_device.motion import Motion
 from .ouimeaux_device.outdoor_plug import OutdoorPlug
@@ -74,6 +74,12 @@ def device_from_uuid_and_location(uuid, location, debug=False):
         return None
     if uuid.startswith('uuid:Socket'):
         return Switch(location)
+    if uuid.startswith('uuid:Lightswitch-1_0'):
+        return LightSwitchLongPress(location)
+    if uuid.startswith('uuid:Lightswitch-2_0'):
+        return LightSwitchLongPress(location)
+    if uuid.startswith('uuid:Lightswitch-3_0'):
+        return LightSwitchLongPress(location)
     if uuid.startswith('uuid:Lightswitch'):
         return LightSwitch(location)
     if uuid.startswith('uuid:Dimmer-1_0'):

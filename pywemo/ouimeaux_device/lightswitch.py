@@ -4,4 +4,8 @@ from .switch import Switch
 
 
 class LightSwitch(Switch, LongPressMixin):
-    """Representation of a WeMo Motion device."""
+    """Representation of a WeMo Light Switch device."""
+
+
+class LightSwitchLongPress(LightSwitch, LongPressMixin):
+    """WeMo Light Switch that supports long press notifications."""
