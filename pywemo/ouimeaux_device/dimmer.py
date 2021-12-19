@@ -3,7 +3,7 @@ from .api.long_press import LongPressMixin
 from .switch import Switch
 
 
-class Dimmer(Switch, LongPressMixin):
+class Dimmer(Switch):
     """Representation of a WeMo Dimmer device."""
 
     def __init__(self, *args, **kwargs):
@@ -48,3 +48,7 @@ class Dimmer(Switch, LongPressMixin):
                 return False
             return True
         return super().subscription_update(_type, _param)
+
+
+class DimmerV1(Dimmer, LongPressMixin):
+    """WeMo Dimmer device that supports long press."""
