@@ -69,3 +69,11 @@ class TestLongPress:
 
         device.remove_long_press_virtual_device()
         assert device.list_long_press_udns() == frozenset()
+
+    def test_required_services(self, device):
+        assert (
+            long_press.RequiredService(
+                name="rules", actions=["FetchRules", "StoreRules"]
+            )
+            in device._required_services
+        )

@@ -1,6 +1,7 @@
 """Representation of a WeMo CrockPot device."""
 from enum import IntEnum
 
+from .api.service import RequiredService
 from .switch import Switch
 
 
@@ -31,6 +32,15 @@ class CrockPot(Switch):
         """Create a WeMo CrockPot device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
+
+    @property
+    def _required_services(self):
+        return super()._required_services + [
+            RequiredService(
+                name="basicevent",
+                actions=["GetCrockpotState", "SetCrockpotState"],
+            ),
+        ]
 
     def update_attributes(self):
         """Request state from device."""

@@ -1,4 +1,5 @@
 """Base WeMo Device class."""
+from __future__ import annotations
 
 import base64
 import logging
@@ -13,19 +14,60 @@ from lxml import etree as et
 from ..exceptions import (
     ActionException,
     APNotFound,
+    InvalidSchemaError,
     ResetException,
     SetupException,
     ShortPassword,
     UnknownService,
 )
 from .api.long_press import LongPressMixin
-from .api.service import REQUESTS_TIMEOUT, Service, Session
+from .api.service import (
+    REQUESTS_TIMEOUT,
+    RequiredService,
+    RequiredServicesMixin,
+    Service,
+    Session,
+)
 from .api.xsd import device as deviceParser
 
 LOG = logging.getLogger(__name__)
 
 # Start with the most commonly used port
 PROBE_PORTS = (49153, 49152, 49154, 49151, 49155, 49156, 49157, 49158, 49159)
+
+
+def parse_device_xml(xml_content: bytes) -> deviceParser.root:
+    """Parse setup.xml into a Python xsd object."""
+    try:
+        try:
+            root = deviceParser.parseString(
+                xml_content, silence=True, print_warnings=False
+            )
+        except Exception as err:
+            raise InvalidSchemaError("Could not parse schema") from err
+
+        device = root.get_device()
+        if device is None:
+            raise InvalidSchemaError("Missing root.device element")
+        for required_element in (
+            "deviceType",
+            "friendlyName",
+            "manufacturer",
+            "modelName",
+            "UDN",
+        ):
+            if not getattr(device, f"get_{required_element}")():
+                raise InvalidSchemaError(
+                    f"Missing device element: {required_element}"
+                )
+        if device.get_manufacturer() != "Belkin International Inc.":
+            raise InvalidSchemaError(
+                f"Unexpected manufacturer: {device.get_manufacturer()}"
+            )
+    except InvalidSchemaError:
+        LOG.debug("Received invalid schema: %r", xml_content)
+        raise
+    return root
 
 
 def probe_wemo(
@@ -43,20 +85,18 @@ def probe_wemo(
             response = requests.get(
                 f'http://{host}:{port}/setup.xml', timeout=probe_timeout
             )
-            if not (('WeMo' in response.text) or ('Belkin' in response.text)):
+            try:
+                device = parse_device_xml(response.content).device
+            except InvalidSchemaError:
                 continue
-            if match_udn:
-                device = deviceParser.parseString(
-                    response.content, silence=True, print_warnings=False
-                ).device
-                if match_udn != device.get_UDN():
-                    LOG.error(
-                        'Reconnected to a different WeMo. '
-                        'Expected %s / Received %s',
-                        match_udn,
-                        device.get_UDN(),
-                    )
-                    continue
+            if match_udn and match_udn != device.get_UDN():
+                LOG.error(
+                    'Reconnected to a different WeMo. '
+                    'Expected %s / Received %s',
+                    match_udn,
+                    device.get_UDN(),
+                )
+                continue
             return port
         except requests.ConnectTimeout:
             # If we timed out connecting, then the wemo is gone,
@@ -91,10 +131,10 @@ def probe_device(device):
     return probe_wemo(device.host, ports, match_udn=device.udn)
 
 
-class Device:
+class Device(RequiredServicesMixin):
     """Base object for WeMo devices."""
 
-    def __init__(self, url, mac='deprecated'):
+    def __init__(self, url: str, mac: str = 'deprecated') -> None:
         """Create a WeMo device."""
         if mac != 'deprecated':
             warnings.warn(
@@ -106,10 +146,10 @@ class Device:
         self.basic_state_params = {}
         self._reconnect_lock = threading.Lock()
         self.session = Session(url)
+
         xml = self.session.get(url)
-        self._config = deviceParser.parseString(
-            xml.content, silence=True, print_warnings=False
-        ).device
+        self._config = parse_device_xml(xml.content).device
+
         # The 'xs:any' values for the xs:complexType DeviceType in device.xsd.
         xs_any = (et.fromstring(extra) for extra in self._config.anytypeobjs_)
         self._config_any = {
@@ -117,11 +157,20 @@ class Device:
             for tag in xs_any
             if tag.text and tag.text.strip()
         }
+
         self.services = {}
-        for svc in self._config.serviceList.service:
-            service = Service(self, svc)
-            self.services[service.name] = service
-            setattr(self, service.name, service)
+        if self._config.serviceList and self._config.serviceList.service:
+            for svc in self._config.serviceList.service:
+                service = Service(self, svc)
+                self.services[service.name] = service
+                setattr(self, service.name, service)
+        self._check_required_services(self.services.values())
+
+    @property
+    def _required_services(self):
+        return super()._required_services + [
+            RequiredService(name="basicevent", actions=["GetBinaryState"])
+        ]
 
     def _reconnect_with_device_by_discovery(self):
         """
@@ -663,12 +712,12 @@ class Device:
     @property
     def mac(self):
         """Return the mac address from the device description."""
-        return self._config.get_macAddress()
+        return self._config.get_macAddress() or ""
 
     @property
     def model(self):
         """Return the model description of the device."""
-        return self._config.get_modelDescription()
+        return self._config.get_modelDescription() or ""
 
     @property
     def model_name(self):
@@ -683,7 +732,7 @@ class Device:
     @property
     def serialnumber(self):
         """Return the serial number of the device."""
-        return self._config.get_serialNumber()
+        return self._config.get_serialNumber() or ""
 
     @property
     def udn(self) -> str:

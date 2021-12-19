@@ -3,6 +3,7 @@ from typing import Dict
 
 from lxml import etree as et
 
+from .api.service import RequiredService
 from .switch import Switch
 
 
@@ -43,6 +44,15 @@ class Maker(Switch):
         super().__init__(*args, **kwargs)
         self.maker_params = {}
         self.get_state(force_update=True)
+
+    @property
+    def _required_services(self):
+        return super()._required_services + [
+            RequiredService(name="basicevent", actions=["SetBinaryState"]),
+            RequiredService(
+                name="deviceevent", actions=["GetAttributes", "SetAttributes"]
+            ),
+        ]
 
     def update_maker_params(self):
         """Get and parse the device attributes."""
