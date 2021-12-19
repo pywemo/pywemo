@@ -2,7 +2,7 @@
 
 import pytest
 
-from pywemo import LightSwitch
+from pywemo.discovery import device_from_uuid_and_location
 
 from .api.unit import long_press_helpers
 
@@ -21,12 +21,43 @@ class Base:
         assert lightswitch.get_state(force_update=True) == 0
 
 
-class Test_PVT_OWRT_LS_v1(Base, long_press_helpers.TestLongPress):
-    """Tests for the WeMo LightSwitch, hardware version v1."""
+class Test_F7C030(Base, long_press_helpers.TestLongPress):
+    """Tests for the WeMo F7C030 LightSwitch."""
 
     @pytest.fixture
     def lightswitch(self, vcr):
         with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-LS'):
-            return LightSwitch('http://192.168.1.100:49153/setup.xml')
+            return device_from_uuid_and_location(
+                'uuid:Lightswitch-1_0-SERIALNUMBER',
+                'http://192.168.1.100:49153/setup.xml',
+            )
+
+    device = lightswitch  # for TestLongPress
+
+
+class Test_WLS040(Base, long_press_helpers.TestLongPress):
+    """Tests for the WeMo WLS040 LightSwitch."""
+
+    @pytest.fixture
+    def lightswitch(self, vcr):
+        with vcr.use_cassette('WeMo_WW_2.00.11563.PVT-OWRT-LIGHTV2-WLS040'):
+            return device_from_uuid_and_location(
+                'uuid:Lightswitch-2_0-SERIALNUMBER',
+                'http://192.168.1.100:49153/setup.xml',
+            )
+
+    device = lightswitch  # for TestLongPress
+
+
+class Test_WLS0403(Base, long_press_helpers.TestLongPress):
+    """Tests for the WeMo WLS0403 three-wey LightSwitch."""
+
+    @pytest.fixture
+    def lightswitch(self, vcr):
+        with vcr.use_cassette('WeMo_WW_2.00.11563.PVT-OWRT-LIGHTV2-WLS0403'):
+            return device_from_uuid_and_location(
+                'uuid:Lightswitch-3_0-SERIALNUMBER',
+                'http://192.168.1.100:49153/setup.xml',
+            )
 
     device = lightswitch  # for TestLongPress
