@@ -1,5 +1,6 @@
 """Representation of a WeMo Insight device."""
 import logging
+import warnings
 from datetime import datetime
 from enum import Enum
 
@@ -126,6 +127,22 @@ class Insight(Switch):
         return self.insight_params['ontoday']
 
     @property
+    def today_standby_time(self) -> int:
+        """Return how long the device has been in standby today."""
+        warnings.warn(
+            "The Insight.today_standby_time property should not be used and "
+            "will be removed in a future version of pyWeMo. Switch to using "
+            "the Insight.today_on_time property instead.",
+            DeprecationWarning,
+        )
+        return self.insight_params['ontoday']
+
+    @property
+    def total_on_time(self) -> int:
+        """Return the number of seconds the device has been on."""
+        return self.insight_params['ontotal']
+
+    @property
     def on_for(self) -> int:
         """Return the number of seconds the device was last on for."""
         return self.insight_params['onfor']
@@ -134,11 +151,6 @@ class Insight(Switch):
     def last_change(self) -> datetime:
         """Return the last change datetime."""
         return self.insight_params['lastchange']
-
-    @property
-    def total_on_time(self) -> int:
-        """Return the number of seconds the device has been on."""
-        return self.insight_params['ontotal']
 
     @property
     def get_standby_state(self) -> StandbyState:
