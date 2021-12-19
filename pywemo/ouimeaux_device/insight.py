@@ -1,11 +1,21 @@
 """Representation of a WeMo Insight device."""
 import logging
+import warnings
 from datetime import datetime
+from enum import Enum
 
 from .api.service import RequiredService
 from .switch import Switch
 
 LOG = logging.getLogger(__name__)
+
+
+class StandbyState(str, Enum):
+    """Standby state for the Insight device."""
+
+    ON = "on"
+    OFF = "off"
+    STANDBY = "standby"
 
 
 class Insight(Switch):
@@ -81,58 +91,83 @@ class Insight(Switch):
         return Switch.get_state(self, force_update)
 
     @property
-    def today_kwh(self):
-        """Return the kwh used today."""
-        return self.insight_params['todaymw'] * 1.6666667e-8
+    def today_kwh(self) -> float:
+        """Return the number of kWh consumed today."""
+        return float(self.insight_params['todaymw']) * 1.6666667e-8
 
     @property
-    def current_power(self):
+    def total_kwh(self) -> float:
+        """Return the total kWh consumed for the device."""
+        return float(self.insight_params['totalmw']) * 1.6666667e-8
+
+    @property
+    def current_power(self) -> int:
         """Return the current power usage in mW."""
         return self.insight_params['currentpower']
 
     @property
-    def wifi_power(self):
+    def current_power_watts(self) -> float:
+        """Return the current power usage in Watts."""
+        return float(self.current_power) / 1000.0
+
+    @property
+    def wifi_power(self) -> int:
         """Return the current rssi wifi signal."""
         return self.insight_params['wifipower']
 
     @property
-    def threshold_power(self):
-        """
-        Return the threshold power.
+    def threshold_power(self) -> int:
+        """Return the threshold power in mW.
 
         Above this the device is on, below it is standby.
         """
         return self.insight_params['powerthreshold']
 
     @property
-    def today_on_time(self):
-        """Return how long the device has been on today."""
+    def threshold_power_watts(self) -> float:
+        """Return the threshold power in watts."""
+        return float(self.threshold_power) / 1000.0
+
+    @property
+    def today_on_time(self) -> int:
+        """Return the number of seconds the device has been on today."""
         return self.insight_params['ontoday']
 
     @property
-    def on_for(self):
-        """Return how long the device has been on."""
+    def today_standby_time(self) -> int:
+        """Return how long the device has been in standby today."""
+        warnings.warn(
+            "The Insight.today_standby_time property should not be used and "
+            "will be removed in a future version of pyWeMo. Switch to using "
+            "the Insight.today_on_time property instead.",
+            DeprecationWarning,
+        )
+        return self.insight_params['ontoday']
+
+    @property
+    def total_on_time(self) -> int:
+        """Return the number of seconds the device has been on."""
+        return self.insight_params['ontotal']
+
+    @property
+    def on_for(self) -> int:
+        """Return the number of seconds the device was last on for."""
         return self.insight_params['onfor']
 
     @property
-    def last_change(self):
+    def last_change(self) -> datetime:
         """Return the last change datetime."""
         return self.insight_params['lastchange']
 
     @property
-    def today_standby_time(self):
-        """Return how long the device has been in standby today."""
-        return self.insight_params['ontoday']
-
-    @property
-    def get_standby_state(self):
+    def get_standby_state(self) -> StandbyState:
         """Return the standby state of the device."""
         state = self.insight_params['state']
 
         if state == '0':
-            return 'off'
+            return StandbyState.OFF
 
         if state == '1':
-            return 'on'
+            return StandbyState.ON
 
-        return 'standby'
+        return StandbyState.STANDBY
