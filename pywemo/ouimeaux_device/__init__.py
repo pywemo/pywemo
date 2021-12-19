@@ -690,6 +690,11 @@ class Device:
         """Return what kind of WeMo this device is."""
         return type(self).__name__
 
+    @property
+    def firmware_version(self) -> str:
+        """Return the device's firmware version."""
+        return self._config_any.get('firmwareVersion', '')
+
     def __repr__(self) -> str:
         """Return a string representation of the device."""
         return f'<WeMo {self.device_type} "{self.name}">'
