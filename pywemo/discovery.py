@@ -3,11 +3,16 @@ import logging
 import warnings
 from ipaddress import ip_address
 from socket import gaierror, gethostbyname
+from typing import Any
 
 import requests
 
 from . import ssdp
-from .exceptions import PyWeMoException
+from .exceptions import (
+    InvalidSchemaError,
+    MissingServiceError,
+    PyWeMoException,
+)
 from .ouimeaux_device import UnsupportedDevice, parse_device_xml, probe_wemo
 from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
 from .ouimeaux_device.bridge import Bridge
@@ -23,6 +28,17 @@ from .ouimeaux_device.outdoor_plug import OutdoorPlug
 from .ouimeaux_device.switch import Switch
 
 LOG = logging.getLogger(__name__)
+_uuid_seen = set()  # See _call_once_per_uuid.
+
+
+def _call_once_per_uuid(
+    uuid: str, method: callable, *args: Any, **kwargs: Any
+) -> None:
+    key = (uuid, method)
+    if key in _uuid_seen:
+        return
+    _uuid_seen.add(key)
+    method(*args, *kwargs)
 
 
 def discover_devices(debug=False, **kwargs):
@@ -97,8 +113,20 @@ def device_from_uuid_and_location(uuid, location, debug=False):  # noqa: C901
             return Humidifier(location)
         if uuid.startswith('uuid:OutdoorPlug'):
             return OutdoorPlug(location)
+    except (InvalidSchemaError, MissingServiceError) as err:
+        _call_once_per_uuid(
+            uuid,
+            LOG.info,
+            "pyWeMo encountered a non-WeMo device %s %s: %r",
+            uuid,
+            location,
+            err,
+        )
+        # Fall-through: Try UnsupportedDevice if debug is enabled.
     except PyWeMoException:
-        LOG.exception("Device setup failed %s %s", uuid, location)
+        _call_once_per_uuid(
+            uuid, LOG.exception, "Device setup failed %s %s", uuid, location
+        )
         # Fall-through: Try UnsupportedDevice if debug is enabled.
 
     if uuid.startswith('uuid:') and debug:
