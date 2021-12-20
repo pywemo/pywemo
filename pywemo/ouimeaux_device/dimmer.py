@@ -57,5 +57,5 @@ class Dimmer(Switch):
         return super().subscription_update(_type, _param)
 
 
-class DimmerV1(Dimmer, LongPressMixin):
+class DimmerLongPress(Dimmer, LongPressMixin):
     """WeMo Dimmer device that supports long press."""

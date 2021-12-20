@@ -15,7 +15,7 @@ from pywemo import discovery, exceptions, ssdp
         ("uuid:Lightswitch-3_0-SERIALNUMBER", discovery.LightSwitchLongPress),
         ("uuid:Lightswitch-3_0-SERIALNUMBER", discovery.LightSwitchLongPress),
         ("uuid:Lightswitch-9_0-SERIALNUMBER", discovery.LightSwitch),
-        ("uuid:Dimmer-1_0-SERIALNUMBER", discovery.DimmerV1),
+        ("uuid:Dimmer-1_0-SERIALNUMBER", discovery.DimmerLongPress),
         ("uuid:Dimmer-2_0-SERIALNUMBER", discovery.Dimmer),
         ("uuid:Insight-1_0-SERIALNUMBER", discovery.Insight),
         ("uuid:Sensor-1_0-SERIALNUMBER", discovery.Motion),
