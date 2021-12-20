@@ -130,3 +130,28 @@ def test_device_from_uuid_and_location_returns_unsupported():
             )
             == unsupported
         )
+
+
+def test_call_once_per_uuid():
+    call_count = 0
+
+    def increment_call_count():
+        nonlocal call_count
+        call_count += 1
+
+    def decrement_call_count():
+        nonlocal call_count
+        call_count -= 1
+
+    for uuid in ("a_uuid", "b_uuid"):
+        discovery._call_once_per_uuid(uuid, increment_call_count)
+        assert call_count == 1
+
+        discovery._call_once_per_uuid(uuid, decrement_call_count)
+        assert call_count == 0
+
+        discovery._call_once_per_uuid(uuid, increment_call_count)
+        assert call_count == 0
+
+        discovery._call_once_per_uuid(uuid, decrement_call_count)
+        assert call_count == 0
