@@ -104,6 +104,16 @@ def test_device_from_uuid_and_location_returns_none():
         )
 
     with mock.patch(
+        "pywemo.discovery.Switch", side_effect=exceptions.InvalidSchemaError
+    ):
+        assert (
+            discovery.device_from_uuid_and_location(
+                "uuid:Socket-1_0-SERIALNUMBER", "http://127.0.0.1/setup.xml"
+            )
+            is None
+        )
+
+    with mock.patch(
         "pywemo.discovery.UnsupportedDevice",
         side_effect=exceptions.HTTPException,
     ):
