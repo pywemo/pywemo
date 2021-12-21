@@ -5,17 +5,19 @@ import socket
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Any, cast
 
 import ifaddr
+from lxml import etree as et
 
 
 # Taken from http://stackoverflow.com/a/10077069
-def etree_to_dict(tree):
+def etree_to_dict(tree: et.Element) -> dict[str, Any]:
     """Split a tree into a dict."""
     # strip namespace
     tag_name = tree.tag[tree.tag.find("}") + 1 :]
 
-    tree_dict = {tag_name: {} if tree.attrib else None}
+    tree_dict: dict[str, Any] = {tag_name: {} if tree.attrib else None}
     children = list(tree)
     if children:
         default_dict = defaultdict(list)
@@ -42,7 +44,7 @@ def etree_to_dict(tree):
     return tree_dict
 
 
-def interface_addresses():
+def interface_addresses() -> list[str]:
     """
     Return local address for broadcast/multicast.
 
@@ -61,12 +63,12 @@ def interface_addresses():
     return addresses
 
 
-def get_ip_address(host='1.2.3.4'):
+def get_ip_address(host: str = '1.2.3.4') -> str | None:
     """Return IP from hostname or IP."""
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         sock.connect((host, 9))
-        return sock.getsockname()[0]
+        return cast(str, sock.getsockname()[0])
     except OSError:
         return None
     finally:
