@@ -48,7 +48,7 @@ class Test_Insight:
             )
         )
         assert insight.today_on_time == 300
-        assert insight.get_standby_state == StandbyState.OFF
+        assert insight.standby_state == StandbyState.OFF
 
     @pytest.mark.vcr()
     def test_subscribe(self, insight, subscription_registry):
@@ -93,7 +93,7 @@ class Test_Insight:
             )
         )
         assert insight.today_on_time == 0
-        assert insight.get_standby_state == StandbyState.STANDBY
+        assert insight.standby_state == StandbyState.STANDBY
 
         subscription_registry.unregister(insight)
 
