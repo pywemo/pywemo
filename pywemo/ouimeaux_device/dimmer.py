@@ -7,6 +7,8 @@ from .switch import Switch
 class Dimmer(Switch):
     """Representation of a WeMo Dimmer device."""
 
+    EVENT_TYPE_BRIGHTNESS = "Brightness"
+
     def __init__(self, *args, **kwargs):
         """Create a WeMo Dimmer device."""
         Switch.__init__(self, *args, **kwargs)
@@ -48,7 +50,7 @@ class Dimmer(Switch):
 
     def subscription_update(self, _type, _param):
         """Update the dimmer attributes due to a subscription update event."""
-        if _type == "Brightness":
+        if _type == self.EVENT_TYPE_BRIGHTNESS:
             try:
                 self._brightness = int(_param)
             except ValueError:

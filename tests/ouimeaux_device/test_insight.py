@@ -6,7 +6,6 @@ import threading
 import pytest
 
 from pywemo import Insight, StandbyState
-from pywemo.subscribe import EVENT_TYPE_BINARY_STATE, EVENT_TYPE_INSIGHT_PARAMS
 
 
 class Test_Insight:
@@ -67,14 +66,14 @@ class Test_Insight:
 
         subscription_registry.event(
             insight,
-            EVENT_TYPE_BINARY_STATE,
+            Insight.EVENT_TYPE_BINARY_STATE,
             '1',
         )
         assert insight.get_state() == 1
 
         subscription_registry.event(
             insight,
-            EVENT_TYPE_INSIGHT_PARAMS,
+            Insight.EVENT_TYPE_INSIGHT_PARAMS,
             '8|1611105078|2607|0|12416|1209600|328|500|457600|69632638|9500',
         )
         assert insight.today_kwh == pytest.approx(0.0076266668)

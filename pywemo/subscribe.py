@@ -14,14 +14,9 @@ from lxml import etree as et
 
 from .exceptions import SubscriptionRegistryFailed
 from .ouimeaux_device import Device
-from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
+from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN, LongPressMixin
 from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
 from .util import get_ip_address
-
-# Subscription event types.
-EVENT_TYPE_BINARY_STATE = "BinaryState"
-EVENT_TYPE_INSIGHT_PARAMS = "InsightParams"
-EVENT_TYPE_LONG_PRESS = "LongPress"
 
 LOG = logging.getLogger(__name__)
 NS = "{urn:schemas-upnp-org:event-1-0}"
@@ -350,7 +345,9 @@ class RequestHandler(BaseHTTPRequestHandler):
                 binary_state = doc.find('.//BinaryState')
                 if binary_state is not None:
                     text = binary_state.text
-                    outer.event(device, EVENT_TYPE_LONG_PRESS, text)
+                    outer.event(
+                        device, LongPressMixin.EVENT_TYPE_LONG_PRESS, text
+                    )
             self._send_response(200, RESPONSE_SUCCESS)
         else:
             self._send_response(404, RESPONSE_NOT_FOUND)

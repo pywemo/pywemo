@@ -8,7 +8,14 @@ from http.server import HTTPServer
 import pytest
 import requests
 
-from pywemo import Bridge, Insight, LightSwitch, subscribe
+from pywemo import (
+    Bridge,
+    Insight,
+    LightSwitch,
+    LongPressMixin,
+    WeMoDevice,
+    subscribe,
+)
 
 
 @pytest.fixture
@@ -104,7 +111,7 @@ class Test_RequestHandler:
         assert response.content == subscribe.RESPONSE_SUCCESS.encode("UTF-8")
         outer.event.assert_called_once_with(
             mock_light_switch,
-            subscribe.EVENT_TYPE_BINARY_STATE,
+            WeMoDevice.EVENT_TYPE_BINARY_STATE,
             '0',
             path='/path',
         )
@@ -145,7 +152,7 @@ class Test_RequestHandler:
         assert response.status_code == 200
         assert response.content == subscribe.RESPONSE_SUCCESS.encode("UTF-8")
         outer.event.assert_called_once_with(
-            mock_light_switch, subscribe.EVENT_TYPE_LONG_PRESS, '0'
+            mock_light_switch, LongPressMixin.EVENT_TYPE_LONG_PRESS, '0'
         )
 
     def test_POST_default_404(self, server_url):
