@@ -13,6 +13,7 @@ from .switch import Switch
 class FanMode(IntEnum):
     """Enum to map WeMo FanModes to human-readable strings."""
 
+    # pylint: disable=invalid-name
     Off = 0  # Fan and device turned off
     Minimum = 1
     Low = 2
@@ -34,6 +35,7 @@ FAN_MODE_NAMES = {
 class DesiredHumidity(IntEnum):
     """Enum to map WeMo DesiredHumidity to human-readable strings."""
 
+    # pylint: disable=invalid-name
     FortyFivePercent = 0
     FiftyPercent = 1
     FiftyFivePercent = 2
@@ -53,6 +55,7 @@ DESIRED_HUMIDITY_NAMES = {
 class WaterLevel(IntEnum):
     """Enum to map WeMo WaterLevel to human-readable strings."""
 
+    # pylint: disable=invalid-name
     Empty = 0
     Low = 1
     Good = 2

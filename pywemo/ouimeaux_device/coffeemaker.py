@@ -16,6 +16,7 @@ from .switch import Switch
 class CoffeeMakerMode(IntEnum):
     """Enum to map WeMo modes to human-readable strings."""
 
+    # pylint: disable=invalid-name
     Refill = 0  # reservoir empty and carafe not in place
     PlaceCarafe = 1  # reservoir has water but carafe not present
     RefillWater = 2  # carafe present but reservoir is empty

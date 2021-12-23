@@ -186,4 +186,4 @@ def setup_url_for_address(host, port=None):
     if not port:
         return None
 
-    return "http://%s:%s/setup.xml" % (host, port)
+    return f"http://{host}:{port}/setup.xml"

@@ -11,6 +11,7 @@ from .switch import Switch
 class CrockPotMode(IntEnum):
     """Modes for the CrockPot."""
 
+    # pylint: disable=invalid-name
     Off = 0
     Warm = 50
     Low = 51

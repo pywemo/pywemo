@@ -1,5 +1,5 @@
 """Representation of a WeMo Maker device."""
-from typing import Dict
+from __future__ import annotations
 
 from lxml import etree as et
 
@@ -7,7 +7,7 @@ from .api.service import RequiredService
 from .switch import Switch
 
 
-def attribute_xml_to_dict(xml_blob) -> Dict[str, int]:
+def attribute_xml_to_dict(xml_blob) -> dict[str, int]:
     """Return attribute values as a dict of key value pairs."""
     xml_blob = "<attributes>" + xml_blob + "</attributes>"
     xml_blob = xml_blob.replace("&gt;", ">")

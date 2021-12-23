@@ -208,6 +208,7 @@ class Device(RequiredServicesMixin):
     def reconnect_with_device(self):
         """Re-probe & scan network to rediscover a disconnected device."""
         # Avoid retrying from multiple threads
+        # pylint: disable=consider-using-with
         if not self._reconnect_lock.acquire(blocking=False):
             return
         try:
