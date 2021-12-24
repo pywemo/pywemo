@@ -160,7 +160,7 @@ class Insight(Switch):
         return self.insight_params['lastchange']
 
     @property
-    def get_standby_state(self) -> StandbyState:
+    def standby_state(self) -> StandbyState:
         """Return the standby state of the device."""
         state = self.insight_params['state']
 
@@ -171,3 +171,14 @@ class Insight(Switch):
             return StandbyState.ON
 
         return StandbyState.STANDBY
+
+    @property
+    def get_standby_state(self) -> StandbyState:
+        """Return the standby state of the device."""
+        warnings.warn(
+            "The Insight.get_standby_state property should not be used and "
+            "will be removed in a future version of pyWeMo. Switch to using "
+            "the Insight.standby_state property instead.",
+            DeprecationWarning,
+        )
+        return self.standby_state
