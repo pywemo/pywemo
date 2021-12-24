@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import List
+from typing import TYPE_CHECKING, List
 from urllib.parse import urljoin, urlparse
 
 import urllib3
@@ -19,7 +19,10 @@ from pywemo.exceptions import (
     SOAPFault,
 )
 
-from .xsd import service as serviceParser
+from .xsd_types import ActionProperties, ServiceDescription, ServiceProperties
+
+if TYPE_CHECKING:
+    from .. import Device
 
 LOG = logging.getLogger(__name__)
 REQUESTS_TIMEOUT = 10
@@ -33,7 +36,7 @@ REQUEST_TEMPLATE = """
 </u:{action}>
 </s:Body>
 </s:Envelope>
-"""  # noqa E501
+"""  # noqa: E501
 
 
 class Session:
@@ -161,11 +164,6 @@ class Session:
         return self._host
 
 
-def _is_output_arg(arg):
-    direction = arg.get_direction()
-    return isinstance(direction, str) and direction.lower().strip() == 'out'
-
-
 class Action:
     """Representation of an Action for a WeMo device."""
 
@@ -179,35 +177,28 @@ class Action:
 
     max_rediscovery_attempts = 3
 
-    def __init__(self, service, action_config):
+    def __init__(
+        self, service: Service, action_config: ActionProperties
+    ) -> None:
         """Create an instance of an Action."""
-        if not action_config.get_name():
-            raise InvalidSchemaError(
-                f"action.name element is missing: {service.name}"
-            )
+        self.name = action_config.name
         self.service = service
-        self._action_config = action_config
-        self.name = action_config.get_name()
         self.soap_action = f'{service.serviceType}#{self.name}'
         self.headers = {
             'Content-Type': 'text/xml',
             'SOAPACTION': f'"{self.soap_action}"',
         }
 
-        self.args = []
-        self.returns = []
-        arglist = action_config.get_argumentList()
-        if arglist is not None:
-            self.args.extend(
-                a.get_name()
-                for a in arglist.get_argument()
-                if not _is_output_arg(a)
-            )
-            self.returns.extend(
-                a.get_name()
-                for a in arglist.get_argument()
-                if _is_output_arg(a)
-            )
+        self.args = [
+            arg.name
+            for arg in action_config.arguments
+            if arg.direction.lower() != "out"
+        ]
+        self.returns = [
+            arg.name
+            for arg in action_config.arguments
+            if arg.direction.lower() == "out"
+        ]
 
     def __call__(self, *, pywemo_timeout=None, **kwargs):
         """Representations a method or function call."""
@@ -267,7 +258,7 @@ class Action:
         LOG.error(msg)
         raise ActionException(msg) from last_exception
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a string representation of the Action."""
         return f"<Action {self.name}({', '.join(self.args)})>"
 
@@ -275,57 +266,43 @@ class Action:
 class Service:
     """Representation of a service for a WeMo device."""
 
-    _EXPECTED_ELEMENTS = (
-        "serviceType",
-        "serviceId",
-        "SCPDURL",
-        "controlURL",
-        "eventSubURL",
-    )
-
-    def __init__(self, device, service):
+    def __init__(self, device: 'Device', service: ServiceProperties) -> None:
         """Create an instance of a Service."""
-        for element in self._EXPECTED_ELEMENTS:
-            if not getattr(service, f"get_{element}")():
-                raise InvalidSchemaError(f"Missing service element: {element}")
         self.device = device
         self._config = service
         self.name = self.serviceType.split(':')[-2]
         self.actions = {}
 
-        url = device.session.urljoin(service.get_SCPDURL())
-        xml = device.session.get(url)
+        url = device.session.urljoin(service.description_url)
+        xml = device.session.get(url).content
 
         try:
-            scpd = serviceParser.parseString(
-                xml.content, silence=True, print_warnings=False
-            )
-        except Exception as err:
-            LOG.debug("Received invalid schema: %r", xml.content)
-            raise InvalidSchemaError(f"Could not parse schema: {url}") from err
+            scpd = ServiceDescription.from_xml(xml)
+        except InvalidSchemaError:
+            LOG.debug("Received invalid schema from %s: %r", url, xml)
+            raise
 
-        if scpd.get_actionList() and scpd.get_actionList().get_action():
-            for action in scpd.get_actionList().get_action():
-                act = Action(self, action)
-                self.actions[act.name] = act
-                setattr(self, act.name, act)
+        for action in scpd.actions:
+            act = Action(self, action)
+            self.actions[act.name] = act
+            setattr(self, act.name, act)
 
     @property
-    def controlURL(self):
+    def controlURL(self) -> str:
         """Get the controlURL for interacting with this Service."""
-        return self.device.session.urljoin(self._config.get_controlURL())
+        return self.device.session.urljoin(self._config.control_url)
 
     @property
-    def eventSubURL(self):
+    def eventSubURL(self) -> str:
         """Get the eventSubURL for interacting with this Service."""
-        return self.device.session.urljoin(self._config.get_eventSubURL())
+        return self.device.session.urljoin(self._config.event_subscription_url)
 
     @property
-    def serviceType(self):
+    def serviceType(self) -> str:
         """Get the type of this Service."""
-        return self._config.get_serviceType()
+        return self._config.service_type
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a string representation of the Service."""
         return f"<Service {self.name}({', '.join(self.actions)})>"
 

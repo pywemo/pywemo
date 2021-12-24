@@ -1,4 +1,5 @@
 """Tests for pywemo.ouimeaux_device.api.service."""
+from __future__ import annotations
 
 import unittest.mock as mock
 
@@ -7,7 +8,6 @@ import urllib3
 from lxml import etree as et
 
 import pywemo.ouimeaux_device.api.service as svc
-import pywemo.ouimeaux_device.api.xsd.device as device_xsd
 from pywemo import WeMoDevice
 from pywemo.exceptions import HTTPException, InvalidSchemaError, SOAPFault
 
@@ -92,16 +92,16 @@ class TestAction:
     @staticmethod
     def get_mock_action(name="action_name", service_type="", url=""):
         device = mock.create_autospec(WeMoDevice)
+        device.name = "device_name"
         device.session = svc.Session('http://192.168.1.100:53892/')
 
-        service = mock.create_autospec(svc.serviceParser.scpd)
+        service = mock.create_autospec(svc.Service)
         service.device = device
         service.name = 'ServiceName'
         service.serviceType = service_type
         service.controlURL = url
 
-        action_config = mock.create_autospec(svc.serviceParser.ActionType)
-        action_config.get_name.return_value = name
+        action_config = svc.ActionProperties(name=name, arguments=[])
 
         return svc.Action(service, action_config)
 
@@ -266,77 +266,54 @@ class TestAction:
         timeout = post_mock.call_args[MOCK_ARGS_KWARGS][TIMEOUT_KWARG_KEY]
         assert timeout == 40
 
-    def test_missing_name(self):
-        service = mock.Mock()
-        action_config = mock.MagicMock()
-        action_config.get_name.return_value = None
-
-        with pytest.raises(InvalidSchemaError):
-            svc.Action(service, action_config)
-
 
 class TestService:
     """Tests for the Service class."""
+
+    _service_type = svc.ServiceProperties(
+        service_type="urn:Belkin:service:basicevent:1",
+        service_id="service_id",
+        description_url="description_url",
+        control_url="control_url",
+        event_subscription_url="event_subscription_url",
+    )
 
     def test_service(self):
         device = mock.create_autospec(WeMoDevice)
         device.session = mock.create_autospec(svc.Session)
 
-        service_type = mock.create_autospec(device_xsd.serviceType)
-        for element in svc.Service._EXPECTED_ELEMENTS:
-            getattr(service_type, f"get_{element}").return_value = element
-        service_type.get_serviceType.return_value = (
-            "urn:Belkin:service:basicevent:1"
+        scpd = svc.ServiceDescription(
+            actions=[svc.ActionProperties(name="TestActionName", arguments=[])]
         )
 
-        action = mock.create_autospec(svc.serviceParser.ActionType)
-        action.get_name.return_value = "TestActionName"
-        scpd = mock.create_autospec(svc.serviceParser.scpd)
-        action_list = mock.Mock()
-        action_list.get_action.return_value = [action]
-        scpd.get_actionList.return_value = action_list
-
         with mock.patch(
-            "pywemo.ouimeaux_device.api.service.serviceParser.parseString",
+            "pywemo.ouimeaux_device.api.service.ServiceDescription.from_xml",
             return_value=scpd,
         ):
-            service = svc.Service(device, service_type)
+            service = svc.Service(device, self._service_type)
+
         assert "TestActionName" in service.actions
         assert hasattr(service, "TestActionName")
 
-    @pytest.mark.parametrize("exclude", svc.Service._EXPECTED_ELEMENTS)
-    def test_service_elements(self, exclude):
-        device = mock.create_autospec(WeMoDevice)
-        service_type = mock.create_autospec(device_xsd.serviceType)
-        for element in svc.Service._EXPECTED_ELEMENTS:
-            if element == exclude:
-                getattr(service_type, f"get_{element}").return_value = None
-                continue
-            getattr(service_type, f"get_{element}").return_value = element
-
-        with pytest.raises(
-            InvalidSchemaError, match=f"Missing service element: {exclude}"
-        ):
-            svc.Service(device, service_type)
-
-    def test_service_parser_exception(self):
-        xml = mock.Mock()
-        xml.content = "invalid xml"
-
+    def test_from_xml_raises(self):
         device = mock.create_autospec(WeMoDevice)
         device.session = mock.create_autospec(svc.Session)
-        device.session.get.return_value = xml
 
-        service_type = mock.create_autospec(device_xsd.serviceType)
-        for element in svc.Service._EXPECTED_ELEMENTS:
-            getattr(service_type, f"get_{element}").return_value = element
-        service_type.get_serviceType.return_value = (
-            "urn:Belkin:service:basicevent:1"
-        )
+        with mock.patch(
+            "pywemo.ouimeaux_device.api.service.ServiceDescription.from_xml",
+            side_effect=InvalidSchemaError,
+        ), pytest.raises(InvalidSchemaError):
+            svc.Service(device, self._service_type)
 
-        with pytest.raises(InvalidSchemaError, match="Could not parse schema"):
-            svc.Service(device, service_type)
-        device.session.get.assert_called_once()
+
+class MockRequiredService(svc.RequiredServicesMixin):
+    """Mock for the RequiredServicesMixin class."""
+
+    _attr_required_services: list[svc.RequiredService] = []
+
+    @property
+    def _required_services(self) -> list[svc.RequiredService]:
+        return self._attr_required_services
 
 
 class TestRequiredServicesMixin:
@@ -346,15 +323,15 @@ class TestRequiredServicesMixin:
         service = mock.create_autospec(svc.Service)
         service.name = "svc_name"
         service.actions = {"action": mock.create_autospec(svc.Action)}
-        mixin = svc.RequiredServicesMixin()
-        mixin._required_services = [
+        mixin = MockRequiredService()
+        mixin._attr_required_services = [
             svc.RequiredService(name="svc_name", actions=["action"])
         ]
         mixin._check_required_services([service])
 
     def test_missing_service(self):
-        mixin = svc.RequiredServicesMixin()
-        mixin._required_services = [
+        mixin = MockRequiredService()
+        mixin._attr_required_services = [
             svc.RequiredService(name="svc_name", actions=["action"])
         ]
         with pytest.raises(svc.MissingServiceError):
@@ -364,8 +341,8 @@ class TestRequiredServicesMixin:
         service = mock.create_autospec(svc.Service)
         service.name = "svc_name"
         service.actions = {"some_action": mock.create_autospec(svc.Action)}
-        mixin = svc.RequiredServicesMixin()
-        mixin._required_services = [
+        mixin = MockRequiredService()
+        mixin._attr_required_services = [
             svc.RequiredService(name="svc_name", actions=["action"])
         ]
 

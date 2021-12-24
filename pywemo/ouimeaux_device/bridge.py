@@ -147,7 +147,7 @@ class Bridge(Device):
 class LinkedDevice:
     """Representation of a device connected to the bridge."""
 
-    def __init__(self, bridge, info):
+    def __init__(self, bridge: Bridge, info: et.Element) -> None:
         """Create a Linked Device."""
         self.bridge = bridge
         self.host = self.bridge.host
@@ -159,7 +159,7 @@ class LinkedDevice:
         self.update_state(info)
         self._last_err = None
         self.mac = self.bridge.mac
-        self.serialnumber = self.bridge.serialnumber
+        self.serialnumber = self.bridge.serial_number
         self.uniqueID = None
 
     def get_state(self, force_update=False):
