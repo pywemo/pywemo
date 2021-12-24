@@ -39,6 +39,7 @@ mypy = ">=0.900"
 # testing and code coverage
 pytest = "6.2.5"
 pytest-vcr = "1.0.2"
+types-requests = ">=2.0"
 coverage = "^5.4"
 coveralls = "^3.0.0"
 # version of generateDS used to create device.py and service.py in .../api/xsd
