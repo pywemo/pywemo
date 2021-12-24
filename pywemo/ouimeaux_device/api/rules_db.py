@@ -191,8 +191,6 @@ class RulesDb:
         """Return a cursor for the underlying sqlite3 database."""
         return self.db.cursor()
 
-    # pylint: disable=unsubscriptable-object
-    # https://github.com/PyCQA/pylint/issues/3882#issuecomment-745148724
     @property
     def rules(self) -> Mapping[int, RulesRow]:
         """Contents of the RULES table, keyed by RuleID."""

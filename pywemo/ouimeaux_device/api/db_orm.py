@@ -36,7 +36,7 @@ class DatabaseRow:
         values = []
         for name in self.FIELDS.keys():
             if hasattr(self, name):
-                values.append("%s=%r" % (name, getattr(self, name)))
+                values.append(f"{name}={repr(getattr(self, name))}")
         class_name = self.__class__.__name__
         values_str = ", ".join(values)
         return f"{class_name}({values_str})"

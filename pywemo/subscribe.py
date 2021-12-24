@@ -1,11 +1,13 @@
 """Module to listen for wemo events."""
+from __future__ import annotations
+
 import collections
 import logging
 import sched
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Dict, Iterable, List, Optional
+from typing import Iterable
 
 import requests
 from lxml import etree as et
@@ -63,9 +65,7 @@ class Subscription:
     """Subscription to a single UPnP service endpoint."""
 
     # Scheduler Event used to periodically maintain the subscription.
-    # pylint: disable=unsubscriptable-object
-    scheduler_event: Optional[sched.Event] = None
-    # pylint: enable=unsubscriptable-object
+    scheduler_event: sched.Event | None = None
 
     # Controls whether or not the subscription will continue to be periodically
     # scheduled by the Scheduler. Set to False when the device us unregistered.
@@ -80,9 +80,7 @@ class Subscription:
 
     # Subscription Identifer (SID) used to maintain/refresh the subscription.
     # `None` when the subscription is not active.
-    # pylint: disable=unsubscriptable-object
-    subscription_id: Optional[str] = None
-    # pylint: enable=unsubscriptable-object
+    subscription_id: str | None = None
 
     # Request that the device keep the subscription active for this number of
     # seconds.
@@ -321,7 +319,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             )
         else:
             doc = self._get_xml_from_http_body()
-            for propnode in doc.findall('./{0}property'.format(NS)):
+            for propnode in doc.findall(f'./{NS}property'):
                 for property_ in list(propnode):
                     text = property_.text
                     outer.event(device, property_.tag, text, path=self.path)
@@ -414,7 +412,7 @@ class SubscriptionRegistry:
 
         self._event_thread = None
         self._event_thread_cond = threading.Condition()
-        self._subscriptions: Dict[Device, List[Subscription]] = {}
+        self._subscriptions: dict[Device, list[Subscription]] = {}
 
         def sleep(secs):
             with self._event_thread_cond:

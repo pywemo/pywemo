@@ -1,5 +1,4 @@
 """Representation of Services and Actions for WeMo devices."""
-# flake8: noqa E501
 from __future__ import annotations
 
 import logging
@@ -34,7 +33,7 @@ REQUEST_TEMPLATE = """
 </u:{action}>
 </s:Body>
 </s:Envelope>
-"""
+"""  # noqa E501
 
 
 class Session:
@@ -213,8 +212,7 @@ class Action:
     def __call__(self, *, pywemo_timeout=None, **kwargs):
         """Representations a method or function call."""
         arglist = '\n'.join(
-            '<{0}>{1}</{0}>'.format(arg, value)
-            for arg, value in kwargs.items()
+            f'<{arg}>{value}</{arg}>' for arg, value in kwargs.items()
         )
         body = REQUEST_TEMPLATE.format(
             action=self.name, service=self.service.serviceType, args=arglist
@@ -271,7 +269,7 @@ class Action:
 
     def __repr__(self):
         """Return a string representation of the Action."""
-        return "<Action %s(%s)>" % (self.name, ", ".join(self.args))
+        return f"<Action {self.name}({', '.join(self.args)})>"
 
 
 class Service:
@@ -329,7 +327,7 @@ class Service:
 
     def __repr__(self):
         """Return a string representation of the Service."""
-        return "<Service %s(%s)>" % (self.name, ", ".join(self.actions))
+        return f"<Service {self.name}({', '.join(self.actions)})>"
 
 
 @dataclass(frozen=True)
@@ -346,7 +344,7 @@ class RequiredServicesMixin:
     _required_services: List[RequiredService] = []
 
     def _check_required_services(self, services) -> None:
-        """Validates that all required services are found."""
+        """Validate that all required services are found."""
         all_services: dict[str, set[str]] = defaultdict(set)
         for service in services:
             all_services[service.name].update(service.actions)

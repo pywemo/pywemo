@@ -7,9 +7,11 @@ configured for the device, it will turn on/off/toggle other Wemo devices on the
 network. The methods in this mixin allow editing of the devices that are
 controlled by a long press.
 """
+from __future__ import annotations
+
 import logging
 from enum import Enum
-from typing import FrozenSet, Iterable, Optional
+from typing import FrozenSet, Iterable
 
 from .rules_db import RuleDevicesRow, RulesDb, RulesRow, rules_db_from_device
 from .service import RequiredService, RequiredServicesMixin
@@ -93,8 +95,6 @@ class LongPressMixin(RequiredServicesMixin):
             RequiredService(name="rules", actions=["FetchRules", "StoreRules"])
         ]
 
-    # pylint: disable=unsubscriptable-object
-    # https://github.com/PyCQA/pylint/issues/3882#issuecomment-745148724
     def list_long_press_udns(self) -> FrozenSet[str]:
         """Return a list of device UDNs that are configured for long press."""
         devices = []
@@ -125,7 +125,7 @@ class LongPressMixin(RequiredServicesMixin):
                     if udn in rules_db.get_target_devices_for_rule(rule):
                         rules_db.remove_target_device_from_rule(rule, udn)
 
-    def get_long_press_action(self) -> Optional[ActionType]:
+    def get_long_press_action(self) -> ActionType | None:
         """Fetch the ActionType for the long press rule.
 
         Will return None if no long press rule is configured for the device.
