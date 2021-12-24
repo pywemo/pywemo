@@ -131,26 +131,15 @@ ignore_errors = true
 
   [tool.pylint.message_control]
   disable = [
-    "abstract-class-little-used",
-    "abstract-method",
-    "cyclic-import",
     "duplicate-code",
-    "global-statement",
-    "inconsistent-return-statements",
-    "locally-disabled",
-    "not-an-iterable",
-    "not-context-manager",
-    "redefined-variable-type",
     "too-few-public-methods",
     "too-many-arguments",
     "too-many-branches",
     "too-many-instance-attributes",
-    "too-many-lines",
     "too-many-locals",
     "too-many-public-methods",
     "too-many-return-statements",
     "too-many-statements",
-    "unnecessary-pass",
     "unused-argument",
   ]
 
@@ -184,8 +173,6 @@ ignore_errors = true
   expected-line-ending-format = "LF"
   good-names = [
     "i",
-    "j",
-    "k",
     "s",
     "st",
     "db",
