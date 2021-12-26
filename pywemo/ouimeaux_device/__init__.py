@@ -353,7 +353,7 @@ class Device(RequiredServicesMixin):
         return self.reset(data=True, wifi=True)
 
     @staticmethod
-    def encrypt_aes128(password: str, meta_info: MetaInfo, is_rtos: bool):
+    def encrypt_aes128(password, wemo_metadata, is_rtos):
         """
         Encrypt a password using OpenSSL.
 
@@ -364,6 +364,7 @@ class Device(RequiredServicesMixin):
             raise SetupException('password required for AES')
 
         # Wemo uses some meta information for salt and iv
+        meta_info = MetaInfo.from_meta_info(wemo_metadata)
         keydata = (
             meta_info.mac[:6] + meta_info.serial_number + meta_info.mac[6:12]
         )
@@ -564,9 +565,7 @@ class Device(RequiredServicesMixin):
             encrypted_password = ''
         else:
             # get the meta information of the device and encrypt the password
-            meta_info = MetaInfo.from_meta_info(
-                self.get_service('metainfo').GetMetaInfo()
-            )
+            meta_info = self.get_service('metainfo').GetMetaInfo()['MetaInfo']
             is_rtos = self._config_any.get('rtos', '0') == '1'
             encrypted_password = self.encrypt_aes128(
                 password, meta_info, is_rtos
