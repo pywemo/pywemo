@@ -8,7 +8,7 @@ from subprocess import CalledProcessError
 import pytest
 import requests
 
-from pywemo.exceptions import ActionException, InvalidSchemaError
+from pywemo.exceptions import ActionException
 from pywemo.ouimeaux_device import (
     APNotFound,
     Device,
@@ -17,7 +17,6 @@ from pywemo.ouimeaux_device import (
     SetupException,
     ShortPassword,
     UnknownService,
-    parse_device_xml,
 )
 
 RESPONSE_SETUP = '''<?xml version="1.0"?>
@@ -224,10 +223,10 @@ class TestDevice:
         assert device.model == 'Belkin Plugin Socket 1.0'
         assert device.model_name == 'Socket'
         assert device.name == 'Wemo Mini'
-        assert device.serialnumber == 'XXXXXXXXXXXXXX'
+        assert device.serial_number == 'XXXXXXXXXXXXXX'
         assert device.host == '192.168.1.100'
         assert device.port == 49158
-        assert device._config.macAddress == 'XXXXXXXXXXXX'
+        assert device.mac == 'XXXXXXXXXXXX'
         assert device.firmware_version == 'WeMo_WW_2.00.11452.PVT-OWRT-SNSV2'
 
     def test_services(self, device):
@@ -517,29 +516,3 @@ class TestDevice:
         ) as url_mock:
             device.reconnect_with_device()
             url_mock.assert_not_called()
-
-    def test_parse_device_xml_raises(self):
-        with pytest.raises(InvalidSchemaError, match="Could not parse schema"):
-            parse_device_xml("invalid xml content")
-
-        missing_device = RESPONSE_SETUP.replace("device>", "something>")
-        with pytest.raises(
-            InvalidSchemaError, match="Missing root.device element"
-        ):
-            parse_device_xml(missing_device.encode())
-
-        missing_deviceType = RESPONSE_SETUP.replace(
-            "<deviceType>urn:Belkin:device:controllee:1</deviceType>", ""
-        )
-        with pytest.raises(
-            InvalidSchemaError, match="Missing device element: deviceType"
-        ):
-            parse_device_xml(missing_deviceType.encode())
-
-        wrong_manufacturer = RESPONSE_SETUP.replace(
-            "Belkin International Inc.", "pyWeMoTest"
-        )
-        with pytest.raises(
-            InvalidSchemaError, match="Unexpected manufacturer"
-        ):
-            parse_device_xml(wrong_manufacturer.encode())

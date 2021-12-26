@@ -1,9 +1,11 @@
 """Module to discover WeMo devices."""
+from __future__ import annotations
+
 import logging
 import warnings
 from ipaddress import ip_address
 from socket import gaierror, gethostbyname
-from typing import Any
+from typing import Any, Callable
 
 import requests
 
@@ -13,8 +15,9 @@ from .exceptions import (
     MissingServiceError,
     PyWeMoException,
 )
-from .ouimeaux_device import UnsupportedDevice, parse_device_xml, probe_wemo
+from .ouimeaux_device import Device, UnsupportedDevice, probe_wemo
 from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
+from .ouimeaux_device.api.xsd_types import DeviceDescription
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
 from .ouimeaux_device.crockpot import CrockPot
@@ -32,7 +35,7 @@ _uuid_seen = set()  # See _call_once_per_uuid.
 
 
 def _call_once_per_uuid(
-    uuid: str, method: callable, *args: Any, **kwargs: Any
+    uuid: str, method: Callable[..., Any], *args: Any, **kwargs: Any
 ) -> None:
     key = (uuid, method)
     if key in _uuid_seen:
@@ -41,7 +44,7 @@ def _call_once_per_uuid(
     method(*args, *kwargs)
 
 
-def discover_devices(debug=False, **kwargs):
+def discover_devices(debug: bool = False, **kwargs: Any) -> list[Device]:
     """Find WeMo devices on the local network."""
     return list(
         filter(
@@ -54,7 +57,9 @@ def discover_devices(debug=False, **kwargs):
     )
 
 
-def device_from_description(description_url, mac='deprecated', debug=False):
+def device_from_description(
+    description_url: str, mac: str = 'deprecated', debug: bool = False
+) -> Device | None:
     """Return object representing WeMo device running at host, else None."""
     if mac != 'deprecated':
         warnings.warn(
@@ -69,16 +74,17 @@ def device_from_description(description_url, mac='deprecated', debug=False):
         return None
 
     try:
-        parsed = parse_device_xml(xml.content)
+        device = DeviceDescription.from_xml(xml.content)
     except PyWeMoException:
         LOG.exception("Failed to parse description %s", description_url)
         return None
 
-    uuid = parsed.device.UDN
-    return device_from_uuid_and_location(uuid, description_url, debug)
+    return device_from_uuid_and_location(device.udn, description_url, debug)
 
 
-def device_from_uuid_and_location(uuid, location, debug=False):  # noqa: C901
+def device_from_uuid_and_location(  # noqa: C901
+    uuid: str | None, location: str | None, debug: bool = False
+) -> Device | None:
     """Determine device class based on the device uuid."""
     if not (uuid and location):
         return None
@@ -149,7 +155,7 @@ def device_from_uuid_and_location(uuid, location, debug=False):  # noqa: C901
     return None
 
 
-def hostname_lookup(hostname):
+def hostname_lookup(hostname: str) -> str:
     """Resolve a hostname into an IP address."""
     try:
         # The {host} must be resolved to an IP address; if this fails, this
@@ -168,7 +174,7 @@ def hostname_lookup(hostname):
         return hostname
 
 
-def setup_url_for_address(host, port=None):
+def setup_url_for_address(host: str, port: int | None = None) -> str | None:
     """Determine setup.xml url for a given host and port pair."""
     # Force hostnames into IP addresses
     try:
