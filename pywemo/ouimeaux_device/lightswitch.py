@@ -3,7 +3,7 @@ from .api.long_press import LongPressMixin
 from .switch import Switch
 
 
-class LightSwitch(Switch, LongPressMixin):
+class LightSwitch(Switch):
     """Representation of a WeMo Light Switch device."""
 
 
