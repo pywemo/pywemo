@@ -19,6 +19,7 @@ from pywemo.ouimeaux_device import (
     UnknownService,
     parse_device_xml,
 )
+from pywemo.util import MetaInfo
 
 RESPONSE_SETUP = '''<?xml version="1.0"?>
 <root xmlns="urn:Belkin:device-1-0">
@@ -217,7 +218,14 @@ def lightspeed():
 class TestDevice:
     """Test the Device object."""
 
-    METAINFO = 'XXXXXXXXXXXX|123456A1234567|dummy'
+    META_INFO = MetaInfo(
+        mac="XXXXXXXXXXXXXX",
+        serial_number="XXXXXXXXXXXXXX",
+        device_sku="",
+        firmware_version="",
+        access_point_ssid="",
+        model_name="",
+    )
 
     def test_initialization(self, device):
         """Test device initialization."""
@@ -283,14 +291,14 @@ class TestDevice:
     def test_encryption_no_openssl(self, mock_run, device):
         """Test device encryption (openssl not found/not installed)."""
         with pytest.raises(SetupException):
-            assert device.encrypt_aes128('password', self.METAINFO, False)
+            assert device.encrypt_aes128('password', self.META_INFO, False)
         assert mock_run.call_count == 1
 
     @mock.patch('subprocess.run', side_effect=CalledProcessError(-1, 'error'))
     def test_encryption_openssl_error(self, mock_run, device):
         """Test device encryption (error in openssl)."""
         with pytest.raises(SetupException):
-            assert device.encrypt_aes128('password', self.METAINFO, False)
+            assert device.encrypt_aes128('password', self.META_INFO, False)
         assert mock_run.call_count == 1
 
     @mock.patch('subprocess.run', return_value=mock.Mock(stdout=ENC_PASSWORD))
@@ -298,7 +306,7 @@ class TestDevice:
         """Test device encryption (good result)."""
         correct = 'wNTUdjT+cA1pa0Vta/jgEg==1808'
         assert (
-            device.encrypt_aes128('password', self.METAINFO, False) == correct
+            device.encrypt_aes128('password', self.META_INFO, False) == correct
         )
         assert mock_run.call_count == 1
 
@@ -307,7 +315,7 @@ class TestDevice:
         """Test device encryption (good result)."""
         correct = 'wNTUdjT+cA1pa0Vta/jgEg=='
         assert (
-            device.encrypt_aes128('password', self.METAINFO, True) == correct
+            device.encrypt_aes128('password', self.META_INFO, True) == correct
         )
         assert mock_run.call_count == 1
 
