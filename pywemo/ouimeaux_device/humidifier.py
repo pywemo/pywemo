@@ -1,5 +1,8 @@
 """Representation of a WeMo Humidifier device."""
+from __future__ import annotations
+
 from enum import IntEnum
+from typing import Any
 
 from lxml import etree as et
 
@@ -13,6 +16,7 @@ from .switch import Switch
 class FanMode(IntEnum):
     """Enum to map WeMo FanModes to human-readable strings."""
 
+    _UNKNOWN = -1
     # pylint: disable=invalid-name
     Off = 0  # Fan and device turned off
     Minimum = 1
@@ -20,6 +24,10 @@ class FanMode(IntEnum):
     Medium = 3
     High = 4
     Maximum = 5
+
+    @classmethod
+    def _missing_(cls, value: Any) -> FanMode:
+        return cls._UNKNOWN
 
 
 FAN_MODE_NAMES = {
@@ -35,12 +43,17 @@ FAN_MODE_NAMES = {
 class DesiredHumidity(IntEnum):
     """Enum to map WeMo DesiredHumidity to human-readable strings."""
 
+    _UNKNOWN = -1
     # pylint: disable=invalid-name
     FortyFivePercent = 0
     FiftyPercent = 1
     FiftyFivePercent = 2
     SixtyPercent = 3
     OneHundredPercent = 4  # "Always On" Mode
+
+    @classmethod
+    def _missing_(cls, value: Any) -> DesiredHumidity:
+        return cls._UNKNOWN
 
 
 DESIRED_HUMIDITY_NAMES = {

@@ -1,5 +1,8 @@
 """Representation of a WeMo CoffeeMaker device."""
+from __future__ import annotations
+
 from enum import IntEnum
+from typing import Any
 
 from lxml import etree as et
 
@@ -15,6 +18,7 @@ from .switch import Switch
 class CoffeeMakerMode(IntEnum):
     """Enum to map WeMo modes to human-readable strings."""
 
+    _UNKNOWN = -1
     # pylint: disable=invalid-name
     Refill = 0  # reservoir empty and carafe not in place
     PlaceCarafe = 1  # reservoir has water but carafe not present
@@ -25,6 +29,10 @@ class CoffeeMakerMode(IntEnum):
     CleaningBrewing = 6
     CleaningSoaking = 7
     BrewFailCarafeRemoved = 8
+
+    @classmethod
+    def _missing_(cls, value: Any) -> CoffeeMakerMode:
+        return cls._UNKNOWN
 
 
 MODE_NAMES = {

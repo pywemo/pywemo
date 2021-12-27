@@ -1,5 +1,8 @@
 """Representation of a WeMo CrockPot device."""
+from __future__ import annotations
+
 from enum import IntEnum
+from typing import Any
 
 from .api.service import RequiredService
 from .switch import Switch
@@ -11,11 +14,16 @@ from .switch import Switch
 class CrockPotMode(IntEnum):
     """Modes for the CrockPot."""
 
+    _UNKNOWN = -1
     # pylint: disable=invalid-name
     Off = 0
     Warm = 50
     Low = 51
     High = 52
+
+    @classmethod
+    def _missing_(cls, value: Any) -> CrockPotMode:
+        return cls._UNKNOWN
 
 
 MODE_NAMES = {
