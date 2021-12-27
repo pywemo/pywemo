@@ -62,7 +62,7 @@ class Maker(Switch):
         self.maker_params = attribute_xml_to_dict(maker_resp)
         self._state = self.switch_state
 
-    def subscription_update(self, _type, _params):
+    def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle reports from device."""
         if _type == "attributeList":
             self.maker_params.update(attribute_xml_to_dict(_params))

@@ -85,7 +85,7 @@ class CoffeeMaker(Switch):
         self._attributes = attribute_xml_to_dict(resp)
         self._state = self.mode
 
-    def subscription_update(self, _type, _params):
+    def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle reports from device."""
         if _type == "attributeList":
             self._attributes.update(attribute_xml_to_dict(_params))

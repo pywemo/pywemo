@@ -60,7 +60,7 @@ class CrockPot(Switch):
             self._attributes = state_attributes
             self._state = self.mode
 
-    def subscription_update(self, _type, _params):
+    def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle reports from device."""
         if _params is None:
             return False

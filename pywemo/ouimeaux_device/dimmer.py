@@ -50,7 +50,7 @@ class Dimmer(Switch):
             self._brightness = brightness
         return state
 
-    def subscription_update(self, _type, _param):
+    def subscription_update(self, _type: str, _param: str) -> bool:
         """Update the dimmer attributes due to a subscription update event."""
         if _type == "Brightness":
             try:

@@ -42,7 +42,7 @@ class Insight(Switch):
         params = self.insight.GetInsightParams().get('InsightParams')
         self.insight_params = self.parse_insight_params(params)
 
-    def subscription_update(self, _type, _params):
+    def subscription_update(self, _type: str, _params: str) -> bool:
         """Update the device attributes due to a subscription update event."""
         LOG.debug("subscription_update %s %s", _type, _params)
         if _type == "InsightParams":

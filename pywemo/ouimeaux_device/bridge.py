@@ -107,7 +107,7 @@ class Bridge(Device):
         self.bridge_update(force_update)
         return state
 
-    def subscription_update(self, _type, _param):
+    def subscription_update(self, _type: str, _param: str) -> bool:
         """Update the bridge attributes due to a subscription update event."""
         if _type == "StatusChange" and _param:
             state_event = et.fromstring(_param.encode('utf8'))
