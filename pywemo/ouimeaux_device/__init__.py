@@ -131,7 +131,7 @@ class Device(DeviceDescription, RequiredServicesMixin):
         self._check_required_services(self.services.values())
 
     @property
-    def _required_services(self):
+    def _required_services(self) -> list[RequiredService]:
         return super()._required_services + [
             RequiredService(name="basicevent", actions=["GetBinaryState"])
         ]

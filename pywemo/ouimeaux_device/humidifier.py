@@ -1,4 +1,6 @@
 """Representation of a WeMo Humidifier device."""
+from __future__ import annotations
+
 from enum import IntEnum
 
 from lxml import etree as et
@@ -137,7 +139,7 @@ class Humidifier(Switch):
         self.update_attributes()
 
     @property
-    def _required_services(self):
+    def _required_services(self) -> list[RequiredService]:
         return super()._required_services + [
             RequiredService(
                 name="deviceevent", actions=["GetAttributes", "SetAttributes"]
