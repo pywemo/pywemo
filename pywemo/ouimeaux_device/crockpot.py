@@ -107,7 +107,7 @@ class CrockPot(Switch):
 
         return int(self.mode != CrockPotMode.Off)
 
-    def set_state(self, state):
+    def set_state(self, state: int) -> None:
         """Set the state of this device to on or off."""
         if state:
             self.update_settings(

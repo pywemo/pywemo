@@ -81,7 +81,7 @@ class Maker(Switch):
 
         return self.switch_state
 
-    def set_state(self, state):
+    def set_state(self, state: int) -> None:
         """Set the state of this device to on or off."""
         # The Maker has a momentary mode - so it's not safe to assume
         # the state is what you just set, so re-read it from the device

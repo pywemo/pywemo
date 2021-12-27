@@ -114,7 +114,7 @@ class CoffeeMaker(Switch):
         # Consider the Coffee Maker to be "on" if it's currently brewing.
         return int(self._state == CoffeeMakerMode.Brewing)
 
-    def set_state(self, state):
+    def set_state(self, state: int) -> None:
         """Set the state of this device to on or off."""
         # CoffeeMaker cannot be turned off remotely, so ignore the request if
         # state is "falsey"

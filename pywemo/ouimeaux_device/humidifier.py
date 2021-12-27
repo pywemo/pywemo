@@ -223,7 +223,7 @@ class Humidifier(Switch):
         # Consider the Humidifier to be "on" if it's not off.
         return int(self._state != FanMode.Off)
 
-    def set_state(self, state):
+    def set_state(self, state: int) -> None:
         """
         Set the fan mode of this device (as int index of the FanMode IntEnum).
 
