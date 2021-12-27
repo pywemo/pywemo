@@ -46,15 +46,11 @@ def _call_once_per_uuid(
 
 def discover_devices(debug: bool = False, **kwargs: Any) -> list[Device]:
     """Find WeMo devices on the local network."""
-    return list(
-        filter(
-            bool,
-            (
-                device_from_uuid_and_location(entry.udn, entry.location, debug)
-                for entry in ssdp.scan(**kwargs)
-            ),
-        )
+    devices = (
+        device_from_uuid_and_location(entry.udn, entry.location, debug)
+        for entry in ssdp.scan(**kwargs)
     )
+    return [d for d in devices if d is not None]
 
 
 def device_from_description(
