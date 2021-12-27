@@ -212,7 +212,7 @@ class Humidifier(Switch):
         """Return 0 if filter is OK, and 1 if it needs to be changed."""
         return self._attributes.get('filter_expired')
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""
         # The base implementation using GetBinaryState
         # doesn't work for Humidifier (always returns 0)

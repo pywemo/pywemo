@@ -101,7 +101,7 @@ class Bridge(Device):
 
         return self.Lights, self.Groups
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Update the state of the Bridge device."""
         state = super().get_state(force_update)
         self.bridge_update(force_update)

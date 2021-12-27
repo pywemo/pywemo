@@ -39,7 +39,7 @@ class Dimmer(Switch):
         else:
             self.off()
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Update the state & brightness for the Dimmer."""
         state = super().get_state(force_update)
         if force_update or self._brightness is None:

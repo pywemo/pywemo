@@ -98,7 +98,7 @@ class CrockPot(Switch):
         """Return the cooked time in minutes."""
         return int(self._attributes.get('cookedTime'))
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""
         # The base implementation using GetBinaryState doesn't work for
         # CrockPot (always returns 0) so use mode instead.

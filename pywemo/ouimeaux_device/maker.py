@@ -71,7 +71,7 @@ class Maker(Switch):
 
         return super().subscription_update(_type, _params)
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""
         # The base implementation using GetBinaryState doesn't work for the
         # Maker (always returns 0), so pull the switch state from the

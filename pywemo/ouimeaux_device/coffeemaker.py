@@ -104,7 +104,7 @@ class CoffeeMaker(Switch):
         """Return the mode of the device as a string."""
         return MODE_NAMES.get(self.mode, "Unknown")
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""
         # The base implementation using GetBinaryState doesn't work for
         # CoffeeMaker (always returns 0), so use mode instead.

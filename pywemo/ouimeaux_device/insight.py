@@ -86,7 +86,7 @@ class Insight(Switch):
             'powerthreshold': int(float(powerthreshold)),
         }
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return the device state."""
         if force_update or self._state is None:
             self.update_insight_params()
