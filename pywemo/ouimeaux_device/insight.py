@@ -21,6 +21,8 @@ class StandbyState(str, Enum):
 class Insight(Switch):
     """Representation of a WeMo Insight device."""
 
+    EVENT_TYPE_INSIGHT_PARAMS = "InsightParams"
+
     def __init__(self, *args, **kwargs):
         """Create a WeMo Switch device."""
         Switch.__init__(self, *args, **kwargs)
@@ -42,11 +44,11 @@ class Insight(Switch):
     def subscription_update(self, _type, _params):
         """Update the device attributes due to a subscription update event."""
         LOG.debug("subscription_update %s %s", _type, _params)
-        if _type == "InsightParams":
+        if _type == self.EVENT_TYPE_INSIGHT_PARAMS:
             self.insight_params = self.parse_insight_params(_params)
             return True
         updated = super().subscription_update(_type, _params)
-        if _type == "BinaryState" and updated:
+        if _type == self.EVENT_TYPE_BINARY_STATE and updated:
             # Special case: When an Insight device turns off, it also stops
             # sending InsightParams updates. Return False in this case to
             # indicate that the current state of the device hasn't been fully

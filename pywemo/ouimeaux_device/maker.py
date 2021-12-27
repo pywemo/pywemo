@@ -39,6 +39,8 @@ def attribute_xml_to_dict(xml_blob) -> dict[str, int]:
 class Maker(Switch):
     """Representation of a WeMo Maker device."""
 
+    EVENT_TYPE_ATTRIBUTE_LIST = "attributeList"
+
     def __init__(self, *args, **kwargs):
         """Create a WeMo Switch device."""
         super().__init__(*args, **kwargs)
@@ -62,7 +64,7 @@ class Maker(Switch):
 
     def subscription_update(self, _type, _params):
         """Handle reports from device."""
-        if _type == "attributeList":
+        if _type == self.EVENT_TYPE_ATTRIBUTE_LIST:
             self.maker_params.update(attribute_xml_to_dict(_params))
             self._state = self.switch_state
             return True

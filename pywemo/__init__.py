@@ -4,6 +4,7 @@
 from .discovery import discover_devices, setup_url_for_address
 from .exceptions import PyWeMoException
 from .ouimeaux_device import Device as WeMoDevice
+from .ouimeaux_device.api.long_press import LongPressMixin
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
 from .ouimeaux_device.crockpot import CrockPot
