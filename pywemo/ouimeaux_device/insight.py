@@ -5,6 +5,7 @@ import logging
 import warnings
 from datetime import datetime
 from enum import Enum
+from typing import Any
 
 from .api.service import RequiredService
 from .switch import Switch
@@ -23,7 +24,7 @@ class StandbyState(str, Enum):
 class Insight(Switch):
     """Representation of a WeMo Insight device."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo Switch device."""
         Switch.__init__(self, *args, **kwargs)
         self.insight_params = {}

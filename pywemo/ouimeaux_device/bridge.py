@@ -4,6 +4,7 @@ from __future__ import annotations
 import io
 import time
 from html import escape
+from typing import Any
 
 from lxml import etree as et
 
@@ -43,7 +44,7 @@ class Bridge(Device):
     Lights = {}
     Groups = {}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo Bridge (Link) device."""
         super().__init__(*args, **kwargs)
         self.bridge_update()

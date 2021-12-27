@@ -1,6 +1,8 @@
 """Representation of a WeMo Maker device."""
 from __future__ import annotations
 
+from typing import Any
+
 from lxml import etree as et
 
 from .api.service import RequiredService
@@ -39,7 +41,7 @@ def attribute_xml_to_dict(xml_blob) -> dict[str, int]:
 class Maker(Switch):
     """Representation of a WeMo Maker device."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo Switch device."""
         super().__init__(*args, **kwargs)
         self.maker_params = {}

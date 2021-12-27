@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
+from typing import Any
 
 from lxml import etree as et
 
@@ -65,7 +66,7 @@ def attribute_xml_to_dict(xml_blob):
 class CoffeeMaker(Switch):
     """Representation of a WeMo CoffeeMaker device."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo CoffeeMaker device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}

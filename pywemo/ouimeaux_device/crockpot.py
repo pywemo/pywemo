@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
+from typing import Any
 
 from .api.service import RequiredService
 from .switch import Switch
@@ -31,7 +32,7 @@ MODE_NAMES = {
 class CrockPot(Switch):
     """WeMo Crockpot."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo CrockPot device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
