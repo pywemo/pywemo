@@ -6,6 +6,7 @@ from pywemo.ouimeaux_device.humidifier import (
     DesiredHumidity,
     FanMode,
     Humidifier,
+    WaterLevel,
 )
 
 
@@ -59,6 +60,21 @@ def test_set_fan_mode_and_humidity(humidifier):
 
 @pytest.mark.vcr()
 def test_reset_filter_life(humidifier):
+    assert humidifier.filter_life_percent == pytest.approx(59.62)
+
     humidifier.reset_filter_life()
 
     assert humidifier.filter_life_percent == pytest.approx(100.0)
+
+
+def test_filter_expired(humidifier):
+    assert humidifier.filter_expired is False
+
+
+def test_current_humidity_percent(humidifier):
+    assert humidifier.current_humidity_percent == pytest.approx(42.0)
+
+
+def test_water_level(humidifier):
+    assert humidifier.water_level == WaterLevel.Good
+    assert humidifier.water_level_string == "Good"
