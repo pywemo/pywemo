@@ -20,6 +20,7 @@ from ..exceptions import (
     ShortPassword,
     UnknownService,
 )
+from ..util import MetaInfo
 from .api.long_press import LongPressMixin
 from .api.service import (
     REQUESTS_TIMEOUT,
@@ -327,8 +328,10 @@ class Device(DeviceDescription, RequiredServicesMixin):
             raise SetupException('password required for AES')
 
         # Wemo uses some meta information for salt and iv
-        metainfo = wemo_metadata.split('|')
-        keydata = metainfo[0][:6] + metainfo[1] + metainfo[0][6:12]
+        meta_info = MetaInfo.from_meta_info(wemo_metadata)
+        keydata = (
+            meta_info.mac[:6] + meta_info.serial_number + meta_info.mac[6:12]
+        )
         if is_rtos:
             keydata += 'b3{8t;80dIN{ra83eC1s?M70?683@2Yf'
 
@@ -526,10 +529,10 @@ class Device(DeviceDescription, RequiredServicesMixin):
             encrypted_password = ''
         else:
             # get the meta information of the device and encrypt the password
-            metainfo = self.get_service('metainfo').GetMetaInfo()['MetaInfo']
+            meta_info = self.get_service('metainfo').GetMetaInfo()['MetaInfo']
             is_rtos = self._config_any.get('rtos', '0') == '1'
             encrypted_password = self.encrypt_aes128(
-                password, metainfo, is_rtos
+                password, meta_info, is_rtos
             )
 
         # optionally make multiple connection attempts

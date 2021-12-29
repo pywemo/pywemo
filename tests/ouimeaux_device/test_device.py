@@ -216,7 +216,7 @@ def lightspeed():
 class TestDevice:
     """Test the Device object."""
 
-    METAINFO = 'XXXXXXXXXXXX|123456A1234567|dummy'
+    METAINFO = 'XXXXXXXXXXXX|123456A1234567|dummy|||'
 
     def test_initialization(self, device):
         """Test device initialization."""
