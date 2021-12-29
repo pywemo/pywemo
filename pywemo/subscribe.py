@@ -6,8 +6,9 @@ import logging
 import sched
 import threading
 import time
+from collections.abc import Iterable, MutableMapping
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Iterable
+from typing import Any, Callable
 
 import requests
 from lxml import etree as et
@@ -95,7 +96,9 @@ class Subscription:
     # Name of the subscription endpoint service.
     service_name: str
 
-    def __init__(self, device: Device, callback_port: int, service_name: str):
+    def __init__(
+        self, device: Device, callback_port: int, service_name: str
+    ) -> None:
         """Initialize a new subscription."""
         self.device = device
         self.callback_port = callback_port
@@ -179,7 +182,7 @@ class Subscription:
                 timeout=REQUESTS_TIMEOUT,
             )
 
-    def _update_subscription(self, headers) -> int:
+    def _update_subscription(self, headers: MutableMapping[str, str]) -> int:
         """Update UPnP subscription parameters from SUBSCRIBE response headers.
 
         Returns:
@@ -230,12 +233,18 @@ class Subscription:
         return self.event_received and self.expiration_time > time.time()
 
 
-def _start_server():
+class HTTPServer(ThreadingHTTPServer):
+    """ThreadingHTTPServer with an 'outer' attribute."""
+
+    outer: SubscriptionRegistry
+
+
+def _start_server() -> HTTPServer | None:
     """Find a valid open port and start the HTTP server."""
     for i in range(0, 128):
         port = 8989 + i
         try:
-            return ThreadingHTTPServer(('', port), RequestHandler)
+            return HTTPServer(('', port), RequestHandler)
         except OSError:
             continue
     return None
@@ -247,7 +256,8 @@ def _cancel_events(
     """Cancel pending scheduler events."""
     for subscription in subscriptions:
         try:
-            scheduler.cancel(subscription.scheduler_event)
+            if subscription.scheduler_event is not None:
+                scheduler.cancel(subscription.scheduler_event)
         except ValueError:
             # event might execute and be removed from queue
             # concurrently.  Safe to ignore
@@ -305,8 +315,9 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     # Do not wait for more than 10 seconds for any request to complete.
     timeout = 10
+    server: HTTPServer
 
-    def do_NOTIFY(self):  # pylint: disable=invalid-name
+    def do_NOTIFY(self) -> None:  # pylint: disable=invalid-name
         """Handle subscription responses received from devices."""
         sender_ip, _ = self.client_address
         outer = self.server.outer
@@ -326,7 +337,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         self._send_response(200, RESPONSE_SUCCESS)
 
-    def do_GET(self):  # pylint: disable=invalid-name
+    def do_GET(self) -> None:  # pylint: disable=invalid-name
         """Handle GET requests for a Virtual WeMo device."""
         if self.path.endswith("/setup.xml"):
             self._send_response(
@@ -335,7 +346,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         else:
             self._send_response(404, RESPONSE_NOT_FOUND)
 
-    def do_POST(self):  # pylint: disable=invalid-name
+    def do_POST(self) -> None:  # pylint: disable=invalid-name
         """Handle POST requests for a Virtual WeMo device."""
         if self.path.endswith("/upnp/control/basicevent1"):
             sender_ip, _ = self.client_address
@@ -355,7 +366,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         else:
             self._send_response(404, RESPONSE_NOT_FOUND)
 
-    def do_SUBSCRIBE(self):  # pylint: disable=invalid-name
+    def do_SUBSCRIBE(self) -> None:  # pylint: disable=invalid-name
         """Handle SUBSCRIBE requests for a Virtual WeMo device."""
         if self.path.endswith("/upnp/event/basicevent1"):
             self.send_response(200)
@@ -370,16 +381,18 @@ class RequestHandler(BaseHTTPRequestHandler):
         else:
             self._send_response(404, RESPONSE_NOT_FOUND)
 
-    def _send_response(self, code, body, *, content_type="text/html"):
+    def _send_response(
+        self, code: int, body: str, *, content_type: str = "text/html"
+    ) -> None:
         self.send_response(code)
         self.send_header('Content-Type', content_type)
-        self.send_header('Content-Length', len(body))
+        self.send_header('Content-Length', str(len(body)))
         self.send_header('Connection', 'close')
         self.end_headers()
         if body:
             self.wfile.write(body.encode("UTF-8"))
 
-    def _get_xml_from_http_body(self):
+    def _get_xml_from_http_body(self) -> et.Element:
         """Build the element tree root from the body of the http request."""
         content_len = int(self.headers.get('content-length', 0))
         data = self.rfile.read(content_len)
@@ -388,9 +401,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         return et.fromstring(data)
 
     # pylint: disable=redefined-builtin
-    def log_message(self, format, *args):
+    def log_message(self, format: str, *args: Any) -> None:
         """Disable error logging."""
         return
+
+
+SubscriberCallback = Callable[[Device, str, str], Any]
 
 
 class SubscriptionRegistry:
@@ -404,31 +420,34 @@ class SubscriptionRegistry:
         'insight',
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create the subscription registry object."""
-        self.devices = {}
-        self._callbacks = collections.defaultdict(list)
+        self.devices: dict[str, Device] = {}
+        self._callbacks: dict[
+            Device, list[tuple[str, SubscriberCallback]]
+        ] = collections.defaultdict(list)
         self._exiting = False
 
-        self._event_thread = None
+        self._event_thread: threading.Thread | None = None
         self._event_thread_cond = threading.Condition()
         self._subscriptions: dict[Device, list[Subscription]] = {}
 
-        def sleep(secs):
+        def sleep(secs: float) -> None:
             with self._event_thread_cond:
                 self._event_thread_cond.wait(secs)
 
         self._sched = sched.scheduler(time.time, sleep)
 
-        self._http_thread = None
-        self._httpd = None
+        self._http_thread: threading.Thread | None = None
+        self._httpd: HTTPServer | None = None
 
     @property
     def port(self) -> int:
         """Return the port that the http server is listening on."""
+        assert self._httpd
         return self._httpd.server_address[1]
 
-    def register(self, device):
+    def register(self, device: Device) -> None:
         """Register a device for subscription updates."""
         if not device:
             LOG.error("Called with an invalid device: %r", device)
@@ -446,7 +465,7 @@ class SubscriptionRegistry:
                     self._schedule(0, subscription)
             self._event_thread_cond.notify()
 
-    def unregister(self, device):
+    def unregister(self, device: Device) -> None:
         """Unregister a device from subscription updates."""
         if not device:
             LOG.error("Called with an invalid device: %r", device)
@@ -487,7 +506,7 @@ class SubscriptionRegistry:
                 self._schedule(SUBSCRIPTION_RETRY, subscription, retry=retry)
 
     def _schedule(
-        self, delay: int, subscription: Subscription, **kwargs
+        self, delay: int, subscription: Subscription, **kwargs: Any
     ) -> None:
         """Schedule a subscription.
 
@@ -508,7 +527,9 @@ class SubscriptionRegistry:
                 kwargs=kwargs,
             )
 
-    def event(self, device, type_, value, path=None):
+    def event(
+        self, device: Device, type_: str, value: str, path: str | None = None
+    ) -> None:
         """Execute the callback for a received event."""
         LOG.debug(
             "Received %s event from %s(%s) - %s %s",
@@ -534,16 +555,20 @@ class SubscriptionRegistry:
             if type_filter is None or type_ == type_filter:
                 callback(device, type_, value)
 
-    def on(self, device, type_filter, callback):
+    def on(
+        self, device: Device, type_filter: str, callback: SubscriberCallback
+    ) -> None:
         """Add an event callback for a device."""
         self._callbacks[device].append((type_filter, callback))
 
     def is_subscribed(self, device: Device) -> bool:
         """Return True if all of the device's subscriptions are active."""
         subscriptions = self._subscriptions.get(device, [])
-        return subscriptions and all(s.is_subscribed for s in subscriptions)
+        return len(subscriptions) > 0 and all(
+            s.is_subscribed for s in subscriptions
+        )
 
-    def start(self):
+    def start(self) -> None:
         """Start the subscription registry."""
         self._httpd = _start_server()
         if self._httpd is None:
@@ -553,17 +578,18 @@ class SubscriptionRegistry:
         self._http_thread = threading.Thread(
             target=self._run_http_server, name='Wemo HTTP Thread'
         )
-        self._http_thread.deamon = True
+        self._http_thread.daemon = True
         self._http_thread.start()
 
         self._event_thread = threading.Thread(
             target=self._run_event_loop, name='Wemo Events Thread'
         )
-        self._event_thread.deamon = True
+        self._event_thread.daemon = True
         self._event_thread.start()
 
-    def stop(self):
+    def stop(self) -> None:
         """Shutdown the HTTP server."""
+        assert self._httpd
         self._httpd.shutdown()
 
         with self._event_thread_cond:
@@ -578,19 +604,21 @@ class SubscriptionRegistry:
         self.join()
         LOG.info("Terminated threads")
 
-    def join(self):
+    def join(self) -> None:
         """Block until the HTTP server and event threads have terminated."""
+        assert self._http_thread and self._event_thread
         self._http_thread.join()
         self._event_thread.join()
 
-    def _run_http_server(self):
+    def _run_http_server(self) -> None:
         """Start the HTTP server."""
+        assert self._httpd
         self._httpd.allow_reuse_address = True
         self._httpd.outer = self
         LOG.info("Listening on port %d", self.port)
         self._httpd.serve_forever()
 
-    def _run_event_loop(self):
+    def _run_event_loop(self) -> None:
         """Run the event thread loop."""
         while not self._exiting:
             with self._event_thread_cond:
