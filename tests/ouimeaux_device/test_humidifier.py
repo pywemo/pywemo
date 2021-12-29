@@ -11,7 +11,7 @@ from pywemo.ouimeaux_device.humidifier import (
 
 @pytest.fixture
 def humidifier(vcr):
-    with vcr.use_cassette('humidifier_setup.yaml'):
+    with vcr.use_cassette('WeMo_WW_2.00.11423.PVT-OWRT-Smart.yaml'):
         return Humidifier('http://192.168.1.100:49153/setup.xml')
 
 
