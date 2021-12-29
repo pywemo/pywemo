@@ -1,4 +1,7 @@
 """Exceptions raised by pywemo."""
+from __future__ import annotations
+
+from lxml import etree as et
 
 
 class PyWeMoException(Exception):
@@ -17,7 +20,9 @@ class SOAPFault(ActionException):
     error_code: str = ""
     error_description: str = ""
 
-    def __init__(self, message="", fault_element=None):
+    def __init__(
+        self, message: str = "", fault_element: et.Element | None = None
+    ) -> None:
         """Initialize from a SOAP Fault lxml.etree Element."""
         details = ""
         if fault_element is not None:

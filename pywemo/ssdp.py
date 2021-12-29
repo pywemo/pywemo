@@ -1,10 +1,13 @@
 """Module that implements SSDP protocol."""
+from __future__ import annotations
+
 import logging
 import re
 import select
 import socket
 import threading
 from datetime import datetime, timedelta
+from typing import Any
 
 import requests
 from lxml import etree as et
@@ -58,18 +61,18 @@ EXPECTED_MAN_HEADER = b'MAN: "ssdp:discover"'
 class SSDP:
     """Controls the scanning of uPnP devices and services and caches output."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create SSDP object."""
-        self.entries = []
-        self.last_scan = None
+        self.entries: list[UPNPEntry] = []
+        self.last_scan: datetime | None = None
         self._lock = threading.RLock()
 
-    def scan(self):
+    def scan(self) -> None:
         """Scan the network."""
         with self._lock:
             self.update()
 
-    def all(self):
+    def all(self) -> list[UPNPEntry]:
         """
         Return all found entries.
 
@@ -80,14 +83,16 @@ class SSDP:
 
             return list(self.entries)
 
-    def find_by_st(self, st):
+    def find_by_st(self, st: str) -> list[UPNPEntry]:
         """Return a list of entries that match the ST."""
         with self._lock:
             self.update()
 
             return [entry for entry in self.entries if entry.st == st]
 
-    def find_by_device_description(self, values):
+    def find_by_device_description(
+        self, values: dict[str, Any]
+    ) -> list[UPNPEntry]:
         """
         Return a list of entries that match the description.
 
@@ -103,7 +108,7 @@ class SSDP:
                 if entry.match_device_description(values)
             ]
 
-    def update(self, force_update=False):
+    def update(self, force_update: bool = False) -> None:
         """Scan for new uPnP devices and services."""
         with self._lock:
             if (
@@ -122,7 +127,7 @@ class SSDP:
 
                 self.last_scan = datetime.now()
 
-    def remove_expired(self):
+    def remove_expired(self) -> None:
         """Filter out expired entries."""
         with self._lock:
             self.entries = [
@@ -134,48 +139,47 @@ class UPNPEntry:
     """Found uPnP entry."""
 
     # Use functools.cached_property if Python < 3.8 support is dropped.
-    _description = None
+    _description: dict[str, Any] | None = None
 
-    def __init__(self, values):
+    def __init__(self, values: dict[str, str]) -> None:
         """Create a UPNPEntry object."""
         self.values = values
         self.created = datetime.now()
+        self.expires: datetime | None = None
 
         if 'cache-control' in self.values:
             cache_seconds = int(self.values['cache-control'].split('=')[1])
 
             self.expires = self.created + timedelta(seconds=cache_seconds)
-        else:
-            self.expires = None
 
     @property
-    def is_expired(self):
+    def is_expired(self) -> bool:
         """Return whether the entry is expired or not."""
         return self.expires is not None and datetime.now() > self.expires
 
     @property
-    def st(self):
+    def st(self) -> str | None:
         """Return ST value."""
         return self.values.get('st')
 
     @property
-    def location(self):
+    def location(self) -> str | None:
         """Return location value."""
         return self.values.get('location')
 
     @property
-    def usn(self):
+    def usn(self) -> str | None:
         """Return unique service name."""
         return self.values.get('usn')
 
     @property
-    def udn(self):
+    def udn(self) -> str:
         """Return unique device name."""
         usn = self.usn or ''
         return usn.split('::')[0]
 
     @property
-    def description(self):
+    def description(self) -> dict[str, Any]:
         """Return the description from the uPnP entry."""
         # The description property may be referenced multiple times. Cache the
         # description to avoid needing to fetch it each time the property is
@@ -193,7 +197,8 @@ class UPNPEntry:
                 try:
                     xml = requests.get(url, timeout=REQUESTS_TIMEOUT).content
                     tree = et.fromstring(xml or b'')
-                    self._description = etree_to_dict(tree).get('root', {})
+                    root: dict[str, Any] = etree_to_dict(tree).get('root', {})
+                    self._description = root
                     break
                 except requests.RequestException:
                     LOG.warning("Error fetching description at %s", url)
@@ -206,7 +211,7 @@ class UPNPEntry:
 
         return self._description
 
-    def match_device_description(self, values):
+    def match_device_description(self, values: dict[str, Any]) -> bool:
         """
         Fetch description and match against it.
 
@@ -216,7 +221,7 @@ class UPNPEntry:
         return all(val == device.get(key) for key, val in values.items())
 
     @classmethod
-    def from_response(cls, response):
+    def from_response(cls, response: str) -> UPNPEntry:
         """Create a uPnP entry from a response."""
         return UPNPEntry(
             {
@@ -226,19 +231,19 @@ class UPNPEntry:
         )
 
     @property
-    def _key(self):
+    def _key(self) -> tuple[str, str | None]:
         """Tuple of values that uniquely identify the UPNPEntry instance."""
         return (self.udn, self.location)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """Equality operator."""
         return isinstance(other, type(self)) and self._key == other._key
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Generate hash of instance."""
         return hash(('UPNPEntry', self._key))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return the string representation of the object."""
         st = self.st or ''
         location = self.location or ''
@@ -246,7 +251,7 @@ class UPNPEntry:
         return f"<UPNPEntry {st} - {location} - {udn}>"
 
 
-def build_ssdp_request(ssdp_st, ssdp_mx):
+def build_ssdp_request(ssdp_st: str, ssdp_mx: int) -> bytes:
     """Build the standard request to send during SSDP discovery."""
     return "\r\n".join(
         [
@@ -261,7 +266,12 @@ def build_ssdp_request(ssdp_st, ssdp_mx):
     ).encode('ascii')
 
 
-def scan(st=ST, timeout=DISCOVER_TIMEOUT, max_entries=None, match_udn=None):
+def scan(
+    st: str = ST,
+    timeout: float = DISCOVER_TIMEOUT,
+    max_entries: int | None = None,
+    match_udn: str | None = None,
+) -> list[UPNPEntry]:
     """
     Send a message over the network to discover upnp devices.
 
@@ -271,7 +281,7 @@ def scan(st=ST, timeout=DISCOVER_TIMEOUT, max_entries=None, match_udn=None):
     # pylint: disable=too-many-nested-blocks
     ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
 
-    entries = []
+    entries: list[UPNPEntry] = []
 
     calc_now = datetime.now
 
@@ -350,16 +360,16 @@ class DiscoveryResponder:
     to inform Wemo devices on the network of the URL for the virtual device.
     """
 
-    def __init__(self, callback_port: int):
+    def __init__(self, callback_port: int) -> None:
         """Create a server that will respond to WeMo discovery requests.
 
         Args:
             callback_port: The port for the SubscriptionRegistry HTTP server.
         """
         self.callback_port = callback_port
-        self._thread = None
+        self._thread: threading.Thread | None = None
         self._exit = threading.Event()
-        self._thread_exception = None
+        self._thread_exception: Exception | None = None
         self._notify_enabled = True  # Only ever set to False in tests.
 
     def send_notify(self) -> None:
