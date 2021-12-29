@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import logging
 from enum import Enum
-from typing import FrozenSet, Iterable
+from typing import Iterable, no_type_check
 
 from .rules_db import RuleDevicesRow, RulesDb, RulesRow, rules_db_from_device
 from .service import RequiredService, RequiredServicesMixin
@@ -32,6 +32,7 @@ class ActionType(Enum):
     OFF = 0.0
 
 
+@no_type_check
 def ensure_long_press_rule_exists(
     rules_db: RulesDb, device_name: str, device_udn: str
 ) -> RulesRow:
@@ -89,13 +90,16 @@ def ensure_long_press_rule_exists(
 class LongPressMixin(RequiredServicesMixin):
     """Methods to make changes to the long press rules for a device."""
 
+    EVENT_TYPE_LONG_PRESS = "LongPress"
+
     @property
-    def _required_services(self):
+    def _required_services(self) -> list[RequiredService]:
         return super()._required_services + [
             RequiredService(name="rules", actions=["FetchRules", "StoreRules"])
         ]
 
-    def list_long_press_udns(self) -> FrozenSet[str]:
+    @no_type_check
+    def list_long_press_udns(self) -> frozenset[str]:
         """Return a list of device UDNs that are configured for long press."""
         devices = []
         with rules_db_from_device(self) as rules_db:
@@ -105,6 +109,7 @@ class LongPressMixin(RequiredServicesMixin):
                 devices.extend(rules_db.get_target_devices_for_rule(rule))
         return frozenset(devices)
 
+    @no_type_check
     def add_long_press_udns(self, device_udns: Iterable[str]) -> None:
         """Add a list of device UDNs to be configured for long press."""
         with rules_db_from_device(self) as rules_db:
@@ -115,6 +120,7 @@ class LongPressMixin(RequiredServicesMixin):
                 if udn not in rules_db.get_target_devices_for_rule(rule):
                     rules_db.add_target_device_to_rule(rule, udn)
 
+    @no_type_check
     def remove_long_press_udns(self, device_udns: Iterable[str]) -> None:
         """Remove a list of device UDNs from the long press configuration."""
         with rules_db_from_device(self) as rules_db:
@@ -125,6 +131,7 @@ class LongPressMixin(RequiredServicesMixin):
                     if udn in rules_db.get_target_devices_for_rule(rule):
                         rules_db.remove_target_device_from_rule(rule, udn)
 
+    @no_type_check
     def get_long_press_action(self) -> ActionType | None:
         """Fetch the ActionType for the long press rule.
 
@@ -137,6 +144,7 @@ class LongPressMixin(RequiredServicesMixin):
                 return ActionType(device.StartAction)
         return None
 
+    @no_type_check
     def set_long_press_action(self, action: ActionType) -> None:
         """Set the ActionType for the long press rule."""
         with rules_db_from_device(self) as rules_db:
