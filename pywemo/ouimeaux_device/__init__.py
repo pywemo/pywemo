@@ -7,7 +7,7 @@ import subprocess
 import threading
 import time
 import warnings
-from typing import Sequence
+from typing import Any, Sequence
 
 import requests
 
@@ -89,7 +89,7 @@ def probe_wemo(
     return None
 
 
-def probe_device(device):
+def probe_device(device: Device) -> int | None:
     """Probe a device for available port.
 
     This is an extension for probe_wemo, also probing current port.
@@ -113,8 +113,8 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                 "in a future release.",
                 DeprecationWarning,
             )
-        self._state = None
-        self.basic_state_params = {}
+        self._state: int | None = None
+        self.basic_state_params: dict[str, str] = {}
         self._reconnect_lock = threading.Lock()
         self.session = Session(url)
         xml = self.session.get(url).content
@@ -138,7 +138,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             RequiredService(name="basicevent", actions=["GetBinaryState"])
         ]
 
-    def _reconnect_with_device_by_discovery(self):
+    def _reconnect_with_device_by_discovery(self) -> None:
         """
         Scan network to find the device again.
 
@@ -159,7 +159,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         else:
             LOG.error("Unable to reconnect with %s", self.name)
 
-    def _reconnect_with_device_by_probing(self):
+    def _reconnect_with_device_by_probing(self) -> bool:
         """Attempt to reconnect to the device on the existing port."""
         port = probe_device(self)
 
@@ -171,7 +171,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         self.session.url = f'http://{self.host}:{port}/setup.xml'
         return True
 
-    def reconnect_with_device(self):
+    def reconnect_with_device(self) -> None:
         """Re-probe & scan network to rediscover a disconnected device."""
         # Avoid retrying from multiple threads
         # pylint: disable=consider-using-with
@@ -184,7 +184,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             self._reconnect_lock.release()
 
     @staticmethod
-    def parse_basic_state(params):
+    def parse_basic_state(params: str) -> dict[str, str]:
         """Parse the basic state response from the device."""
         # The BinaryState `params` could have two different formats:
         #   1|1492338954|0|922|14195|1209600|0|940670|15213709|227088884
@@ -193,7 +193,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         # 0 if off, 1 if on,
         return {'state': params.split('|')[0]}
 
-    def update_binary_state(self):
+    def update_binary_state(self) -> None:
         """Update the cached copy of the basic state response."""
         self.basic_state_params = self.basicevent.GetBinaryState() or {}
 
@@ -202,7 +202,9 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         LOG.debug("subscription_update %s %s", _type, _params)
         if _type == "BinaryState":
             try:
-                self._state = int(self.parse_basic_state(_params).get("state"))
+                self._state = int(
+                    self.parse_basic_state(_params).get("state", "0")
+                )
             except ValueError:
                 LOG.error(
                     "Unexpected BinaryState value `%s` for device %s.",
@@ -226,18 +228,18 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
         return self._state
 
-    def get_service(self, name):
+    def get_service(self, name: str) -> Service:
         """Get service object by name."""
         try:
             return self.services[name]
         except KeyError as exc:
             raise UnknownService(name) from exc
 
-    def list_services(self):
+    def list_services(self) -> list[str]:
         """Return list of services."""
         return list(self.services.keys())
 
-    def explain(self):
+    def explain(self) -> None:
         """Print information about the device and its actions."""
         for name, svc in self.services.items():
             print(name)
@@ -252,7 +254,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                 print(f"  {aname}({inputs}){outputs}")
             print()
 
-    def reset(self, data, wifi):
+    def reset(self, data: bool, wifi: bool) -> str:
         """
         Reset Wemo device.
 
@@ -313,12 +315,14 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
         return status
 
-    def factory_reset(self):
+    def factory_reset(self) -> str:
         """Perform a full factory reset (convenience method)."""
         return self.reset(data=True, wifi=True)
 
     @staticmethod
-    def encrypt_aes128(password, wemo_metadata, is_rtos):
+    def encrypt_aes128(
+        password: str, wemo_metadata: str, is_rtos: bool
+    ) -> str:
         """
         Encrypt a password using OpenSSL.
 
@@ -366,15 +370,15 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             ) from exc
         except subprocess.CalledProcessError as exc:
             try:
-                stdout = openssl.stdout.decode().strip()
-            except UnicodeDecodeError:
-                stdout = openssl.stdout
+                stdout = openssl.stdout.decode(
+                    errors='backslashreplace'
+                ).strip()
             except UnboundLocalError:
                 stdout = 'not available'
             try:
-                stderr = openssl.stderr.decode().strip()
-            except UnicodeDecodeError:
-                stderr = openssl.stderr
+                stderr = openssl.stderr.decode(
+                    errors='backslashreplace'
+                ).strip()
             except UnboundLocalError:
                 stderr = 'not available'
             LOG.error('stdout:\n%s', stdout)
@@ -405,7 +409,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             encrypted_password += f'{n_password:#04x}'[2:]
         return encrypted_password
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: Any, **kwargs: Any) -> tuple[str, str]:
         """
         Connect Wemo to wifi network.
 
@@ -470,12 +474,12 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
     def _setup(  # noqa: C901
         self,
-        ssid,
-        password,
-        timeout=20.0,
-        connection_attempts=1,
-        status_delay=1.0,
-    ):
+        ssid: str,
+        password: str,
+        timeout: float = 20.0,
+        connection_attempts: int = 1,
+        status_delay: float = 1.0,
+    ) -> tuple[str, str]:
         """
         Connect Wemo to wifi network.
 
@@ -564,7 +568,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                     status = result['PairingStatus']
                 except KeyError:
                     # print entire dictionary if PairingStatus doesn't exist
-                    status = result
+                    status = repr(result)
                 LOG.debug('pairing status (send %s): %s', i + 1, status)
                 if i == 0:
                     # only delay on the first call
@@ -572,7 +576,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
             timeout_start = time.time()
             LOG.info('starting status checks (%s second timeout)', timeout)
-            status = None
+            status = ''
 
             # Make an initial, quicker check
             time.sleep(min(0.50, status_delay / 3.0))
@@ -612,7 +616,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             close_status = result['status']
         except KeyError:
             # print entire dictionary if status doesn't exist
-            close_status = result
+            close_status = repr(result)
         LOG.debug('network status: %s', status)
         LOG.debug('close status: %s', close_status)
 
