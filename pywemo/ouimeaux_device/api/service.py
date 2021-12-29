@@ -19,6 +19,7 @@ from pywemo.exceptions import (
     SOAPFault,
 )
 
+from .wemo_services import WeMoAllActionsMixin
 from .xsd_types import ActionProperties, ServiceDescription, ServiceProperties
 
 if TYPE_CHECKING:
@@ -270,7 +271,7 @@ class Action:
         return f"<Action {self.name}({', '.join(self.args)})>"
 
 
-class Service:
+class Service(WeMoAllActionsMixin):
     """Representation of a service for a WeMo device."""
 
     def __init__(self, device: 'Device', service: ServiceProperties) -> None:

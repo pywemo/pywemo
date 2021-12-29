@@ -29,6 +29,7 @@ from .api.service import (
     Service,
     Session,
 )
+from .api.wemo_services import WeMoServiceTypesMixin
 from .api.xsd_types import DeviceDescription
 
 LOG = logging.getLogger(__name__)
@@ -101,7 +102,7 @@ def probe_device(device):
     return probe_wemo(device.host, ports, match_udn=device.udn)
 
 
-class Device(DeviceDescription, RequiredServicesMixin):
+class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
     """Base object for WeMo devices."""
 
     def __init__(self, url: str, mac: str = 'deprecated') -> None:
