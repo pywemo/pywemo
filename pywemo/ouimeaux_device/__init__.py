@@ -197,7 +197,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         """Update the cached copy of the basic state response."""
         self.basic_state_params = self.basicevent.GetBinaryState() or {}
 
-    def subscription_update(self, _type, _params):
+    def subscription_update(self, _type: str, _params: str) -> bool:
         """Update device state based on subscription event."""
         LOG.debug("subscription_update %s %s", _type, _params)
         if _type == "BinaryState":
@@ -212,7 +212,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             return True
         return False
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""
         if force_update or self._state is None:
             self.update_binary_state()

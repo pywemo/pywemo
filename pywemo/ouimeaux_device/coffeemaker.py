@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
+from typing import Any
 
 from lxml import etree as et
 
@@ -65,7 +66,7 @@ def attribute_xml_to_dict(xml_blob):
 class CoffeeMaker(Switch):
     """Representation of a WeMo CoffeeMaker device."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo CoffeeMaker device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
@@ -84,7 +85,7 @@ class CoffeeMaker(Switch):
         self._attributes = attribute_xml_to_dict(resp)
         self._state = self.mode
 
-    def subscription_update(self, _type, _params):
+    def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle reports from device."""
         if _type == "attributeList":
             self._attributes.update(attribute_xml_to_dict(_params))
@@ -103,7 +104,7 @@ class CoffeeMaker(Switch):
         """Return the mode of the device as a string."""
         return MODE_NAMES.get(self.mode, "Unknown")
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""
         # The base implementation using GetBinaryState doesn't work for
         # CoffeeMaker (always returns 0), so use mode instead.
@@ -113,7 +114,7 @@ class CoffeeMaker(Switch):
         # Consider the Coffee Maker to be "on" if it's currently brewing.
         return int(self._state == CoffeeMakerMode.Brewing)
 
-    def set_state(self, state):
+    def set_state(self, state: int) -> None:
         """Set the state of this device to on or off."""
         # CoffeeMaker cannot be turned off remotely, so ignore the request if
         # state is "falsey"

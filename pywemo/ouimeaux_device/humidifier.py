@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
+from typing import Any
 
 from lxml import etree as et
 
@@ -132,7 +133,7 @@ def attribute_xml_to_dict(xml_blob):  # noqa: 901
 class Humidifier(Switch):
     """Representation of a WeMo Humidifier device."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo Humidifier device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
@@ -152,7 +153,7 @@ class Humidifier(Switch):
         self._attributes = attribute_xml_to_dict(resp)
         self._state = self.fan_mode
 
-    def subscription_update(self, _type, _params):
+    def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle reports from device."""
         if _type == "attributeList":
             self._attributes.update(attribute_xml_to_dict(_params))
@@ -211,7 +212,7 @@ class Humidifier(Switch):
         """Return 0 if filter is OK, and 1 if it needs to be changed."""
         return self._attributes.get('filter_expired')
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""
         # The base implementation using GetBinaryState
         # doesn't work for Humidifier (always returns 0)
@@ -222,7 +223,7 @@ class Humidifier(Switch):
         # Consider the Humidifier to be "on" if it's not off.
         return int(self._state != FanMode.Off)
 
-    def set_state(self, state):
+    def set_state(self, state: int) -> None:
         """
         Set the fan mode of this device (as int index of the FanMode IntEnum).
 

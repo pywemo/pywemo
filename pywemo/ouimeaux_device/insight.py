@@ -5,6 +5,7 @@ import logging
 import warnings
 from datetime import datetime
 from enum import Enum
+from typing import Any
 
 from .api.service import RequiredService
 from .switch import Switch
@@ -23,7 +24,7 @@ class StandbyState(str, Enum):
 class Insight(Switch):
     """Representation of a WeMo Insight device."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo Switch device."""
         Switch.__init__(self, *args, **kwargs)
         self.insight_params = {}
@@ -41,7 +42,7 @@ class Insight(Switch):
         params = self.insight.GetInsightParams().get('InsightParams')
         self.insight_params = self.parse_insight_params(params)
 
-    def subscription_update(self, _type, _params):
+    def subscription_update(self, _type: str, _params: str) -> bool:
         """Update the device attributes due to a subscription update event."""
         LOG.debug("subscription_update %s %s", _type, _params)
         if _type == "InsightParams":
@@ -85,7 +86,7 @@ class Insight(Switch):
             'powerthreshold': int(float(powerthreshold)),
         }
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return the device state."""
         if force_update or self._state is None:
             self.update_insight_params()

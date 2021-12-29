@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
+from typing import Any
 
 from .api.service import RequiredService
 from .switch import Switch
@@ -31,7 +32,7 @@ MODE_NAMES = {
 class CrockPot(Switch):
     """WeMo Crockpot."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo CrockPot device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
@@ -59,7 +60,7 @@ class CrockPot(Switch):
             self._attributes = state_attributes
             self._state = self.mode
 
-    def subscription_update(self, _type, _params):
+    def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle reports from device."""
         if _params is None:
             return False
@@ -97,7 +98,7 @@ class CrockPot(Switch):
         """Return the cooked time in minutes."""
         return int(self._attributes.get('cookedTime'))
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""
         # The base implementation using GetBinaryState doesn't work for
         # CrockPot (always returns 0) so use mode instead.
@@ -106,7 +107,7 @@ class CrockPot(Switch):
 
         return int(self.mode != CrockPotMode.Off)
 
-    def set_state(self, state):
+    def set_state(self, state: int) -> None:
         """Set the state of this device to on or off."""
         if state:
             self.update_settings(

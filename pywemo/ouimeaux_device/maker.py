@@ -1,6 +1,8 @@
 """Representation of a WeMo Maker device."""
 from __future__ import annotations
 
+from typing import Any
+
 from lxml import etree as et
 
 from .api.service import RequiredService
@@ -39,7 +41,7 @@ def attribute_xml_to_dict(xml_blob) -> dict[str, int]:
 class Maker(Switch):
     """Representation of a WeMo Maker device."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo Switch device."""
         super().__init__(*args, **kwargs)
         self.maker_params = {}
@@ -60,7 +62,7 @@ class Maker(Switch):
         self.maker_params = attribute_xml_to_dict(maker_resp)
         self._state = self.switch_state
 
-    def subscription_update(self, _type, _params):
+    def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle reports from device."""
         if _type == "attributeList":
             self.maker_params.update(attribute_xml_to_dict(_params))
@@ -69,7 +71,7 @@ class Maker(Switch):
 
         return super().subscription_update(_type, _params)
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""
         # The base implementation using GetBinaryState doesn't work for the
         # Maker (always returns 0), so pull the switch state from the
@@ -79,7 +81,7 @@ class Maker(Switch):
 
         return self.switch_state
 
-    def set_state(self, state):
+    def set_state(self, state: int) -> None:
         """Set the state of this device to on or off."""
         # The Maker has a momentary mode - so it's not safe to assume
         # the state is what you just set, so re-read it from the device

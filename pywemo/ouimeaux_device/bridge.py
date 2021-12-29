@@ -4,6 +4,7 @@ from __future__ import annotations
 import io
 import time
 from html import escape
+from typing import Any
 
 from lxml import etree as et
 
@@ -43,7 +44,7 @@ class Bridge(Device):
     Lights = {}
     Groups = {}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo Bridge (Link) device."""
         super().__init__(*args, **kwargs)
         self.bridge_update()
@@ -100,13 +101,13 @@ class Bridge(Device):
 
         return self.Lights, self.Groups
 
-    def get_state(self, force_update=False):
+    def get_state(self, force_update: bool = False) -> int:
         """Update the state of the Bridge device."""
         state = super().get_state(force_update)
         self.bridge_update(force_update)
         return state
 
-    def subscription_update(self, _type, _param):
+    def subscription_update(self, _type: str, _param: str) -> bool:
         """Update the bridge attributes due to a subscription update event."""
         if _type == "StatusChange" and _param:
             state_event = et.fromstring(_param.encode('utf8'))
