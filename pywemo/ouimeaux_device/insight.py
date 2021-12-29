@@ -1,4 +1,6 @@
 """Representation of a WeMo Insight device."""
+from __future__ import annotations
+
 import logging
 import warnings
 from datetime import datetime
@@ -29,7 +31,7 @@ class Insight(Switch):
         self.update_insight_params()
 
     @property
-    def _required_services(self):
+    def _required_services(self) -> list[RequiredService]:
         return super()._required_services + [
             RequiredService(name="insight", actions=["GetInsightParams"]),
         ]

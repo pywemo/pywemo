@@ -46,7 +46,7 @@ class Maker(Switch):
         self.get_state(force_update=True)
 
     @property
-    def _required_services(self):
+    def _required_services(self) -> list[RequiredService]:
         return super()._required_services + [
             RequiredService(name="basicevent", actions=["SetBinaryState"]),
             RequiredService(

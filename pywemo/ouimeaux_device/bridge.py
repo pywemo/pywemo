@@ -1,4 +1,6 @@
 """Representation of a WeMo Bridge (Link) device."""
+from __future__ import annotations
+
 import io
 import time
 from html import escape
@@ -55,7 +57,7 @@ class Bridge(Device):
         )
 
     @property
-    def _required_services(self):
+    def _required_services(self) -> list[RequiredService]:
         return super()._required_services + [
             RequiredService(name="basicevent", actions=["GetMacAddr"]),
             RequiredService(

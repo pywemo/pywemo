@@ -1,4 +1,6 @@
 """Representation of a WeMo CrockPot device."""
+from __future__ import annotations
+
 from enum import IntEnum
 
 from .api.service import RequiredService
@@ -35,7 +37,7 @@ class CrockPot(Switch):
         self._attributes = {}
 
     @property
-    def _required_services(self):
+    def _required_services(self) -> list[RequiredService]:
         return super()._required_services + [
             RequiredService(
                 name="basicevent",
