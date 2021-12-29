@@ -1,0 +1,89 @@
+interactions:
+- request:
+    body: '<?xml version="1.0" encoding="utf-8"?>
+
+      <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+
+      <s:Body>
+
+      <u:SetAttributes xmlns:u="urn:Belkin:service:deviceevent:1">
+
+      <attributeList>&lt;attribute&gt;&lt;name&gt;FilterLife&lt;/name&gt;&lt;value&gt;60480&lt;/value&gt;&lt;/attribute&gt;</attributeList>
+
+      </u:SetAttributes>
+
+      </s:Body>
+
+      </s:Envelope>'
+    headers:
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:deviceevent:1#SetAttributes"'
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/deviceevent1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:SetAttributesResponse
+        xmlns:u=\"urn:Belkin:service:deviceevent:1\">\r\n<attributeList>0</attributeList>\r\n</u:SetAttributesResponse>\r\n</s:Body>
+        </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '288'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Wed, 29 Dec 2021 20:37:08 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '<?xml version="1.0" encoding="utf-8"?>
+
+      <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+
+      <s:Body>
+
+      <u:GetAttributes xmlns:u="urn:Belkin:service:deviceevent:1">
+
+
+      </u:GetAttributes>
+
+      </s:Body>
+
+      </s:Envelope>'
+    headers:
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:deviceevent:1#GetAttributes"'
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/deviceevent1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:GetAttributesResponse
+        xmlns:u=\"urn:Belkin:service:deviceevent:1\">\r\n<attributeList>&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;FanMode&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;3&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;DesiredHumidity&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;0&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;CurrentHumidity&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;42.0&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;WaterAdvise&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;0&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;NoWater&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;0&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;FilterLife&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;60480&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;ExpiredFilterTime&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;0&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;\n</attributeList>\r\n</u:GetAttributesResponse>\r\n</s:Body>
+        </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '1329'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Wed, 29 Dec 2021 20:37:08 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+version: 1

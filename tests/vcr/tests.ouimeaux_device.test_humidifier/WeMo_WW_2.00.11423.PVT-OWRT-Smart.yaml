@@ -1,0 +1,1011 @@
+interactions:
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/setup.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?>\n<root xmlns=\"urn:Belkin:device-1-0\">\n  <specVersion>\n
+        \   <major>1</major>\n    <minor>0</minor>\n  </specVersion>\n  <device>\n<deviceType>urn:Belkin:device:Humidifier:1</deviceType>\n<friendlyName>WeMo
+        Device</friendlyName>\n    <manufacturer>Belkin International Inc.</manufacturer>\n
+        \   <manufacturerURL>http://www.belkin.com</manufacturerURL>\n    <modelDescription>Belkin
+        Plugin Socket 1.0</modelDescription>\n<modelName>Humidifier</modelName>\n
+        \   <modelNumber>1.0</modelNumber>\n    <modelURL>http://www.belkin.com/plugin/</modelURL>\n<serialNumber>SERIALNUMBER</serialNumber>\n<UDN>uuid:Humidifier-1_0-SERIALNUMBER</UDN>\n
+        \   <UPC>123456789</UPC>\n<macAddress>001122334455</macAddress>\n<firmwareVersion>WeMo_WW_2.00.11423.PVT-OWRT-Smart</firmwareVersion>\n<iconVersion>1|49153</iconVersion>\n<binaryState>0</binaryState>\n<DeviceID>65542</DeviceID>\n<DeviceFWVersion>V.04</DeviceFWVersion>\n<brandName>Holmes</brandName>\n
+        \   <new_algo>1</new_algo>\n    <iconList> \n      <icon> \n        <mimetype>jpg</mimetype>
+        \n        <width>100</width> \n        <height>100</height> \n        <depth>100</depth>
+        \n         <url>icon.jpg</url> \n      </icon> \n    </iconList>\n    <serviceList>\n
+        \     <service>\n        <serviceType>urn:Belkin:service:WiFiSetup:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:WiFiSetup1</serviceId>\n        <controlURL>/upnp/control/WiFiSetup1</controlURL>\n
+        \       <eventSubURL>/upnp/event/WiFiSetup1</eventSubURL>\n        <SCPDURL>/setupservice.xml</SCPDURL>\n
+        \     </service>\n      <service>\n        <serviceType>urn:Belkin:service:timesync:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:timesync1</serviceId>\n        <controlURL>/upnp/control/timesync1</controlURL>\n
+        \       <eventSubURL>/upnp/event/timesync1</eventSubURL>\n        <SCPDURL>/timesyncservice.xml</SCPDURL>\n
+        \     </service>\n      <service>\n        <serviceType>urn:Belkin:service:basicevent:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:basicevent1</serviceId>\n        <controlURL>/upnp/control/basicevent1</controlURL>\n
+        \       <eventSubURL>/upnp/event/basicevent1</eventSubURL>\n        <SCPDURL>/eventservice.xml</SCPDURL>\n
+        \     </service>\n      <service>\n        <serviceType>urn:Belkin:service:deviceevent:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:deviceevent1</serviceId>\n        <controlURL>/upnp/control/deviceevent1</controlURL>\n
+        \       <eventSubURL>/upnp/event/deviceevent1</eventSubURL>\n        <SCPDURL>/deviceservice.xml</SCPDURL>\n
+        \     </service>      \n      <service>\n        <serviceType>urn:Belkin:service:firmwareupdate:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:firmwareupdate1</serviceId>\n        <controlURL>/upnp/control/firmwareupdate1</controlURL>\n
+        \       <eventSubURL>/upnp/event/firmwareupdate1</eventSubURL>\n        <SCPDURL>/firmwareupdate.xml</SCPDURL>\n
+        \     </service>\n      <service>\n        <serviceType>urn:Belkin:service:rules:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:rules1</serviceId>\n        <controlURL>/upnp/control/rules1</controlURL>\n
+        \       <eventSubURL>/upnp/event/rules1</eventSubURL>\n        <SCPDURL>/rulesservice.xml</SCPDURL>\n
+        \     </service>\n\t  \n      <service>\n        <serviceType>urn:Belkin:service:metainfo:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:metainfo1</serviceId>\n        <controlURL>/upnp/control/metainfo1</controlURL>\n
+        \       <eventSubURL>/upnp/event/metainfo1</eventSubURL>\n        <SCPDURL>/metainfoservice.xml</SCPDURL>\n
+        \     </service>\n\n      <service>\n        <serviceType>urn:Belkin:service:remoteaccess:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:remoteaccess1</serviceId>\n        <controlURL>/upnp/control/remoteaccess1</controlURL>\n
+        \       <eventSubURL>/upnp/event/remoteaccess1</eventSubURL>\n        <SCPDURL>/remoteaccess.xml</SCPDURL>\n
+        \     </service>\n\t   \n      <service>\n        <serviceType>urn:Belkin:service:deviceinfo:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:deviceinfo1</serviceId>\n        <controlURL>/upnp/control/deviceinfo1</controlURL>\n
+        \       <eventSubURL>/upnp/event/deviceinfo1</eventSubURL>\n        <SCPDURL>/deviceinfoservice.xml</SCPDURL>\n
+        \     </service>\n\t   \n      <service>\n        <serviceType>urn:Belkin:service:smartsetup:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:smartsetup1</serviceId>\n        <controlURL>/upnp/control/smartsetup1</controlURL>\n
+        \       <eventSubURL>/upnp/event/smartsetup1</eventSubURL>\n        <SCPDURL>/smartsetup.xml</SCPDURL>\n
+        \     </service>\n\t\n      <service>\n        <serviceType>urn:Belkin:service:manufacture:1</serviceType>\n
+        \       <serviceId>urn:Belkin:serviceId:manufacture1</serviceId>\n        <controlURL>/upnp/control/manufacture1</controlURL>\n
+        \       <eventSubURL>/upnp/event/manufacture1</eventSubURL>\n        <SCPDURL>/manufacture.xml</SCPDURL>\n
+        \     </service>\n\n    </serviceList>\n   <presentationURL>/pluginpres.html</presentationURL>\n</device>\n</root>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '4906'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:04 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:01:05 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/setupservice.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?>\n<scpd xmlns=\"urn:Belkin:service-1-0\">\n\n
+        \ <specVersion>\n    <major>1</major>\n    <minor>0</minor>\n  </specVersion>\n
+        \ \n<actionList>\n    <action>\n        <name>GetApList</name>\n        <argumentList>\n
+        \        <argument>\n         <retval />\n         <name>ApList</name>\n         <relatedStateVariable>ApList</relatedStateVariable>\n
+        \        <direction>out</direction>\n         </argument>\n         </argumentList>\n
+        \   </action>\n    \n    <action>\n        <name>GetNetworkList</name>\n        <argumentList>\n
+        \        <argument>\n         <retval />\n         <name>NetworkList</name>\n
+        \        <relatedStateVariable>NetworkList</relatedStateVariable>\n         <direction>out</direction>\n
+        \        </argument>\n         </argumentList>\n    </action>\n    \n    <action>\n
+        \     <name>ConnectHomeNetwork</name>    \n      <argumentList>\n\n         <argument>\n
+        \          <retval />\n           <name>ssid</name>\n           <relatedStateVariable>ssid</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n          \n
+        \         <argument>\n         <retval />\n        <name>auth</name>\n        <relatedStateVariable>auth</relatedStateVariable>\n
+        \       <direction>in</direction>\n        </argument>\n\n       <argument>\n
+        \            <retval />\n             <name>password</name>\n             <relatedStateVariable>password</relatedStateVariable>\n
+        \            <direction>in</direction>\n       </argument>\n\n       <argument>\n
+        \            <retval />\n             <name>encrypt</name>\n             <relatedStateVariable>encrypt</relatedStateVariable>\n
+        \            <direction>in</direction>\n       </argument>\n\n       <argument>\n
+        \            <retval />\n             <name>channel</name>\n             <relatedStateVariable>channel</relatedStateVariable>\n
+        \            <direction>in</direction>\n       </argument>\n       \n      </argumentList>\n
+        \         \n    </action>\n    \n        <action>\n          <name>GetNetworkStatus</name>
+        \   \n          <argumentList>\n             <argument>\n               <retval
+        />\n               <name>NetworkStatus</name>\n               <relatedStateVariable>NetworkStatus</relatedStateVariable>\n
+        \              <direction>out</direction>\n              </argument>\n          </argumentList>\n
+        \   </action>\n\n    <action>\n          <name>CloseSetup</name>    \n          <argumentList>\n
+        \         </argumentList>\n    </action>\n\t\n\t<action>\n          <name>StopPair</name>
+        \   \n          <argumentList>\n          </argumentList>\n    </action>\n
+        \   \n</actionList>\n\n  <serviceStateTable>\n  \n  <!-- connected, connecting,
+        disconnected, time out error -->\n  <stateVariable sendEvents=\"yes\">\n      <name>NetworkStatus</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>Disconnected</defaultValue>\n
+        \   </stateVariable>\n  <stateVariable sendEvents=\"yes\">\t\n\t<name>PairingStatus</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>Connecting</defaultValue>\n
+        \   </stateVariable>\n    \n    <stateVariable sendEvents=\"yes\">\n      <name>ApList</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue></defaultValue>\n    </stateVariable>\n\t\n
+        \   <stateVariable sendEvents=\"yes\">\n      <name>NetworkList</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue></defaultValue>\n    </stateVariable>\n\t\n  </serviceStateTable>\n
+        \ \n  </scpd>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '3278'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:04 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/timesyncservice.xml
+  response:
+    body:
+      string: "\uFEFF<?xml version=\"1.0\"?>\n<scpd xmlns=\"urn:Belkin:service-1-0\">\n
+        \ <specVersion>\n    <major>1</major>\n    <minor>0</minor>\n  </specVersion>\n
+        \ \n  <actionList>  \n    <action>    \n      <name>TimeSync</name>    \n
+        \     <argumentList>\n         <argument>\n           <retval />\n\t\t   <!--
+        UTC value, long -->\n           <name>UTC</name>\n           <relatedStateVariable>UTC</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>TimeZone</name>\n           <relatedStateVariable>TimeZone</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>dst</name>\n           <relatedStateVariable>dst</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n\t\t  <argument>\n
+        \          <retval />\n           <name>DstSupported</name>\n           <relatedStateVariable>DstSupported</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n      </argumentList>
+        \     \n    </action>\n\t\n    <action>\n      <name>GetTime</name> \n    </action>\n
+        \   <action>\n      <name>GetDeviceTime</name>\n      <argumentList>\n         <argument>\n
+        \          <retval />\n           <name>DeviceTime</name>\n           <relatedStateVariable>DeviceTime</relatedStateVariable>\n
+        \          <direction>out</direction>\n          </argument>\n      </argumentList>\n
+        \   </action>\n    \n</actionList>\n\n  <serviceStateTable>\n    \n        <stateVariable
+        sendEvents=\"no\">\n        <!-- UTC seconds-->\n      <name>UTC</name>\n
+        \     <dataType>long</dataType>\n      <defaultValue>0</defaultValue>\n    </stateVariable>\n
+        \   \n    \n    <stateVariable sendEvents=\"no\">\n      <name>TimeZone</name>\n
+        \     <dataType>int</dataType>\n      <defaultValue>0</defaultValue>\n    </stateVariable>\n
+        \   \n    <stateVariable sendEvents=\"yes\">\n      <name>DeviceTime</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t\n\t<stateVariable sendEvents=\"no\">\n      <name>dst</name>\n
+        \     <dataType>Boolean</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n    \n  </serviceStateTable>\n  \n  </scpd>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '2190'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:04 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/eventservice.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?>\n<scpd xmlns=\"urn:Belkin:service-1-0\">\n\n
+        \ <specVersion>\n    <major>1</major>\n    <minor>0</minor>\n  </specVersion>\n
+        \ \n  <actionList>\n  \n    <action>\n      <name>SetBinaryState</name>\n
+        \     <argumentList>\n         <argument>\n           <retval />\n           <name>BinaryState</name>\n
+        \          <relatedStateVariable>BinaryState</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n      </argumentList>\n    </action>\n\n    <action>\n
+        \     <name>SetLogLevelOption</name>\n      <argumentList>\n         <argument>\n
+        \          <retval />\n           <name>Level</name>\n           <relatedStateVariable>Level</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>Option</name>\n           <relatedStateVariable>Option</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n      </argumentList>\n
+        \   </action>\n\n    <action>\n      <name>GetFriendlyName</name>\n  \t  <argumentList>\n
+        \     <argument>\n      <retval />\n      <name>FriendlyName</name>\n      <relatedStateVariable>FriendlyName</relatedStateVariable>\n
+        \     <direction>in</direction>\n       </argument>\n       </argumentList>\n
+        \   </action>\n    <action>\n      <name>ReSetup</name>\n      <argumentList>\n
+        \        <argument>\n           <retval />\n           <name>Reset</name>\n
+        \          <relatedStateVariable>Reset</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n      </argumentList>\n    </action>\n\t<action>\n
+        \     <name>SetHomeId</name>\n      <argumentList>\n         <argument>\n
+        \          <retval />\n           <name>SetHomeId</name>\n           <relatedStateVariable>HomeId</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n      </argumentList>\n
+        \   </action>\n\t<action>\n      <name>GetHomeId</name>\n    </action>\n\t<action>\n
+        \     <name>SetDeviceId</name>\n      <argumentList>\n         <argument>\n
+        \          <retval />\n           <name>SetDeviceId</name>\n           <relatedStateVariable>DeviceId</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n      </argumentList>\n
+        \   </action>\n    <action>\n      <name>GetDeviceId</name>\n    </action>\n\t
+        <action>\n      <name>GetMacAddr</name>\n    </action>\n    <action>\n      <name>GetSerialNo</name>\n
+        \   </action>\n    <action>\n      <name>GetPluginUDN</name>\n    </action>\n
+        \   <action>\n      <name>GetSmartDevInfo</name>\n    </action>\n    <action>\n
+        \     <name>ShareHWInfo</name>\n      <argumentList>\n         <argument>\n
+        \          <retval />\n           <name>Mac</name>\n           <relatedStateVariable>Mac</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>Serial</name>\n           <relatedStateVariable>Serial</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>Udn</name>\n           <relatedStateVariable>Udn</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>RestoreState</name>\n           <relatedStateVariable>RestoreState</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>HomeId</name>\n           <relatedStateVariable>HomeId</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>PluginKey</name>\n           <relatedStateVariable>PluginKey</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n      </argumentList>\n
+        \   </action>\n    <action>\n      <name>ChangeFriendlyName</name>\n      <argumentList>\n
+        \        <argument>\n           <retval />\n           <name>FriendlyName</name>\n
+        \          <relatedStateVariable>FriendlyName</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n      </argumentList>\n    </action>\n\t\n    <action>\n
+        \     <name>SetSmartDevInfo</name>\n      <argumentList>\n         <argument>\n
+        \          <retval />\n           <name>SmartDevURL</name>\n           <relatedStateVariable>SmartDevURL</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n      </argumentList>\n
+        \   </action>\n\t<action>\n      <name>GetRuleOverrideStatus</name>\n      <argumentList>\n
+        \        <argument>\n           <retval />\n           <name>RuleOverrideStatus</name>\n
+        \          <relatedStateVariable>RuleOverrideStatus</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n      </argumentList>\n
+        \   </action>\n\n\t<action>\n      <name>GetDeviceIcon</name>\n      <argumentList>\n
+        \        <argument>\n           <retval />\n           <name>DeviceIcon</name>\n
+        \          <relatedStateVariable>DeviceIcon</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n      </argumentList>\n    </action>\n\n\t<action>\n
+        \     <name>GetIconURL</name>\n      <argumentList>\n      <argument>\n      <retval
+        />\n\t<name>URL</name>\n\t<relatedStateVariable>URL</relatedStateVariable>\n\t<direction>out</direction>\n\t</argument>\n
+        \     </argumentList>\n    </action>\n\t\n\t<action>\n      <name>GetLogFileURL</name>\n
+        \     <argumentList>\n      <argument>\n      <retval />\n\t<name>LOGURL</name>\n\t<relatedStateVariable>LOGURL</relatedStateVariable>\n\t<direction>out</direction>\n\t</argument>\n
+        \     </argumentList>\n    </action>\n\n\t<action>\n      <name>ChangeDeviceIcon</name>\n
+        \     <argumentList>\n         <argument>\n           <retval />\n           <name>PictureSize</name>\n
+        \          <relatedStateVariable>PictureSize</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n\t\t  <argument>\n           <retval />\n           <name>PictureHeight</name>\n
+        \          <relatedStateVariable>PictureWidth</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n\t\t  \n\t\t  <argument>\n           <retval />\n           <name>PictureColorDeep</name>\n
+        \          <relatedStateVariable>PictureColorDeep</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n      </argumentList>\n
+        \   </action>\n  \n    <action>\n    <name>GetBinaryState</name>\n    <argumentList>\n
+        \   <argument>\n    <retval />\n    <name>BinaryState</name>\n    <relatedStateVariable>BinaryState</relatedStateVariable>\n
+        \   <direction>out</direction>\n    </argument>\n    </argumentList>\n    </action>\n\t\n\t<action>\n
+        \     <name>SetMultiState</name>\n      <argumentList>\n         <argument>\n
+        \          <retval />\n           <name>state</name>\n           <relatedStateVariable>StateList</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n\n\t\t  <argument>\n
+        \          <retval />\n           <name>state</name>\n           <relatedStateVariable>StateList</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\t\t  \n\t\n         <argument>\n
+        \          <retval />\n           <name>state</name>\n           <relatedStateVariable>StateList</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n\t\t  \n      </argumentList>\n
+        \   </action>\n\t\n\t<action>\n          <name>SetCrockpotState</name>\n          <argumentList>\n
+        \             <argument>\n                  <retval />\n                  <name>mode</name>\n
+        \                 <relatedStateVariable>mode</relatedStateVariable>\n                  <direction>in</direction>\n
+        \             </argument>\n              <argument>\n                  <retval
+        />\n                  <name>time</name>\n                  <relatedStateVariable>timeVariable</relatedStateVariable>\n
+        \                 <direction>in</direction>\n              </argument>\n          </argumentList>\n
+        \     </action>\n\n    <action>\n          <name>GetCrockpotState</name>\n
+        \         <argumentList>\n              <argument>\n                  <retval
+        />\n                  <name>mode</name>\n                  <relatedStateVariable>mode</relatedStateVariable>\n
+        \                 <direction>out</direction>\n              </argument>\n
+        \             <argument>\n                  <retval />\n                  <name>time</name>\n
+        \                 <relatedStateVariable>timeVariable</relatedStateVariable>\n
+        \                 <direction>out</direction>\n              </argument>\n
+        \             <argument>\n                  <retval />\n                  <name>cookedTime</name>\n
+        \                 <relatedStateVariable>timeVariable</relatedStateVariable>\n
+        \                 <direction>out</direction>\n              </argument>\n
+        \             <argument>\n                  <retval />\n                  <name>timeStamp</name>\n
+        \                 <relatedStateVariable>timeVariable</relatedStateVariable>\n
+        \                 <direction>out</direction>\n              </argument>\t\t\t
+        \ \n          </argumentList>\n      </action>\n\n\t<action>\n          <name>SetJardenStatus</name>\n
+        \         <argumentList>\n              <argument>\n                  <retval
+        />\n                  <name>mode</name>\n                  <relatedStateVariable>mode</relatedStateVariable>\n
+        \                 <direction>in</direction>\n              </argument>\n              <argument>\n
+        \                 <retval />\n                  <name>time</name>\n                  <relatedStateVariable>timeVariable</relatedStateVariable>\n
+        \                 <direction>in</direction>\n              </argument>\n          </argumentList>\n
+        \     </action>\n\n    <action>\n          <name>GetJardenStatus</name>\n
+        \         <argumentList>\n              <argument>\n                  <retval
+        />\n                  <name>mode</name>\n                  <relatedStateVariable>mode</relatedStateVariable>\n
+        \                 <direction>out</direction>\n              </argument>\n
+        \             <argument>\n                  <retval />\n                  <name>time</name>\n
+        \                 <relatedStateVariable>timeVariable</relatedStateVariable>\n
+        \                 <direction>out</direction>\n              </argument>\n
+        \             <argument>\n                  <retval />\n                  <name>cookedTime</name>\n
+        \                 <relatedStateVariable>timeVariable</relatedStateVariable>\n
+        \                 <direction>out</direction>\n              </argument>\n
+        \             <argument>\n                  <retval />\n                  <name>timeStamp</name>\n
+        \                 <relatedStateVariable>timeVariable</relatedStateVariable>\n
+        \                 <direction>out</direction>\n              </argument>\t\t\t
+        \ \n          </argumentList>\n      </action>\n\t\n    <action>\n      <name>GetWatchdogFile</name>\n
+        \     <argumentList>\n        <argument>\n          <retval />\n            <name>WDFile</name>\n
+        \           <relatedStateVariable>WDFile</relatedStateVariable>\n            <direction>out</direction>\n
+        \       </argument>\n      </argumentList>\n    </action>\n\n    <action>\n
+        \     <name>GetSignalStrength</name>\n      <argumentList>\n        <argument>\n
+        \         <retval />\n            <name>SignalStrength</name>\n            <relatedStateVariable>SignalStrength</relatedStateVariable>\n
+        \           <direction>in</direction>\n        </argument>\n      </argumentList>\n
+        \   </action>\n\n    <action>\n      <name>SetServerEnvironment</name>\n      <argumentList>\n
+        \       <argument>\n          <retval />\n            <name>ServerEnvironment</name>\n
+        \           <relatedStateVariable>ServerEnvironment</relatedStateVariable>\n
+        \           <direction>in</direction>\n        </argument>\n        <argument>\n
+        \         <retval />\n            <name>TurnServerEnvironment</name>\n            <relatedStateVariable>TurnServerEnvironment</relatedStateVariable>\n
+        \           <direction>in</direction>\n        </argument>\n\t<argument>\n
+        \         <retval />\n            <name>ServerEnvironmentType</name>\n            <relatedStateVariable>ServerEnvironmentType</relatedStateVariable>\n
+        \           <direction>in</direction>\n        </argument>\n      </argumentList>\n
+        \   </action>\n\n    <action>\n      <name>GetServerEnvironment</name>\n      <argumentList>\n
+        \       <argument>\n          <retval />\n            <name>ServerEnvironment</name>\n
+        \           <relatedStateVariable>ServerEnvironment</relatedStateVariable>\n
+        \           <direction>out</direction>\n        </argument>\n        <argument>\n
+        \         <retval />\n            <name>TurnServerEnvironment</name>\n            <relatedStateVariable>TurnServerEnvironment</relatedStateVariable>\n
+        \           <direction>out</direction>\n        </argument>\n        <argument>\n
+        \         <retval />\n            <name>ServerEnvironmentType</name>\n            <relatedStateVariable>ServerEnvironmentType</relatedStateVariable>\n
+        \           <direction>out</direction>\n        </argument>\n      </argumentList>\n
+        \   </action>\n\n    <action>\n      <name>ControlCloudUpload</name>\n      <argumentList>\n
+        \       <argument>\n          <name>EnableUpload</name>\n          <direction>in</direction>\n
+        \         <relatedStateVariable>EnableUpload</relatedStateVariable>\n        </argument>\n
+        \     </argumentList>\n    </action>\n\n</actionList>\n\n  <serviceStateTable>\n
+        \ \n    <stateVariable sendEvents=\"yes\">\n      <name>BinaryState</name>\n
+        \     <dataType>Boolean</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t\n    <stateVariable sendEvents=\"yes\">\n      <name>mode</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n    \n    <stateVariable sendEvents=\"yes\">\n      <name>time</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n    \n    <stateVariable sendEvents=\"yes\">\n      <name>cookedTime</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t\n    <stateVariable sendEvents=\"yes\">\n      <name>timeStamp</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\t\n\t\n    <stateVariable sendEvents=\"yes\">\n      <name>level</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>option</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n\t<stateVariable sendEvents=\"yes\">\n      <name>Reset</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>FriendlyName</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t\n\t<stateVariable sendEvents=\"yes\">\n      <name>HomeId</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>DeviceId</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>SmartDevInfo</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>MacAddr</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>SerialNo</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n\t<stateVariable sendEvents=\"yes\">\n      <name>PluginUDN</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>DeviceIcon</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n  \n    <stateVariable sendEvents=\"No\">\n      <name>StateList</name>\n
+        \     <dataType>list</dataType>\n      <defaultValue>0</defaultValue>\n    </stateVariable>\n
+        \ <stateVariable sendEvents=\"yes\">\n      <name>URL</name>\n\t  <dataType>string</dataType>\n\t
+        \ <defaultValue>0</defaultValue>\n  </stateVariable>\n\t\t\t\t\t\t\n\t<stateVariable
+        sendEvents=\"yes\">\n      <name>RuleOverrideStatus</name>\n\t  <dataType>string</dataType>\n\t
+        \ <defaultValue>0</defaultValue>\n  </stateVariable>\n\t\t\t\t\t\t\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>WDFile</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>SignalStrength</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>ServerEnvironment</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>TurnServerEnvironment</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n\n  <stateVariable
+        sendEvents=\"yes\">\n      <name>ServerEnvironmentType</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n\n  <stateVariable
+        sendEvents=\"yes\">\n      <name>EnableUpload</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n\n  </serviceStateTable>\n
+        \ \n  </scpd>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '17012'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:04 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/deviceservice.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<scpd xmlns=\"urn:Belkin:service-1-0\">\r\n
+        \      <specVersion>\r\n              <major>1</major>\r\n              <minor>0</minor>\r\n
+        \         </specVersion>\r\n\t\t  \r\n  <actionList>\r\n              <action>\r\n
+        \                    <name>GetAttributeList</name>\r\n                     <argumentList>\r\n
+        \                           <argument>\r\n                                   <name>attributeList</name>\r\n
+        \                                  <relatedStateVariable>String</relatedStateVariable>\r\n
+        \                                  <direction>out</direction>\r\n                               </argument>\r\n
+        \                       </argumentList>\r\n                 </action>\r\n
+        \             <action>\r\n                     <name>GetAttributes</name>\r\n
+        \                    <argumentList>\r\n                            <argument>\r\n
+        \                                  <retval></retval>\r\n                                   <name>attributeList</name>\r\n
+        \                                  <relatedStateVariable>String</relatedStateVariable>\r\n
+        \                                  <direction>out</direction>\r\n                               </argument>\r\n
+        \                       </argumentList>\r\n                 </action>\r\n
+        \             <action>\r\n                     <name>SetAttributes</name>\r\n
+        \                    <argumentList>\r\n                            <argument>\r\n
+        \                                  <retval></retval>\r\n                                   <name>attributeList</name>\r\n
+        \                                  <relatedStateVariable>String</relatedStateVariable>\r\n
+        \                                  <direction>in</direction>\r\n                               </argument>\r\n
+        \                       </argumentList>\r\n                 </action>\r\n
+        \              <action>\r\n                     <name>SetBlobStorage</name>
+        \ \r\n                     <argumentList>\r\n                            <argument>\r\n
+        \                                  <retval></retval>\r\n                                   <name>attributeList</name>\r\n
+        \                                  <relatedStateVariable>String</relatedStateVariable>\r\n
+        \                                  <direction>in</direction>\r\n                               </argument>\r\n
+        \                       </argumentList>\r\n                   </action>\r\n
+        \              <action>\r\n                     <name>GetBlobStorage</name>
+        \ \r\n                     <argumentList>\r\n                            <argument>\r\n
+        \                                  <retval></retval>\r\n                                   <name>attributeList</name>\r\n
+        \                                  <relatedStateVariable>String</relatedStateVariable>\r\n
+        \                                  <direction>in</direction>\r\n                               </argument>\r\n
+        \                       </argumentList>\r\n                   </action>\r\n
+        \ </actionList> \r\n\r\n   <serviceStateTable>\r\n\t<stateVariable sendEvents=\"yes\">\r\n
+        \       <name>attributeList</name>\r\n        <dataType>String</dataType>\r\n
+        \       <defaultValue>0</defaultValue>\r\n    </stateVariable>\r\n  </serviceStateTable>\r\n\r\n
+        \ </scpd>"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '3075'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:04 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/firmwareupdate.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\" ?> \n<scpd xmlns=\"urn:Belkin:service-1-0\">\n<specVersion>\n<major>1</major>
+        \n<minor>0</minor> \n</specVersion>\n<actionList>\n<action>\n<name>UpdateFirmware</name>
+        \n<argumentList>\n<argument>\n<retval /> \n<name>NewFirmwareVersion</name>
+        \n<relatedStateVariable>NewFirmwareVersion</relatedStateVariable> \n<direction>in</direction>
+        \n</argument>\n<argument>\n<retval /> \n<name>ReleaseDate</name> \n<relatedStateVariable>ReleaseDate</relatedStateVariable>
+        \n<direction>in</direction> \n</argument>\n<argument>\n<retval /> \n<name>URL</name>
+        \n<relatedStateVariable>URL</relatedStateVariable> \n<direction>in</direction>
+        \n</argument>\n<argument>\n<retval /> \n<name>Signature</name> \n<relatedStateVariable>Signature</relatedStateVariable>
+        \n<direction>in</direction> \n</argument>\n<argument>\n<retval /> \n<name>DownloadStartTime</name>\n<relatedStateVariable>DownloadStartTime</relatedStateVariable>\n<direction>in</direction>\n</argument>\n<argument>\n<retval
+        /> \n<name>WithUnsignedImage</name>\n<relatedStateVariable>WithUnsignedImage</relatedStateVariable>\n<direction>in</direction>\n</argument>\n</argumentList>\n</action>\n<action>\n<name>GetFirmwareVersion</name>\n<retval
+        />\n<argumentList>\n<argument>\n<name>FirmwareVersion</name> \n<relatedStateVariable>FirmwareVersion</relatedStateVariable>
+        \n<direction>out</direction> \n</argument>\n</argumentList>\n</action>\n</actionList>\n<serviceStateTable>\n<stateVariable
+        sendEvents=\"yes\">\n<name>FirmwareVersion</name>\n<dataType>string</dataType>\n<defaultValue>0</defaultValue>\n</stateVariable>\n<stateVariable
+        sendEvents=\"yes\">\n<name>FirmwareUpdateStatus</name>\n<dataType>string</dataType>\n<defaultValue>0</defaultValue>\n</stateVariable>\n<stateVariable
+        sendEvents=\"no\">\n<name>WithUnsignedImage</name>\n<dataType>string</dataType>\n<defaultValue>0</defaultValue>\n</stateVariable>\n</serviceStateTable>\n</scpd>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '1826'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:04 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/rulesservice.xml
+  response:
+    body:
+      string: "\uFEFF<?xml version=\"1.0\"?>\n<scpd xmlns=\"urn:Belkin:service-1-0\">\n\n
+        \ <specVersion>\n    <major>1</major>\n    <minor>0</minor>\n  </specVersion>\n
+        \ \n<actionList>\n    <action>\n          <name>UpdateWeeklyCalendar</name>
+        \  \n\t\t  <argumentList>\n\t        <argument>\n                <retval />\n<!--
+        entire day's timers list: \nNumberOfTimers|time,action,[deviceUDN;deviceUDN;...]|time,action,[deviceUDN;deviceUDN...]|time,action
+        \n -->\t\t\t\t\n<!--time, seconds from 00:00 am within 24 hours. action: 0x00
+        (OFF/NO detection), 0x01: (ON/Detection)--> \n<!--PLEASE note that, for simpler
+        timer stored on socket, deviceUDN is NULL-->\n                <name>Mon</name>\n
+        \               <relatedStateVariable>Mon</relatedStateVariable>\n                <direction>in</direction>\n
+        \           </argument>\n\t        <argument>\n                <retval />\n
+        \               <name>Tues</name>\n                <relatedStateVariable>Tues</relatedStateVariable>\n
+        \               <direction>in</direction>\n            </argument>\n\t        <argument>\n
+        \               <retval />\n                <name>Wed</name>\n                <relatedStateVariable>Wed</relatedStateVariable>\n
+        \               <direction>in</direction>\n            </argument>\n\t        <argument>\n
+        \               <retval />\n                <name>Thurs</name>\n                <relatedStateVariable>Thurs</relatedStateVariable>\n
+        \               <direction>in</direction>\n            </argument>\n\t        <argument>\n
+        \               <retval />\n                <name>Fri</name>\n                <relatedStateVariable>Fri</relatedStateVariable>\n
+        \               <direction>in</direction>\n            </argument>\n\t        <argument>\n
+        \               <retval />\n                <name>Sat</name>\n                <relatedStateVariable>Sat</relatedStateVariable>\n
+        \               <direction>in</direction>\n            </argument>\n\t        <argument>\n
+        \               <retval />\n                <name>Sun</name>\n                <relatedStateVariable>Sun</relatedStateVariable>\n
+        \               <direction>in</direction>\n            </argument>\n\n          </argumentList>\n
+        \   </action>\n\n    <action>\n          <name>EditWeeklycalendar</name>    \n
+        \         <argumentList>\n           <argument>\n                <retval />\n<!--
+        0x00: disbale; 0x01: enable; 0x02: remove-->\n<!--- Disable will disable entire
+        week schedule, now only remove will be applied \nsince app will manage all
+        rules and store on device on other way \n-->\n                <name>action</name>\n
+        \               <relatedStateVariable>action</relatedStateVariable>\n                <direction>in</direction>\n
+        \         </argument>\n          </argumentList>\n    </action>\n\n    \n
+        \   <!--Should create detailed low level protocol-->\n    <action>\n          <name>GetRulesDBPath</name>
+        \   \n          <argumentList>\n\t  <argument>\n           <retval />\n           <name>RulesDBPath</name>\n
+        \          <relatedStateVariable>RulesDBPath</relatedStateVariable>\n           <direction>out</direction>\n
+        \         </argument>\n          </argumentList>\n    </action>\n\n<action>\n
+        <name>SetRulesDBVersion</name>    \n          <argumentList>\n\t  <argument>\n
+        \          <retval />\n           <name>RulesDBVersion</name>\n           <relatedStateVariable>RulesDBVersion</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n          </argumentList>\n
+        \   </action>\n\n<action>\n\t  <name>GetRulesDBVersion</name>    \n\t  <argumentList>\n\t
+        \ <argument>\n           <retval />\n           <name>RulesDBVersion</name>\n
+        \          <relatedStateVariable>RulesDBVersion</relatedStateVariable>\n           <direction>out</direction>\n
+        \         </argument>\n          </argumentList>\n    </action>\n<action>\n
+        \ <name>SetRuleID</name>\n  <argumentList>\n     <argument>\n       <retval
+        />\n       <name>RuleID</name>\n       <relatedStateVariable>RuleID</relatedStateVariable>\n
+        \      <direction>in</direction>\n      </argument>\n     <argument>\n       <retval
+        />\n       <name>RuleMsg</name>\n       <relatedStateVariable>RuleMsg</relatedStateVariable>\n
+        \      <direction>in</direction>\n      </argument>\n     <argument>\n       <retval
+        />\n       <name>RuleFreq</name>\n       <relatedStateVariable>RuleFreq</relatedStateVariable>\n
+        \      <direction>in</direction>\n      </argument>\n  </argumentList>\n</action>\n\n<action>\n
+        \ <name>DeleteRuleID</name>\n  <argumentList>\n     <argument>\n       <retval
+        />\n       <name>RuleID</name>\n       <relatedStateVariable>RuleID</relatedStateVariable>\n
+        \      <direction>in</direction>\n      </argument>\n  </argumentList>\n</action>\n\t\n<action>\n
+        \ <name>SimulatedRuleData</name>\n  <argumentList>\n     <argument>\n       <retval
+        />\n       <name>DeviceList</name>\n       <relatedStateVariable>DeviceList</relatedStateVariable>\n
+        \      <direction>in</direction>\n      </argument>\n     <argument>\n       <retval
+        />\n       <name>DeviceCount</name>\n       <relatedStateVariable>DeviceCount</relatedStateVariable>\n
+        \      <direction>in</direction>\n      </argument>\n  </argumentList>\n</action>\n\n<!--
+        ** BEGIN ** Rules TNG API: XML Schema -->\n<action>\n  <name>SetTemplates</name>\n
+        \ <argumentList>\n     <argument>\n\t   <retval></retval>\n       <name>templateList</name>\n
+        \      <relatedStateVariable>templateList</relatedStateVariable>\n       <direction>in</direction>\n
+        \    </argument>\n  </argumentList>\t \n</action>\n\n<action>\n  <name>GetTemplates</name>\n
+        \ <argumentList>\n     <argument>\n\t   <retval></retval>\n       <name>templateList</name>\n
+        \      <relatedStateVariable>templateList</relatedStateVariable>\n       <direction>out</direction>\n
+        \    </argument>\n  </argumentList>\t \n</action>\n\n<action>\n  <name>SetRules</name>\n
+        \ <argumentList>\n     <argument>\n       <retval></retval>\n       <name>ruleList</name>\n
+        \      <relatedStateVariable>ruleList</relatedStateVariable>\n       <direction>in</direction>\n
+        \    </argument>\n  </argumentList>\n</action>\n\n<action>\n  <name>GetRules</name>\n
+        \ <argumentList>\n     <argument>\n       <retval></retval>\n       <name>ruleList</name>\n
+        \      <relatedStateVariable>ruleList</relatedStateVariable>\n       <direction>in</direction>\n
+        \    </argument>\n  </argumentList>\n</action>\n<!-- ** END ** Rules TNG API:
+        XML Schema -->\n</actionList>\n\n  <serviceStateTable>\n  \n  <!-- connected,
+        connecting, disconnected, time out error -->\n  <stateVariable sendEvents=\"no\">\n
+        \     <name>RulesDBPath</name>\n      <dataType>string</dataType>\n      <defaultValue>/rules.db</defaultValue>\n
+        \   </stateVariable>\n\t\n\t  <stateVariable sendEvents=\"no\">\n      <name>RulesDBVersion</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue></defaultValue>\n    </stateVariable>\n\t\n
+        \ <stateVariable sendEvents=\"no\">\t\n\t<name>Mon</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue></defaultValue>\n    </stateVariable>\n    \n  <stateVariable
+        sendEvents=\"no\">\t\n\t<name>Tues</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue></defaultValue>\n    </stateVariable>\n    \n    <stateVariable
+        sendEvents=\"no\">\n      <name>Wed</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue></defaultValue>\n    </stateVariable>\n\t\n\t<stateVariable
+        sendEvents=\"no\">\n      <name>Thurs</name>\n      <dataType>Thurs</dataType>\n
+        \     <defaultValue></defaultValue>\n    </stateVariable>\n\t\n\t<stateVariable
+        sendEvents=\"no\">\n      <name>Fri</name>\n      <dataType>Fri</dataType>\n
+        \     <defaultValue></defaultValue>\n    </stateVariable>\t\n\n\t<stateVariable
+        sendEvents=\"no\">\n      <name>Sat</name>\n      <dataType>Sat</dataType>\n
+        \     <defaultValue></defaultValue>\n    </stateVariable>\n\t\n\t<stateVariable
+        sendEvents=\"no\">\n      <name>Sun</name>\n      <dataType>Sun</dataType>\n
+        \     <defaultValue></defaultValue>\n    </stateVariable>\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>RuleID</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>RuleMsg</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>RuleFreq</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>DeviceList</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>DeviceCount</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n\n    <!-- **
+        BEGIN ** Rules TNG API -->\n    <stateVariable sendEvents=\"yes\">\n      <name>templateList</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>ruleList</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n    <!-- ** END ** Rules TNG API -->\n\n   </serviceStateTable>\n
+        \ \n  </scpd>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '8785'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:05 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/metainfoservice.xml
+  response:
+    body:
+      string: "\uFEFF<?xml version=\"1.0\"?>\n<scpd xmlns=\"urn:Belkin:service-1-0\">\n\n
+        \ <specVersion>\n    <major>1</major>\n    <minor>0</minor>\n  </specVersion>\n
+        \ \n  <actionList>\n  \n    <action>\n      <name>GetMetaInfo</name>\n      <argumentList>\n
+        \     <argument>\n \t<retval />\n           <name>MetaInfo</name>\n           <relatedStateVariable>MetaInfo</relatedStateVariable>\n
+        \          <direction>out</direction>\n      </argument>\n      </argumentList>\n
+        \   </action>\n    <action>\n      <name>GetExtMetaInfo</name>\n      <argumentList>\n
+        \     <argument>\n \t<retval />\n           <name>ExtMetaInfo</name>\n           <relatedStateVariable>ExtMetaInfo</relatedStateVariable>\n
+        \          <direction>out</direction>\n      </argument>\n      </argumentList>\n
+        \   </action>\n</actionList>\n\n  <serviceStateTable>\n  \n    <stateVariable
+        sendEvents=\"no\">\n      <name>ExtMetaInfo</name>\n      <dataType>String</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>MetaInfo</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n\n  </serviceStateTable>\n
+        \ \n  </scpd>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '1132'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:05 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/remoteaccess.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?>\n<scpd xmlns=\"urn:Belkin:service-1-0\">\n
+        \ <specVersion>\n    <major>1</major>\n    <minor>0</minor>\n  </specVersion>\n
+        \ \n  <actionList>  \n    <action>\n      <name>RemoteAccess</name>\n      <argumentList>\n
+        \        <argument>\n           <retval />\n           <name>DeviceId</name>\n
+        \          <relatedStateVariable>DeviceId</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n\t\t  <argument>\n           <retval />\n           <name>dst</name>\n
+        \          <relatedStateVariable>dst</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n\t  <argument>\n           <retval />\n           <name>HomeId</name>\n
+        \          <relatedStateVariable>HomeId</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n\t  <argument>\n           <retval />\n           <name>DeviceName</name>\n
+        \          <relatedStateVariable>DeviceName</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n\t  <argument>\n           <retval />\n           <name>MacAddr</name>\n
+        \          <relatedStateVariable>MacAddr</relatedStateVariable>\n           <direction>in</direction>\n
+        \         </argument>\n\t<argument>\n\t\t<retval />\n\t\t<name>pluginprivateKey</name>\n\t\t<relatedStateVariable>pluginprivateKey</relatedStateVariable>\n\t\t<direction>in</direction>\n\t</argument>\n\t<argument>\n\t\t<retval
+        />\n\t\t<name>smartprivateKey</name>\n\t\t<relatedStateVariable>smartprivateKey</relatedStateVariable>\n\t\t<direction>in</direction>\n\t</argument>\n\t<argument>\n\t<retval
+        />\n\t<name>smartUniqueId</name>\n\t<relatedStateVariable>smartUniqueId</relatedStateVariable>\n\t<direction>in</direction>\n\t</argument>\t
+        \t  \n\t<argument>\n\t<retval />\n\t<name>numSmartDev</name>\n\t<relatedStateVariable>numSmartDev</relatedStateVariable>\n\t<direction>in</direction>\n\t</argument>\t
+        \t  \n\t<argument>\n\t<retval />\n\t<name>ArpMac</name>\n\t<relatedStateVariable>ArpMac</relatedStateVariable>\n\t<direction>out</direction>\n\t</argument>\t
+        \t  \n </argumentList>\n </action>\n\t\n    \n</actionList>\n\n  <serviceStateTable>\n
+        \   \n        <stateVariable sendEvents=\"yes\">\n        <!-- DEV ID -->\n
+        \     <name>homeId</name>\n      <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>\"pluginprivateKey\"</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n    <stateVariable sendEvents=\"yes\">\n      <name>\"smartprivateKey\"</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>statusCode</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>resultCode</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>description</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>smartUniqueId</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\t<stateVariable sendEvents=\"yes\">\n      <name>smartDeviceDescription</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n    <stateVariable sendEvents=\"yes\">\n\t\t<name>pluginprivateKey</name>\n\t\t<dataType>string</dataType>\n\t\t<defaultValue>0</defaultValue>\n\t</stateVariable>\n\t<stateVariable
+        sendEvents=\"yes\">\n\t\t<name>smartprivateKey</name>\n\t\t<dataType>string</dataType>\n\t\t<defaultValue>0</defaultValue>\n\t</stateVariable>\n\t<stateVariable
+        sendEvents=\"yes\">\n\t\t<name>numSmartDev</name>\n\t\t<dataType>string</dataType>\n\t\t<defaultValue>0</defaultValue>\n\t</stateVariable>\n
+        \    <stateVariable sendEvents=\"yes\">\n      <name>ArpMac</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n     </stateVariable>\n  </serviceStateTable>\n
+        \ \n  </scpd>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '3974'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:05 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/deviceinfoservice.xml
+  response:
+    body:
+      string: "\uFEFF<?xml version=\"1.0\"?>\n<scpd xmlns=\"urn:Belkin:service-1-0\">\n\n
+        \ <specVersion>\n    <major>1</major>\n    <minor>0</minor>\n  </specVersion>\n
+        \ \n  <actionList>\n    <action>\n\t<name>GetDeviceInformation</name>\n\t<argumentList>\n\t
+        \   <argument>\n\t\t<retval />\n           <name>UTC</name>\n           <relatedStateVariable>UTC</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>TimeZone</name>\n           <relatedStateVariable>TimeZone</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>dst</name>\n           <relatedStateVariable>dst</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n\t\t  <argument>\n
+        \          <retval />\n           <name>DstSupported</name>\n           <relatedStateVariable>DstSupported</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n \n\t    <argument>\n\t\t<retval
+        />\n\t\t<name>DeviceInformation</name>\n\t\t<relatedStateVariable>DeviceInformation</relatedStateVariable>\n\t\t<direction>out</direction>\n\t
+        \   </argument>\n      <!--  Adding Countdown Time -->\n      <argument>\n
+        \       <retval />\n        <name>CountdownTime</name>\n        <relatedStateVariable>CountdownTime</relatedStateVariable>\n
+        \       <direction>out</direction>\n      </argument>\n         <argument>\n
+        \          <retval />\n           <name>TimeSync</name>\n           <relatedStateVariable>TimeSync</relatedStateVariable>\n
+        \          <direction>out</direction>\n          </argument>\n\t</argumentList>\n
+        \   </action>\n    <action>\n\t<name>GetInformation</name>\n\t<argumentList>\n\t
+        \   <argument>\n\t\t<retval />\n           <name>UTC</name>\n           <relatedStateVariable>UTC</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>TimeZone</name>\n           <relatedStateVariable>TimeZone</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n         <argument>\n
+        \          <retval />\n           <name>dst</name>\n           <relatedStateVariable>dst</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n\t <argument>\n
+        \          <retval />\n           <name>DstSupported</name>\n           <relatedStateVariable>DstSupported</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n \n\t    <argument>\n\t\t<retval
+        />\n\t\t<name>Information</name>\n\t\t<relatedStateVariable>Information</relatedStateVariable>\n\t\t<direction>out</direction>\n\t
+        \   </argument>\n         <argument>\n           <retval />\n           <name>TimeSync</name>\n
+        \          <relatedStateVariable>TimeSync</relatedStateVariable>\n           <direction>out</direction>\n
+        \         </argument>\n\t</argumentList>\n    </action>\n    <action>\n\t<name>OpenInstaAP</name>\n\t<argumentList>\n\t
+        \   <argument>\n\t    </argument>\n\t</argumentList>\n    </action>\n    <action>\n\t<name>CloseInstaAP</name>\n\t<argumentList>\n\t
+        \   <argument>\n\t    </argument>\n\t</argumentList>\n    </action>\n    <action>\n\t<name>GetConfigureState</name>\n\t<argumentList>\n\t
+        \   <argument>\n\t\t<retval />\n\t\t<name>ConfigureState</name>\n\t\t<relatedStateVariable>ConfigureState</relatedStateVariable>\n\t\t<direction>out</direction>\n\t
+        \   </argument>\n\t</argumentList>\n    </action>\n    <action>\n      <name>InstaConnectHomeNetwork</name>
+        \   \n      <argumentList>\n         <argument>\n           <retval />\n           <name>ssid</name>\n
+        \          <relatedStateVariable>ssid</relatedStateVariable>\n           <direction>in</direction>\n
+        \        </argument>\n         <argument>\n\t    <retval />\n\t    <name>auth</name>\n\t
+        \   <relatedStateVariable>auth</relatedStateVariable>\n\t    <direction>in</direction>\n
+        \       </argument>\n        <argument>\n\t    <retval />\n            <name>password</name>\n
+        \           <relatedStateVariable>password</relatedStateVariable>\n            <direction>in</direction>\n
+        \      </argument>\n       <argument>\n            <retval />\n            <name>encrypt</name>\n
+        \           <relatedStateVariable>encrypt</relatedStateVariable>\n            <direction>in</direction>\n
+        \      </argument>\n       <argument>\n            <retval />\n            <name>channel</name>\n
+        \           <relatedStateVariable>channel</relatedStateVariable>\n            <direction>in</direction>\n
+        \      </argument>\n\t<argument>\n\t    <retval />\n\t    <name>brlist</name>\n\t
+        \   <relatedStateVariable>brlist</relatedStateVariable>\n\t    <direction>in</direction>\n\t</argument>\n
+        \     </argumentList>\n    </action>\n    <action>\n\t<name>UpdateBridgeList</name>\n\t<argumentList>\n\t
+        \   <argument>\n\t\t<retval />\n\t\t<name>BridgeList</name>\n\t\t<relatedStateVariable>BridgeList</relatedStateVariable>\n\t\t<direction>in</direction>\n\t
+        \   </argument>\n\t</argumentList>\n    </action>\n    <action>\n\t<name>GetRouterInformation</name>\n\t<argumentList>\n\t
+        \   <argument>\n\t\t<retval />\n\t\t<name>mac</name>\n\t\t<relatedStateVariable>mac</relatedStateVariable>\n\t\t<direction>out</direction>\n\t
+        \   </argument>\n         <argument>\n           <retval />\n           <name>ssid</name>\n
+        \          <relatedStateVariable>ssid</relatedStateVariable>\n           <direction>out</direction>\n
+        \        </argument>\n         <argument>\n\t    <retval />\n\t    <name>auth</name>\n\t
+        \   <relatedStateVariable>auth</relatedStateVariable>\n\t    <direction>out</direction>\n
+        \       </argument>\n        <argument>\n\t    <retval />\n            <name>password</name>\n
+        \           <relatedStateVariable>password</relatedStateVariable>\n            <direction>out</direction>\n
+        \      </argument>\n       <argument>\n            <retval />\n            <name>encrypt</name>\n
+        \           <relatedStateVariable>encrypt</relatedStateVariable>\n            <direction>out</direction>\n
+        \      </argument>\n       <argument>\n            <retval />\n            <name>channel</name>\n
+        \           <relatedStateVariable>channel</relatedStateVariable>\n            <direction>out</direction>\n
+        \      </argument>\n\t</argumentList>\n    </action>\n    <action>\n    <name>InstaRemoteAccess</name>\n
+        \   <argumentList>\n    <argument>\n    <retval />\n    <name>DeviceId</name>\n
+        \   <relatedStateVariable>DeviceId</relatedStateVariable>\n    <direction>in</direction>\n
+        \   </argument>\n    <argument>\n    <retval />\n    <name>dst</name>\n    <relatedStateVariable>dst</relatedStateVariable>\n
+        \   <direction>in</direction>\n    </argument>\n    <argument>\n    <retval
+        />\n    <name>HomeId</name>\n    <relatedStateVariable>HomeId</relatedStateVariable>\n
+        \   <direction>in</direction>\n    </argument>\n    <argument>\n    <retval
+        />\n    <name>DeviceName</name>\n    <relatedStateVariable>DeviceName</relatedStateVariable>\n
+        \   <direction>in</direction>\n    </argument>\n    <argument>\n    <retval
+        />\n    <name>MacAddr</name>\n    <relatedStateVariable>MacAddr</relatedStateVariable>\n
+        \   <direction>in</direction>\n    </argument>\n    <argument>\n    <retval
+        />\n    <name>pluginprivateKey</name>\n    <relatedStateVariable>pluginprivateKey</relatedStateVariable>\n
+        \   <direction>in</direction>\n    </argument>\n    <argument>\n    <retval
+        />\n    <name>smartprivateKey</name>\n    <relatedStateVariable>smartprivateKey</relatedStateVariable>\n
+        \   <direction>in</direction>\n    </argument>\n    <argument>\n    <retval
+        />\n    <name>smartUniqueId</name>\n    <relatedStateVariable>smartUniqueId</relatedStateVariable>\n
+        \   <direction>in</direction>\n    </argument>\t \t  \n    <argument>\n    <retval
+        />\n    <name>numSmartDev</name>\n    <relatedStateVariable>numSmartDev</relatedStateVariable>\n
+        \   <direction>in</direction>\n    </argument>\t \t  \n    </argumentList>\n
+        \   </action>\n    <action>\n      <name>SetAutoFwUpdateVar</name>\n      <argumentList>\n
+        \        <argument>\n           <retval />\n           <name>AutoFwUpdateVar</name>\n
+        \          <relatedStateVariable>AutoFwUpdateVar</relatedStateVariable>\n
+        \          <direction>in</direction>\n          </argument>\n      </argumentList>\n
+        \   </action>\n    <action>\n      <name>GetAutoFwUpdateVar</name>\n      <argumentList>\n
+        \        <argument>\n           <retval />\n           <name>AutoFwUpdateVar</name>\n
+        \          <relatedStateVariable>AutoFwUpdateVar</relatedStateVariable>\n
+        \          <direction>out</direction>\n          </argument>\n      </argumentList>\n
+        \   </action>\n</actionList>\n\n  <serviceStateTable>\n  \n    <stateVariable
+        sendEvents=\"yes\">\n      <name>DeviceInformation</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n\n    <!--  Adding
+        Countdown Time -->\n    <stateVariable sendEvents=\"yes\">\n      <name>CountdownTime</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>Information</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>ConfigureState</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>BridgeList</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>mac</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>ssid</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>auth</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>password</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>encrypt</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n      <name>channel</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>0</defaultValue>\n
+        \   </stateVariable>\n\n  <stateVariable sendEvents=\"yes\">\t\n\t<name>PairingStatus</name>\n
+        \     <dataType>string</dataType>\n      <defaultValue>Connecting</defaultValue>\n
+        \   </stateVariable>\n\n    <stateVariable sendEvents=\"yes\">\n    <name>statusCode</name>\n
+        \   <dataType>string</dataType>\n    <defaultValue>0</defaultValue>\n    </stateVariable>\n\n
+        \   <stateVariable sendEvents=\"yes\">\n    <name>TimeSync</name>\n    <dataType>string</dataType>\n
+        \   <defaultValue>0</defaultValue>\n    </stateVariable>\n\n    <stateVariable
+        sendEvents=\"yes\">\n      <name>AutoFwUpdateVar</name>\n      <dataType>string</dataType>\n
+        \     <defaultValue>0</defaultValue>\n    </stateVariable>\n\n  </serviceStateTable>\n
+        \ \n  </scpd>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '10704'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:05 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/smartsetup.xml
+  response:
+    body:
+      string: "\uFEFF<?xml version=\"1.0\"?>\n<scpd xmlns=\"urn:Belkin:service-1-0\">\n\n
+        \ <specVersion>\n    <major>1</major>\n    <minor>0</minor>\n  </specVersion>\n
+        \ \n  <actionList>\n    <action>\n        <name>PairAndRegister</name>    \n\t<argumentList>\n\t<argument>\n\t\t<retval
+        />\n\t    \t<name>PairingData</name>\n            \t<relatedStateVariable>PairingData</relatedStateVariable>\n\t
+        \   \t<direction>in</direction>\n\t</argument>\n\t<argument>\n\t\t<retval
+        />\n\t\t<name>RegistrationData</name>\n\t\t<relatedStateVariable>RegistrationData</relatedStateVariable>\n\t\t<direction>in</direction>\n\t</argument>\n\t<argument>\n\t\t<retval
+        />\n\t\t<name>PairingStatus</name>\n\t\t<relatedStateVariable>PairingStatus</relatedStateVariable>\n\t\t<direction>out</direction>\n\t</argument>\n\t</argumentList>\n
+        \   </action>\n    \n    <action>\n\t<name>GetRegistrationData</name>    \n\t<argumentList>\n\t<argument>\n
+        \          \t<retval />\n           \t<name>SmartDeviceData</name>\n           \t<relatedStateVariable>SmartDeviceData</relatedStateVariable>\n
+        \          \t<direction>in</direction>\n\t</argument>         \n        <argument>\n\t\t<retval
+        />\n        \t<name>RegistrationData</name>\n         \t<relatedStateVariable>RegistrationData</relatedStateVariable>\n
+        \        \t<direction>out</direction>\n        </argument>\n       \t</argumentList>
+        \      \n    </action>\n    \n    <action>\n\t<name>GetRegistrationStatus</name>
+        \   \n\t<argumentList>\n\t<argument>\n           \t<retval />\n           \t<name>RegistrationStatus</name>\n
+        \          \t<relatedStateVariable>RegistrationStatus</relatedStateVariable>\n
+        \          \t<direction>out</direction>\n\t</argument>         \n\t<argument>\n
+        \          \t<retval />\n           \t<name>StatusCode</name>\n           \t<relatedStateVariable>StatusCode</relatedStateVariable>\n
+        \          \t<direction>out</direction>\n\t</argument>         \n\t</argumentList>
+        \      \n    </action>\n\n  </actionList>\n\n  <serviceStateTable>\n    <stateVariable
+        sendEvents=\"yes\">\t\n\t<name>PairingStatus</name>\n      \t<dataType>string</dataType>\n
+        \     \t<defaultValue>0</defaultValue>\n    </stateVariable>\n\n    <stateVariable
+        sendEvents=\"yes\">\n      \t<name>RegistrationData</name>\n      \t<dataType>string</dataType>\n
+        \     \t<defaultValue>0</defaultValue>\n    </stateVariable>\n\n    <stateVariable
+        sendEvents=\"yes\">\n      \t<name>StatusCode</name>\n      \t<dataType>string</dataType>\n
+        \     \t<defaultValue>0</defaultValue>\n    </stateVariable>\n\n    <stateVariable
+        sendEvents=\"yes\">\n      \t<name>RegistrationStatus</name>\n      \t<dataType>string</dataType>\n
+        \     \t<defaultValue>0</defaultValue>\n    </stateVariable>\n  </serviceStateTable>\n\n
+        \ </scpd>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '2539'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:05 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers: {}
+    method: GET
+    uri: http://192.168.1.100:49153/manufacture.xml
+  response:
+    body:
+      string: "<?xml version=\"1.0\"?>\n<scpd xmlns=\"urn:Belkin:service-1-0\">\n\n
+        \ <specVersion>\n    <major>1</major>\n    <minor>0</minor>\n  </specVersion>\n\n
+        \ <actionList>\n    <action>\n      <name>GetManufactureData</name>\n      <argumentList>\n
+        \       <argument>\n          <name>ManufactureData</name>\n          <direction>out</direction>\n
+        \         <relatedStateVariable>ManufactureData</relatedStateVariable>\n        </argument>\n
+        \     </argumentList>\n    </action>\n  </actionList>\n\n  <serviceStateTable>\n
+        \   <stateVariable sendEvent=\"no\">\n      <name>ManufactureData</name>\n
+        \     <dataType>string</dataType>\n    </stateVariable>\n  </serviceStateTable>\n\n</scpd>\n"
+    headers:
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '642'
+      CONTENT-TYPE:
+      - text/xml
+      DATE:
+      - Wed, 29 Dec 2021 20:37:05 GMT
+      LAST-MODIFIED:
+      - Sat, 01 Jan 2000 00:00:26 GMT
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '<?xml version="1.0" encoding="utf-8"?>
+
+      <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+
+      <s:Body>
+
+      <u:GetAttributes xmlns:u="urn:Belkin:service:deviceevent:1">
+
+
+      </u:GetAttributes>
+
+      </s:Body>
+
+      </s:Envelope>'
+    headers:
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:deviceevent:1#GetAttributes"'
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/deviceevent1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:GetAttributesResponse
+        xmlns:u=\"urn:Belkin:service:deviceevent:1\">\r\n<attributeList>&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;FanMode&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;2&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;DesiredHumidity&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;0&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;CurrentHumidity&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;42.0&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;WaterAdvise&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;0&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;NoWater&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;0&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;FilterLife&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;36057&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;&amp;lt;attribute&amp;gt;&amp;lt;name&amp;gt;ExpiredFilterTime&amp;lt;/name&amp;gt;&amp;lt;value&amp;gt;0&amp;lt;/value&amp;gt;&amp;lt;/attribute&amp;gt;\n</attributeList>\r\n</u:GetAttributesResponse>\r\n</s:Body>
+        </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '1329'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Wed, 29 Dec 2021 20:37:05 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+version: 1

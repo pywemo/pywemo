@@ -29,6 +29,7 @@ FIRMWARE_VCR_CASSETTE_FILES = [
         "bridge/WeMo_WW_2.00.11057.PVT-OWRT-Link.yaml",
         "dimmer/WeMo_WW_2.00.11453.PVT-OWRT-Dimmer.yaml",
         "dimmer/WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2.yaml",
+        "humidifier/WeMo_WW_2.00.11423.PVT-OWRT-Smart.yaml",
         "insight/WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml",
         "lightswitch/WeMo_WW_2.00.11408.PVT-OWRT-LS.yaml",
         "lightswitch/WeMo_WW_2.00.11563.PVT-OWRT-LIGHTV2-WLS040.yaml",
