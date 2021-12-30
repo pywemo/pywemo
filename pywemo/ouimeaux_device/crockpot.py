@@ -110,7 +110,7 @@ class CrockPot(Switch):
         """Return 0 if off and 1 if on."""
         # The base implementation using GetBinaryState doesn't work for
         # CrockPot (always returns 0) so use mode instead.
-        if force_update or self.mode is None:
+        if force_update or self._attributes.get("mode") is None:
             self.update_attributes()
 
         return int(self.mode != CrockPotMode.Off)
