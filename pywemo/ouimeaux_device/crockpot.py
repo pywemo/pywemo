@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from typing import Any, Dict, Literal, cast
+from typing import Any, cast
 
 from .api.service import RequiredService
 from .switch import Switch
@@ -35,8 +35,6 @@ MODE_NAMES = {
     CrockPotMode.High: "High",
 }
 
-AttributesType = Dict[Literal["cookedTime", "mode", "time"], str]
-
 
 class CrockPot(Switch):
     """WeMo Crockpot."""
@@ -45,7 +43,7 @@ class CrockPot(Switch):
     EVENT_TYPE_MODE = "mode"
     EVENT_TYPE_TIME = "time"
 
-    _attributes: AttributesType = {}
+    _attributes: dict[str, str] = {}
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo CrockPot device."""
@@ -70,7 +68,7 @@ class CrockPot(Switch):
             state_attributes.get(attr) is not None
             for attr in ("cookedTime", "mode", "time")
         ):
-            self._attributes = cast(AttributesType, state_attributes)
+            self._attributes = state_attributes
             self._state = cast(int, self.mode)
 
     def subscription_update(self, _type: str, _params: str) -> bool:
