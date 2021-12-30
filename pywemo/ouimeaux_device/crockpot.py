@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from typing import Any, cast
+from typing import Any
 
 from .api.service import RequiredService
 from .switch import Switch
@@ -69,13 +69,13 @@ class CrockPot(Switch):
             for attr in ("cookedTime", "mode", "time")
         ):
             self._attributes = state_attributes
-            self._state = cast(int, self.mode)
+            self._state = self.mode
 
     def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle reports from device."""
         if _type == self.EVENT_TYPE_MODE:
             self._attributes['mode'] = _params
-            self._state = cast(int, self.mode)
+            self._state = self.mode
             return True
         if _type == self.EVENT_TYPE_TIME:
             self._attributes['time'] = _params
