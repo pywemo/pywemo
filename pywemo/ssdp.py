@@ -6,6 +6,7 @@ import re
 import select
 import socket
 import threading
+import warnings
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -66,6 +67,11 @@ class SSDP:
         self.entries: list[UPNPEntry] = []
         self.last_scan: datetime | None = None
         self._lock = threading.RLock()
+        warnings.warn(
+            "pywemo.ssdp.SSDP is unused within pywemo and will be removed in "
+            "a future release.",
+            DeprecationWarning,
+        )
 
     def scan(self) -> None:
         """Scan the network."""
@@ -187,6 +193,11 @@ class UPNPEntry:
         if self._description is not None:
             return self._description
         self._description = {}
+        warnings.warn(
+            "pywemo.ssdp.UPNPEntry.description is unused within pywemo and "
+            "will be removed in a future release.",
+            DeprecationWarning,
+        )
 
         url = self.location
         if not url:
@@ -217,6 +228,11 @@ class UPNPEntry:
 
         Values should only contain lowercase keys.
         """
+        warnings.warn(
+            "pywemo.ssdp.UPNPEntry.match_device_description is unused within "
+            "pywemo and will be removed in a future release.",
+            DeprecationWarning,
+        )
         device = self.description.get('device', {})
         return all(val == device.get(key) for key, val in values.items())
 

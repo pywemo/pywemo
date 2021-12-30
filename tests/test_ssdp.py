@@ -5,7 +5,6 @@ import socket
 import unittest.mock as mock
 
 import pytest
-import requests
 
 from pywemo import ssdp
 
@@ -245,26 +244,6 @@ class TestScan:
 
         entries = ssdp.scan(st=ssdp.ST, timeout=0, **kwargs)
         assert len(entries) == expected_count
-
-    def test_scan_no_setup_xml(
-        self, mock_interface_addresses, mock_socket, mock_select
-    ):
-        mock_socket.recv.return_value = self._R1
-        mock_select.put(([mock_socket],))
-        mock_select.put(([],))
-
-        entries = ssdp.scan(st=ssdp.ST, timeout=0)
-        assert len(entries) == 1
-
-        entry = entries[0]
-        assert entry.udn == 'uuid:Socket-1_0-SERIAL'
-        assert entry.st == 'urn:Belkin:service:basicevent:1'
-        assert repr(entry) == (
-            '<UPNPEntry urn:Belkin:service:basicevent:1 - '
-            'http://192.168.1.100:49158/setup.xml - uuid:Socket-1_0-SERIAL>'
-        )
-        with mock.patch('requests.get', side_effect=requests.RequestException):
-            assert entry.description == {}
 
 
 class TestUPNPEntry:
