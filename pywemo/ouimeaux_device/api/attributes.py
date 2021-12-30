@@ -47,10 +47,6 @@ class AttributeDevice(Switch):
             ),
         ]
 
-    def _get_state(self) -> int | None:
-        state: int | None = getattr(self, self._state_property)
-        return state
-
     def _update_attributes_dict(self, xml_blob: str) -> None:
         xml_blob = "<attributes>" + xml_blob + "</attributes>"
         xml_blob = xml_blob.replace("&gt;", ">")
@@ -64,7 +60,8 @@ class AttributeDevice(Switch):
             }
         )
 
-        self._state = self._get_state()
+        state: int | None = getattr(self, self._state_property)
+        self._state = state
 
     def update_attributes(self) -> None:
         """Request state from device."""
