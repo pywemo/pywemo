@@ -41,6 +41,7 @@ class CrockPot(Switch):
         """Create a WeMo CrockPot device."""
         Switch.__init__(self, *args, **kwargs)
         self._attributes = {}
+        self.get_state(True)
 
     @property
     def _required_services(self) -> list[RequiredService]:
