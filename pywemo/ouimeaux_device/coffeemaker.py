@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from typing import Any, Final
+from typing import Any
 
 from .api.attributes import AttributeDevice
 
-_UNKNOWN: Final = -1
+_UNKNOWN = -1
 
 
 # These enums were derived from the
