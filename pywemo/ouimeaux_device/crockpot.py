@@ -126,7 +126,7 @@ class CrockPot(Switch):
         """Update mode and cooking time."""
         if CrockPotMode(mode) == _UNKNOWN:
             raise ValueError(f"Unknown CrockPotMode: {mode}")
-        self.basicevent.SetCrockpotState(mode=f"{mode}", time=f"{time}")
+        self.basicevent.SetCrockpotState(mode=str(int(mode)), time=str(time))
 
         # The CrockPot might not be ready - so it's not safe to assume the
         # state is what you just set so re-read it from the device.
