@@ -260,7 +260,6 @@ class TestUPNPEntry:
         )
         assert r1.udn == "uuid:Socket-1_0-SERIAL"
         assert r1.location == "http://192.168.1.100:49158/setup.xml"
-        assert r1.is_expired is False
 
         r2 = ssdp.UPNPEntry.from_response(self._R2)
         assert r1 != r2
