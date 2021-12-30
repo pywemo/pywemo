@@ -52,14 +52,14 @@ class CoffeeMaker(AttributeDevice):
     _state_property = "mode"  # Required by AttributeDevice.
 
     @property
-    def mode_string(self) -> str:
-        """Return the mode of the device as a string."""
-        return MODE_NAMES.get(self.mode, "Unknown")
-
-    @property
     def mode(self) -> CoffeeMakerMode:
         """Return the mode of the device."""
         return CoffeeMakerMode(int(self._attributes.get("Mode", _UNKNOWN)))
+
+    @property
+    def mode_string(self) -> str:
+        """Return the mode of the device as a string."""
+        return MODE_NAMES.get(self.mode, "Unknown")
 
     def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""
