@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import warnings
-from typing import Any
 
 from .api.long_press import LongPressMixin
 from .api.service import RequiredService
@@ -12,10 +11,7 @@ from .switch import Switch
 class Dimmer(Switch):
     """Representation of a WeMo Dimmer device."""
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        """Create a WeMo Dimmer device."""
-        Switch.__init__(self, *args, **kwargs)
-        self._brightness: int | None = None
+    _brightness: int | None = None
 
     @property
     def _required_services(self) -> list[RequiredService]:
