@@ -6,6 +6,7 @@ import re
 import select
 import socket
 import threading
+import warnings
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -66,6 +67,11 @@ class SSDP:
         self.entries: list[UPNPEntry] = []
         self.last_scan: datetime | None = None
         self._lock = threading.RLock()
+        warnings.warn(
+            "pywemo.ssdp.SSDP is unused within pywemo and will be removed in "
+            "a future release.",
+            DeprecationWarning,
+        )
 
     def scan(self) -> None:
         """Scan the network."""
@@ -144,17 +150,42 @@ class UPNPEntry:
     def __init__(self, values: dict[str, str]) -> None:
         """Create a UPNPEntry object."""
         self.values = values
-        self.created = datetime.now()
-        self.expires: datetime | None = None
+        self._created = datetime.now()
+        self._expires: datetime | None = None
 
         if 'cache-control' in self.values:
             cache_seconds = int(self.values['cache-control'].split('=')[1])
 
-            self.expires = self.created + timedelta(seconds=cache_seconds)
+            self._expires = self._created + timedelta(seconds=cache_seconds)
+
+    @property
+    def created(self) -> datetime:
+        """Return timestamp for when this entry was created."""
+        warnings.warn(
+            "pywemo.ssdp.UPNPEntry.created is unused within pywemo and "
+            "will be removed in a future release.",
+            DeprecationWarning,
+        )
+        return self._created
+
+    @property
+    def expires(self) -> datetime:
+        """Return timestamp for when this entry expires."""
+        warnings.warn(
+            "pywemo.ssdp.UPNPEntry.expires is unused within pywemo and "
+            "will be removed in a future release.",
+            DeprecationWarning,
+        )
+        return self._expires
 
     @property
     def is_expired(self) -> bool:
         """Return whether the entry is expired or not."""
+        warnings.warn(
+            "pywemo.ssdp.UPNPEntry.is_expired is unused within pywemo and "
+            "will be removed in a future release.",
+            DeprecationWarning,
+        )
         return self.expires is not None and datetime.now() > self.expires
 
     @property
@@ -187,6 +218,11 @@ class UPNPEntry:
         if self._description is not None:
             return self._description
         self._description = {}
+        warnings.warn(
+            "pywemo.ssdp.UPNPEntry.description is unused within pywemo and "
+            "will be removed in a future release.",
+            DeprecationWarning,
+        )
 
         url = self.location
         if not url:
@@ -217,6 +253,11 @@ class UPNPEntry:
 
         Values should only contain lowercase keys.
         """
+        warnings.warn(
+            "pywemo.ssdp.UPNPEntry.match_device_description is unused within "
+            "pywemo and will be removed in a future release.",
+            DeprecationWarning,
+        )
         device = self.description.get('device', {})
         return all(val == device.get(key) for key, val in values.items())
 

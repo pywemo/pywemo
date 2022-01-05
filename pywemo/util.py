@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import socket
+import warnings
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -14,6 +15,11 @@ from lxml import etree as et
 # Taken from http://stackoverflow.com/a/10077069
 def etree_to_dict(tree: et.Element) -> dict[str, Any]:
     """Split a tree into a dict."""
+    warnings.warn(
+        "pywemo.util.etree_to_dict is unused within pywemo and will be "
+        "removed in a future release.",
+        DeprecationWarning,
+    )
     # strip namespace
     tag_name = tree.tag[tree.tag.find("}") + 1 :]
 
