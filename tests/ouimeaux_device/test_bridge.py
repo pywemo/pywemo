@@ -5,7 +5,8 @@ from lxml import etree as et
 
 from pywemo import Bridge
 
-LIGHT_ID = '0017880108DA898B'
+LIGHT_ID = "F0D1B8000001420C"
+GROUP_ID = "12345678"
 
 
 @pytest.fixture
@@ -14,26 +15,70 @@ def bridge(vcr):
         return Bridge('http://192.168.1.100:49153/setup.xml')
 
 
-@pytest.mark.vcr()
-def test_light_turn_on(bridge):
-    lights, _ = bridge.bridge_update()
-    assert LIGHT_ID in lights
-    light = lights[LIGHT_ID]
+@pytest.fixture
+def light(bridge):
+    assert LIGHT_ID in bridge.Lights
+    light = bridge.Lights[LIGHT_ID]
+    return light
 
-    # Turn on.
-    light.turn_on()
+
+@pytest.fixture
+def group(bridge):
+    assert GROUP_ID in bridge.Groups
+    group = bridge.Groups[GROUP_ID]
+    return group
+
+
+@pytest.mark.vcr()
+def test_light_turn_on(light):
+    light.turn_on(level=120)
     assert light.get_state(force_update=True)['onoff'] == 1
+    assert light.get_state()['level'] == 120
 
 
 @pytest.mark.vcr()
-def test_light_turn_off(bridge):
-    lights, _ = bridge.bridge_update()
-    assert LIGHT_ID in lights
-    light = lights[LIGHT_ID]
-
-    # Turn off.
+def test_light_turn_off(light):
     light.turn_off()
     assert light.get_state(force_update=True)['onoff'] == 0
+
+
+@pytest.mark.vcr()
+def test_light_color_fade(light):
+    light.set_color((0.701, 0.299), 5, False)
+
+    color_xy = light.get_state(force_update=True)['color_xy']
+    assert color_xy == pytest.approx((0.701, 0.299), rel=1e-3)
+
+
+@pytest.mark.vcr()
+def test_light_color_temperature(light):
+    light.set_temperature(kelvin=5000)
+    assert light.get_state(force_update=True)['temperature_kelvin'] == 5000
+
+
+@pytest.mark.vcr()
+def test_light_start_ramp(light):
+    light.start_ramp('1', 100)
+    light.get_state(force_update=True)
+
+
+@pytest.mark.vcr()
+def test_group_turn_on(group):
+    group.turn_on()
+    assert group.get_state(force_update=True)['onoff'] == 1
+
+
+@pytest.mark.vcr()
+def test_group_turn_off(group):
+    group.turn_off()
+    assert group.get_state(force_update=True)['onoff'] == 0
+
+
+@pytest.mark.vcr()
+def test_group_toggle(group):
+    orig_onoff = group.get_state()['onoff']
+    group.toggle()
+    assert group.get_state(force_update=True)['onoff'] != orig_onoff
 
 
 @pytest.mark.vcr()
@@ -43,9 +88,13 @@ def test_bridge_getdevicestatus(bridge):
         [
             b'<DeviceStatus>',
             b'<IsGroupAction>NO</IsGroupAction>',
-            b'<DeviceID available="YES">0017880108DA898B</DeviceID>',
-            b'<CapabilityID>10006,10008,30008,30009,3000A</CapabilityID>',
-            b'<CapabilityValue>0,255:0,,,</CapabilityValue>',
+            b'<DeviceID available="YES">F0D1B8000001420C</DeviceID>',
+            b'<CapabilityID>',
+            b'10006,10008,10300,30008,30009,3000A,30301',
+            b'</CapabilityID>',
+            b'<CapabilityValue>',
+            b'0,120:0,45940:19594:50,,,,200:0',
+            b'</CapabilityValue>',
             b'<LastEventTimeStamp>0</LastEventTimeStamp>',
             b'</DeviceStatus>',
         ]
@@ -65,7 +114,14 @@ def test_bridge_getdevicestatus(bridge):
                 '</StateEvent>'
             ),
             True,
-            {'available': True, 'level': 255, 'onoff': 0},
+            {
+                'available': True,
+                'level': 120,
+                'onoff': 0,
+                'color_xy': (0.17599755855649654, 0.653986419470512),
+                'temperature_kelvin': 2092,
+                'temperature_mireds': 478,
+            },
         ),
         (
             (
@@ -76,7 +132,14 @@ def test_bridge_getdevicestatus(bridge):
                 '</StateEvent>'
             ),
             True,
-            {'available': True, 'level': 255, 'onoff': 1},
+            {
+                'available': True,
+                'level': 120,
+                'onoff': 1,
+                'color_xy': (0.17599755855649654, 0.653986419470512),
+                'temperature_kelvin': 2092,
+                'temperature_mireds': 478,
+            },
         ),
         (
             (
@@ -87,7 +150,14 @@ def test_bridge_getdevicestatus(bridge):
                 '</StateEvent>'
             ),
             True,
-            {'available': True, 'level': 128, 'onoff': 1},
+            {
+                'available': True,
+                'level': 128,
+                'onoff': 0,
+                'color_xy': (0.17599755855649654, 0.653986419470512),
+                'temperature_kelvin': 2092,
+                'temperature_mireds': 478,
+            },
         ),
         (
             (
@@ -98,7 +168,14 @@ def test_bridge_getdevicestatus(bridge):
                 '</StateEvent>'
             ),
             True,
-            {'available': False, 'level': 255, 'onoff': 0},
+            {
+                'available': False,
+                'level': 120,
+                'onoff': 0,
+                'color_xy': (0.17599755855649654, 0.653986419470512),
+                'temperature_kelvin': 2092,
+                'temperature_mireds': 478,
+            },
         ),
         (
             (
@@ -109,13 +186,38 @@ def test_bridge_getdevicestatus(bridge):
                 '</StateEvent>'
             ),
             True,
-            {'available': True, 'level': 255, 'onoff': 0},
+            {
+                'available': True,
+                'level': 120,
+                'onoff': 0,
+                'color_xy': (0.17599755855649654, 0.653986419470512),
+                'temperature_kelvin': 2092,
+                'temperature_mireds': 478,
+            },
         ),
         (
             (
                 '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
                 f'<DeviceID>{LIGHT_ID}</DeviceID>'
                 '<CapabilityId>30301</CapabilityId>'
+                '<Value>2700:0</Value>'
+                '</StateEvent>'
+            ),
+            True,
+            {
+                'available': True,
+                'color_xy': (0.17599755855649654, 0.653986419470512),
+                'level': 120,
+                'onoff': 0,
+                'temperature_kelvin': 370,
+                'temperature_mireds': 2700,
+            },
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f'<DeviceID>{LIGHT_ID}</DeviceID>'
+                '<CapabilityId>99999</CapabilityId>'
                 '<Value>2700:0</Value>'
                 '</StateEvent>'
             ),

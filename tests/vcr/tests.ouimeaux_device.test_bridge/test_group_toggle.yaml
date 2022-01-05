@@ -10,8 +10,8 @@ interactions:
 
       <DeviceStatusList>&lt;?xml version=&#x27;1.0&#x27; encoding=&#x27;UTF-8&#x27;?&gt;
 
-      &lt;DeviceStatus&gt;&lt;IsGroupAction&gt;NO&lt;/IsGroupAction&gt;&lt;DeviceID
-      available=&quot;YES&quot;&gt;F0D1B8000001420C&lt;/DeviceID&gt;&lt;CapabilityID&gt;10006&lt;/CapabilityID&gt;&lt;CapabilityValue&gt;0&lt;/CapabilityValue&gt;&lt;/DeviceStatus&gt;</DeviceStatusList>
+      &lt;DeviceStatus&gt;&lt;IsGroupAction&gt;YES&lt;/IsGroupAction&gt;&lt;DeviceID
+      available=&quot;YES&quot;&gt;12345678&lt;/DeviceID&gt;&lt;CapabilityID&gt;10006&lt;/CapabilityID&gt;&lt;CapabilityValue&gt;2&lt;/CapabilityValue&gt;&lt;/DeviceStatus&gt;</DeviceStatusList>
 
       </u:SetDeviceStatus>
 
@@ -36,7 +36,7 @@ interactions:
       CONTENT-TYPE:
       - text/xml; charset="utf-8"
       DATE:
-      - Wed, 05 Jan 2022 05:49:28 GMT
+      - Wed, 05 Jan 2022 05:49:30 GMT
       EXT:
       - ''
       SERVER:
@@ -79,7 +79,7 @@ interactions:
       CONTENT-TYPE:
       - text/xml; charset="utf-8"
       DATE:
-      - Wed, 05 Jan 2022 05:49:28 GMT
+      - Wed, 05 Jan 2022 05:49:30 GMT
       EXT:
       - ''
       SERVER:
@@ -132,7 +132,7 @@ interactions:
       CONTENT-TYPE:
       - text/xml; charset="utf-8"
       DATE:
-      - Wed, 05 Jan 2022 05:49:28 GMT
+      - Wed, 05 Jan 2022 05:49:30 GMT
       EXT:
       - ''
       SERVER:
