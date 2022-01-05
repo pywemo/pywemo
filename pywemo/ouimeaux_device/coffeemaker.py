@@ -4,11 +4,9 @@ from __future__ import annotations
 from enum import IntEnum
 from typing import Any
 
-from lxml import etree as et
+from .api.attributes import AttributeDevice
 
-from .api.service import RequiredService
-from .api.xsd_types import quote_xml
-from .switch import Switch
+_UNKNOWN = -1
 
 
 # These enums were derived from the
@@ -18,7 +16,7 @@ from .switch import Switch
 class CoffeeMakerMode(IntEnum):
     """Enum to map WeMo modes to human-readable strings."""
 
-    _UNKNOWN = -1
+    _UNKNOWN = _UNKNOWN
     # pylint: disable=invalid-name
     Refill = 0  # reservoir empty and carafe not in place
     PlaceCarafe = 1  # reservoir has water but carafe not present
@@ -48,64 +46,18 @@ MODE_NAMES = {
 }
 
 
-def attribute_xml_to_dict(xml_blob):
-    """Return integer value of Mode from an attributesList blob, if present."""
-    xml_blob = "<attributes>" + xml_blob + "</attributes>"
-    xml_blob = xml_blob.replace("&gt;", ">")
-    xml_blob = xml_blob.replace("&lt;", "<")
-    result = {}
-    attributes = et.fromstring(xml_blob)
-    for attribute in attributes:
-        # The coffee maker might also send unrelated xml blobs, e.g.:
-        # <ruleID>coffee-brewed</ruleID>
-        # <ruleMsg><![CDATA[Coffee's ready!]]></ruleMsg>
-        # so be sure to check the length of attribute
-        if len(attribute) >= 2:
-            try:
-                result[attribute[0].text] = int(attribute[1].text)
-            except ValueError:
-                pass
-    return result
-
-
-class CoffeeMaker(Switch):
+class CoffeeMaker(AttributeDevice):
     """Representation of a WeMo CoffeeMaker device."""
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        """Create a WeMo CoffeeMaker device."""
-        Switch.__init__(self, *args, **kwargs)
-        self._attributes = {}
+    _state_property = "mode"  # Required by AttributeDevice.
 
     @property
-    def _required_services(self) -> list[RequiredService]:
-        return super()._required_services + [
-            RequiredService(
-                name="deviceevent", actions=["GetAttributes", "SetAttributes"]
-            ),
-        ]
-
-    def update_attributes(self):
-        """Request state from device."""
-        resp = self.deviceevent.GetAttributes().get('attributeList')
-        self._attributes = attribute_xml_to_dict(resp)
-        self._state = self.mode
-
-    def subscription_update(self, _type: str, _params: str) -> bool:
-        """Handle reports from device."""
-        if _type == "attributeList":
-            self._attributes.update(attribute_xml_to_dict(_params))
-            self._state = self.mode
-            return True
-
-        return Switch.subscription_update(self, _type, _params)
-
-    @property
-    def mode(self):
+    def mode(self) -> CoffeeMakerMode:
         """Return the mode of the device."""
-        return self._attributes.get('Mode')
+        return CoffeeMakerMode(int(self._attributes.get("Mode", _UNKNOWN)))
 
     @property
-    def mode_string(self):
+    def mode_string(self) -> str:
         """Return the mode of the device as a string."""
         return MODE_NAMES.get(self.mode, "Unknown")
 
@@ -113,11 +65,8 @@ class CoffeeMaker(Switch):
         """Return 0 if off and 1 if on."""
         # The base implementation using GetBinaryState doesn't work for
         # CoffeeMaker (always returns 0), so use mode instead.
-        if force_update or self._state is None:
-            self.update_attributes()
-
         # Consider the Coffee Maker to be "on" if it's currently brewing.
-        return int(self._state == CoffeeMakerMode.Brewing)
+        return int(super().get_state(force_update) == CoffeeMakerMode.Brewing)
 
     def set_state(self, state: int) -> None:
         """Set the state of this device to on or off."""
@@ -126,12 +75,4 @@ class CoffeeMaker(Switch):
         if state:
             # Coffee Maker always responds with an error if SetBinaryState is
             # called. Use SetAttributes to change the Mode to "Brewing"
-            self.deviceevent.SetAttributes(
-                attributeList=quote_xml(
-                    "<attribute><name>Mode</name><value>4</value></attribute>"
-                )
-            )
-
-        # The Coffee Maker might not be ready - so it's not safe to assume the
-        # state is what you just set, so re-read it from the device
-        self.get_state(True)
+            self._set_attributes(("Mode", CoffeeMakerMode.Brewing))

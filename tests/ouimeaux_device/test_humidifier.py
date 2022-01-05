@@ -57,6 +57,12 @@ def test_set_fan_mode_and_humidity(humidifier):
 
     assert humidifier.get_state() == 1
 
+    with pytest.raises(ValueError):
+        humidifier.set_fan_mode_and_humidity(fan_mode=99)
+
+    with pytest.raises(ValueError):
+        humidifier.set_fan_mode_and_humidity(desired_humidity=99)
+
 
 @pytest.mark.vcr()
 def test_reset_filter_life(humidifier):

@@ -1,7 +1,5 @@
 """Integration tests for WeMo Switch devices."""
 
-import unittest
-
 import pytest
 
 from pywemo import Maker
@@ -21,15 +19,6 @@ class Test_Maker:
         assert maker.get_state(force_update=True) == 0
 
     def test_maker_params(self, maker):
-        expected_params = {
-            'hassensor': 1,
-            'sensorstate': 1,
-            'switchmode': 1,
-            'switchstate': 0,
-        }
-        unittest.TestCase().assertDictEqual(
-            maker.maker_params, expected_params
-        )
         assert maker.switch_state == 0
         assert maker.sensor_state == 1
         assert maker.switch_mode == 1
@@ -44,7 +33,7 @@ class Test_Maker:
         assert maker.subscription_update("", "") is False
 
     @pytest.mark.parametrize(
-        "update,expected_params",
+        "update,has_sensor,sensor_state,switch_mode,switch_state",
         [
             # Sensor/sensorstate
             (
@@ -52,12 +41,10 @@ class Test_Maker:
                     '<attribute><name>Sensor</name><value>0</value>'
                     '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
                 ),
-                {
-                    'hassensor': 1,
-                    'sensorstate': 0,
-                    'switchmode': 1,
-                    'switchstate': 0,
-                },
+                1,
+                0,
+                1,
+                0,
             ),
             # Switch/switchstate
             (
@@ -65,12 +52,10 @@ class Test_Maker:
                     '<attribute><name>Switch</name><value>1</value>'
                     '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
                 ),
-                {
-                    'hassensor': 1,
-                    'sensorstate': 1,
-                    'switchmode': 1,
-                    'switchstate': 1,
-                },
+                1,
+                1,
+                1,
+                1,
             ),
             # SwitchMode/switchmode
             (
@@ -78,12 +63,10 @@ class Test_Maker:
                     '<attribute><name>SwitchMode</name><value>0</value>'
                     '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
                 ),
-                {
-                    'hassensor': 1,
-                    'sensorstate': 1,
-                    'switchmode': 0,
-                    'switchstate': 0,
-                },
+                1,
+                1,
+                0,
+                0,
             ),
             # SensorPresent/hassensor
             (
@@ -91,12 +74,10 @@ class Test_Maker:
                     '<attribute><name>SensorPresent</name><value>0</value>'
                     '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
                 ),
-                {
-                    'hassensor': 0,
-                    'sensorstate': 1,
-                    'switchmode': 1,
-                    'switchstate': 0,
-                },
+                0,
+                1,
+                1,
+                0,
             ),
             # Invalid state value.
             (
@@ -104,12 +85,10 @@ class Test_Maker:
                     '<attribute><name>SensorPresent</name><value>ABC</value>'
                     '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
                 ),
-                {
-                    'hassensor': 1,
-                    'sensorstate': 1,
-                    'switchmode': 1,
-                    'switchstate': 0,
-                },
+                1,
+                1,
+                1,
+                0,
             ),
             # Unexpected State name
             (
@@ -117,22 +96,29 @@ class Test_Maker:
                     '<attribute><name>Unexpected</name><value>ABC</value>'
                     '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
                 ),
-                {
-                    'hassensor': 1,
-                    'sensorstate': 1,
-                    'switchmode': 1,
-                    'switchstate': 0,
-                },
+                1,
+                1,
+                1,
+                0,
             ),
         ],
     )
-    def test_subscription_update(self, update, expected_params, maker):
+    def test_subscription_update(
+        self,
+        update,
+        has_sensor,
+        sensor_state,
+        switch_mode,
+        switch_state,
+        maker,
+    ):
         """Test that subscription updates happen as expected."""
         updated = maker.subscription_update('attributeList', update)
         assert updated is True
-        unittest.TestCase().assertDictEqual(
-            maker.maker_params, expected_params
-        )
+        assert maker.has_sensor == has_sensor
+        assert maker.sensor_state == sensor_state
+        assert maker.switch_mode == switch_mode
+        assert maker.switch_state == switch_state
 
     @pytest.fixture
     def maker(self, vcr):
