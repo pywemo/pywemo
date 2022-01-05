@@ -105,6 +105,8 @@ def probe_device(device: Device) -> int | None:
 class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
     """Base object for WeMo devices."""
 
+    EVENT_TYPE_BINARY_STATE = "BinaryState"
+
     def __init__(self, url: str, mac: str = 'deprecated') -> None:
         """Create a WeMo device."""
         if mac != 'deprecated':
@@ -200,7 +202,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
     def subscription_update(self, _type: str, _params: str) -> bool:
         """Update device state based on subscription event."""
         LOG.debug("subscription_update %s %s", _type, _params)
-        if _type == "BinaryState":
+        if _type == self.EVENT_TYPE_BINARY_STATE:
             try:
                 self._state = int(
                     self.parse_basic_state(_params).get("state", "0")

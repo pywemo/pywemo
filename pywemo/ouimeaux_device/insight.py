@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 import logging
+import sys
 import warnings
 from datetime import datetime
-from enum import Enum
+from enum import IntEnum
 from typing import Any
 
 from .api.service import RequiredService
@@ -13,22 +14,53 @@ from .switch import Switch
 LOG = logging.getLogger(__name__)
 
 
-class StandbyState(str, Enum):
+class StandbyState(IntEnum):
     """Standby state for the Insight device."""
 
-    ON = "on"
-    OFF = "off"
-    STANDBY = "standby"
+    _UNKNOWN = -1
+    OFF = 0
+    ON = 1
+    STANDBY = 8
+
+    @classmethod
+    def _missing_(cls, value: Any) -> StandbyState:
+        return cls._UNKNOWN
+
+
+if sys.version_info >= (3, 8):
+    # Remove pylint disable when Python 3.7 support is removed.
+    from typing import TypedDict  # pylint: disable=no-name-in-module
+
+    class InsightParams(TypedDict):
+        """Energy related parameters for Insight devices."""
+
+        state: str
+        lastchange: datetime
+        onfor: int
+        ontoday: int
+        ontotal: int
+        todaymw: int
+        totalmw: int
+        currentpower: int
+        wifipower: int
+        powerthreshold: int
+
+
+else:
+    from typing import Dict, Union
+
+    InsightParams = Dict[str, Union[str, datetime, int]]
 
 
 class Insight(Switch):
     """Representation of a WeMo Insight device."""
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        """Create a WeMo Switch device."""
-        Switch.__init__(self, *args, **kwargs)
-        self.insight_params = {}
+    EVENT_TYPE_INSIGHT_PARAMS = "InsightParams"
+    insight_params: InsightParams
 
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Create a WeMo Insight device."""
+        super().__init__(*args, **kwargs)
         self.update_insight_params()
 
     @property
@@ -37,19 +69,20 @@ class Insight(Switch):
             RequiredService(name="insight", actions=["GetInsightParams"]),
         ]
 
-    def update_insight_params(self):
+    def update_insight_params(self) -> None:
         """Get and parse the device attributes."""
         params = self.insight.GetInsightParams().get('InsightParams')
+        assert params
         self.insight_params = self.parse_insight_params(params)
 
     def subscription_update(self, _type: str, _params: str) -> bool:
         """Update the device attributes due to a subscription update event."""
         LOG.debug("subscription_update %s %s", _type, _params)
-        if _type == "InsightParams":
+        if _type == self.EVENT_TYPE_INSIGHT_PARAMS:
             self.insight_params = self.parse_insight_params(_params)
             return True
         updated = super().subscription_update(_type, _params)
-        if _type == "BinaryState" and updated:
+        if _type == self.EVENT_TYPE_BINARY_STATE and updated:
             # Special case: When an Insight device turns off, it also stops
             # sending InsightParams updates. Return False in this case to
             # indicate that the current state of the device hasn't been fully
@@ -58,7 +91,7 @@ class Insight(Switch):
         return updated
 
     @staticmethod
-    def parse_insight_params(params):
+    def parse_insight_params(params: str) -> InsightParams:
         """Parse the Insight parameters."""
         (
             state,  # 0 if off, 1 if on, 8 if on but load is off
@@ -91,7 +124,7 @@ class Insight(Switch):
         if force_update or self._state is None:
             self.update_insight_params()
 
-        return Switch.get_state(self, force_update)
+        return super().get_state(force_update)
 
     @property
     def today_kwh(self) -> float:
@@ -165,18 +198,10 @@ class Insight(Switch):
     @property
     def standby_state(self) -> StandbyState:
         """Return the standby state of the device."""
-        state = self.insight_params['state']
-
-        if state == '0':
-            return StandbyState.OFF
-
-        if state == '1':
-            return StandbyState.ON
-
-        return StandbyState.STANDBY
+        return StandbyState(int(self.insight_params['state']))
 
     @property
-    def get_standby_state(self) -> StandbyState:
+    def get_standby_state(self) -> str:
         """Return the standby state of the device."""
         warnings.warn(
             "The Insight.get_standby_state property should not be used and "
@@ -184,4 +209,4 @@ class Insight(Switch):
             "the Insight.standby_state property instead.",
             DeprecationWarning,
         )
-        return self.standby_state
+        return self.standby_state.name.lower()
