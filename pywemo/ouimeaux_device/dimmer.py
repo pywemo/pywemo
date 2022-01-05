@@ -1,7 +1,7 @@
 """Representation of a WeMo Dimmer device."""
 from __future__ import annotations
 
-from typing import Any
+import warnings
 
 from .api.long_press import LongPressMixin
 from .api.service import RequiredService
@@ -11,10 +11,7 @@ from .switch import Switch
 class Dimmer(Switch):
     """Representation of a WeMo Dimmer device."""
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        """Create a WeMo Dimmer device."""
-        Switch.__init__(self, *args, **kwargs)
-        self._brightness = None
+    _brightness: int | None = None
 
     @property
     def _required_services(self) -> list[RequiredService]:
@@ -22,20 +19,31 @@ class Dimmer(Switch):
             RequiredService(name="basicevent", actions=["SetBinaryState"]),
         ]
 
-    def get_brightness(self, force_update=False):
+    def get_brightness(self, force_update: bool = False) -> int:
         """Get brightness from device."""
         self.get_state(force_update)
+        assert self._brightness is not None
         return self._brightness
 
-    def set_brightness(self, brightness):
+    def set_brightness(self, brightness: int) -> None:
         """Set the brightness of this device to an integer between 1-100."""
-        value = int(brightness)
+        if not isinstance(brightness, int):
+            warnings.warn(  # type: ignore[unreachable]
+                "The brightness argument to Dimmer.set_brightness must be an "
+                "int. Support for non-int values will be dropped in a future "
+                "pyWeMo release.",
+                DeprecationWarning,
+            )
+            brightness = int(brightness)
+
         # WeMo only supports values between 1-100. WeMo will ignore a 0
         # brightness value. If 0 is requested, then turn the light off instead.
         if brightness:
-            self.basicevent.SetBinaryState(BinaryState=1, brightness=value)
+            self.basicevent.SetBinaryState(
+                BinaryState=1, brightness=brightness
+            )
             self._state = 1
-            self._brightness = value
+            self._brightness = brightness
         else:
             self.off()
 
