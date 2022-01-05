@@ -10,8 +10,8 @@ interactions:
 
       <DeviceStatusList>&lt;?xml version=&#x27;1.0&#x27; encoding=&#x27;UTF-8&#x27;?&gt;
 
-      &lt;DeviceStatus&gt;&lt;IsGroupAction&gt;NO&lt;/IsGroupAction&gt;&lt;DeviceID
-      available=&quot;YES&quot;&gt;F0D1B8000001420C&lt;/DeviceID&gt;&lt;CapabilityID&gt;10006&lt;/CapabilityID&gt;&lt;CapabilityValue&gt;0&lt;/CapabilityValue&gt;&lt;/DeviceStatus&gt;</DeviceStatusList>
+      &lt;DeviceStatus&gt;&lt;IsGroupAction&gt;YES&lt;/IsGroupAction&gt;&lt;DeviceID
+      available=&quot;YES&quot;&gt;12345678&lt;/DeviceID&gt;&lt;CapabilityID&gt;10006&lt;/CapabilityID&gt;&lt;CapabilityValue&gt;0&lt;/CapabilityValue&gt;&lt;/DeviceStatus&gt;</DeviceStatusList>
 
       </u:SetDeviceStatus>
 
@@ -36,7 +36,7 @@ interactions:
       CONTENT-TYPE:
       - text/xml; charset="utf-8"
       DATE:
-      - Wed, 05 Jan 2022 05:49:28 GMT
+      - Wed, 05 Jan 2022 05:49:30 GMT
       EXT:
       - ''
       SERVER:
@@ -79,7 +79,7 @@ interactions:
       CONTENT-TYPE:
       - text/xml; charset="utf-8"
       DATE:
-      - Wed, 05 Jan 2022 05:49:28 GMT
+      - Wed, 05 Jan 2022 05:49:30 GMT
       EXT:
       - ''
       SERVER:
@@ -122,9 +122,9 @@ interactions:
         Room Couch Light&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;02&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;,,,,&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;NO&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;Philips&lt;/Manufacturer&gt;&lt;ModelCode&gt;LWA008&lt;/ModelCode&gt;&lt;productName&gt;lighting&lt;/productName&gt;&lt;WeMoCertified&gt;NO&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;DeviceInfo&gt;&lt;DeviceIndex&gt;3&lt;/DeviceIndex&gt;&lt;DeviceID\navailable=&quot;YES&quot;&gt;F0D1B8000001420C&lt;/DeviceID&gt;&lt;FriendlyName&gt;RGBW
         Light&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;01&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,10300,30008,30009,3000A,30301&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;0,120:0,45940:19594:50,,,,200:0&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;NO&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;LEDVANCE&lt;/Manufacturer&gt;&lt;ModelCode&gt;A19
         RGBW&lt;/ModelCode&gt;&lt;productName&gt;lighting&lt;/productName&gt;&lt;WeMoCertified&gt;NO&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;/DeviceInfos&gt;&lt;GroupInfos&gt;&lt;GroupInfo&gt;&lt;GroupID&gt;12345678&lt;/GroupID&gt;&lt;GroupName&gt;Testing
-        Group&lt;/GroupName&gt;&lt;GroupCapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/GroupCapabilityIDs&gt;&lt;GroupCapabilityValues&gt;1,1:0,0:0,,&lt;/GroupCapabilityValues&gt;&lt;DeviceInfos&gt;&lt;DeviceInfo&gt;&lt;DeviceIndex&gt;0&lt;/DeviceIndex&gt;&lt;DeviceID\navailable=&quot;YES&quot;&gt;94103EA2B277BD6E&lt;/DeviceID&gt;&lt;FriendlyName&gt;Test
-        Bulb 1&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;83&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;1,1:0,,,&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;YES&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;MRVL&lt;/Manufacturer&gt;&lt;ModelCode&gt;MZ100&lt;/ModelCode&gt;&lt;productName&gt;Lighting&lt;/productName&gt;&lt;WeMoCertified&gt;YES&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;DeviceInfo&gt;&lt;DeviceIndex&gt;1&lt;/DeviceIndex&gt;&lt;DeviceID\navailable=&quot;YES&quot;&gt;94103EA2B27751AB&lt;/DeviceID&gt;&lt;FriendlyName&gt;Test
-        Bulb 2&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;83&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;1,20:0,,,&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;YES&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;MRVL&lt;/Manufacturer&gt;&lt;ModelCode&gt;MZ100&lt;/ModelCode&gt;&lt;productName&gt;Lighting&lt;/productName&gt;&lt;WeMoCertified&gt;YES&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;/DeviceInfos&gt;&lt;/GroupInfo&gt;&lt;/GroupInfos&gt;&lt;/DeviceList&gt;&lt;/DeviceLists&gt;\n</DeviceLists>\r\n</u:GetEndDevicesWithStatusResponse>\r\n</s:Body>
+        Group&lt;/GroupName&gt;&lt;GroupCapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/GroupCapabilityIDs&gt;&lt;GroupCapabilityValues&gt;0,1:0,0:0,,&lt;/GroupCapabilityValues&gt;&lt;DeviceInfos&gt;&lt;DeviceInfo&gt;&lt;DeviceIndex&gt;0&lt;/DeviceIndex&gt;&lt;DeviceID\navailable=&quot;YES&quot;&gt;94103EA2B277BD6E&lt;/DeviceID&gt;&lt;FriendlyName&gt;Test
+        Bulb 1&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;83&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;0,1:0,,,&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;YES&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;MRVL&lt;/Manufacturer&gt;&lt;ModelCode&gt;MZ100&lt;/ModelCode&gt;&lt;productName&gt;Lighting&lt;/productName&gt;&lt;WeMoCertified&gt;YES&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;DeviceInfo&gt;&lt;DeviceIndex&gt;1&lt;/DeviceIndex&gt;&lt;DeviceID\navailable=&quot;YES&quot;&gt;94103EA2B27751AB&lt;/DeviceID&gt;&lt;FriendlyName&gt;Test
+        Bulb 2&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;83&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;0,20:0,,,&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;YES&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;MRVL&lt;/Manufacturer&gt;&lt;ModelCode&gt;MZ100&lt;/ModelCode&gt;&lt;productName&gt;Lighting&lt;/productName&gt;&lt;WeMoCertified&gt;YES&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;/DeviceInfos&gt;&lt;/GroupInfo&gt;&lt;/GroupInfos&gt;&lt;/DeviceList&gt;&lt;/DeviceLists&gt;\n</DeviceLists>\r\n</u:GetEndDevicesWithStatusResponse>\r\n</s:Body>
         </s:Envelope>"
     headers:
       CONTENT-LENGTH:
@@ -132,7 +132,7 @@ interactions:
       CONTENT-TYPE:
       - text/xml; charset="utf-8"
       DATE:
-      - Wed, 05 Jan 2022 05:49:28 GMT
+      - Wed, 05 Jan 2022 05:49:30 GMT
       EXT:
       - ''
       SERVER:
