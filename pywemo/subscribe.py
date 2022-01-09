@@ -17,6 +17,7 @@ from .exceptions import SubscriptionRegistryFailed
 from .ouimeaux_device import Device
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
 from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
+from .ouimeaux_device.insight import Insight
 from .util import get_ip_address
 
 # Subscription event types.
@@ -563,6 +564,12 @@ class SubscriptionRegistry:
 
     def is_subscribed(self, device: Device) -> bool:
         """Return True if all of the device's subscriptions are active."""
+        if isinstance(device, Insight) and device.get_state() == 0:
+            # Special case: When the Insight device is off, it stops reporting
+            # Insight subscription updates. This causes problems for the
+            # "today" energy properties on the device, which should reset at
+            # midnight but don't because subscription updates have stopped.
+            return False
         subscriptions = self._subscriptions.get(device, [])
         return len(subscriptions) > 0 and all(
             s.is_subscribed for s in subscriptions
