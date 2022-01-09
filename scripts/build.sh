@@ -53,6 +53,10 @@ echo "===Lint with pylint==="
 pylint pywemo scripts
 
 echo
+echo "===Lint with mypy==="
+mypy .
+
+echo
 echo "===Test with pytest and coverage==="
 coverage run -m pytest --vcr-record=none
 coverage report --skip-covered
