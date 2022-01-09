@@ -169,7 +169,7 @@ class UPNPEntry:
         return self._created
 
     @property
-    def expires(self) -> datetime:
+    def expires(self) -> datetime | None:
         """Return timestamp for when this entry expires."""
         warnings.warn(
             "pywemo.ssdp.UPNPEntry.expires is unused within pywemo and "
