@@ -42,6 +42,13 @@ repos:
         types: [python]
         exclude: tests/
 
+      - id: mypy
+        name: mypy
+        language: system
+        entry: poetry run mypy
+        require_serial: true
+        types: [python]
+
       - id: rstcheck
         name: rstcheck
         language: system
