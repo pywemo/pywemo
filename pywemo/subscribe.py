@@ -80,7 +80,7 @@ class Subscription:
     # Has a notification event been received for this subscription?
     event_received: bool = False
 
-    # Subscription Identifer (SID) used to maintain/refresh the subscription.
+    # Subscription Identifier (SID) used to maintain/refresh the subscription.
     # `None` when the subscription is not active.
     subscription_id: str | None = None
 
