@@ -173,14 +173,13 @@ class Subscription:
         subscription. Does nothing if there is no subscription.
         """
         if self.subscription_id:
-            subscription_id = self.subscription_id
-            self.subscription_id = None
             requests.request(
                 method='UNSUBSCRIBE',
                 url=self.url,
-                headers={'SID': subscription_id},
+                headers={'SID': self.subscription_id},
                 timeout=REQUESTS_TIMEOUT,
             )
+            self.subscription_id = None
 
     def _update_subscription(self, headers: MutableMapping[str, str]) -> int:
         """Update UPnP subscription parameters from SUBSCRIBE response headers.
@@ -207,7 +206,6 @@ class Subscription:
         """
         self.event_received = False
         self.expiration_time = 0.0
-        self.subscription_id = None
 
     @property
     def url(self) -> str:
