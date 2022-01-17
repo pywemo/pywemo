@@ -126,6 +126,11 @@ class Insight(Switch):
 
         return super().get_state(force_update)
 
+    def set_state(self, state: int) -> None:
+        """Set the state of this device to on or off."""
+        super().set_state(state)
+        self.get_state(force_update=True)  # Refresh the insight params.
+
     @property
     def today_kwh(self) -> float:
         """Return the number of kWh consumed today."""

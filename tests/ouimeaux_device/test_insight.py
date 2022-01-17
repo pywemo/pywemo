@@ -21,13 +21,15 @@ class Test_Insight:
     def test_turn_on(self, insight):
         """Turn on the insight switch."""
         insight.on()
-        assert insight.get_state(force_update=True) == 8
+        assert insight.get_state() == 8
+        assert insight.standby_state == StandbyState.STANDBY
 
     @pytest.mark.vcr()
     def test_turn_off(self, insight):
         """Turn off the insight switch."""
         insight.off()
-        assert insight.get_state(force_update=True) == 0
+        assert insight.get_state() == 0
+        assert insight.standby_state == StandbyState.OFF
 
     @pytest.mark.vcr()
     def test_insight_params(self, insight):
