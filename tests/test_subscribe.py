@@ -346,11 +346,14 @@ class Test_SubscriptionRegistry:
         assert insight.time == pytest.approx(time.time() + 225, abs=2)
         assert insight.action == subscription_registry._resubscribe
 
+        device._state = 1
         assert subscription_registry.is_subscribed(device) is False
         subscription_registry.event(device, '', '', path='/sub/insight')
         assert subscription_registry.is_subscribed(device) is False
         subscription_registry.event(device, '', '', path='/sub/basicevent')
         assert subscription_registry.is_subscribed(device) is True
+        device._state = 0
+        assert subscription_registry.is_subscribed(device) is False
         subscription_registry.event(device, '', '', path='invalid_path')
 
         assert subscription_registry.devices['192.168.1.100'] == device
