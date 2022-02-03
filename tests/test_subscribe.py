@@ -239,8 +239,17 @@ class Test_Subscription:
             timeout=subscribe.REQUESTS_TIMEOUT,
         )
 
-        # Now test with the renewal failing with code 412.
+        # Verify that a request timeout doesn't clear the SID.
+        # Clearing the SID can result in pyWeMo generating many subscriptions
+        # to a single device.
         mock_request.reset_mock()
+        mock_request.side_effect = requests.ReadTimeout
+        with pytest.raises(requests.ReadTimeout):
+            subscription.maintain()
+        assert subscription.subscription_id == 'uuid:321'
+
+        # Now test with the renewal failing with code 412.
+        mock_request.reset_mock(side_effect=True)
         mock_response = mock.Mock()
         mock_response.headers = {'SID': 'uuid:222', 'TIMEOUT': 'Second-333'}
         type(mock_response).status_code = mock.PropertyMock(
