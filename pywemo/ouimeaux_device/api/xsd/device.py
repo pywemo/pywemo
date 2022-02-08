@@ -23,7 +23,7 @@ try:
     ModulenotfoundExp_ = ModuleNotFoundError
 except NameError:
     ModulenotfoundExp_ = ImportError
-from six.moves import zip_longest
+from itertools import zip_longest
 import os
 import re as re_
 import base64
