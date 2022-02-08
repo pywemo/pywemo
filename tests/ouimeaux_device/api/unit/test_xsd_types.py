@@ -1,5 +1,6 @@
 """Tests for interfacing with the generated XSD classes."""
 
+import ast
 import unittest.mock as mock
 
 import pytest
@@ -230,3 +231,22 @@ def test_device_parser_raises():
     ):
         mock_parser.parseString.side_effect = Exception
         xsd_types.DeviceDescription.from_xml(b'')
+
+
+def test_no_six_import():
+    # device.py & service.py were manually edited to remove the dependency on
+    # 'six' for https://github.com/pywemo/pywemo/issues/344. Ensure this
+    # dependency is not added again next time these files are re-generated.
+    with open("pywemo/ouimeaux_device/api/xsd/device.py") as device_py:
+        device_ast = ast.parse(device_py.read())
+    import_modules = [
+        e.module for e in device_ast.body if isinstance(e, ast.ImportFrom)
+    ]
+    assert 'six.moves' not in import_modules
+
+    with open("pywemo/ouimeaux_device/api/xsd/service.py") as service_py:
+        service_ast = ast.parse(service_py.read())
+    import_modules = [
+        e.module for e in service_ast.body if isinstance(e, ast.ImportFrom)
+    ]
+    assert 'six.moves' not in import_modules
