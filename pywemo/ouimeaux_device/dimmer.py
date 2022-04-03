@@ -71,3 +71,7 @@ class Dimmer(Switch):
 
 class DimmerLongPress(Dimmer, LongPressMixin):
     """WeMo Dimmer device that supports long press."""
+
+
+class DimmerV2(Dimmer):
+    """WeMo Dimmer version 2."""

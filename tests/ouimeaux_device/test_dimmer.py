@@ -1,8 +1,10 @@
 """Integration tests for the Dimmer class."""
+import threading
 
 import pytest
 
 from pywemo.discovery import device_from_uuid_and_location
+from pywemo.subscribe import EVENT_TYPE_BINARY_STATE
 
 from .api.unit import long_press_helpers
 
@@ -67,3 +69,38 @@ class Test_PVT_RTOS_Dimmer_v2(Base):
                 'uuid:Dimmer-2_0-SERIALNUMBER',
                 'http://192.168.1.100:49153/setup.xml',
             )
+
+    @pytest.mark.vcr()
+    def test_is_subscribed(self, dimmer, subscription_registry):
+        subscription_registry.register(dimmer)
+
+        # Wait for registry to be ready to make sure the Dimmer device has
+        # been registered.
+        ready = threading.Event()
+        subscription_registry._sched.enter(0.1, 0, ready.set)
+        ready.wait()
+
+        # Subscribe to all events.
+        subscription_registry.on(
+            dimmer, None, lambda a, b, c: dimmer.subscription_update(b, c)
+        )
+
+        # is_subscribed returns False when the device is On.
+        subscription_registry.event(
+            dimmer,
+            EVENT_TYPE_BINARY_STATE,
+            '1',  # Dimmer is On.
+            '/sub/basicevent',
+        )
+        assert dimmer.get_state() == 1
+        assert subscription_registry.is_subscribed(dimmer) is False
+
+        # is_subscribed returns True when the device is Off.
+        subscription_registry.event(
+            dimmer,
+            EVENT_TYPE_BINARY_STATE,
+            '0',  # Dimmer is Off.
+            '/sub/basicevent',
+        )
+        assert dimmer.get_state() == 0
+        assert subscription_registry.is_subscribed(dimmer)

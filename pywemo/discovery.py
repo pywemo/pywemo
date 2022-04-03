@@ -21,7 +21,7 @@ from .ouimeaux_device.api.xsd_types import DeviceDescription
 from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
 from .ouimeaux_device.crockpot import CrockPot
-from .ouimeaux_device.dimmer import Dimmer, DimmerLongPress
+from .ouimeaux_device.dimmer import Dimmer, DimmerLongPress, DimmerV2
 from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.insight import Insight
 from .ouimeaux_device.lightswitch import LightSwitch, LightSwitchLongPress
@@ -97,6 +97,8 @@ def device_from_uuid_and_location(  # noqa: C901
             return LightSwitch(location)
         if uuid.startswith('uuid:Dimmer-1_0'):
             return DimmerLongPress(location)
+        if uuid.startswith('uuid:Dimmer-2_0'):
+            return DimmerV2(location)
         if uuid.startswith('uuid:Dimmer'):
             return Dimmer(location)
         if uuid.startswith('uuid:Insight'):
