@@ -15,7 +15,7 @@ from .ouimeaux_device.bridge import Group as BridgeGroup
 from .ouimeaux_device.bridge import Light as BridgeLight
 from .ouimeaux_device.coffeemaker import CoffeeMaker, CoffeeMakerMode
 from .ouimeaux_device.crockpot import CrockPot, CrockPotMode
-from .ouimeaux_device.dimmer import Dimmer, DimmerLongPress
+from .ouimeaux_device.dimmer import Dimmer, DimmerLongPress, DimmerV2
 from .ouimeaux_device.humidifier import (
     DesiredHumidity,
     FanMode,

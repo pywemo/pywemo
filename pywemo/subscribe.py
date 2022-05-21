@@ -17,6 +17,7 @@ from .exceptions import SubscriptionRegistryFailed
 from .ouimeaux_device import Device
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
 from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
+from .ouimeaux_device.dimmer import DimmerV2
 from .ouimeaux_device.insight import Insight
 from .util import get_ip_address
 
@@ -567,6 +568,11 @@ class SubscriptionRegistry:
             # Insight subscription updates. This causes problems for the
             # "today" energy properties on the device, which should reset at
             # midnight but don't because subscription updates have stopped.
+            return False
+        if isinstance(device, DimmerV2) and device.get_state() == 1:
+            # Special case: The V2 (RTOS) Dimmers do not send subscription
+            # updates for brightness changes. Return False so clients know
+            # polling is required to update the device brightness.
             return False
         subscriptions = self._subscriptions.get(device, [])
         return len(subscriptions) > 0 and all(
