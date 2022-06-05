@@ -15,7 +15,7 @@ from lxml import etree as et
 
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
 from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
-from .util import etree_to_dict, get_ip_address, interface_addresses
+from .util import etree_to_dict, get_callback_address, interface_addresses
 
 DISCOVER_TIMEOUT = 5
 
@@ -35,7 +35,7 @@ VIRTUAL_DEVICE_USN = f'{VIRTUAL_DEVICE_UDN}::{ST}'
 SSDP_REPLY = f"""HTTP/1.1 200 OK
 CACHE-CONTROL: max-age=86400
 EXT:
-LOCATION: http://%s:%d/setup.xml
+LOCATION: http://%s/setup.xml
 OPT: "http://schemas.upnp.org/upnp/1/0/"; ns=01
 ST: {ST}
 USN: {VIRTUAL_DEVICE_USN}
@@ -46,7 +46,7 @@ SSDP_REPLY = SSDP_REPLY.replace('\n', '\r\n')
 SSDP_NOTIFY = f"""NOTIFY * HTTP/1.1
 HOST: {MULTICAST_GROUP}:{MULTICAST_PORT}
 CACHE-CONTROL: max-age=1800
-LOCATION: http://%s:%d/setup.xml
+LOCATION: http://%s/setup.xml
 SERVER: Unspecified, UPnP/1.0, Unspecified
 NT: {ST}
 NTS: ssdp:alive
@@ -417,7 +417,7 @@ class DiscoveryResponder:
         """Send a UPnP NOTIFY message containing the virtual device URL."""
         ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
         for addr in interface_addresses():  # Send on all interfaces.
-            callback_addr = (addr, self.callback_port)
+            callback_addr = get_callback_address(addr, self.callback_port)
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             try:
                 sock.bind((addr, 0))
@@ -475,8 +475,8 @@ class DiscoveryResponder:
                     or EXPECTED_MAN_HEADER not in lines
                 ):
                     continue
-                callback_addr = (
-                    get_ip_address(sock_addr[0]),
+                callback_addr = get_callback_address(
+                    sock_addr[0],
                     self.callback_port,
                 )
                 try:

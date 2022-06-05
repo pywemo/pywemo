@@ -179,9 +179,11 @@ class Test_Subscription:
     http_port = 8989
 
     @pytest.fixture(autouse=True)
-    def get_ip_address(self):
-        with mock.patch('pywemo.subscribe.get_ip_address') as mock_ip_address:
-            mock_ip_address.return_value = '192.168.1.1'
+    def get_callback_address(self):
+        with mock.patch(
+            'pywemo.subscribe.get_callback_address'
+        ) as mock_ip_address:
+            mock_ip_address.return_value = f'192.168.1.1:{self.http_port}'
             yield mock_ip_address
 
     @pytest.fixture(

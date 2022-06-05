@@ -10,6 +10,7 @@ from pywemo import ssdp
 
 MOCK_CALLBACK_PORT = 8989
 MOCK_IP_ADDRESS = "5.6.7.8"
+MOCK_CALLBACK_ADDRESS = f'{MOCK_IP_ADDRESS}:{MOCK_CALLBACK_PORT}'
 
 
 @pytest.fixture()
@@ -21,12 +22,12 @@ def mock_interface_addresses():
 
 
 @pytest.fixture()
-def mock_get_ip_address():
+def mock_get_callback_address():
     """Mock for util.get_ip_address."""
     with mock.patch(
-        "pywemo.ssdp.get_ip_address", return_value=MOCK_IP_ADDRESS
+        "pywemo.ssdp.get_callback_address", return_value=MOCK_CALLBACK_ADDRESS
     ):
-        yield MOCK_IP_ADDRESS
+        yield MOCK_CALLBACK_ADDRESS
 
 
 @pytest.fixture()
@@ -56,7 +57,10 @@ def mock_select():
 
 @pytest.fixture()
 def discovery_responder(
-    mock_select, mock_socket, mock_interface_addresses, mock_get_ip_address
+    mock_select,
+    mock_socket,
+    mock_interface_addresses,
+    mock_get_callback_address,
 ):
     """Fixture for DiscoveryResponder instance.
 
@@ -114,14 +118,15 @@ def discovery_responder(
         assert mock_socket.sendto.call_count == sendto_count
 
 
-def test_discovery_responder_notify(mock_socket, mock_interface_addresses):
+def test_discovery_responder_notify(
+    mock_socket, mock_interface_addresses, mock_get_callback_address
+):
     resp = ssdp.DiscoveryResponder(callback_port=MOCK_CALLBACK_PORT)
     resp.send_notify()
-    for addr in mock_interface_addresses:
-        mock_socket.sendto.assert_called_with(
-            (ssdp.SSDP_NOTIFY % (addr, MOCK_CALLBACK_PORT)).encode('utf-8'),
-            ('239.255.255.250', 1900),
-        )
+    mock_socket.sendto.assert_called_with(
+        (ssdp.SSDP_NOTIFY % MOCK_CALLBACK_ADDRESS).encode('utf-8'),
+        ('239.255.255.250', 1900),
+    )
 
 
 def test_discovery_responder_responds_to_wemo(discovery_responder):
@@ -136,7 +141,7 @@ HOST: 239.255.255.250:1900
 """
     resp_msg, resp_to_addr = discovery_responder(msg, from_addr)
 
-    expected_response = ssdp.SSDP_REPLY % (MOCK_IP_ADDRESS, MOCK_CALLBACK_PORT)
+    expected_response = ssdp.SSDP_REPLY % MOCK_CALLBACK_ADDRESS
 
     assert resp_msg.decode("UTF-8") == expected_response
     # The reply should go back to the source.
