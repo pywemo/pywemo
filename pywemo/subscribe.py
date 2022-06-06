@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import collections
 import logging
+import os
 import sched
 import threading
 import time
@@ -19,7 +20,7 @@ from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
 from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
 from .ouimeaux_device.dimmer import DimmerV2
 from .ouimeaux_device.insight import Insight
-from .util import get_ip_address
+from .util import get_callback_address
 
 # Subscription event types.
 EVENT_TYPE_BINARY_STATE = "BinaryState"
@@ -157,8 +158,12 @@ class Subscription:
         if self.subscription_id:  # Renew existing subscription.
             headers = {'SID': self.subscription_id}
         else:  # Start a new subscription.
-            host = get_ip_address(host=self.device.host)
-            callback = f'<http://{host}:{self.callback_port}{self.path}>'
+            callback_address = get_callback_address(
+                host=self.device.host,
+                port=self.callback_port,
+            )
+
+            callback = f'<http://{callback_address}{self.path}>'
             headers = {'CALLBACK': callback, 'NT': 'upnp:event'}
         headers['TIMEOUT'] = f'Second-{self.default_timeout_seconds}'
         return requests.request(
@@ -239,15 +244,23 @@ class HTTPServer(ThreadingHTTPServer):
     outer: SubscriptionRegistry
 
 
-def _start_server() -> HTTPServer | None:
+def _start_server(port: int | None) -> HTTPServer:
     """Find a valid open port and start the HTTP server."""
-    for i in range(0, 128):
-        port = 8989 + i
+    requested_port = port or os.getenv('PYWEMO_HTTP_SERVER_PORT')
+    if requested_port is not None:
+        start_port = int(requested_port)
+        ports_to_check = 1
+    else:
+        start_port = 8989
+        ports_to_check = 128
+
+    for i in range(0, ports_to_check):
+        port = start_port + i
         try:
             return HTTPServer(('', port), RequestHandler)
-        except OSError:
-            continue
-    return None
+        except OSError as error:
+            last_error = error
+    raise last_error
 
 
 def _cancel_events(
@@ -420,7 +433,7 @@ class SubscriptionRegistry:
         'insight',
     )
 
-    def __init__(self) -> None:
+    def __init__(self, requested_port: int | None = None) -> None:
         """Create the subscription registry object."""
         self.devices: dict[str, Device] = {}
         self._callbacks: dict[
@@ -440,6 +453,7 @@ class SubscriptionRegistry:
 
         self._http_thread: threading.Thread | None = None
         self._httpd: HTTPServer | None = None
+        self._requested_port: int | None = requested_port
 
     @property
     def port(self) -> int:
@@ -581,7 +595,7 @@ class SubscriptionRegistry:
 
     def start(self) -> None:
         """Start the subscription registry."""
-        self._httpd = _start_server()
+        self._httpd = _start_server(self._requested_port)
         if self._httpd is None:
             raise SubscriptionRegistryFailed(
                 'Unable to bind a port for listening'

@@ -1,6 +1,7 @@
 """Miscellaneous utility functions."""
 from __future__ import annotations
 
+import os
 import socket
 import warnings
 from collections import defaultdict
@@ -69,12 +70,16 @@ def interface_addresses() -> list[str]:
     return addresses
 
 
-def get_ip_address(host: str = '1.2.3.4') -> str | None:
-    """Return IP from hostname or IP."""
+def get_callback_address(host: str, port: int) -> str | None:
+    """Return IP address & port used by devices to send event notifications."""
+    pywemo_callback_address = os.getenv('PYWEMO_CALLBACK_ADDRESS')
+    if pywemo_callback_address is not None:
+        return pywemo_callback_address
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         sock.connect((host, 9))
-        return cast(str, sock.getsockname()[0])
+        return f'{cast(str, sock.getsockname()[0])}:{port}'
     except OSError:
         return None
     finally:
