@@ -43,11 +43,10 @@ class CrockPot(Switch):
     EVENT_TYPE_MODE = "mode"
     EVENT_TYPE_TIME = "time"
 
-    _attributes: dict[str, str] = {}
-
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo CrockPot device."""
         super().__init__(*args, **kwargs)
+        self._attributes: dict[str, str] = {}
         self.get_state(True)
 
     @property
