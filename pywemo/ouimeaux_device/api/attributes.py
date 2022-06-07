@@ -30,12 +30,12 @@ class AttributeDevice(Switch):
 
     EVENT_TYPE_ATTRIBUTE_LIST = "attributeList"
 
-    _attributes: dict[str, str] = {}
     _state_property: str
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a Attributes device."""
         assert isinstance(self._state_property, str)
+        self._attributes: dict[str, str] = {}
         super().__init__(*args, **kwargs)
         self.update_attributes()
 
