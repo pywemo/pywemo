@@ -130,15 +130,19 @@ class Test_RequestHandler:
         """POST returns success status for unknown devices."""
         response = requests.post(f"{server_url}/upnp/control/basicevent1")
         assert response.status_code == 200
-        assert response.content == subscribe.RESPONSE_SUCCESS.encode("UTF-8")
+        assert response.content == subscribe.ERROR_SOAP_ACTION_RESPONSE.encode(
+            "UTF-8"
+        )
 
     def test_POST_known_device(
         self, outer, server_address, server_url, mock_light_switch
     ):
         """POST (LongPress) for known device delivers the appropriate event."""
         outer.devices[server_address] = mock_light_switch
+        action = '"urn:Belkin:service:basicevent:1#SetBinaryState"'
         response = requests.post(
             f"{server_url}/upnp/control/basicevent1",
+            headers={"SOAPACTION": action},
             data="""<?xml version="1.0" encoding="utf-8"?>
 <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
 <s:Body>
@@ -149,7 +153,9 @@ class Test_RequestHandler:
 </s:Envelope>""",  # noqa: E501
         )
         assert response.status_code == 200
-        assert response.content == subscribe.RESPONSE_SUCCESS.encode("UTF-8")
+        assert response.content == subscribe.SOAP_ACTION_RESPONSE[
+            action
+        ].encode("UTF-8")
         outer.event.assert_called_once_with(
             mock_light_switch, subscribe.EVENT_TYPE_LONG_PRESS, "0"
         )

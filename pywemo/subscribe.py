@@ -64,6 +64,38 @@ VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
 </device>
 </root>"""
 
+SOAP_ACTION_RESPONSE = {
+    '"urn:Belkin:service:basicevent:1#GetBinaryState"': """<s:Envelope
+  xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"
+  s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<s:Body>
+  <u:GetBinaryStateResponse xmlns:u="urn:Belkin:service:basicevent:1">
+  <BinaryState>0</BinaryState>
+  </u:GetBinaryStateResponse>
+</s:Body></s:Envelope>""",
+    '"urn:Belkin:service:basicevent:1#SetBinaryState"': """<s:Envelope
+  xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"
+  s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<s:Body>
+  <u:SetBinaryStateResponse xmlns:u="urn:Belkin:service:basicevent:1">
+    <BinaryState>0</BinaryState>
+  </u:SetBinaryStateResponse>
+</s:Body></s:Envelope>""",
+}
+
+ERROR_SOAP_ACTION_RESPONSE = """<?xml version='1.0' encoding='UTF-8'?>
+<s:Envelope
+  xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"
+  s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<s:Body>
+  <s:Fault>
+    <faultcode>SOAP-ENV:Server</faultcode>
+    <faultstring>Unknown Action</faultstring>
+    <detail>The requested SOAP action is not handled by pyWeMo</detail>
+  </s:Fault>
+</s:Body>
+</s:Envelope>"""
+
 
 class Subscription:
     """Subscription to a single UPnP service endpoint."""
@@ -374,7 +406,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                 doc = self._get_xml_from_http_body()
                 if binary_state := doc.findtext(".//BinaryState"):
                     outer.event(device, EVENT_TYPE_LONG_PRESS, binary_state)
-            self._send_response(200, RESPONSE_SUCCESS)
+            action = self.headers.get("SOAPACTION", "")
+            response = SOAP_ACTION_RESPONSE.get(
+                action, ERROR_SOAP_ACTION_RESPONSE
+            )
+            self._send_response(200, response)
         else:
             self._send_response(404, RESPONSE_NOT_FOUND)
 
