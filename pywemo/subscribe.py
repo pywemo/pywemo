@@ -360,6 +360,7 @@ class RequestHandler(BaseHTTPRequestHandler):
     # Do not wait for more than 10 seconds for any request to complete.
     timeout = 10
     server: HTTPServer
+    server_version = f"{BaseHTTPRequestHandler.server_version} UPnP/1.0"
 
     def do_NOTIFY(self) -> None:  # pylint: disable=invalid-name
         """Handle subscription responses received from devices."""

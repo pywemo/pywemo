@@ -157,6 +157,7 @@ class Test_RequestHandler:
             action
         ].encode("UTF-8")
         assert response.headers["Content-Type"] == 'text/xml; charset="utf-8"'
+        assert "UPnP/1.0" in response.headers["Server"]
         outer.event.assert_called_once_with(
             mock_light_switch, subscribe.EVENT_TYPE_LONG_PRESS, "0"
         )
