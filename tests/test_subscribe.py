@@ -156,6 +156,7 @@ class Test_RequestHandler:
         assert response.content == subscribe.SOAP_ACTION_RESPONSE[
             action
         ].encode("UTF-8")
+        assert response.headers["Content-Type"] == 'text/xml; charset="utf-8"'
         outer.event.assert_called_once_with(
             mock_light_switch, subscribe.EVENT_TYPE_LONG_PRESS, "0"
         )

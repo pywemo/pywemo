@@ -410,7 +410,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             response = SOAP_ACTION_RESPONSE.get(
                 action, ERROR_SOAP_ACTION_RESPONSE
             )
-            self._send_response(200, response)
+            self._send_response(
+                200, response, content_type='text/xml; charset="utf-8"'
+            )
         else:
             self._send_response(404, RESPONSE_NOT_FOUND)
 
