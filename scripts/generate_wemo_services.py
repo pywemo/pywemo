@@ -27,6 +27,7 @@ FIRMWARE_VCR_CASSETTE_FILES = [
     f"tests/vcr/tests.ouimeaux_device.test_{cassette}"
     for cassette in [
         "bridge/WeMo_WW_2.00.11057.PVT-OWRT-Link.yaml",
+        "crockpot/crockpot_setup.yaml",
         "dimmer/WeMo_WW_2.00.11453.PVT-OWRT-Dimmer.yaml",
         "dimmer/WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2.yaml",
         "humidifier/WeMo_WW_2.00.11423.PVT-OWRT-Smart.yaml",
