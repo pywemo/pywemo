@@ -1,0 +1,91 @@
+interactions:
+- request:
+    body: '<?xml version="1.0" encoding="utf-8"?>
+
+      <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+
+      <s:Body>
+
+      <u:SetCrockpotState xmlns:u="urn:Belkin:service:basicevent:1">
+
+      <mode>52</mode>
+
+      <time>0</time>
+
+      </u:SetCrockpotState>
+
+      </s:Body>
+
+      </s:Envelope>'
+    headers:
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:basicevent:1#SetCrockpotState"'
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/basicevent1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:SetCrockpotStateResponse
+        xmlns:u=\"urn:Belkin:service:basicevent:1\">\r\n<time>0</time>\r\n</u:SetCrockpotStateResponse>\r\n</s:Body>
+        </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '275'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Sat, 13 Aug 2022 20:37:14 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '<?xml version="1.0" encoding="utf-8"?>
+
+      <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+
+      <s:Body>
+
+      <u:GetCrockpotState xmlns:u="urn:Belkin:service:basicevent:1">
+
+
+      </u:GetCrockpotState>
+
+      </s:Body>
+
+      </s:Envelope>'
+    headers:
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:basicevent:1#GetCrockpotState"'
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/basicevent1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:GetCrockpotStateResponse
+        xmlns:u=\"urn:Belkin:service:basicevent:1\">\r\n<mode>52</mode>\r\n<time>0</time>\r\n<cookedTime>0</cookedTime>\r\n<timeStamp>1660423034</timeStamp>\r\n</u:GetCrockpotStateResponse>\r\n</s:Body>
+        </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '355'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Sat, 13 Aug 2022 20:37:14 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+version: 1
