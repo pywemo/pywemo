@@ -115,6 +115,12 @@ class Service_bridge:
     SetZigbeeMode: UPnPMethod
     UpgradeSubDeviceFirmware: UPnPMethod
 
+class Service_crockpotevent:
+    GetCrockpotState: UPnPMethod
+    GetJardenStatus: UPnPMethod
+    SetCrockpotState: UPnPMethod
+    SetJardenStatus: UPnPMethod
+
 class Service_deviceevent:
     GetAttributeList: UPnPMethod
     GetAttributes: UPnPMethod
@@ -154,6 +160,12 @@ class Service_insight:
     ScheduleDataExport: UPnPMethod
     SetAutoPowerThreshold: UPnPMethod
     SetPowerThreshold: UPnPMethod
+
+class Service_jardenevent:
+    GetCrockpotState: UPnPMethod
+    GetJardenStatus: UPnPMethod
+    SetCrockpotState: UPnPMethod
+    SetJardenStatus: UPnPMethod
 
 class Service_manufacture:
     GetManufactureData: UPnPMethod
@@ -196,10 +208,12 @@ class WeMoServiceTypesMixin:
     WiFiSetup: Service_WiFiSetup
     basicevent: Service_basicevent
     bridge: Service_bridge
+    crockpotevent: Service_crockpotevent
     deviceevent: Service_deviceevent
     deviceinfo: Service_deviceinfo
     firmwareupdate: Service_firmwareupdate
     insight: Service_insight
+    jardenevent: Service_jardenevent
     manufacture: Service_manufacture
     metainfo: Service_metainfo
     remoteaccess: Service_remoteaccess
@@ -211,10 +225,12 @@ class WeMoAllActionsMixin(
     Service_WiFiSetup,
     Service_basicevent,
     Service_bridge,
+    Service_crockpotevent,
     Service_deviceevent,
     Service_deviceinfo,
     Service_firmwareupdate,
     Service_insight,
+    Service_jardenevent,
     Service_manufacture,
     Service_metainfo,
     Service_remoteaccess,
