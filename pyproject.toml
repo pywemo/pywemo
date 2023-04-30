@@ -17,7 +17,7 @@ homepage = "https://github.com/pywemo/pywemo"
 keywords = ['wemo', 'api']
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.7.2"
 ifaddr = ">=0.1.0"
 requests = ">=2.0"
 urllib3 = ">=1.26.0"
@@ -33,7 +33,7 @@ isort = "^5.6.4"
 flake8 = ">=3.6.0"
 flake8-docstrings = ">=1.3.0"
 flake8-bugbear = "^20.11.1"
-pylint = "2.12.2"
+pylint = ">=2.17.0"
 rstcheck = "^3.3.1"
 mypy = ">=0.900"
 # testing and code coverage

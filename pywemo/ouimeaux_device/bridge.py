@@ -263,8 +263,7 @@ class LinkedDevice:
             # Should't receive updates for capabilities that were not
             # originally present.
             return False
-        else:
-            self._values[index] = value
+        self._values[index] = value
 
         # Don't call the subclass. It expects to have a list of all the
         # capability/value pairs. The subscription_update only receives a
