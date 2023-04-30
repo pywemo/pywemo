@@ -122,7 +122,6 @@ class SSDP:
                 or force_update
                 or datetime.now() - self.last_scan > MIN_TIME_BETWEEN_SCANS
             ):
-
                 self.remove_expired()
 
                 self.entries.extend(

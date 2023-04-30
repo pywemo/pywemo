@@ -173,7 +173,6 @@ if sys.version_info >= (3, 8):
         temperature_kelvin: int
         color_xy: ColorXY
 
-
 else:
     from typing import Dict, Union
 
