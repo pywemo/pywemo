@@ -73,7 +73,7 @@ def probe_wemo(
             # If we timed out connecting, then the wemo is gone,
             # no point in trying further.
             LOG.debug(
-                'Timed out connecting to %s on port %i, ' 'wemo is offline',
+                'Timed out connecting to %s on port %i, wemo is offline',
                 host,
                 port,
             )
@@ -371,20 +371,6 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                 'openssl command failed (openssl not installed / not on path?)'
             ) from exc
         except subprocess.CalledProcessError as exc:
-            try:
-                stdout = openssl.stdout.decode(
-                    errors='backslashreplace'
-                ).strip()
-            except UnboundLocalError:
-                stdout = 'not available'
-            try:
-                stderr = openssl.stderr.decode(
-                    errors='backslashreplace'
-                ).strip()
-            except UnboundLocalError:
-                stderr = 'not available'
-            LOG.error('stdout:\n%s', stdout)
-            LOG.error('stderr:\n%s', stderr)
             raise SetupException('openssl command failed') from exc
 
         # remove 16byte magic and salt prefix inserted by OpenSSL, which is of

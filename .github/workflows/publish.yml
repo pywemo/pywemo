@@ -8,28 +8,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+        uses: actions/checkout@v3
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.7
-      - name: Build and publish
-        env:
-          CI: 1
-          COVERALLS_SERVICE_NAME: github
-          COVERALLS_PARALLEL: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./scripts/build_and_publish.sh ${{ secrets.PYPI_PASSWORD }}
-  coveralls:
-    name: Indicate completion to coveralls.io
-    needs: deploy
-    runs-on: ubuntu-latest
-    container: python:3-slim
-    steps:
-      - name: Finished
-        env:
-          COVERALLS_SERVICE_NAME: github
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          python-version: '3.11'
+      - name: Build
+        run: ./scripts/build.sh
+      - name: Generate coverage
         run: |
-          pip3 install --upgrade coveralls
-          coveralls --finish
+          . .venv/bin/activate
+          coverage lcov
+      - name: Report Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          path-to-lcov: coverage.lcov
+      - name: Publish
+        run: |
+          . .venv/bin/activate
+          poetry publish --username __token__ --password "${{ secrets.PYPI_PASSWORD }}"
