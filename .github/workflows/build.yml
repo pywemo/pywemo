@@ -20,22 +20,25 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Build
-        env:
-          CI: 1
-          COVERALLS_SERVICE_NAME: github
-          COVERALLS_PARALLEL: true
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./scripts/build.sh
+      - name: Generate coverage
+        run: |
+          . .venv/bin/activate
+          coverage lcov
+      - name: Report Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          path-to-lcov: coverage.lcov
+          flag-name: run-${{ join(matrix.*, '-') }}
+          parallel: true
   coveralls:
     name: Indicate completion to coveralls.io
     needs: build
+    if: ${{ always() }}
     runs-on: ubuntu-latest
-    container: python:3-slim
     steps:
-      - name: Finished
-        env:
-          COVERALLS_SERVICE_NAME: github
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          pip3 install --upgrade coveralls
-          coveralls --finish
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@v2
+      with:
+        parallel-finished: true
+        carryforward: "run-1,run-2"

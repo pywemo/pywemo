@@ -60,9 +60,6 @@ echo
 echo "===Test with pytest and coverage==="
 coverage run -m pytest --vcr-record=none
 coverage report --skip-covered
-if [[ "${CI:-}" = "1" ]]; then
-  coveralls
-fi
 
 echo
 echo "===Building package==="
