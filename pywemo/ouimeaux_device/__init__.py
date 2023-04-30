@@ -119,7 +119,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         self.basic_state_params: dict[str, str] = {}
         self._reconnect_lock = threading.Lock()
         self.session = Session(url)
-        xml = self.session.get(url).content
+        xml = self.session.get(url).data
 
         try:
             super().__init__(**DeviceDescription.dict_from_xml(xml))

@@ -45,7 +45,6 @@ if sys.version_info >= (3, 8):
         wifipower: int
         powerthreshold: int
 
-
 else:
     from typing import Dict, Union
 

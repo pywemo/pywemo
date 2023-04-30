@@ -27,7 +27,7 @@ lxml = "^4.6"
 # toml is used by multiple tools to read this pyproject.toml file
 toml = "^0.10"
 # formatters
-black = "21.10b0"
+black = "23.3.0"
 isort = "^5.6.4"
 # linters/code analysis
 flake8 = ">=3.6.0"
@@ -40,8 +40,7 @@ mypy = ">=0.900"
 pytest = "6.2.5"
 pytest-vcr = "1.0.2"
 types-requests = ">=2.0"
-coverage = "^5.4"
-coveralls = "^3.0.0"
+coverage = ">=6.3"
 # version of generateDS used to create device.py and service.py in .../api/xsd
 generateDS = "2.37.11"
 # other
@@ -94,7 +93,7 @@ src_paths = ["pywemo", "tests"]
 skip_glob = "*/xsd/*"
 
 [tool.mypy]
-python_version = 3.8
+python_version = "3.10"
 show_error_codes = true
 ignore_missing_imports = true
 strict_equality = true

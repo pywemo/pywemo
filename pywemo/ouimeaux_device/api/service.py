@@ -68,7 +68,7 @@ class Session:
     """
 
     # Retry strategy for requests that fail.
-    retries = urllib3.Retry(
+    retries: int | urllib3.Retry | None = urllib3.Retry(
         total=6, backoff_factor=1.5, allowed_methods=['GET', 'POST']
     )
 
@@ -78,7 +78,7 @@ class Session:
     def __init__(
         self,
         url: str,
-        retries: int | None = None,
+        retries: int | urllib3.Retry | None = None,
         timeout: float | None = None,
     ) -> None:
         """Create a session with the specified default parameters."""
@@ -92,7 +92,7 @@ class Session:
         self,
         method: str,
         url: str,
-        retries: int | None = None,
+        retries: int | urllib3.Retry | None = None,
         timeout: float | None = None,
         **kwargs: Any,
     ) -> urllib3.HTTPResponse:
@@ -122,6 +122,7 @@ class Session:
         # http connection is also closed. This avoids tying up TCP sessions
         # on the device.
         with urllib3.PoolManager(retries=retries, timeout=timeout) as pool:
+            response: urllib3.HTTPResponse
             try:
                 response = pool.request(method=method, url=url, **kwargs)
                 if response.status != 200:
@@ -130,7 +131,8 @@ class Session:
                     )
             except urllib3.exceptions.HTTPError as err:
                 raise HTTPException(err) from err
-            response.content = response.data  # For `requests` compatibility.
+            # For `requests` compatibility.
+            response.content = response.data  # type: ignore
             return response
 
     def get(self, url: str, **kwargs: Any) -> urllib3.HTTPResponse:
@@ -241,7 +243,7 @@ class Action:
                 )
                 last_exception = err
             else:
-                envelope = et.fromstring(response.content)
+                envelope = et.fromstring(response.data)
                 body_element = list(envelope)[0]
                 response_element = list(body_element)[0]
                 if (
@@ -282,7 +284,7 @@ class Service(WeMoAllActionsMixin):
         self.actions = {}
 
         url = device.session.urljoin(service.description_url)
-        xml = device.session.get(url).content
+        xml = device.session.get(url).data
 
         try:
             scpd = ServiceDescription.from_xml(xml)

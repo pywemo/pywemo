@@ -41,7 +41,7 @@ def ensure_long_press_rule_exists(
     Returns the long press rule.
     """
     current_rules = rules_db.rules_for_device(rule_type=RULE_TYPE_LONG_PRESS)
-    for (rule, _) in current_rules:
+    for rule, _ in current_rules:
         if rule.State != "1":
             LOG.info("Enabling long press rule for device %s", device_name)
             rule.State = "1"

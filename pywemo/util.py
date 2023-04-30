@@ -62,7 +62,9 @@ def interface_addresses() -> list[str]:
 
     for iface in ifaddr.get_adapters():
         for addr in iface.ips:
-            if not addr.is_IPv4 or addr.ip == '127.0.0.1':
+            if not (addr.is_IPv4 and isinstance(addr.ip, str)):
+                continue
+            if addr.ip == '127.0.0.1':
                 continue
 
             addresses.append(addr.ip)
