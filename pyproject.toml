@@ -25,7 +25,7 @@ lxml = "^4.6"
 
 [tool.poetry.dev-dependencies]
 # toml is used by multiple tools to read this pyproject.toml file
-toml = "^0.10"
+toml = ">=0.10"
 # formatters
 black = "23.3.0"
 isort = "^5.6.4"
