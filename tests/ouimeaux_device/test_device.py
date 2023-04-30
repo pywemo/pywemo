@@ -292,21 +292,24 @@ class TestDevice:
             assert device.encrypt_aes128('password', self.METAINFO, False)
         assert mock_run.call_count == 1
 
-    @mock.patch('subprocess.run', return_value=mock.Mock(stdout=ENC_PASSWORD))
-    def test_encryption_successful_non_rtos(self, mock_run, device):
+    @pytest.mark.parametrize(
+        'is_rtos, openssl_stdout, expected',
+        [
+            (False, ENC_PASSWORD, 'wNTUdjT+cA1pa0Vta/jgEg==1808'),
+            (False, ENC_PASSWORD[16:], 'wNTUdjT+cA1pa0Vta/jgEg==1808'),
+            (True, ENC_PASSWORD, 'wNTUdjT+cA1pa0Vta/jgEg=='),
+            (True, ENC_PASSWORD[16:], 'wNTUdjT+cA1pa0Vta/jgEg=='),
+        ],
+    )
+    @mock.patch('subprocess.run')
+    def test_encryption_successful(
+        self, mock_run, is_rtos, openssl_stdout, expected, device
+    ):
         """Test device encryption (good result)."""
-        correct = 'wNTUdjT+cA1pa0Vta/jgEg==1808'
+        mock_run.return_value = mock.Mock(stdout=openssl_stdout)
         assert (
-            device.encrypt_aes128('password', self.METAINFO, False) == correct
-        )
-        assert mock_run.call_count == 1
-
-    @mock.patch('subprocess.run', return_value=mock.Mock(stdout=ENC_PASSWORD))
-    def test_encryption_successful_rtos(self, mock_run, device):
-        """Test device encryption (good result)."""
-        correct = 'wNTUdjT+cA1pa0Vta/jgEg=='
-        assert (
-            device.encrypt_aes128('password', self.METAINFO, True) == correct
+            device.encrypt_aes128('password', self.METAINFO, is_rtos)
+            == expected
         )
         assert mock_run.call_count == 1
 
