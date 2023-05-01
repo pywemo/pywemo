@@ -3,27 +3,68 @@ on:
   release:
     types: [created]
 jobs:
-  deploy:
-    name: Build, test, and deploy to PyPI
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
+
+  check:
+    name: Check version and tag match
     runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      version: ${{ steps.outputs.outputs.version }}
+      artifact: ${{ steps.outputs.outputs.artifact }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: Build
-        run: ./scripts/build.sh
-      - name: Generate coverage
+      - name: Set Outputs
+        id: outputs
         run: |
-          . .venv/bin/activate
-          coverage lcov
-      - name: Report Coveralls
-        uses: coverallsapp/github-action@v2
+          echo "artifact=dist-files-3.10" | tee -a "$GITHUB_OUTPUT"
+          echo "version=$GITHUB_REF_NAME" | tee -a "$GITHUB_OUTPUT"
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
         with:
-          path-to-lcov: coverage.lcov
-      - name: Publish
+          name: ${{ steps.outputs.outputs.artifact }}
+          path: dist
+      - name: Check if tag version matches project version
+        working-directory: dist
         run: |
-          . .venv/bin/activate
-          poetry publish --username __token__ --password "${{ secrets.PYPI_PASSWORD }}"
+          # Get the version from the PKG-INFO in the source package.
+          tar -xzf *.tar.gz
+          DIST_VERSION=$(sed -ne 's/^Version: \([0-9]\..*\)$/\1/p' < */PKG-INFO | head -1)
+          echo "TAG: $GITHUB_REF_NAME"
+          echo "VERSION: $DIST_VERSION"
+          if [[ "$GITHUB_REF_NAME" != "$DIST_VERSION" ]]; then exit 1; fi
+
+  assets:
+    name: Add assets to Release
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ needs.check.outputs.artifact }}
+          path: dist
+      - name: Generate Checksums
+        working-directory: dist
+        run: sha256sum * | tee sha256sums.txt
+      - name: Add assets to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+
+  pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: check
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ needs.check.outputs.artifact }}
+          path: dist
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
