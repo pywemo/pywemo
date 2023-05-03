@@ -207,7 +207,7 @@ def device(mock_get):
 def lightspeed():
     """Skip sleeps in the code and auto-increment time.time calls."""
     with mock.patch('time.sleep', return_value=None), mock.patch(
-        'time.time', side_effect=itertools.count(0, 15)
+        'time.time', side_effect=itertools.count(0, 20)
     ):
         yield
 

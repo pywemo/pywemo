@@ -478,7 +478,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         """
         # a timeout of less than 20 is too short for many devices, so require
         # at least 20 seconds.
-        timeout = min(timeout, 15.0)
+        timeout = max(timeout, 20.0)
         status_delay = min(status_delay, timeout / 2.0)
         connection_attempts = int(max(1, connection_attempts))
 
