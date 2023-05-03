@@ -51,7 +51,7 @@ jobs:
         working-directory: dist
         run: sha256sum * | tee sha256sums.txt
       - name: Add assets to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
         with:
           files: dist/*
 
@@ -70,4 +70,4 @@ jobs:
           name: ${{ needs.check.outputs.artifact }}
           path: dist
       - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@a56da0b891b3dc519c7ee3284aff1fad93cc8598 # v1.8.6
