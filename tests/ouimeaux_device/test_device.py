@@ -2,6 +2,7 @@
 
 import itertools
 import logging
+import shutil
 import unittest.mock as mock
 from subprocess import CalledProcessError
 
@@ -150,8 +151,6 @@ EMPTY_SERVICE = '''<?xml version="1.0"?>
   </actionList>
 </scpd>'''
 
-ENC_PASSWORD = b'Salted__XXXXXX12\xc0\xd4\xd4v4\xfep\rikEmk\xf8\xe0\x12'
-
 APLIST = (
     'Page:1/1/2$\n'
     'ap_aes|6|100|WPA2PSK/AES,\n'
@@ -292,23 +291,57 @@ class TestDevice:
             assert device.encrypt_aes128('password', self.METAINFO, False)
         assert mock_run.call_count == 1
 
-    @mock.patch('subprocess.run', return_value=mock.Mock(stdout=ENC_PASSWORD))
-    def test_encryption_successful_non_rtos(self, mock_run, device):
+    @pytest.mark.parametrize(
+        'is_rtos, is_salted_prefix',
+        [(False, True), (False, False), (True, True), (True, False)],
+    )
+    @mock.patch('subprocess.run')
+    def test_encryption_successful(
+        self, mock_run, is_rtos, is_salted_prefix, device
+    ):
         """Test device encryption (good result)."""
-        correct = 'wNTUdjT+cA1pa0Vta/jgEg==1808'
+        salt = '5858585858583132'
+        iv = '58585858585831323334353641313233'
+        password = 'pass:XXXXXX123456A1234567XXXXXX' + (
+            'b3{8t;80dIN{ra83eC1s?M70?683@2Yf' if is_rtos else ''
+        )
+        stdout = {
+            False: b'I\x08\xfb\x9fh\x80\t\xd1\x99\x9cskl\xb3;\xdb',
+            True: b'\xc7\xf7\x9f\xd7 \x8dL\xe3nS\xe6S\xdd\xce$\x02',
+        }
+        expected = {
+            False: 'SQj7n2iACdGZnHNrbLM72w==1808',
+            True: 'x/ef1yCNTONuU+ZT3c4kAg==',
+        }
+
+        def check_args(args, **kwargs):
+            assert args[args.index('-S') + 1] == salt
+            assert args[args.index('-iv') + 1] == iv
+            assert args[args.index('-pass') + 1] == password
+            prefix = b'Salted__XXXXXX12' if is_salted_prefix else b''
+            return mock.Mock(stdout=prefix + stdout[is_rtos])
+
+        mock_run.side_effect = check_args
         assert (
-            device.encrypt_aes128('password', self.METAINFO, False) == correct
+            device.encrypt_aes128('password', self.METAINFO, is_rtos)
+            == expected[is_rtos]
         )
         assert mock_run.call_count == 1
 
-    @mock.patch('subprocess.run', return_value=mock.Mock(stdout=ENC_PASSWORD))
-    def test_encryption_successful_rtos(self, mock_run, device):
-        """Test device encryption (good result)."""
-        correct = 'wNTUdjT+cA1pa0Vta/jgEg=='
-        assert (
-            device.encrypt_aes128('password', self.METAINFO, True) == correct
-        )
-        assert mock_run.call_count == 1
+    @pytest.mark.parametrize(
+        'is_rtos, expected',
+        [
+            (False, 'SQj7n2iACdGZnHNrbLM72w==1808'),
+            (True, 'x/ef1yCNTONuU+ZT3c4kAg=='),
+        ],
+    )
+    @pytest.mark.skipif(
+        not shutil.which('openssl'), reason='The openssl binary was not found'
+    )
+    def test_encryption_with_openssl(self, is_rtos, expected, device):
+        """Test encryption using the OpenSSL binary (if it exists)."""
+        actual = device.encrypt_aes128('password', self.METAINFO, is_rtos)
+        assert expected == actual
 
     def test_setup_unknown_service(self, device):
         """Test device setup (WiFiSetup service not available)."""
