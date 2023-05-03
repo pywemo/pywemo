@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - main
+  workflow_call:
 jobs:
   build:
     name: Build and test
@@ -31,6 +32,12 @@ jobs:
           path-to-lcov: coverage.lcov
           flag-name: run-${{ join(matrix.*, '-') }}
           parallel: true
+      - name: Archive build files
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-files-${{ matrix.python-version }}
+          path: dist
+          retention-days: 3
   coveralls:
     name: Indicate completion to coveralls.io
     needs: build
