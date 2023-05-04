@@ -10,21 +10,14 @@ jobs:
   check:
     name: Check version and tag match
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: build
-    outputs:
-      version: ${{ steps.outputs.outputs.version }}
-      artifact: ${{ steps.outputs.outputs.artifact }}
     steps:
-      - name: Set Outputs
-        id: outputs
-        run: |
-          echo "artifact=dist-files-3.10" | tee -a "$GITHUB_OUTPUT"
-          echo "version=$GITHUB_REF_NAME" | tee -a "$GITHUB_OUTPUT"
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ${{ steps.outputs.outputs.artifact }}
-          path: dist
+          name: build-artifacts
       - name: Check if tag version matches project version
         working-directory: dist
         run: |
@@ -47,8 +40,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: ${{ needs.check.outputs.artifact }}
-          path: dist
+          name: build-artifacts
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@a56da0b891b3dc519c7ee3284aff1fad93cc8598 # v1.8.6
       - name: Generate Checksums
