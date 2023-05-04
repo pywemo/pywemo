@@ -6,8 +6,7 @@ on:
     - main
   workflow_call:
 
-permissions:
-  contents: read
+permissions: {}  # No permissions needed for this workflow.
 
 jobs:
   build:
@@ -30,8 +29,8 @@ jobs:
         run: |
           . .venv/bin/activate
           coverage lcov
-      - name: Archive build files
-        if: ${{ matrix.python-version == '3.10' }}  # Just for 3.10.
+      - name: Archive build files (Python 3.10 only)
+        if: ${{ success() && matrix.python-version == '3.10' }}
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error

@@ -10,8 +10,7 @@ jobs:
   check:
     name: Check version and tag match
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    permissions: {}
     needs: build
     steps:
       - name: Download build artifacts
