@@ -14,7 +14,11 @@ enterVenv
 
 echo
 echo "===Installing poetry==="
-pip install poetry
+pip install \
+  --require-hashes \
+  --no-deps \
+  --only-binary :all: \
+  -r "$SELF_DIR/bootstrap_requirements.txt"
 
 echo
 echo "===Installing dependencies==="
