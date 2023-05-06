@@ -674,16 +674,6 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         return self.session.port
 
     @property
-    def serialnumber(self) -> str:
-        """Return the serial number of the device."""
-        warnings.warn(
-            "serialnumber is deprecated and will be removed in a future "
-            "release. Use serial_number instead.",
-            DeprecationWarning,
-        )
-        return self.serial_number
-
-    @property
     def device_type(self) -> str:
         """Return what kind of WeMo this device is."""
         return type(self).__name__
