@@ -25,8 +25,7 @@ def etree_to_dict(tree: et.Element) -> dict[str, Any]:
     tag_name = tree.tag[tree.tag.find("}") + 1 :]
 
     tree_dict: dict[str, Any] = {tag_name: {} if tree.attrib else None}
-    children = list(tree)
-    if children:
+    if children := list(tree):
         default_dict = defaultdict(list)
         for dict_children in map(etree_to_dict, children):
             for key, value in dict_children.items():

@@ -195,8 +195,7 @@ class Subscription:
             The duration of the subscription in seconds.
         """
         self.subscription_id = headers.get('SID', self.subscription_id)
-        timeout_header = headers.get('TIMEOUT', None)
-        if timeout_header:
+        if timeout_header := headers.get('TIMEOUT', None):
             timeout = min(
                 int(timeout_header.replace('Second-', '')),
                 self.default_timeout_seconds,
@@ -334,8 +333,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Handle subscription responses received from devices."""
         sender_ip, _ = self.client_address
         outer = self.server.outer
-        device = outer.devices.get(sender_ip)
-        if device is None:
+        if (device := outer.devices.get(sender_ip)) is None:
             LOG.warning(
                 'Received %s event for unregistered device %s',
                 self.path,
@@ -364,8 +362,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         if self.path.endswith("/upnp/control/basicevent1"):
             sender_ip, _ = self.client_address
             outer = self.server.outer
-            device = outer.devices.get(sender_ip)
-            if device is None:
+            if (device := outer.devices.get(sender_ip)) is None:
                 LOG.warning(
                     'Received event for unregistered device %s', sender_ip
                 )
