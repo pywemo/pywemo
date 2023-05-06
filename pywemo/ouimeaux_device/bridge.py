@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 import io
-import sys
 import time
 from html import escape
-from typing import Any
+from typing import Any, TypedDict
 
 from lxml import etree as et
 
@@ -159,24 +158,15 @@ class Bridge(Device):
         return self.bridge.SetDeviceStatus(DeviceStatusList=send_state)
 
 
-if sys.version_info >= (3, 8):
-    # Remove pylint disable when Python 3.7 support is removed.
-    from typing import TypedDict  # pylint: disable=no-name-in-module
+class DeviceState(TypedDict, total=False):
+    """LinkedDevice state dictionary type."""
 
-    class DeviceState(TypedDict, total=False):
-        """LinkedDevice state dictionary type."""
-
-        available: bool
-        onoff: int
-        level: int
-        temperature_mireds: int
-        temperature_kelvin: int
-        color_xy: ColorXY
-
-else:
-    from typing import Dict, Union
-
-    DeviceState = Dict[str, Union[ColorXY, bool, int]]
+    available: bool
+    onoff: int
+    level: int
+    temperature_mireds: int
+    temperature_kelvin: int
+    color_xy: ColorXY
 
 
 class LinkedDevice:
