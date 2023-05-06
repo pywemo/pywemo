@@ -56,6 +56,8 @@ pre-commit = "^2.10"
     "*/xsd/device.py",
     "*/xsd/service.py",
   ]
+  [tool.coverage.lcov]
+  output = ".cache/coverage.lcov"
 
 [tool.pytest]
   [tool.pytest.ini_options]
