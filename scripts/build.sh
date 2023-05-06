@@ -60,6 +60,7 @@ echo
 echo "===Test with pytest and coverage==="
 coverage run -m pytest --vcr-record=none
 coverage report --skip-covered
+coverage lcov
 
 echo
 echo "===Building package==="
