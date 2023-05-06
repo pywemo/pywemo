@@ -6,16 +6,10 @@ import re
 import select
 import socket
 import threading
-import warnings
 from datetime import datetime, timedelta
-from typing import Any
-
-import requests
-from lxml import etree as et
 
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
-from .ouimeaux_device.api.service import REQUESTS_TIMEOUT
-from .util import etree_to_dict, get_callback_address, interface_addresses
+from .util import get_callback_address, interface_addresses
 
 DISCOVER_TIMEOUT = 5
 
@@ -62,9 +56,6 @@ EXPECTED_MAN_HEADER = b'MAN: "ssdp:discover"'
 class UPNPEntry:
     """Found uPnP entry."""
 
-    # Use functools.cached_property if Python < 3.8 support is dropped.
-    _description: dict[str, Any] | None = None
-
     def __init__(self, values: dict[str, str]) -> None:
         """Create a UPNPEntry object."""
         self.values = values
@@ -75,36 +66,6 @@ class UPNPEntry:
             cache_seconds = int(self.values['cache-control'].split('=')[1])
 
             self._expires = self._created + timedelta(seconds=cache_seconds)
-
-    @property
-    def created(self) -> datetime:
-        """Return timestamp for when this entry was created."""
-        warnings.warn(
-            "pywemo.ssdp.UPNPEntry.created is unused within pywemo and "
-            "will be removed in a future release.",
-            DeprecationWarning,
-        )
-        return self._created
-
-    @property
-    def expires(self) -> datetime | None:
-        """Return timestamp for when this entry expires."""
-        warnings.warn(
-            "pywemo.ssdp.UPNPEntry.expires is unused within pywemo and "
-            "will be removed in a future release.",
-            DeprecationWarning,
-        )
-        return self._expires
-
-    @property
-    def is_expired(self) -> bool:
-        """Return whether the entry is expired or not."""
-        warnings.warn(
-            "pywemo.ssdp.UPNPEntry.is_expired is unused within pywemo and "
-            "will be removed in a future release.",
-            DeprecationWarning,
-        )
-        return self.expires is not None and datetime.now() > self.expires
 
     @property
     def st(self) -> str | None:
@@ -126,58 +87,6 @@ class UPNPEntry:
         """Return unique device name."""
         usn = self.usn or ''
         return usn.split('::')[0]
-
-    @property
-    def description(self) -> dict[str, Any]:
-        """Return the description from the uPnP entry."""
-        # The description property may be referenced multiple times. Cache the
-        # description to avoid needing to fetch it each time the property is
-        # accessed.
-        if self._description is not None:
-            return self._description
-        self._description = {}
-        warnings.warn(
-            "pywemo.ssdp.UPNPEntry.description is unused within pywemo and "
-            "will be removed in a future release.",
-            DeprecationWarning,
-        )
-
-        url = self.location
-        if not url:
-            return {}
-
-        try:
-            for _ in range(3):
-                try:
-                    xml = requests.get(url, timeout=REQUESTS_TIMEOUT).content
-                    tree = et.fromstring(xml or b'')
-                    root: dict[str, Any] = etree_to_dict(tree).get('root', {})
-                    self._description = root
-                    break
-                except requests.RequestException:
-                    LOG.warning("Error fetching description at %s", url)
-
-        except et.ParseError:
-            # There used to be a log message here to record an error about
-            # malformed XML, but this only happens on non-WeMo devices
-            # and can be safely ignored.
-            pass
-
-        return self._description
-
-    def match_device_description(self, values: dict[str, Any]) -> bool:
-        """
-        Fetch description and match against it.
-
-        Values should only contain lowercase keys.
-        """
-        warnings.warn(
-            "pywemo.ssdp.UPNPEntry.match_device_description is unused within "
-            "pywemo and will be removed in a future release.",
-            DeprecationWarning,
-        )
-        device = self.description.get('device', {})
-        return all(val == device.get(key) for key, val in values.items())
 
     @classmethod
     def from_response(cls, response: str) -> UPNPEntry:
