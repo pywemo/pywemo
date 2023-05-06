@@ -107,14 +107,8 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
     EVENT_TYPE_BINARY_STATE = "BinaryState"
 
-    def __init__(self, url: str, mac: str = 'deprecated') -> None:
+    def __init__(self, url: str) -> None:
         """Create a WeMo device."""
-        if mac != 'deprecated':
-            warnings.warn(
-                "The mac argument to Device is deprecated and will be removed "
-                "in a future release.",
-                DeprecationWarning,
-            )
         self._state: int | None = None
         self.basic_state_params: dict[str, str] = {}
         self._reconnect_lock = threading.Lock()
