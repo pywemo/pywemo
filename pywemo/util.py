@@ -3,51 +3,10 @@ from __future__ import annotations
 
 import os
 import socket
-import warnings
-from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any
 
 import ifaddr
-from lxml import etree as et
-
-
-# Taken from http://stackoverflow.com/a/10077069
-def etree_to_dict(tree: et.Element) -> dict[str, Any]:
-    """Split a tree into a dict."""
-    warnings.warn(
-        "pywemo.util.etree_to_dict is unused within pywemo and will be "
-        "removed in a future release.",
-        DeprecationWarning,
-    )
-    # strip namespace
-    tag_name = tree.tag[tree.tag.find("}") + 1 :]
-
-    tree_dict: dict[str, Any] = {tag_name: {} if tree.attrib else None}
-    if children := list(tree):
-        default_dict = defaultdict(list)
-        for dict_children in map(etree_to_dict, children):
-            for key, value in dict_children.items():
-                default_dict[key].append(value)
-        tree_dict = {
-            tag_name: {
-                key: value[0] if len(value) == 1 else value
-                for key, value in default_dict.items()
-            }
-        }
-    if tree.attrib:
-        tree_dict[tag_name].update(
-            ('@' + key, value) for key, value in tree.attrib.items()
-        )
-    if tree.text:
-        text = tree.text.strip()
-        if children or tree.attrib:
-            if text:
-                tree_dict[tag_name]['#text'] = text
-        else:
-            tree_dict[tag_name] = text
-    return tree_dict
 
 
 def interface_addresses() -> list[str]:
