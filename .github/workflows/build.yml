@@ -25,10 +25,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Build
         run: ./scripts/build.sh
-      - name: Generate coverage
-        run: |
-          . .venv/bin/activate
-          coverage lcov
       - name: Archive build files (Python 3.10 only)
         if: ${{ success() && matrix.python-version == '3.10' }}
         uses: actions/upload-artifact@v3
@@ -36,7 +32,7 @@ jobs:
           if-no-files-found: error
           name: build-artifacts
           path: |
-            coverage.lcov
+            .cache/coverage.lcov
             dist/
 
   coverage:
@@ -53,4 +49,4 @@ jobs:
       - name: Report to Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: coverage.lcov
+          path-to-lcov: .cache/coverage.lcov
