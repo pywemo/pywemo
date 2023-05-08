@@ -16,9 +16,8 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts
+          name: dist
       - name: Check if tag version matches project version
-        working-directory: dist
         run: |
           # Get the version from the PKG-INFO in the source package.
           tar -xzf *.tar.gz
@@ -39,7 +38,8 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: build-artifacts
+          name: dist
+          path: dist
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@a56da0b891b3dc519c7ee3284aff1fad93cc8598 # v1.8.6
       - name: Generate Checksums

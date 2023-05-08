@@ -66,5 +66,12 @@ echo
 echo "===Building package==="
 poetry build
 
+if [[ ! -z "${OUTPUT_ENV_VAR:-}" ]]; then
+  echo
+  echo "===Generating output variables for CI==="
+  echo "version=$(poetry version -s)" | tee -a "${!OUTPUT_ENV_VAR}"
+  echo "coverage-lcov=$(coverage debug config | sed -ne 's/^.*lcov_output: \(.*\)$/\1/p')" | tee -a "${!OUTPUT_ENV_VAR}"
+fi
+
 echo
 echo "Build complete"
