@@ -7,18 +7,8 @@ cd "$SELF_DIR/.."
 source "$SELF_DIR/common.sh"
 
 assertPython
-
-echo
-echo "===Settting up venv==="
 enterVenv
-
-echo
-echo "===Installing poetry==="
-pip install "poetry$(sed -n 's/^poetry = "\([^"]\+\)"$/\1/p' pyproject.toml)"
-
-echo
-echo "===Installing dependencies==="
-poetry install
+poetryInstall
 
 echo
 echo "===Updating poetry lock file==="
@@ -26,4 +16,4 @@ poetry update --lock
 
 echo
 echo "===Updating bootstrap_requirements.txt==="
-poetry export --only=bootstrap > "$SELF_DIR/bootstrap_requirements.txt"
+poetry export --only=bootstrap --output="$SELF_DIR/bootstrap-requirements.txt"

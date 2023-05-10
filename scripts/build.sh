@@ -7,22 +7,8 @@ cd "$SELF_DIR/.."
 source "$SELF_DIR/common.sh"
 
 assertPython
-
-echo
-echo "===Settting up venv==="
 enterVenv
-
-echo
-echo "===Installing poetry==="
-pip install \
-  --require-hashes \
-  --no-deps \
-  --only-binary :all: \
-  -r "$SELF_DIR/bootstrap_requirements.txt"
-
-echo
-echo "===Installing dependencies==="
-poetry install
+poetryInstall
 
 echo
 echo "===Installing pre-commit hooks==="

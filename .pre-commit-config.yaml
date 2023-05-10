@@ -10,6 +10,27 @@ repos:
         types: [file]
         files: ^(pyproject.toml|poetry.lock)$
 
+      - id: poetry-lock-check
+        name: poetry-lock-check
+        language: system
+        entry: poetry lock
+        args: ['--no-update']
+        pass_filenames: false
+        types: [file]
+        files: ^(pyproject.toml|poetry.lock)$
+
+      - id: bootstrap-requirements
+        name: bootstrap-requirements
+        language: system
+        entry: poetry export
+        args:
+          - --only=bootstrap
+          - --format=requirements.txt
+          - --output=scripts/bootstrap-requirements.txt
+        pass_filenames: false
+        types: [file]
+        files: ^(pyproject.toml|poetry.lock|scripts/bootstrap-requirements.txt)$
+
       - id: isort
         name: isort
         language: system

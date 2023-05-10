@@ -11,6 +11,8 @@ function assertPython() {
 }
 
 function enterVenv() {
+  echo
+  echo "===Settting up venv==="
   # Not sure why I couldn't use "if ! [[ `"$PYTHON_BIN" -c 'import venv'` ]]" below. It just never worked when venv was
   # present.
   VENV_NOT_INSTALLED=$("$PYTHON_BIN" -c 'import venv' 2>&1 | grep -ic ' No module named' || true)
@@ -34,4 +36,18 @@ function enterVenv() {
   else
     echo Already in venv.
   fi
+}
+
+function poetryInstall() {
+  echo
+  echo "===Installing poetry==="
+  pip install \
+    --require-hashes \
+    --no-deps \
+    --only-binary :all: \
+    -r "$SELF_DIR/bootstrap-requirements.txt"
+
+  echo
+  echo "===Installing dependencies==="
+  poetry install
 }
