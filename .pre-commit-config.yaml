@@ -31,6 +31,17 @@ repos:
         types: [file]
         files: ^(pyproject.toml|poetry.lock|scripts/bootstrap-requirements.txt_)$
 
+      - id: generateDS
+        name: generateDS
+        language: system
+        entry: poetry run python scripts/generate_ds.py
+        args:
+          - pywemo/ouimeaux_device/api/xsd/device.xsd
+          - pywemo/ouimeaux_device/api/xsd/service.xsd
+        pass_filenames: false
+        types: [file]
+        files: ^(pyproject.toml|poetry.lock|scripts/generate_ds.py|pywemo/ouimeaux_device/api/xsd/.*)$
+
       - id: isort
         name: isort
         language: system
