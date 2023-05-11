@@ -45,6 +45,7 @@ coverage = "^7.2.4"
 generateDS = "2.37.11"
 # other
 pre-commit = "^2.10"
+deptry = "^0.11.0"
 
 [tool.poetry.group.bootstrap.dependencies]
 poetry = ">=1.2.0"
@@ -61,6 +62,15 @@ poetry = ">=1.2.0"
   ]
   [tool.coverage.lcov]
   output = ".cache/coverage.lcov"
+
+[tool.deptry]
+extend_exclude = ["scripts"]
+ignore_missing = [
+  # These are created by generateDS.
+  "generatedsnamespaces",
+  "generatedscollector",
+  "generatedssuper"
+]
 
 [tool.pytest]
   [tool.pytest.ini_options]
