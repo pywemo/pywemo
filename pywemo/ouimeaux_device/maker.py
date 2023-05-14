@@ -1,8 +1,6 @@
 """Representation of a WeMo Maker device."""
 from __future__ import annotations
 
-import warnings
-
 from .api.attributes import AttributeDevice
 from .api.service import RequiredService
 
@@ -13,34 +11,10 @@ class Maker(AttributeDevice):
     _state_property = "switch_state"  # Required by AttributeDevice.
 
     @property
-    def maker_params(self) -> dict[str, int]:
-        """Legacy maker_params value."""
-        warnings.warn(
-            "maker_params is deprecated and will be removed in a future "
-            "release. Use the properties on the Maker instance instead.",
-            DeprecationWarning,
-        )
-        return {
-            "switchstate": self.switch_state,
-            "sensorstate": self.sensor_state,
-            "switchmode": self.switch_mode,
-            "hassensor": self.has_sensor,
-        }
-
-    @property
     def _required_services(self) -> list[RequiredService]:
         return super()._required_services + [
             RequiredService(name="basicevent", actions=["SetBinaryState"]),
         ]
-
-    def update_maker_params(self) -> None:
-        """Get and parse the device attributes."""
-        warnings.warn(
-            "update_maker_params is deprecated and will be removed in a "
-            "future release. Use update_attributes instead.",
-            DeprecationWarning,
-        )
-        self.update_attributes()
 
     def set_state(self, state: int) -> None:
         """Set the state of this device to on or off."""
