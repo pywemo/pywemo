@@ -408,7 +408,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         data = self.rfile.read(content_len)
         # trim garbage from end, if any
         data = data.strip()
-        return et.fromstring(data)
+        return et.fromstring(data, parser=et.XMLParser(resolve_entities=False))
 
     # pylint: disable=redefined-builtin
     def log_message(self, format: str, *args: Any) -> None:

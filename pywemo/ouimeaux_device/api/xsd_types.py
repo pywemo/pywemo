@@ -157,7 +157,12 @@ class DeviceDescription:
             )
 
         if device.anytypeobjs_:
-            xs_any = (et.fromstring(extra) for extra in device.anytypeobjs_)
+            xs_any = (
+                et.fromstring(
+                    extra, parser=et.XMLParser(resolve_entities=False)
+                )
+                for extra in device.anytypeobjs_
+            )
             config_any = {
                 et.QName(tag).localname: tag.text.strip()
                 for tag in xs_any
