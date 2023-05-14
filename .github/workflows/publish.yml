@@ -2,6 +2,15 @@ name: Publish
 on:
   release:
     types: [published]
+
+permissions: {}  # No permissions by default. Permissions are added per-job.
+
+env:
+  # Artifact name to use for the release. The build matrix builds and tests
+  # multiple Python versions. But the release only comes from this single
+  # version.
+  DIST_ARTIFACT: dist-3.10
+
 jobs:
   build:
     name: Build
@@ -10,13 +19,12 @@ jobs:
   check:
     name: Check version and tag match
     runs-on: ubuntu-latest
-    permissions: {}
     needs: build
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: dist
+          name: ${{ env.DIST_ARTIFACT }}
       - name: Check if tag version matches project version
         run: |
           # Get the version from the PKG-INFO in the source package.
@@ -38,7 +46,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
-          name: dist
+          name: ${{ env.DIST_ARTIFACT }}
           path: dist
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@a56da0b891b3dc519c7ee3284aff1fad93cc8598 # v1.8.6
