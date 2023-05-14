@@ -6,7 +6,6 @@ import logging
 import subprocess
 import threading
 import time
-import warnings
 from typing import Any, Sequence
 
 import requests
