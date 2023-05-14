@@ -1,8 +1,6 @@
 """Representation of a WeMo Dimmer device."""
 from __future__ import annotations
 
-import warnings
-
 from .api.long_press import LongPressMixin
 from .api.service import RequiredService
 from .switch import Switch
@@ -27,15 +25,6 @@ class Dimmer(Switch):
 
     def set_brightness(self, brightness: int) -> None:
         """Set the brightness of this device to an integer between 1-100."""
-        if not isinstance(brightness, int):
-            warnings.warn(  # type: ignore[unreachable]
-                "The brightness argument to Dimmer.set_brightness must be an "
-                "int. Support for non-int values will be dropped in a future "
-                "pyWeMo release.",
-                DeprecationWarning,
-            )
-            brightness = int(brightness)
-
         # WeMo only supports values between 1-100. WeMo will ignore a 0
         # brightness value. If 0 is requested, then turn the light off instead.
         if brightness:
