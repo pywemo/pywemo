@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import warnings
 from datetime import datetime
 from enum import IntEnum
 from typing import Any, TypedDict
@@ -164,17 +163,6 @@ class Insight(Switch):
         return self.insight_params['ontoday']
 
     @property
-    def today_standby_time(self) -> int:
-        """Return how long the device has been in standby today."""
-        warnings.warn(
-            "The Insight.today_standby_time property should not be used and "
-            "will be removed in a future version of pyWeMo. Switch to using "
-            "the Insight.today_on_time property instead.",
-            DeprecationWarning,
-        )
-        return self.insight_params['ontoday']
-
-    @property
     def total_on_time(self) -> int:
         """Return the number of seconds the device has been on."""
         return self.insight_params['ontotal']
@@ -193,14 +181,3 @@ class Insight(Switch):
     def standby_state(self) -> StandbyState:
         """Return the standby state of the device."""
         return StandbyState(int(self.insight_params['state']))
-
-    @property
-    def get_standby_state(self) -> str:
-        """Return the standby state of the device."""
-        warnings.warn(
-            "The Insight.get_standby_state property should not be used and "
-            "will be removed in a future version of pyWeMo. Switch to using "
-            "the Insight.standby_state property instead.",
-            DeprecationWarning,
-        )
-        return self.standby_state.name.lower()
