@@ -25,19 +25,36 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Build
         id: build
-        run: ./scripts/build.sh
         env:
-          OUTPUT_ENV_VAR: ${{ (matrix.python-version == '3.10' && 'GITHUB_OUTPUT') || '' }}
-      # The next two steps only run if OUTPUT_ENV_VAR (above) has a value.
+          OUTPUT_ENV_VAR: GITHUB_OUTPUT
+        run: ./scripts/build.sh
       - name: Archive build artifacts
-        if: ${{ success() && steps.build.outputs.version }}
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
-          name: dist
+          name: dist-${{ matrix.python-version }}
           path: dist/
-      - name: Report to Coveralls
-        if: ${{ success() && steps.build.outputs.coverage-lcov }}
-        uses: coverallsapp/github-action@v2
+      - name: Archive coverage results
+        uses: actions/upload-artifact@v3
         with:
-          path-to-lcov: ${{ steps.build.outputs.coverage-lcov }}
+          if-no-files-found: error
+          name: coverage-${{ matrix.python-version }}
+          path: ${{ steps.build.outputs.coverage-lcov }}
+
+  # Coverage reporting is its own step so it can optionally fail if coveralls
+  # is experiencing issues. pyWeMo doesn't currently have any logic that is
+  # different between Python versions, so the coverage output from only one
+  # version needs to be reported. Change the artifact name to use the coverage
+  # from a different matrix build version.
+  coverage:
+    name: Report coverage to coveralls.io
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: coverage-3.10
+      - uses: coverallsapp/github-action@v2
+        with:
+          path-to-lcov: coverage.lcov
