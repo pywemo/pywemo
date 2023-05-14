@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 import io
-import sys
 import time
 from html import escape
-from typing import Any
+from typing import Any, TypedDict
 
 from lxml import etree as et
 
@@ -86,22 +85,19 @@ class Bridge(Device):
                     DevUDN=plugin_udn, ReqListType='PAIRED_LIST'
                 )
 
-            end_devices_xml = end_devices.get('DeviceLists')
-            if not end_devices_xml:
+            if not (end_devices_xml := end_devices.get('DeviceLists')):
                 return self.Lights, self.Groups
 
             end_device_list = et.fromstring(end_devices_xml.encode('utf-8'))
 
             for light in end_device_list.iter('DeviceInfo'):
-                uniqueID = light.find('DeviceID').text
-                if uniqueID in self.Lights:
+                if (uniqueID := light.find('DeviceID').text) in self.Lights:
                     self.Lights[uniqueID].update_state(light)
                 else:
                     self.Lights[uniqueID] = Light(self, light)
 
             for group in end_device_list.iter('GroupInfo'):
-                uniqueID = group.find('GroupID').text
-                if uniqueID in self.Groups:
+                if (uniqueID := group.find('GroupID').text) in self.Groups:
                     self.Groups[uniqueID].update_state(group)
                 else:
                     self.Groups[uniqueID] = Group(self, group)
@@ -118,8 +114,7 @@ class Bridge(Device):
         """Update the bridge attributes due to a subscription update event."""
         if _type == self.EVENT_TYPE_STATUS_CHANGE and _param:
             state_event = et.fromstring(_param.encode('utf8'))
-            key = state_event.findtext('DeviceID')
-            if not key:
+            if not (key := state_event.findtext('DeviceID')):
                 return False
             if key in self.Lights:
                 return self.Lights[key].subscription_update(state_event)
@@ -159,24 +154,15 @@ class Bridge(Device):
         return self.bridge.SetDeviceStatus(DeviceStatusList=send_state)
 
 
-if sys.version_info >= (3, 8):
-    # Remove pylint disable when Python 3.7 support is removed.
-    from typing import TypedDict  # pylint: disable=no-name-in-module
+class DeviceState(TypedDict, total=False):
+    """LinkedDevice state dictionary type."""
 
-    class DeviceState(TypedDict, total=False):
-        """LinkedDevice state dictionary type."""
-
-        available: bool
-        onoff: int
-        level: int
-        temperature_mireds: int
-        temperature_kelvin: int
-        color_xy: ColorXY
-
-else:
-    from typing import Dict, Union
-
-    DeviceState = Dict[str, Union[ColorXY, bool, int]]
+    available: bool
+    onoff: int
+    level: int
+    temperature_mireds: int
+    temperature_kelvin: int
+    color_xy: ColorXY
 
 
 class LinkedDevice:

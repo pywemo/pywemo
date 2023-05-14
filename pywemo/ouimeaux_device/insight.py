@@ -2,11 +2,10 @@
 from __future__ import annotations
 
 import logging
-import sys
 import warnings
 from datetime import datetime
 from enum import IntEnum
-from typing import Any
+from typing import Any, TypedDict
 
 from .api.service import RequiredService
 from .switch import Switch
@@ -27,28 +26,19 @@ class StandbyState(IntEnum):
         return cls._UNKNOWN
 
 
-if sys.version_info >= (3, 8):
-    # Remove pylint disable when Python 3.7 support is removed.
-    from typing import TypedDict  # pylint: disable=no-name-in-module
+class InsightParams(TypedDict):
+    """Energy related parameters for Insight devices."""
 
-    class InsightParams(TypedDict):
-        """Energy related parameters for Insight devices."""
-
-        state: str
-        lastchange: datetime
-        onfor: int
-        ontoday: int
-        ontotal: int
-        todaymw: int
-        totalmw: int
-        currentpower: int
-        wifipower: int
-        powerthreshold: int
-
-else:
-    from typing import Dict, Union
-
-    InsightParams = Dict[str, Union[str, datetime, int]]
+    state: str
+    lastchange: datetime
+    onfor: int
+    ontoday: int
+    ontotal: int
+    todaymw: int
+    totalmw: int
+    currentpower: int
+    wifipower: int
+    powerthreshold: int
 
 
 class Insight(Switch):
