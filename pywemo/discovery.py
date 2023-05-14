@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import warnings
 from ipaddress import ip_address
 from socket import gaierror, gethostbyname
 from typing import Any, Callable
@@ -54,15 +53,9 @@ def discover_devices(debug: bool = False, **kwargs: Any) -> list[Device]:
 
 
 def device_from_description(
-    description_url: str, mac: str = 'deprecated', debug: bool = False
+    description_url: str, debug: bool = False
 ) -> Device | None:
     """Return object representing WeMo device running at host, else None."""
-    if mac != 'deprecated':
-        warnings.warn(
-            "The mac argument to device_from_description is deprecated and "
-            "will be removed in a future release.",
-            DeprecationWarning,
-        )
     try:
         xml = requests.get(description_url, timeout=REQUESTS_TIMEOUT)
     except requests.RequestException:
