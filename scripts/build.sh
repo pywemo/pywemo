@@ -31,7 +31,7 @@ rstcheck README.rst
 echo
 echo "===Sort imports with isort==="
 ISORT_ARGS=""
-if [[ "${CI:-}" = "1" ]]; then
+if [[ ! -z "${CI:-}" ]]; then
   ISORT_ARGS="--check-only"
 fi
 isort $ISORT_ARGS .
@@ -39,7 +39,7 @@ isort $ISORT_ARGS .
 echo
 echo "===Format with black==="
 BLACK_ARGS=""
-if [[ "${CI:-}" = "1" ]]; then
+if [[ ! -z "${CI:-}" ]]; then
   BLACK_ARGS="--check"
 fi
 black $BLACK_ARGS .
@@ -60,10 +60,18 @@ echo
 echo "===Test with pytest and coverage==="
 coverage run -m pytest --vcr-record=none
 coverage report --skip-covered
+coverage lcov
 
 echo
 echo "===Building package==="
 poetry build
+
+if [[ ! -z "${OUTPUT_ENV_VAR:-}" ]]; then
+  echo
+  echo "===Generating output variables for CI==="
+  echo "version=$(poetry version -s)" | tee -a "${!OUTPUT_ENV_VAR}"
+  echo "coverage-lcov=$(coverage debug config | sed -ne 's/^.*lcov_output: \(.*\)$/\1/p')" | tee -a "${!OUTPUT_ENV_VAR}"
+fi
 
 echo
 echo "Build complete"
