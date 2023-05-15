@@ -45,7 +45,7 @@ function poetryInstall() {
     --require-hashes \
     --no-deps \
     --only-binary :all: \
-    -r "$SELF_DIR/bootstrap-requirements.txt"
+    -r scripts/bootstrap-requirements.txt
 
   echo
   echo "===Installing dependencies==="
