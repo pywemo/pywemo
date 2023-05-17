@@ -16,4 +16,4 @@ poetry update --lock
 
 echo
 echo "===Updating bootstrap_requirements.txt==="
-poetry export --only=bootstrap --output="$SELF_DIR/bootstrap-requirements.txt"
+poetry export --only=bootstrap --output="$BOOTSTRAP_REQUIREMENTS"

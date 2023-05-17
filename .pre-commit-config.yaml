@@ -26,10 +26,10 @@ repos:
         args:
           - --only=bootstrap
           - --format=requirements.txt
-          - --output=scripts/bootstrap-requirements.txt
+          - --output=scripts/bootstrap-requirements.txt_
         pass_filenames: false
         types: [file]
-        files: ^(pyproject.toml|poetry.lock|scripts/bootstrap-requirements.txt)$
+        files: ^(pyproject.toml|poetry.lock|scripts/bootstrap-requirements.txt_)$
 
       - id: isort
         name: isort

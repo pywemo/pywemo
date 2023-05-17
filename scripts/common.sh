@@ -2,6 +2,8 @@
 
 VENV_DIR=".venv"
 PYTHON_BIN="python3"
+# The .txt_ extension is used to avoid changes by Dependabot.
+BOOTSTRAP_REQUIREMENTS="scripts/bootstrap-requirements.txt_"
 
 function assertPython() {
   if ! [[ $(which "$PYTHON_BIN") ]]; then
@@ -45,7 +47,7 @@ function poetryInstall() {
     --require-hashes \
     --no-deps \
     --only-binary :all: \
-    -r scripts/bootstrap-requirements.txt
+    -r "$BOOTSTRAP_REQUIREMENTS"
 
   echo
   echo "===Installing dependencies==="
