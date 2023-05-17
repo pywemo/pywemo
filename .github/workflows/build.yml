@@ -45,7 +45,9 @@ jobs:
           path: .cache/build-changes.patch
       - name: Fail on build error or changes
         if: steps.build.outcome != 'success' || steps.build.outputs.build-changes-size > 2
-        run: exit 1
+        run: |
+          echo "Build failed. See Build step for details."
+          exit 1
       - name: Archive build artifacts
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
         with:
