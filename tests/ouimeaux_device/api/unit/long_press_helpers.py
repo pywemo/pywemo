@@ -1,6 +1,7 @@
 """Helper(s) for long press testing on supported devices."""
 
 import contextlib
+import os
 import sqlite3
 import tempfile
 from unittest.mock import patch
@@ -17,12 +18,11 @@ class TestLongPress:
 
     @pytest.fixture
     def rules_db_from_device(self, device):
-        with tempfile.NamedTemporaryFile(
-            prefix="wemorules", suffix=".db"
-        ) as temp_file:
-            rules_db._create_empty_db(temp_file.name)
+        with tempfile.TemporaryDirectory(prefix="wemorules_") as temp_dir:
+            rules_file_name = os.path.join(temp_dir, "rules.db")
+            rules_db._create_empty_db(rules_file_name)
             try:
-                conn = sqlite3.connect(temp_file.name)
+                conn = sqlite3.connect(rules_file_name)
                 conn.row_factory = sqlite3.Row
                 rdb = rules_db.RulesDb(conn, device.udn, device.name)
 

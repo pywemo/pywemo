@@ -1,6 +1,7 @@
 """Tests for working with the rules database."""
 
 import base64
+import os
 import sqlite3
 import tempfile
 from unittest.mock import Mock, create_autospec, patch
@@ -19,18 +20,16 @@ MOCK_RULE_TYPE = "RuleType"
 
 
 @pytest.fixture()
-def temp_file():
-    with tempfile.NamedTemporaryFile(
-        prefix="wemorules", suffix=".db"
-    ) as temp_file:
-        yield temp_file
+def temp_file_name():
+    with tempfile.TemporaryDirectory(prefix="wemorules_") as temp_dir:
+        yield os.path.join(temp_dir, 'rules.db')
 
 
 @pytest.fixture()
-def sqldb(temp_file):
-    rules_db._create_empty_db(temp_file.name)
+def sqldb(temp_file_name):
+    rules_db._create_empty_db(temp_file_name)
     try:
-        conn = sqlite3.connect(temp_file.name)
+        conn = sqlite3.connect(temp_file_name)
         conn.row_factory = sqlite3.Row
         yield conn
     finally:
@@ -58,16 +57,17 @@ def test_create_empty_db(sqldb):
     )
 
 
-def test_pack_unpack_db(temp_file, sqldb):
+def test_pack_unpack_db(temp_file_name, sqldb):
     orig_statements = set(
         line for line in sqldb.iterdump() if line.startswith('CREATE TABLE')
     )
-    packed = rules_db._pack_db(temp_file, "inner.db")
-    inner_name = rules_db._unpack_db(base64.b64decode(packed), temp_file)
+    sqldb.close()
+    packed = rules_db._pack_db(temp_file_name, "inner.db")
+    inner_name = rules_db._unpack_db(base64.b64decode(packed), temp_file_name)
 
     assert inner_name == "inner.db"
 
-    conn = sqlite3.connect(temp_file.name)
+    conn = sqlite3.connect(temp_file_name)
     try:
         unpacked_statements = set(
             line for line in conn.iterdump() if line.startswith('CREATE TABLE')
@@ -229,11 +229,13 @@ def test_entry_with_no_primary_key(sqldb):
     assert len(db.rule_devices) == 0
 
 
-def test_rules_db_from_device(temp_file, sqldb):
+def test_rules_db_from_device(temp_file_name, sqldb):
     rules_db.RulesRow(RuleID=501, Name="", Type="").update_db(sqldb.cursor())
     sqldb.commit()
     sqldb.close()
-    zip_content = base64.b64decode(rules_db._pack_db(temp_file, "inner.db"))
+    zip_content = base64.b64decode(
+        rules_db._pack_db(temp_file_name, "inner.db")
+    )
     mock_response = create_autospec(urllib3.HTTPResponse, instance=True)
     mock_response.status = 200
     mock_response.data = zip_content

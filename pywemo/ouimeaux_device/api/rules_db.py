@@ -4,6 +4,7 @@ import base64
 import contextlib
 import io
 import logging
+import os
 import sqlite3
 import tempfile
 import zipfile
@@ -372,17 +373,16 @@ def rules_db_from_device(device) -> RulesDb:
     except HTTPNotOkException:
         response = None
 
-    with tempfile.NamedTemporaryFile(
-        prefix="wemorules", suffix=".db"
-    ) as temp_db_file:
+    with tempfile.TemporaryDirectory(prefix="wemorules_") as temp_dir:
+        local_file_name = os.path.join(temp_dir, "rules.db")
         # Create a new db, or extract the current db.
         if response is None:
-            db_file_name = _create_empty_db(temp_db_file.name)
+            inner_file_name = _create_empty_db(local_file_name)
         else:
-            db_file_name = _unpack_db(response.content, temp_db_file)
+            inner_file_name = _unpack_db(response.content, local_file_name)
 
         # Open the DB.
-        conn = sqlite3.connect(temp_db_file.name)
+        conn = sqlite3.connect(local_file_name)
         try:
             conn.row_factory = sqlite3.Row
             try:
@@ -407,7 +407,7 @@ def rules_db_from_device(device) -> RulesDb:
                 conn.commit()
                 conn.close()
                 conn = None
-                body = _pack_db(temp_db_file, db_file_name)
+                body = _pack_db(local_file_name, inner_file_name)
                 device.rules.StoreRules(
                     ruleDbVersion=version + 1,
                     processDb=1,
@@ -418,25 +418,25 @@ def rules_db_from_device(device) -> RulesDb:
                 conn.close()
 
 
-def _unpack_db(content, db_file):
+def _unpack_db(content, local_file_name):
     """Unpack the sqlite database from a .zip file content."""
     zip_contents = io.BytesIO(content)
     with zipfile.ZipFile(zip_contents) as zip_file:
         inner_file_name = zip_file.namelist()[0]
         with zip_file.open(inner_file_name) as zipped_db_file:
-            db_file.write(zipped_db_file.read())
-            db_file.flush()
+            with open(local_file_name, "w+b") as db_file:
+                db_file.write(zipped_db_file.read())
         return inner_file_name
     raise RuntimeError("Could not find database within zip file")
 
 
-def _pack_db(db_file, inner_file_name):
+def _pack_db(local_file_name, inner_file_name):
     """Pack the sqlite database as a base64(zipped(db))."""
     zip_contents = io.BytesIO()
     with zipfile.ZipFile(
         zip_contents, mode="w", compression=zipfile.ZIP_DEFLATED
     ) as zip_file:
-        zip_file.write(db_file.name, arcname=inner_file_name)
+        zip_file.write(local_file_name, arcname=inner_file_name)
     return base64.b64encode(zip_contents.getvalue()).decode("utf-8")
 
 
