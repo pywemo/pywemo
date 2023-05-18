@@ -35,7 +35,7 @@ jobs:
         id: modified
         run: |
           mkdir -p ./.cache  # This directory is in .gitignore
-          git diff | tee ./.cache/build-changes.patch
+          git diff "${GITHUB_SHA}" | tee ./.cache/build-changes.patch
 
           # exit 0 if there are only whitespace characters in the file.
           grep '[^[:space:]]' ./.cache/build-changes.patch > /dev/null || exit 0
