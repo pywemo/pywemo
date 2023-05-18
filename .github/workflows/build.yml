@@ -29,25 +29,28 @@ jobs:
         id: build
         env:
           OUTPUT_ENV_VAR: GITHUB_OUTPUT
-        continue-on-error: true
+        run: ./scripts/build.sh
+      - name: Check for code modifications
+        if: always()
+        id: modified
         run: |
-          ./scripts/build.sh && RC=0 || RC=$?
           mkdir -p ./.cache  # This directory is in .gitignore
-          git diff > ./.cache/build-changes.patch
-          echo "build-changes-size=$(stat -c %s ./.cache/build-changes.patch)" | tee -a "$GITHUB_OUTPUT"
-          exit $RC
-      - name: Upload build changes
-        if: steps.build.outputs.build-changes-size > 2
+          git diff | tee ./.cache/build-changes.patch
+
+          # exit 0 if there are only whitespace characters in the file.
+          grep '[^[:space:]]' ./.cache/build-changes.patch > /dev/null || exit 0
+
+          echo "build-changes=./.cache/build-changes.patch" | tee -a "$GITHUB_OUTPUT"
+          echo "FAIL: Files were changed during the Build step"
+          echo "Please ensure pre-commit was run on these changes"
+          exit 1
+      - name: Archive code modifications
+        if: failure() && steps.modified.outputs.build-changes
         uses: actions/upload-artifact@v3
         with:
           if-no-files-found: error
           name: build-changes-${{ matrix.python-version }}
-          path: .cache/build-changes.patch
-      - name: Fail on build error or changes
-        if: steps.build.outcome != 'success' || steps.build.outputs.build-changes-size > 2
-        run: |
-          echo "Build failed. See Build step for details."
-          exit 1
+          path: ${{ steps.modified.outputs.build-changes }}
       - name: Archive build artifacts
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
         with:
