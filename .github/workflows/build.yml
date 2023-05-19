@@ -3,8 +3,12 @@ on:
   pull_request:
   push:
     branches:
-    - main
+      - main
   workflow_call:
+    outputs:
+      version:
+        description: "Version of built module"
+        value: ${{ jobs.build.outputs.version }}
 
 permissions: {}  # No permissions needed for this workflow.
 
@@ -12,6 +16,8 @@ jobs:
   build:
     name: Build and test
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.build.outputs.version }}
     strategy:
       max-parallel: 4
       matrix:
