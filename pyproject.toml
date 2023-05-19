@@ -67,9 +67,11 @@ poetry = ">=1.2.0"
 extend_exclude = ["scripts"]
 ignore_missing = [
   # These are created by generateDS.
+  "StringIO",
   "generatedsnamespaces",
   "generatedscollector",
-  "generatedssuper"
+  "generatedssuper",
+  "generatedssupersuper"
 ]
 
 [tool.pytest]
