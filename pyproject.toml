@@ -44,8 +44,8 @@ coverage = "^7.2.4"
 # version of generateDS used to create device.py and service.py in .../api/xsd
 generateDS = "2.37.11"
 # other
-pre-commit = "^2.10"
 deptry = "^0.11.0"
+pre-commit = "^2.10"
 
 [tool.poetry.group.bootstrap.dependencies]
 poetry = ">=1.2.0"
