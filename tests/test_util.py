@@ -7,6 +7,14 @@ import pytest
 from pywemo import util
 
 
+def test_interface_addresses():
+    addresses = util.interface_addresses()
+
+    for address in addresses:
+        assert address != "127.0.0.1"
+        assert ":" not in address  # No IPv6
+
+
 @pytest.mark.parametrize(
     "test_input,expected",
     [
