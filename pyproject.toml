@@ -45,6 +45,7 @@ coverage = "^7.2.4"
 generateDS = "2.37.11"
 # other
 pre-commit = "^2.10"
+poetry-pre-commit-plugin = "^0.1.2"
 
 [tool.poetry.group.bootstrap.dependencies]
 poetry = ">=1.2.0"

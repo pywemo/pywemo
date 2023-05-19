@@ -1496,6 +1496,21 @@ poetry = ">=1.3.0,<2.0.0"
 poetry-core = ">=1.3.0,<2.0.0"
 
 [[package]]
+name = "poetry-pre-commit-plugin"
+version = "0.1.2"
+description = "Poetry plugin for automatically installing pre-commit hook when it is added to a project"
+category = "dev"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "poetry-pre-commit-plugin-0.1.2.tar.gz", hash = "sha256:7afd327a45e14b5e17dc7fc7747f1b6f34aae421b8226368d4ca98772e823e52"},
+    {file = "poetry_pre_commit_plugin-0.1.2-py3-none-any.whl", hash = "sha256:a245945c776147df7108071e3a3699874c2bf9859dd613f6017ae1c8857fd4a4"},
+]
+
+[package.dependencies]
+poetry = ">=1.2.0b1,<2.0.0"
+
+[[package]]
 name = "pre-commit"
 version = "2.21.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
@@ -2442,4 +2457,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "398c9f58eff0de0f403fd5fe504f365fb0046d1556ad7f987840e91cc15d92f6"
+content-hash = "e2974882329b55d1b6e56aeedf51a03f3238353440a2353f9bb32e498678fba7"

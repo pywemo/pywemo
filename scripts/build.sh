@@ -11,10 +11,6 @@ enterVenv
 poetryInstall
 
 echo
-echo "===Installing pre-commit hooks==="
-pre-commit install
-
-echo
 echo "===Validate with rstcheck==="
 rstcheck README.rst
 
