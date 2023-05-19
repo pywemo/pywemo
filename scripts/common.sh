@@ -2,6 +2,8 @@
 
 VENV_DIR=".venv"
 PYTHON_BIN="python3"
+# The .txt_ extension is used to avoid changes by Dependabot.
+BOOTSTRAP_REQUIREMENTS="scripts/bootstrap-requirements.txt_"
 
 function assertPython() {
   if ! [[ $(which "$PYTHON_BIN") ]]; then
@@ -11,6 +13,8 @@ function assertPython() {
 }
 
 function enterVenv() {
+  echo
+  echo "===Settting up venv==="
   # Not sure why I couldn't use "if ! [[ `"$PYTHON_BIN" -c 'import venv'` ]]" below. It just never worked when venv was
   # present.
   VENV_NOT_INSTALLED=$("$PYTHON_BIN" -c 'import venv' 2>&1 | grep -ic ' No module named' || true)
@@ -34,4 +38,18 @@ function enterVenv() {
   else
     echo Already in venv.
   fi
+}
+
+function poetryInstall() {
+  echo
+  echo "===Installing poetry==="
+  pip install \
+    --require-hashes \
+    --no-deps \
+    --only-binary :all: \
+    -r "$BOOTSTRAP_REQUIREMENTS"
+
+  echo
+  echo "===Installing dependencies==="
+  poetry install
 }
