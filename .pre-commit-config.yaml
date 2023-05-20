@@ -93,3 +93,10 @@ repos:
         language: system
         entry: poetry run rstcheck
         types: [rst]
+
+      - id: deptry
+        name: deptry
+        language: system
+        entry: poetry run deptry .
+        pass_filenames: false
+        types: [python]
