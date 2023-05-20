@@ -25,11 +25,11 @@ jobs:
       (github.actor == 'dependabot[bot]' || github.actor == 'esev')
     environment: pyWeMo-bot
     steps:
-      # If changes were needed, the Build workflow will upload the diff as an
-      # artifact. The Build took place on a different workflow run so the usual
-      # actions/checkout won't work. Instead this finds the artifact, downloads
-      # it, and returns the path to the downloaded file. The returned path will
-      # be an empty string '' if no artifacts are found.
+      # If changes were needed, the Build workflow will upload modified files
+      # as an artifact. The Build workflow took place on a different workflow
+      # run so the usual actions/checkout won't work. Instead this finds the
+      # artifact, downloads it, and returns the path to the downloaded file.
+      # The returned path will be an empty string '' if no artifacts are found.
       - name: Download build changes
         id: download
         uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
@@ -58,26 +58,15 @@ jobs:
               Buffer.from(download.data));
             return '${{github.workspace}}/download/build-changes.zip';
 
-      # Checkout the HEAD for the PR's branch.
-      # Warning: This code needs to be considered untrusted. Do not run/install
-      # anything from this code.
-      # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
-      - name: Checkout code
-        if: steps.download.outputs.result
-        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3
-        with:
-          ref: ${{github.event.workflow_run.head_branch}}
-          path: pywemo_checkout
-
-      # Apply the patch.
-      - name: Apply changes
+      # Unzip the changes.
+      - name: Unzip changes
         if: steps.download.outputs.result
         env:
           CHANGES_ZIP: ${{steps.download.outputs.result}}
-        working-directory: pywemo_checkout
         run: |
-          (cd $(dirname "$CHANGES_ZIP") && unzip $(basename "$CHANGES_ZIP"))
-          git apply --cached "$(dirname "$CHANGES_ZIP")/build-changes.patch"
+          mkdir ./changes
+          cd ./changes
+          unzip "$CHANGES_ZIP"
 
       # Get a token so changes are pushed by an app. An app is used instead
       # of using the runner permissions because the runner actions cannot
@@ -91,9 +80,7 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      # Push a commit with the required changes to the branch. The GitHub git
-      # API is used, instead of running git on the command line, because GitHub
-      # will automatically sign commits that are created via the API.
+      # Push a commit with the required changes to the branch.
       # https://github.com/orgs/community/discussions/50055
       - name: Push changes
         if: steps.download.outputs.result
@@ -101,35 +88,26 @@ jobs:
         with:
           github-token: ${{ steps.generate_token.outputs.token }}
           script: |
-            // Configure exec options. Will write stdout to 'output'.
-            let output = '';
-            const options = {
-              listeners: {stdout: (data) => { output += data.toString(); }},
-              cwd: './pywemo_checkout'
+            const fs = require('fs');
+            const changesPath = '${{github.workspace}}/changes/';
+            const globberOptions = {
+              followSymbolicLinks: false,
+              matchDirectories: false,
             };
+            const globber = await glob.create(`${changesPath}**`, globberOptions);
 
             // Add the modified files to treeObjs.
-            await exec.exec('git', ['diff-index', '--cached', 'HEAD'], options);
-            options.silent = true;
             const treeObjs = [];
-            for (let diff of output.split('\n')) {
-              const start = diff.split(':', 2);
-              if (start.length < 2 || start[1].search('\t') < 30) continue;
-
-              const [metas, path] = start[1].split('\t', 2);
-              const meta = metas.split(' ');
-              // Only interested in modifications ('M'). Skip all others.
-              if (meta.length < 5 || meta[4] !== 'M') continue;
-
-              // Fetch the file contents into 'output'.
-              output = '';
-              await exec.exec('git', ['cat-file', 'blob', meta[3]], options);
+            for await (const file of globber.globGenerator()) {
+              const stat = fs.statSync(file);
+              if (!stat.isFile()) continue;
+              const content = fs.readFileSync(file, { encoding: 'utf8' });
 
               treeObjs.push({
-                path: path,
-                mode: meta[1],
+                path: file.substring(changesPath.length),
+                mode: stat.mode.toString(8),
                 type: 'blob',
-                content: output
+                content: content
               });
             }
 
