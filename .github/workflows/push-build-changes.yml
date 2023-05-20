@@ -59,6 +59,9 @@ jobs:
             return '${{github.workspace}}/download/build-changes.zip';
 
       # Checkout the HEAD for the PR's branch.
+      # Warning: This code needs to be considered untrusted. Do not run/install
+      # anything from this code.
+      # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
       - name: Checkout code
         if: steps.download.outputs.result
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3
