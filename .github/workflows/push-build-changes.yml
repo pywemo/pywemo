@@ -23,7 +23,7 @@ jobs:
       github.event.workflow_run.conclusion == 'failure' &&
       github.event.workflow_run.head_repository.full_name == github.repository &&
       (github.actor == 'dependabot[bot]' || github.actor == 'esev')
-    environment: push-build-changes
+    environment: pyWeMo-bot
     steps:
       # If changes were needed, the Build workflow will upload the diff as an
       # artifact. The Build took place on a different workflow run so the usual
