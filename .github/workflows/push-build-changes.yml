@@ -1,0 +1,158 @@
+# This is designed to run after the "Build" workflow has failed due to modified
+# files being detected. This workflow runs with elevated permissions to push a
+# commit onto the PR that contains the modified files.
+#
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+name: Push build changes
+
+on:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
+    branches:
+      - dependabot/**
+
+permissions: {}  # No permissions needed for this workflow.
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      (github.actor == 'dependabot[bot]' || github.actor == 'esev')
+    environment: push-build-changes
+    steps:
+      # If changes were needed, the Build workflow will upload the diff as an
+      # artifact. The Build took place on a different workflow run so the usual
+      # actions/checkout won't work. Instead this finds the artifact, downloads
+      # it, and returns the path to the downloaded file. The returned path will
+      # be an empty string '' if no artifacts are found.
+      - name: Download build changes
+        id: download
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
+        with:
+          result-encoding: string
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              ...context.repo,
+              run_id: ${{github.event.workflow_run.id}},
+            });
+            const buildChangesArtifacts = artifacts.data.artifacts.filter((artifact) => {
+              return artifact.name.startsWith("build-changes-");
+            });
+            if (buildChangesArtifacts.length < 1) {
+              return '';
+            }
+            const download = await github.rest.actions.downloadArtifact({
+              ...context.repo,
+              artifact_id: buildChangesArtifacts[0].id,
+              archive_format: 'zip',
+            });
+            await io.mkdirP('${{github.workspace}}/download');
+            const fs = require('fs');
+            fs.writeFileSync(
+              '${{github.workspace}}/download/build-changes.zip',
+              Buffer.from(download.data));
+            return '${{github.workspace}}/download/build-changes.zip';
+
+      # Checkout the HEAD for the PR's branch.
+      - name: Checkout code
+        if: steps.download.outputs.result
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3
+        with:
+          ref: ${{github.event.workflow_run.head_branch}}
+          path: pywemo_checkout
+
+      # Apply the patch.
+      - name: Apply changes
+        if: steps.download.outputs.result
+        env:
+          CHANGES_ZIP: ${{steps.download.outputs.result}}
+        working-directory: pywemo_checkout
+        run: |
+          (cd $(dirname "$CHANGES_ZIP") && unzip $(basename "$CHANGES_ZIP"))
+          git apply --cached "$(dirname "$CHANGES_ZIP")/build-changes.patch"
+
+      # Get a token so changes are pushed by an app. An app is used instead
+      # of using the runner permissions because the runner actions cannot
+      # trigger additional workflows to run. And we want the Build workflow
+      # on the PR to be triggered after pushing a commit.
+      - name: Generate a token
+        id: generate_token
+        if: steps.download.outputs.result
+        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92 # v1.8.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      # Push a commit with the required changes to the branch. The GitHub git
+      # API is used, instead of running git on the command line, because GitHub
+      # will automatically sign commits that are created via the API.
+      # https://github.com/orgs/community/discussions/50055
+      - name: Push changes
+        if: steps.download.outputs.result
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
+        with:
+          github-token: ${{ steps.generate_token.outputs.token }}
+          script: |
+            // Configure exec options. Will write stdout to 'output'.
+            let output = '';
+            const options = {
+              listeners: {stdout: (data) => { output += data.toString(); }},
+              cwd: './pywemo_checkout'
+            };
+
+            // Add the modified files to treeObjs.
+            await exec.exec('git', ['diff-index', '--cached', 'HEAD'], options);
+            options.silent = true;
+            const treeObjs = [];
+            for (let diff of output.split('\n')) {
+              const start = diff.split(':', 2);
+              if (start.length < 2 || start[1].search('\t') < 30) continue;
+
+              const [metas, path] = start[1].split('\t', 2);
+              const meta = metas.split(' ');
+              // Only interested in modifications ('M'). Skip all others.
+              if (meta.length < 5 || meta[4] !== 'M') continue;
+
+              // Fetch the file contents into 'output'.
+              output = '';
+              await exec.exec('git', ['cat-file', 'blob', meta[3]], options);
+
+              treeObjs.push({
+                path: path,
+                mode: meta[1],
+                type: 'blob',
+                content: output
+              });
+            }
+
+            if (treeObjs.length < 1) {
+              console.log('No files to upload');
+              return;
+            }
+
+            // Create a new tree containing the changed blobs.
+            const tree = await github.rest.git.createTree({
+              ...context.repo,
+              tree: treeObjs,
+              base_tree: '${{github.event.workflow_run.head_commit.tree_id}}'
+            });
+
+            // Create a commit for the tree. This will be signed automatically.
+            const gitCommit = await github.rest.git.createCommit({
+              ...context.repo,
+              message: '[dependabot skip] build changes for ${{github.event.workflow_run.head_commit.id}}',
+              tree: tree.data.sha,
+              parents: ['${{github.event.workflow_run.head_commit.id}}'],
+            });
+
+            // Update the branch HEAD to the new commit.
+            const ref = await github.rest.git.updateRef({
+              ...context.repo,
+              ref: 'heads/${{github.event.workflow_run.head_branch}}',
+              sha: gitCommit.data.sha,
+            });
