@@ -46,7 +46,7 @@ repos:
         name: isort
         language: system
         entry: poetry run isort
-        args: ['--check-only', '--filter-files']
+        args: ['--filter-files']
         require_serial: true
         types_or: [cython, pyi, python]
 
@@ -54,7 +54,6 @@ repos:
         name: black
         language: system
         entry: poetry run black
-        args: ['--check']
         require_serial: true
         types_or: [python, pyi]
 
@@ -72,14 +71,22 @@ repos:
         args: ['--disable=fixme']
         require_serial: true
         types: [python]
-        exclude: tests/
 
       - id: mypy
         name: mypy
         language: system
         entry: poetry run mypy
         require_serial: true
-        types: [python]
+        types_or: [python, pyi]
+        # By default mypy will prefer .pyi files to py files if both are found
+        # While traversing a directory. However mypy will fail if
+        # both wemo_services.py & wemo_services.pyi are included in the
+        # command line. wemo_services.py is excluded here and pyi files are
+        # included in the types_or as a work-around. mypy also has an
+        # 'exclude' option that can be placed in pyproject.toml, but similar
+        # to flake8 above, any files passed on the command-line bypass
+        # 'exclude'.
+        exclude: pywemo/ouimeaux_device/api/wemo_services.py
 
       - id: rstcheck
         name: rstcheck

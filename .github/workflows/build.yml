@@ -30,6 +30,27 @@ jobs:
         env:
           OUTPUT_ENV_VAR: GITHUB_OUTPUT
         run: ./scripts/build.sh
+      - name: Check for code modifications
+        if: always()
+        id: modified
+        run: |
+          mkdir -p ./.cache  # This directory is in .gitignore
+          git diff "${GITHUB_SHA}" | tee ./.cache/build-changes.patch
+
+          # exit 0 if there are only whitespace characters in the file.
+          grep '[^[:space:]]' ./.cache/build-changes.patch > /dev/null || exit 0
+
+          echo "build-changes=./.cache/build-changes.patch" | tee -a "$GITHUB_OUTPUT"
+          echo "FAIL: Files were changed during the Build step"
+          echo "Please ensure pre-commit was run on these changes"
+          exit 1
+      - name: Archive code modifications
+        if: failure() && steps.modified.outputs.build-changes
+        uses: actions/upload-artifact@v3
+        with:
+          if-no-files-found: error
+          name: build-changes-${{ matrix.python-version }}
+          path: ${{ steps.modified.outputs.build-changes }}
       - name: Archive build artifacts
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
         with:

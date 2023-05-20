@@ -71,7 +71,7 @@ poetry = ">=1.2.0"
 line-length = 79
 skip-string-normalization = true
 include = '\.pyi?$'
-exclude = '''
+force-exclude = '''
 (
   /(
       \.eggs         # exclude a few common directories in the
@@ -79,8 +79,8 @@ exclude = '''
     | \.hg
     | \.mypy_cache
     | \.tox
-    | \.venv
-    | \venv
+    | \.venv*
+    | \venv*
     | _build
     | buck-out
     | build
@@ -127,7 +127,7 @@ ignore_errors = true
   [tool.pylint.master]
   jobs = 0
   max-line-length = 79
-  ignore = "xsd"
+  ignore-paths = "^(pywemo/ouimeaux_device/api/xsd/|tests/)"
   extension-pkg-whitelist = "lxml"
   max-parents = 15
 
