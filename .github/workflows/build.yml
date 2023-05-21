@@ -54,18 +54,18 @@ jobs:
           exit 1
       - name: Archive code modifications
         if: failure() && steps.modified.outputs.build-changes
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
           name: build-changes-${{ matrix.python-version }}
           path: ${{ steps.modified.outputs.build-changes }}
       - name: Archive build artifacts
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
           if-no-files-found: error
           name: dist-${{ matrix.python-version }}
           path: dist/
       - name: Archive coverage results
-        uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
           if-no-files-found: error
           name: coverage-${{ matrix.python-version }}
