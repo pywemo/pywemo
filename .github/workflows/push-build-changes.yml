@@ -11,7 +11,7 @@ on:
     types:
       - completed
     branches:
-      - dependabot/**
+      - dependabot/pip/**
 
 permissions: {}  # No permissions needed for this workflow.
 

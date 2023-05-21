@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:  # These will run in publish.yml.
+      - .github/**
+      - pyproject.toml
+      - scripts/build.sh
   workflow_call:
     outputs:
       version:
