@@ -75,6 +75,29 @@ jobs:
           name: coverage-${{ matrix.python-version }}
           path: ${{ steps.build.outputs.coverage-lcov }}
 
+  windows:
+    name: Test (Windows 3.8)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - run: |
+          pip install -r scripts/bootstrap-requirements.txt_
+          poetry install
+          poetry run pytest tests
+
+  macos:
+    name: Build and test (MacOS 3.8)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+      - run: ./scripts/build.sh
+
   # Coverage reporting is its own step so it can optionally fail if coveralls
   # is experiencing issues. pyWeMo doesn't currently have any logic that is
   # different between Python versions, so the coverage output from only one
