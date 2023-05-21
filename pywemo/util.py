@@ -91,6 +91,8 @@ class MetaInfo:
     def from_meta_info(cls, value: dict[str, str] | str) -> MetaInfo:
         """Initialize from metainfo.GetMetaInfo() output."""
         info_str = value["MetaInfo"] if isinstance(value, dict) else value
+        if not info_str.isprintable():
+            raise ValueError("Invalid characters found in MetaInfo")
         values = info_str.split("|")
         if len(values) < 6:
             raise ValueError(f"Could not unpack MetaInfo: {info_str}")
@@ -116,6 +118,8 @@ class ExtMetaInfo:
     def from_ext_meta_info(cls, value: dict[str, str] | str) -> ExtMetaInfo:
         """Initialize from metainfo.GetExtMetaInfo() output."""
         info_str = value["ExtMetaInfo"] if isinstance(value, dict) else value
+        if not info_str.isprintable():
+            raise ValueError("Invalid characters found in ExtMetaInfo")
         values = info_str.split("|")
         if not len(values) > 9:
             raise ValueError(f"Could not unpack ExtMetaInfo: {info_str}")
