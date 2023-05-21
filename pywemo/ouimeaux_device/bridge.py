@@ -88,7 +88,10 @@ class Bridge(Device):
             if not (end_devices_xml := end_devices.get('DeviceLists')):
                 return self.Lights, self.Groups
 
-            end_device_list = et.fromstring(end_devices_xml.encode('utf-8'))
+            end_device_list = et.fromstring(
+                end_devices_xml.encode('utf-8'),
+                parser=et.XMLParser(resolve_entities=False),
+            )
 
             for light in end_device_list.iter('DeviceInfo'):
                 if (uniqueID := light.find('DeviceID').text) in self.Lights:
@@ -113,7 +116,10 @@ class Bridge(Device):
     def subscription_update(self, _type: str, _param: str) -> bool:
         """Update the bridge attributes due to a subscription update event."""
         if _type == self.EVENT_TYPE_STATUS_CHANGE and _param:
-            state_event = et.fromstring(_param.encode('utf8'))
+            state_event = et.fromstring(
+                _param.encode('utf8'),
+                parser=et.XMLParser(resolve_entities=False),
+            )
             if not (key := state_event.findtext('DeviceID')):
                 return False
             if key in self.Lights:
@@ -132,7 +138,8 @@ class Bridge(Device):
         if not device_status_list_xml:
             return None
         device_status_list = et.fromstring(
-            device_status_list_xml.encode('utf-8')
+            device_status_list_xml.encode('utf-8'),
+            parser=et.XMLParser(resolve_entities=False),
         )
 
         return device_status_list.find('DeviceStatus')

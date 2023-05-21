@@ -55,7 +55,9 @@ class AttributeDevice(Switch):
         self._attributes.update(
             {
                 attribute[0].text: attribute[1].text
-                for attribute in et.fromstring(xml_blob)
+                for attribute in et.fromstring(
+                    xml_blob, parser=et.XMLParser(resolve_entities=False)
+                )
                 if len(attribute) >= 2 and _is_int_or_float(attribute[1].text)
             }
         )

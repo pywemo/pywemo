@@ -243,7 +243,9 @@ class Action:
                 )
                 last_exception = err
             else:
-                envelope = et.fromstring(response.data)
+                envelope = et.fromstring(
+                    response.data, parser=et.XMLParser(resolve_entities=False)
+                )
                 body_element = list(envelope)[0]
                 response_element = list(body_element)[0]
                 if (
