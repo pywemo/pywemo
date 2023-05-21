@@ -40,13 +40,15 @@ jobs:
         if: always()
         id: modified
         run: |
-          mkdir -p ./.cache  # This directory is in .gitignore
-          git diff "${GITHUB_SHA}" | tee ./.cache/build-changes.patch
+          # exit 0 if nothing was modified.
+          [ -z "$(git diff-index "${GITHUB_SHA}")" ] && exit 0
 
-          # exit 0 if there are only whitespace characters in the file.
-          grep '[^[:space:]]' ./.cache/build-changes.patch > /dev/null || exit 0
+          # Copy modified files to ./.cache/diff. This path is in .gitignore
+          rm -fR ./.cache/diff && mkdir --parents ./.cache/diff
+          git diff-index -z --name-only --diff-filter=M "${GITHUB_SHA}" | \
+            xargs -0 cp --parents -t ./.cache/diff/ -- 2>/dev/null && \
+            echo "build-changes=./.cache/diff/" | tee -a "$GITHUB_OUTPUT"
 
-          echo "build-changes=./.cache/build-changes.patch" | tee -a "$GITHUB_OUTPUT"
           echo "FAIL: Files were changed during the Build step"
           echo "Please ensure pre-commit was run on these changes"
           exit 1
@@ -54,7 +56,6 @@ jobs:
         if: failure() && steps.modified.outputs.build-changes
         uses: actions/upload-artifact@3cea5372237819ed00197afe530f5a7ea3e805c8 # v3.1.0
         with:
-          if-no-files-found: error
           name: build-changes-${{ matrix.python-version }}
           path: ${{ steps.modified.outputs.build-changes }}
       - name: Archive build artifacts
