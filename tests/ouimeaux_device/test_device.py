@@ -1,5 +1,6 @@
 """Integration tests for the Device class."""
 
+import base64
 import itertools
 import logging
 import shutil
@@ -8,17 +9,18 @@ from subprocess import CalledProcessError
 
 import pytest
 import requests
+from hypothesis import example, given
+from hypothesis import strategies as st
 
-from pywemo.exceptions import ActionException
-from pywemo.ouimeaux_device import (
+from pywemo.exceptions import (
+    ActionException,
     APNotFound,
-    Device,
-    RequiredService,
     ResetException,
     SetupException,
     ShortPassword,
     UnknownService,
 )
+from pywemo.ouimeaux_device import Device, RequiredService
 
 RESPONSE_SETUP = '''<?xml version="1.0"?>
 <root xmlns="urn:Belkin:device-1-0">
@@ -342,6 +344,36 @@ class TestDevice:
         """Test encryption using the OpenSSL binary (if it exists)."""
         actual = device.encrypt_aes128('password', self.METAINFO, is_rtos)
         assert expected == actual
+
+    @pytest.mark.skipif(
+        not shutil.which('openssl'), reason='The openssl binary was not found'
+    )
+    @given(
+        password=st.text(),
+        mac=st.text(),
+        serial=st.text(),
+        is_rtos=st.booleans(),
+    )
+    @example("password", "XXXXXXXXXXXX", "123456A1234567", False)
+    @example("password", "XXXXXXXXXXXX", "123456A1234567", True)
+    @example("a" * 256, "XXXXXXXXXXXX", "123456A1234567", True)
+    def test_fuzz_Device_encrypt_aes128(
+        self, password, mac, serial, is_rtos
+    ) -> None:
+        wemo_metadata = "|".join([mac, serial, "", "", "", ""])
+        try:
+            encrypted = Device.encrypt_aes128(
+                password=password, wemo_metadata=wemo_metadata, is_rtos=is_rtos
+            )
+        except SetupException:
+            pass
+        except ValueError as err:
+            if "Invalid characters found in MetaInfo" not in str(err):
+                raise
+        else:
+            assert base64.b64decode(
+                encrypted if is_rtos else encrypted[:-4], validate=True
+            )
 
     def test_setup_unknown_service(self, device):
         """Test device setup (WiFiSetup service not available)."""

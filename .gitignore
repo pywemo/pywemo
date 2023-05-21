@@ -18,6 +18,7 @@ Icon
 # pytest
 .pytest_cache
 .cache
+.hypothesis
 
 # GITHUB Proposed Python stuff:
 *.py[cod]
