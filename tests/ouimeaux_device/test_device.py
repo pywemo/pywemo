@@ -549,3 +549,9 @@ class TestDevice:
         ) as url_mock:
             device.reconnect_with_device()
             url_mock.assert_not_called()
+
+    def test_explain(self, device, capsys):
+        device.explain()
+
+        captured = capsys.readouterr()
+        assert "GetBinaryState() -> BinaryState" in captured.out
