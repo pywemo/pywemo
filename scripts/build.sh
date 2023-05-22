@@ -13,6 +13,9 @@ poetryInstall
 echo
 echo "===Installing pre-commit hooks==="
 pre-commit install
+sed -ie \
+    "s#INSTALL_PYTHON=.*#INSTALL_PYTHON=$(pwd)/scripts/pre-commit.sh#" \
+    .git/hooks/pre-commit
 
 echo
 echo "===Running pre-commit checks==="
