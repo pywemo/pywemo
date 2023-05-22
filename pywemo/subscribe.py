@@ -639,6 +639,7 @@ class SubscriptionRegistry:
         self._httpd.outer = self
         LOG.info("Listening on port %d", self.port)
         self._httpd.serve_forever()
+        self._httpd.server_close()
 
     def _run_event_loop(self) -> None:
         """Run the event thread loop."""
