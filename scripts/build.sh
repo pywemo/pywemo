@@ -15,8 +15,9 @@ echo "===Installing pre-commit hooks==="
 pre-commit install
 # Always run pre-commit inside the venv.
 ORIG_PATH="$(python -c "import os;print(f'{os.pathsep}\$PATH')")"
-REPLACE="VIRTUAL_ENV=\"$VIRTUAL_ENV\"\nPATH=\"$VIRTUAL_ENV/bin$ORIG_PATH\""
-sed -ie "s^# start templated.*^$REPLACE^" .git/hooks/pre-commit
+ESCAPED_VENV="$(echo "$VIRTUAL_ENV" | sed -e 's/[\/&]/\\&/g')"
+REPLACE="VIRTUAL_ENV=\"$ESCAPED_VENV\"\nPATH=\"$ESCAPED_VENV\/bin$ORIG_PATH\""
+sed -ie "s/# start templated.*/$REPLACE/" .git/hooks/pre-commit
 
 echo
 echo "===Running pre-commit checks==="

@@ -1,4 +1,5 @@
 name: Build
+
 on:
   pull_request:
   push:
@@ -19,13 +20,21 @@ permissions: {}  # No permissions needed for this workflow.
 jobs:
   build:
     name: Build and test
-    runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.build.outputs.version }}
     strategy:
-      max-parallel: 4
       matrix:
+        os: ['ubuntu-latest']
         python-version: ['3.8', '3.9', '3.10', '3.11']
+        include:
+          - os: windows-latest
+            python-version: '3.8'
+          - os: macos-latest
+            python-version: '3.8'
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
@@ -39,7 +48,7 @@ jobs:
         id: build
         env:
           OUTPUT_ENV_VAR: GITHUB_OUTPUT
-        run: ./scripts/build.sh
+        run: bash -x ./scripts/build.sh
       - name: Check for code modifications
         if: always()
         id: modified
@@ -60,43 +69,20 @@ jobs:
         if: failure() && steps.modified.outputs.build-changes
         uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
-          name: build-changes-${{ matrix.python-version }}
+          name: build-changes-${{ join(matrix.*, '-') }}
           path: ${{ steps.modified.outputs.build-changes }}
       - name: Archive build artifacts
         uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
           if-no-files-found: error
-          name: dist-${{ matrix.python-version }}
+          name: dist-${{ join(matrix.*, '-') }}
           path: dist/
       - name: Archive coverage results
         uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
           if-no-files-found: error
-          name: coverage-${{ matrix.python-version }}
+          name: coverage-${{ join(matrix.*, '-') }}
           path: ${{ steps.build.outputs.coverage-lcov }}
-
-  windows:
-    name: Test (Windows 3.8)
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - run: |
-          pip install -r scripts/bootstrap-requirements.txt_
-          poetry install
-          poetry run pytest tests
-
-  macos:
-    name: Build and test (MacOS 3.8)
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - run: ./scripts/build.sh
 
   # Coverage reporting is its own step so it can optionally fail if coveralls
   # is experiencing issues. pyWeMo doesn't currently have any logic that is
@@ -113,7 +99,7 @@ jobs:
           persist-credentials: false
       - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
-          name: coverage-3.10
+          name: coverage-ubuntu-latest-3.10
       - uses: coverallsapp/github-action@f350da2c033043742f89e8c0b7b5145a1616da6d # v2.1.2
         with:
           path-to-lcov: coverage.lcov

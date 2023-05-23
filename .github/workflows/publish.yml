@@ -16,7 +16,7 @@ env:
   # Artifact name to use for the release. The build matrix builds and tests
   # multiple Python versions. But the release only comes from this single
   # version.
-  DIST_ARTIFACT: dist-3.8
+  DIST_ARTIFACT: dist-ubuntu-latest-3.8
 
 jobs:
   build:

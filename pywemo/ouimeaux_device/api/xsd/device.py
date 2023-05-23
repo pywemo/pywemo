@@ -12,13 +12,13 @@
 # Command line options:
 #   ('-f', '')
 #   ('--no-dates', '')
-#   ('-o', '/dev/stdout')
+#   ('-o', 'device.py')
 #
 # Command line arguments:
 #   pywemo/ouimeaux_device/api/xsd/device.xsd
 #
 # Command line:
-#   generateDS -f --no-dates -o "/dev/stdout" pywemo/ouimeaux_device/api/xsd/device.xsd
+#   generateDS.py -f --no-dates -o "device.py" pywemo/ouimeaux_device/api/xsd/device.xsd
 #
 # Current working directory (os.getcwd()):
 #   pywemo
@@ -3824,8 +3824,8 @@ def parseLiteral(inFileName, silence=False, print_warnings=True):
         doc = None
         rootNode = None
     if not silence:
-        sys.stdout.write('#from stdout import *\n\n')
-        sys.stdout.write('import stdout as model_\n\n')
+        sys.stdout.write('#from device import *\n\n')
+        sys.stdout.write('import device as model_\n\n')
         sys.stdout.write('rootObj = model_.rootClass(\n')
         rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
         sys.stdout.write(')\n')

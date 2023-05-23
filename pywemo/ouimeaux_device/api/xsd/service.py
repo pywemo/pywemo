@@ -12,13 +12,13 @@
 # Command line options:
 #   ('-f', '')
 #   ('--no-dates', '')
-#   ('-o', '/dev/stdout')
+#   ('-o', 'service.py')
 #
 # Command line arguments:
 #   pywemo/ouimeaux_device/api/xsd/service.xsd
 #
 # Command line:
-#   generateDS -f --no-dates -o "/dev/stdout" pywemo/ouimeaux_device/api/xsd/service.xsd
+#   generateDS.py -f --no-dates -o "service.py" pywemo/ouimeaux_device/api/xsd/service.xsd
 #
 # Current working directory (os.getcwd()):
 #   pywemo
@@ -3777,8 +3777,8 @@ def parseLiteral(inFileName, silence=False, print_warnings=True):
         doc = None
         rootNode = None
     if not silence:
-        sys.stdout.write('#from stdout import *\n\n')
-        sys.stdout.write('import stdout as model_\n\n')
+        sys.stdout.write('#from service import *\n\n')
+        sys.stdout.write('import service as model_\n\n')
         sys.stdout.write('rootObj = model_.rootClass(\n')
         rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
         sys.stdout.write(')\n')
