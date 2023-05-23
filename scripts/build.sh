@@ -14,7 +14,7 @@ echo
 echo "===Installing pre-commit hooks==="
 pre-commit install
 # Always run pre-commit inside the venv.
-REPLACE="VIRTUAL_ENV=$VIRTUAL_ENV\nPATH=$VIRTUAL_ENV/bin:\$PATH"
+REPLACE="VIRTUAL_ENV=\"$VIRTUAL_ENV\"\nPATH=\"$VIRTUAL_ENV/bin:\$PATH\""
 sed -ie "s^# start templated.*^$REPLACE^" .git/hooks/pre-commit
 
 echo
