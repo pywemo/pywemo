@@ -411,3 +411,16 @@ class Test_SubscriptionRegistry:
             headers=mock.ANY,
             timeout=10,
         )
+
+    def test_start_stop(self):
+        registry = subscribe.SubscriptionRegistry(requested_port=0)
+        registry.start()
+        port = registry.port
+        try:
+            response = requests.request("NOTIFY", f"http://127.0.0.1:{port}/")
+            assert response.status_code == 200
+        finally:
+            registry.stop()
+
+        with pytest.raises(requests.ConnectionError):
+            requests.request("NOTIFY", f"http://127.0.0.1:{port}/", timeout=5)
