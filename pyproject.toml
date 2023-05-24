@@ -179,7 +179,6 @@ ignore_errors = true
   reports = "no"
 
   [tool.pylint.format]
-  expected-line-ending-format = "LF"
   good-names = [
     "i",
     "s",

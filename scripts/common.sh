@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 VENV_DIR=".venv"
-PYTHON_BIN="python3"
+PYTHON_BIN="$(which python3)"
 # The .txt_ extension is used to avoid changes by Dependabot.
 BOOTSTRAP_REQUIREMENTS="scripts/bootstrap-requirements.txt_"
 
 function assertPython() {
-  if ! [[ $(which "$PYTHON_BIN") ]]; then
+  if [[ -z "$PYTHON_BIN" ]]; then
     echo "Error: '$PYTHON_BIN' is not in your path."
     exit 1
   fi
@@ -23,17 +23,25 @@ function enterVenv() {
     exit 1
   fi
 
-  if ! [[ -e "$VENV_DIR" ]]; then
+  if [[ ! -e "$VENV_DIR" ]]; then
     echo "Creating venv."
-    "$PYTHON_BIN" -m venv "$VENV_DIR"
+    VENV_ARGS=("$VENV_DIR")
+    if [[ ! -z "${CI:-}" ]]; then
+      VENV_ARGS+=(--symlink)
+    fi
+    "$PYTHON_BIN" -m venv "${VENV_ARGS[@]}"
   else
     echo Using existing venv.
   fi
 
-  if ! [[ $(env | grep VIRTUAL_ENV) ]]; then
+  if [[ -z "${VIRTUAL_ENV:-}" ]]; then
     echo "Entering venv."
     set +uf
-    source "$VENV_DIR/bin/activate"
+    if [[ -f "$VENV_DIR/Scripts/activate" ]]; then
+      source "$VENV_DIR/Scripts/activate"
+    else
+      source "$VENV_DIR/bin/activate"
+    fi
     set -uf
   else
     echo Already in venv.

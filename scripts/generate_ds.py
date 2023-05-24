@@ -11,9 +11,10 @@ from __future__ import annotations
 
 import concurrent.futures
 import os
-import shutil
 import subprocess
 import sys
+import sysconfig
+import tempfile
 
 
 def generate_module(xsd_path: str) -> None:
@@ -22,7 +23,6 @@ def generate_module(xsd_path: str) -> None:
 
     # Modifications for pyWeMo.
     module = remove_python_version(module)
-    module = remove_generate_ds_path(module)
     module = remove_six_import(module)
     module = disable_code_analyzers(module)
     module = format_with_black(module)
@@ -40,20 +40,29 @@ def generate_module(xsd_path: str) -> None:
 
 def run_generate_ds(xsd_path: str) -> str:
     """Run generateDS and return the generated module a string."""
-    process = subprocess.run(
-        [
-            "generateDS",
-            "-f",
-            "--no-dates",
-            "-o",
-            "/dev/stdout",
-            xsd_path,
-        ],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return process.stdout
+    with tempfile.TemporaryDirectory() as path:
+        py_name = os.path.basename(xsd_path).replace(".xsd", ".py")
+        py_path = os.path.join(path, py_name)
+        scripts_dir = sysconfig.get_path("scripts")
+        subprocess.run(
+            [
+                sys.executable,
+                os.path.join(scripts_dir, "generateDS.py"),
+                "-f",
+                "--no-dates",
+                "-o",
+                py_path,
+                xsd_path,
+            ],
+            check=True,
+        )
+        with open(py_path, "r", encoding="utf-8") as py_file:
+            output = py_file.read()
+    # Remove paths related to running generateDS.py.
+    output = output.replace(os.path.join(scripts_dir, ""), "")
+    output = output.replace(repr(os.path.join(path, py_name)), repr(py_name))
+    output = output.replace(os.path.join(path, ""), "")
+    return output
 
 
 def remove_python_version(module: str) -> str:
@@ -65,18 +74,6 @@ def remove_python_version(module: str) -> str:
     removes the Python version string.
     """
     return module.replace(sys.version.replace("\n", " "), "[sys.version]", 1)
-
-
-def remove_generate_ds_path(module: str) -> str:
-    """Remove the full path to the generateDS binary.
-
-    generateDS adds the full path to its script to the header comments in the
-    generated file. This path will be different on different systems and
-    different for each venv on the system. This helper removes the full path.
-    """
-    if not (full_path := shutil.which("generateDS")):
-        raise ValueError("generateDS not found in path")
-    return module.replace(full_path, "generateDS", 1)
 
 
 def remove_six_import(module: str) -> str:
@@ -109,8 +106,8 @@ def disable_code_analyzers(module: str) -> str:
     ]
     # Add these comments on the first empty line in the file.
     return module.replace(
-        os.linesep * 2,
-        os.linesep + os.linesep.join(disabling_lines) + os.linesep * 2,
+        "\n" * 2,
+        "\n" + "\n".join(disabling_lines) + "\n" * 2,
         1,
     )
 
@@ -124,7 +121,7 @@ def format_with_black(module: str) -> str:
     process = subprocess.run(
         ["black", "-"],
         check=True,
-        capture_output=True,
+        stdout=subprocess.PIPE,
         text=True,
         input=module,
     )

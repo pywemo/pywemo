@@ -1,10 +1,22 @@
-# Ensure Docker script files uses LF to support Docker for Windows.
-# Ensure "git config --global core.autocrlf input" before you clone
-*     text eol=lf
-*.py  whitespace=error
+# Auto detect text files and perform LF normalization
+*      text=auto
 
-*.ico binary
-*.jpg binary
-*.png binary
-*.zip binary
-*.mp3 binary
+#
+# The above will handle all files NOT found below
+#
+*.py   text diff=python whitespace=error
+*.sh   text eol=lf
+
+*.ico  binary
+*.jpg  binary
+*.png  binary
+*.zip  binary
+*.mp3  binary
+
+#
+# Exclude files from exporting
+#
+
+.gitattributes export-ignore
+.gitignore     export-ignore
+.gitkeep       export-ignore
