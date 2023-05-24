@@ -33,7 +33,7 @@ repos:
       - id: generateDS
         name: generateDS
         language: system
-        entry: poetry run python scripts/generate_ds.py
+        entry: python scripts/generate_ds.py
         args:
           - pywemo/ouimeaux_device/api/xsd/device.xsd
           - pywemo/ouimeaux_device/api/xsd/service.xsd
@@ -44,7 +44,7 @@ repos:
       - id: isort
         name: isort
         language: system
-        entry: poetry run isort
+        entry: isort
         args: ['--filter-files']
         require_serial: true
         types_or: [cython, pyi, python]
@@ -52,21 +52,21 @@ repos:
       - id: black
         name: black
         language: system
-        entry: poetry run black
+        entry: black
         require_serial: true
         types_or: [python, pyi]
 
       - id: flake8
         name: flake8
         language: system
-        entry: poetry run flake8
+        entry: flake8
         require_serial: true
         types: [python]
 
       - id: pylint
         name: pylint
         language: system
-        entry: poetry run pylint
+        entry: pylint
         args: ['--disable=fixme']
         require_serial: true
         types: [python]
@@ -74,7 +74,7 @@ repos:
       - id: mypy
         name: mypy
         language: system
-        entry: poetry run mypy
+        entry: mypy
         require_serial: true
         types_or: [python, pyi]
         # By default mypy will prefer .pyi files to py files if both are found
@@ -90,12 +90,12 @@ repos:
       - id: rstcheck
         name: rstcheck
         language: system
-        entry: poetry run rstcheck
+        entry: rstcheck
         types: [rst]
 
       - id: deptry
         name: deptry
         language: system
-        entry: poetry run deptry .
+        entry: deptry .
         pass_filenames: false
         types: [python]
