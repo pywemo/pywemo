@@ -122,6 +122,31 @@ jobs:
             "./${PROVENANCE_NAME}/${PROVENANCE_NAME}" \
             ./signing-artifacts-sigstore/*/*.sigstore \
             ./release/
+      - name: Add SHA256SUM environment variable
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "SHA256SUM<<$EOF" >> "$GITHUB_ENV"
+          cat ./hashes/*.sha256sum.txt >> "$GITHUB_ENV"
+          echo "$EOF" >> "$GITHUB_ENV"
+      - name: Checkout code
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+        with:
+          path: pywemo_checkout
+      - name: Update release text
+        env:
+          BODY: ${{ github.event.release && github.event.release.body || '' }}
+          TEMPLATE_FILE: ./pywemo_checkout/.github/RELEASE_NOTES_TEMPLATE.md
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
+        with:
+          script: |
+            const fsp = require('fs').promises;
+            let body = await fsp.readFile(
+              process.env.TEMPLATE_FILE, { encoding: 'utf8' });
+            for (const [key, value] of Object.entries(process.env)) {
+                body = body.replaceAll(`\${${key}}`, value);
+            }
+            await fsp.writeFile(
+              '${{github.workspace}}/release/release-notes.md', body);
       - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
           if-no-files-found: error
@@ -147,9 +172,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          mv ./release/release-notes.md "${{github.workspace}}/"
           gh release upload "${GITHUB_REF_NAME}" \
             --repo "${GITHUB_REPOSITORY}" \
             ./release/*
+      - name: Update release text
+        env:
+          RELEASE_ID: ${{ github.event.release.id }}
+        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
+        with:
+          script: |
+            const fsp = require('fs').promises;
+            const body = await fsp.readFile(
+              '${{github.workspace}}/release-notes.md', { encoding: 'utf8' });
+            await github.rest.repos.updateRelease({
+                ...context.repo,
+                release_id: process.env.RELEASE_ID,
+                body: body,
+            });
 
   pypi-release:
     name: Publish to PyPI
