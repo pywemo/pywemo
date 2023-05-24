@@ -41,6 +41,8 @@ jobs:
     name: Generate SHA256 hashes
     needs: [build, check]
     runs-on: ubuntu-latest
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
     steps:
       - name: Download dist artifacts
         uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
@@ -52,13 +54,39 @@ jobs:
         env:
           PYWEMO_VERSION: ${{ needs.build.outputs.version }}
         working-directory: dist
-        run: sha256sum * | tee "pywemo-${PYWEMO_VERSION}.sha256sum.txt"
+        run: |
+          sha256sum * | tee "pywemo-${PYWEMO_VERSION}.sha256sum.txt"
+          echo "hashes=$(sha256sum * | base64 -w0)" | tee -a "$GITHUB_OUTPUT"
       - name: Archive hashes
         uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
           if-no-files-found: error
           name: hashes
           path: dist/pywemo-${{ needs.build.outputs.version }}.sha256sum.txt
+
+  slsa:
+    name: Generate SLSA provenance
+    needs: [build, hash]
+    permissions:
+      # Needed to upload assets to the Github release.
+      # TODO: Find a way to remove 'contents: write':
+      #   https://github.com/slsa-framework/slsa-github-generator/issues/2044
+      #   https://github.com/slsa-framework/slsa-github-generator/issues/2076
+      contents: write
+      # Needed to detect the GitHub Actions environment.
+      actions: read
+      # Needed to create the provenance via GitHub OIDC.
+      id-token: write
+    # Best practices for workflows suggest actions/workflows should be pinned
+    # by their git commit SHA digest.
+    # TODO: Pin this workflow with a git commit SHA digest.
+    #   https://github.com/slsa-framework/slsa-verifier/issues/12
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.6.0
+    with:
+      # SHA-256 hashes of the Python distributions.
+      base64-subjects: ${{ needs.hash.outputs.hashes }}
+      # Provenance file name.
+      provenance-name: pywemo-${{ needs.build.outputs.version }}.intoto.jsonl
 
   sigstore:
     name: Generate Sigstore signatures
@@ -78,17 +106,20 @@ jobs:
 
   assets:
     name: Create release assets
-    needs: [build, hash, sigstore]
+    needs: [build, hash, sigstore, slsa]
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
       - name: Populate release assets
+        env:
+          PROVENANCE_NAME: ${{ needs.slsa.outputs.provenance-name }}
         run: |
           mkdir -p ./release
           cp \
             ./${DIST_ARTIFACT}/* \
             ./hashes/* \
+            "./${PROVENANCE_NAME}/${PROVENANCE_NAME}" \
             ./signing-artifacts-sigstore/*/*.sigstore \
             ./release/
       - uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
