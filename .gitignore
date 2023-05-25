@@ -107,3 +107,6 @@ desktop.ini
 
 # monkeytype
 monkeytype.sqlite3
+
+# git
+.git
