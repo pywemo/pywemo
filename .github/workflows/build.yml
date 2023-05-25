@@ -44,10 +44,25 @@ jobs:
         uses: actions/setup-python@57ded4d7d5e986d7296eab16560982c6dd7c923b # v4.6.0
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Enable build input caching
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
+        with:
+          path: |
+            ./.cache/pip
+            ./.cache/pypoetry
+          key: ${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          # Don't restore for pushes to the main branch. Otherwise the cache
+          # will continue to grow over time.
+          restore-keys: >-
+            ${{ github.event_name == 'push' &&
+                github.ref_name == 'main' &&
+                'no-restore' || runner.os }}-
       - name: Build
         id: build
         env:
           OUTPUT_ENV_VAR: GITHUB_OUTPUT
+          PIP_CACHE_DIR: ./.cache/pip
+          POETRY_CACHE_DIR: ./.cache/pypoetry
         run: bash -x ./scripts/build.sh
       - name: Check for code modifications
         if: always()
