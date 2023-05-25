@@ -56,7 +56,7 @@ jobs:
           restore-keys: >-
             ${{ github.event_name == 'push' &&
                 github.ref_name == 'main' &&
-                'no-restore' || format('{0}-', runner.os) }}
+                'no-restore' || runner.os }}-
       - name: Build
         id: build
         env:
