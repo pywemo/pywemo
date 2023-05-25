@@ -51,7 +51,12 @@ jobs:
             ./.cache/pip
             ./.cache/pypoetry
           key: ${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: ${{ runner.os }}-
+          # Don't restore for pushes to the main branch. Otherwise the cache
+          # will continue to grow over time.
+          restore-keys: >
+            ${{ github.event_name == 'push' &&
+                github.ref_name == 'main' &&
+                'no-restore' || format('{0}-', runner.os) }}
       - name: Build
         id: build
         env:
