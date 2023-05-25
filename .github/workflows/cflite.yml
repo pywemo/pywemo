@@ -1,0 +1,53 @@
+name: ClusterFuzzLite
+
+on:
+  push:
+    paths:
+      - .github/workflows/fuzz.yml
+      - .clusterfuzzlite/**
+      - pywemo/**.py
+      - tests/**_fuzz.py
+  pull_request:
+    paths:
+      - .github/workflows/fuzz.yml
+      - .clusterfuzzlite/**
+      - pywemo/**.py
+      - tests/**_fuzz.py
+  schedule:
+    - cron: '27 3 * * *'  # Daily.
+
+permissions: read-all
+
+jobs:
+  fuzz:
+    name: Fuzzing
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.sanitizer }}-${{ github.event_name }}-${{ github.ref }}
+      cancel-in-progress: true
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer:
+        - address
+        # - undefined
+        # - memory
+    steps:
+    - name: Build Fuzzers (${{ matrix.sanitizer }})
+      id: build
+      uses: google/clusterfuzzlite/actions/build_fuzzers@1e163f06cba7820da5154ac9fe1a32d7fe6f73a3 # v1
+      with:
+        language: python
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        sanitizer: ${{ matrix.sanitizer }}
+        upload-build: ${{ github.event_name == 'push' }}
+
+    - name: Run Fuzzers (${{ matrix.sanitizer }})
+      id: run
+      if: github.event_name != 'push'
+      uses: google/clusterfuzzlite/actions/run_fuzzers@1e163f06cba7820da5154ac9fe1a32d7fe6f73a3 # v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        fuzz-seconds: ${{ github.event_name == 'schedule' && 3600 || 600 }}
+        mode: ${{ github.event_name == 'schedule' && 'batch' || 'code-change' }}
+        sanitizer: ${{ matrix.sanitizer }}
