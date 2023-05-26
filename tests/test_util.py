@@ -70,6 +70,9 @@ def test_meta_info():
     with pytest.raises(ValueError):
         util.MetaInfo.from_meta_info("")
 
+    with pytest.raises(ValueError):
+        util.MetaInfo.from_meta_info("\b")
+
 
 def test_ext_meta_info():
     ext_meta_info = {
@@ -105,3 +108,6 @@ def test_ext_meta_info():
 
     with pytest.raises(ValueError):
         util.ExtMetaInfo.from_ext_meta_info("")
+
+    with pytest.raises(ValueError):
+        util.ExtMetaInfo.from_ext_meta_info("\b")
