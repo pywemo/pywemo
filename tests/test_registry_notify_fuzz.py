@@ -143,7 +143,7 @@ def properties(draw, names=PROPERTY_NAMES, values=PROPERTY_VALUES):
     }
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def registry(request):
     sub = pywemo.SubscriptionRegistry()
     sub.start()
