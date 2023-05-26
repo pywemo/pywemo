@@ -1,6 +1,7 @@
 """Attribute device helpers."""
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from lxml import etree as et
@@ -8,6 +9,8 @@ from lxml import etree as et
 from ..switch import Switch
 from .service import RequiredService
 from .xsd_types import quote_xml
+
+LOG = logging.getLogger(__name__)
 
 
 def _is_int_or_float(value: str) -> bool:
@@ -76,7 +79,15 @@ class AttributeDevice(Switch):
     def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle subscription push-events from device."""
         if _type == self.EVENT_TYPE_ATTRIBUTE_LIST:
-            self._update_attributes_dict(_params)
+            try:
+                self._update_attributes_dict(_params)
+            except et.XMLSyntaxError:
+                LOG.error(
+                    "Unexpected %s value `%s` for device %s.",
+                    self.EVENT_TYPE_ATTRIBUTE_LIST,
+                    _params,
+                    self.name,
+                )
             return True
 
         return super().subscription_update(_type, _params)

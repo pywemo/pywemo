@@ -343,7 +343,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             doc = self._get_xml_from_http_body()
             for propnode in doc.findall(f'./{NS}property'):
                 for property_ in list(propnode):
-                    text = property_.text
+                    text = property_.text or ""
                     outer.event(device, property_.tag, text, path=self.path)
 
         self._send_response(200, RESPONSE_SUCCESS)

@@ -116,10 +116,13 @@ class Bridge(Device):
     def subscription_update(self, _type: str, _param: str) -> bool:
         """Update the bridge attributes due to a subscription update event."""
         if _type == self.EVENT_TYPE_STATUS_CHANGE and _param:
-            state_event = et.fromstring(
-                _param.encode('utf8'),
-                parser=et.XMLParser(resolve_entities=False),
-            )
+            try:
+                state_event = et.fromstring(
+                    _param.encode('utf8'),
+                    parser=et.XMLParser(resolve_entities=False),
+                )
+            except et.XMLSyntaxError:
+                return False
             if not (key := state_event.findtext('DeviceID')):
                 return False
             if key in self.Lights:
