@@ -67,6 +67,7 @@ DEVICE_NAMES = sorted(DEVICES.keys())
 PROPERTY_NAMES = st.one_of(
     st.sampled_from(
         [
+            "attributeList",
             "BinaryState",
             "CurrentHumidity",
             "DesiredHumidity",
@@ -127,10 +128,8 @@ def toXml(properties):
 @st.composite
 def properties(draw, names=PROPERTY_NAMES, values=PROPERTY_VALUES):
     return {
-        **draw(st.dictionaries(names, values)),
         **draw(
             st.nothing()
-            | st.fixed_dictionaries({"attributeList": values})
             | st.fixed_dictionaries(
                 {
                     "attributeList": st.dictionaries(
@@ -140,6 +139,7 @@ def properties(draw, names=PROPERTY_NAMES, values=PROPERTY_VALUES):
                 }
             )
         ),
+        **draw(st.dictionaries(names, values)),
     }
 
 
