@@ -67,7 +67,15 @@ class Insight(Switch):
         """Update the device attributes due to a subscription update event."""
         LOG.debug("subscription_update %s %s", _type, _params)
         if _type == self.EVENT_TYPE_INSIGHT_PARAMS:
-            self.insight_params = self.parse_insight_params(_params)
+            try:
+                self.insight_params = self.parse_insight_params(_params)
+            except ValueError:
+                LOG.error(
+                    "Unexpected %s value `%s` for device %s.",
+                    self.EVENT_TYPE_INSIGHT_PARAMS,
+                    _params,
+                    self.name,
+                )
             return True
         updated = super().subscription_update(_type, _params)
         if _type == self.EVENT_TYPE_BINARY_STATE and updated:
