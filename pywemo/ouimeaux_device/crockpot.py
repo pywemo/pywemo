@@ -1,13 +1,16 @@
 """Representation of a WeMo CrockPot device."""
 from __future__ import annotations
 
+import logging
 from enum import IntEnum
-from typing import Any
+from typing import Any, TypedDict
 
 from .api.service import RequiredService
 from .switch import Switch
 
 _UNKNOWN = -1
+
+LOG = logging.getLogger(__name__)
 
 
 # These enums were derived from the CrockPot.basicevent.GetCrockpotState()
@@ -36,6 +39,14 @@ MODE_NAMES = {
 }
 
 
+class _Attributes(TypedDict, total=False):
+    """LinkedDevice state dictionary type."""
+
+    cookedTime: int
+    mode: int
+    time: int
+
+
 class CrockPot(Switch):
     """WeMo Crockpot."""
 
@@ -43,10 +54,12 @@ class CrockPot(Switch):
     EVENT_TYPE_MODE = "mode"
     EVENT_TYPE_TIME = "time"
 
+    _attributes: _Attributes
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo CrockPot device."""
         super().__init__(*args, **kwargs)
-        self._attributes: dict[str, str] = {}
+        self._attributes = {}
         self.get_state(True)
 
     @property
@@ -63,32 +76,40 @@ class CrockPot(Switch):
         state_attributes = self.basicevent.GetCrockpotState()
 
         # Only update our state on complete updates from the device
-        if all(
-            state_attributes.get(attr) is not None
-            for attr in ("cookedTime", "mode", "time")
-        ):
-            self._attributes = state_attributes
+        try:
+            self._attributes = {
+                "cookedTime": int(state_attributes["cookedTime"]),
+                "mode": int(state_attributes["mode"]),
+                "time": int(state_attributes["time"]),
+            }
+        except KeyError as err:
+            LOG.error("Missing expected state attribute: %r", err)
+        except ValueError as err:
+            LOG.error("Invalid state value: %r", err)
+        else:
             self._state = self.mode
 
     def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle reports from device."""
-        if _type == self.EVENT_TYPE_MODE:
-            self._attributes["mode"] = _params
-            self._state = self.mode
-            return True
-        if _type == self.EVENT_TYPE_TIME:
-            self._attributes["time"] = _params
-            return True
-        if _type == self.EVENT_TYPE_COOKED_TIME:
-            self._attributes["cookedTime"] = _params
-            return True
-
+        try:
+            if _type == self.EVENT_TYPE_MODE:
+                self._attributes["mode"] = int(_params)
+                self._state = self.mode
+                return True
+            if _type == self.EVENT_TYPE_TIME:
+                self._attributes["time"] = int(_params)
+                return True
+            if _type == self.EVENT_TYPE_COOKED_TIME:
+                self._attributes["cookedTime"] = int(_params)
+                return True
+        except ValueError as err:
+            LOG.error("Invalid value for %s: %r", _type, err)
         return super().subscription_update(_type, _params)
 
     @property
     def mode(self) -> CrockPotMode:
         """Return the mode of the device."""
-        return CrockPotMode(int(self._attributes.get("mode", _UNKNOWN)))
+        return CrockPotMode(self._attributes.get("mode", _UNKNOWN))
 
     @property
     def mode_string(self) -> str:
@@ -98,12 +119,12 @@ class CrockPot(Switch):
     @property
     def remaining_time(self) -> int:
         """Return the remaining time in minutes."""
-        return int(self._attributes.get("time", 0))
+        return self._attributes.get("time", 0)
 
     @property
     def cooked_time(self) -> int:
         """Return the cooked time in minutes."""
-        return int(self._attributes.get("cookedTime", 0))
+        return self._attributes.get("cookedTime", 0)
 
     def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""

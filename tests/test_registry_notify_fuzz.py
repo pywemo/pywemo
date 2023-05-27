@@ -24,7 +24,9 @@ MOCK_SERVICE_RETURN_VALUES = {
             )
         }
     },
-    "basicevent": {"GetCrockpotState": {}},
+    "basicevent": {
+        "GetCrockpotState": {"cookedTime": "0", "mode": "0", "time": "0"}
+    },
     "insight": {
         "GetInsightParams": {
             "InsightParams": (
@@ -68,6 +70,9 @@ PROPERTY_NAMES = st.one_of(
     st.sampled_from(
         [
             "attributeList",
+            "cookedTime",
+            "mode",
+            "time",
             "BinaryState",
             "CurrentHumidity",
             "DesiredHumidity",
@@ -156,6 +161,9 @@ def registry(request):
 @example(name="Bridge", properties={"StatusChange": "1"})
 @example(name="CoffeeMaker", properties={"attributeList": {}})
 @example(name="CoffeeMaker", properties={"attributeList": "<"})
+@example(name="CrockPot", properties={"cookedTime": "'"})
+@example(name="CrockPot", properties={"mode": "'"})
+@example(name="CrockPot", properties={"time": "'"})
 @example(name="Insight", properties={"InsightParams": "1"})
 def test_notify(name, properties, registry):
     device = DEVICES[name]
