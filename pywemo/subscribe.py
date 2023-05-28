@@ -434,7 +434,7 @@ class SubscriptionRegistry:
         """Create the subscription registry object."""
         self.devices: dict[str, Device] = {}
         self._callbacks: dict[
-            Device, list[tuple[str, SubscriberCallback]]
+            Device, list[tuple[str | None, SubscriberCallback]]
         ] = collections.defaultdict(list)
         self._exiting = False
 
@@ -567,7 +567,10 @@ class SubscriptionRegistry:
                 callback(device, type_, value)
 
     def on(
-        self, device: Device, type_filter: str, callback: SubscriberCallback
+        self,
+        device: Device,
+        type_filter: str | None,
+        callback: SubscriberCallback,
     ) -> None:
         """Add an event callback for a device."""
         self._callbacks[device].append((type_filter, callback))
