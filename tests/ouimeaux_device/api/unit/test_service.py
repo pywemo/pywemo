@@ -27,8 +27,8 @@ MOCK_RESPONSE = (
     b'<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"'
     b' s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'
     b'<s:Body>\n<u:GetInsightParamsResponse xmlns:u="urn:Belkin:service:metainfo:1">'  # noqa: E501
-    b'\r\n<InsightParams>0|1604849509|85|1315|27628|1209600|772|0|21689183|386799026.000000|8000'  # noqa: E501
-    b'</InsightParams>\r\n</u:GetInsightParamsResponse>\r\n</s:Body> </s:Envelope>'  # noqa: E501
+    b"\r\n<InsightParams>0|1604849509|85|1315|27628|1209600|772|0|21689183|386799026.000000|8000"  # noqa: E501
+    b"</InsightParams>\r\n</u:GetInsightParamsResponse>\r\n</s:Body> </s:Envelope>"  # noqa: E501
 )
 
 
@@ -36,40 +36,40 @@ class TestSession:
     """Test the Session class."""
 
     def test_init_and_properties(self):
-        url = 'HTTP://1.2.3.4/setup/#'
+        url = "HTTP://1.2.3.4/setup/#"
         session = svc.Session(url, retries=3, timeout=4)
-        assert session.url == 'http://1.2.3.4/setup/'
-        assert session.host == '1.2.3.4'
+        assert session.url == "http://1.2.3.4/setup/"
+        assert session.host == "1.2.3.4"
         assert session.port == 80
         assert session.retries == 3
         assert session.timeout == 4
 
-        url = 'HTTP://5.6.7.8:9090/setup.xml'
+        url = "HTTP://5.6.7.8:9090/setup.xml"
         orig = session.url = url
         assert orig == url
-        assert session.url == 'http://5.6.7.8:9090/setup.xml'
-        assert session.host == '5.6.7.8'
+        assert session.url == "http://5.6.7.8:9090/setup.xml"
+        assert session.host == "5.6.7.8"
         assert session.port == 9090
 
-    @mock.patch('urllib3.PoolManager.request')
+    @mock.patch("urllib3.PoolManager.request")
     def test_404_raises(self, mock_request):
         response = mock.Mock()
         response.status = 404
         mock_request.return_value = response
 
-        session = svc.Session('http://1.2.3.4')
+        session = svc.Session("http://1.2.3.4")
         with pytest.raises(HTTPException):
-            session.get('/')
+            session.get("/")
 
     @mock.patch(
-        'urllib3.PoolManager.request', side_effect=urllib3.exceptions.HTTPError
+        "urllib3.PoolManager.request", side_effect=urllib3.exceptions.HTTPError
     )
     def test_urllib_raises_http_exception(self, mock_request):
-        session = svc.Session('http://1.2.3.4')
+        session = svc.Session("http://1.2.3.4")
         with pytest.raises(HTTPException):
-            session.get('/')
+            session.get("/")
 
-    @mock.patch('urllib3.PoolManager')
+    @mock.patch("urllib3.PoolManager")
     def test_arg_override(self, mock_poolmgr):
         pool = mock.Mock()
         mock_poolmgr.return_value.__enter__.return_value = pool
@@ -77,12 +77,12 @@ class TestSession:
         response.status = 200
         pool.request.return_value = response
 
-        session = svc.Session('http://1.2.3.4')
-        session.get('/', retries=3, timeout=4)
+        session = svc.Session("http://1.2.3.4")
+        session.get("/", retries=3, timeout=4)
         mock_poolmgr.assert_called_once_with(retries=3, timeout=4)
 
         mock_poolmgr.reset_mock()
-        session.post('/', retries=3, timeout=4)
+        session.post("/", retries=3, timeout=4)
         mock_poolmgr.assert_called_once_with(retries=3, timeout=4)
 
 
@@ -93,11 +93,11 @@ class TestAction:
     def get_mock_action(name="action_name", service_type="", url=""):
         device = mock.create_autospec(WeMoDevice)
         device.name = "device_name"
-        device.session = svc.Session('http://192.168.1.100:53892/')
+        device.session = svc.Session("http://192.168.1.100:53892/")
 
         service = mock.create_autospec(svc.Service)
         service.device = device
-        service.name = 'ServiceName'
+        service.name = "ServiceName"
         service.serviceType = service_type
         service.controlURL = url
 
@@ -108,7 +108,7 @@ class TestAction:
     @pytest.fixture(autouse=True)
     def mock_et_fromstring(self):
         resp = et.fromstring(MOCK_RESPONSE)
-        with mock.patch('lxml.etree.fromstring', return_value=resp) as mocked:
+        with mock.patch("lxml.etree.fromstring", return_value=resp) as mocked:
             yield mocked
 
     def test_call_post_request_is_made_exactly_once_when_successful(self):
@@ -173,7 +173,7 @@ class TestAction:
         assert actual_url == url
 
     @mock.patch(
-        'urllib3.PoolManager.request', side_effect=urllib3.exceptions.HTTPError
+        "urllib3.PoolManager.request", side_effect=urllib3.exceptions.HTTPError
     )
     def test_call_request_is_tried_up_to_max_on_communication_error(
         self, mock_request
@@ -188,7 +188,7 @@ class TestAction:
         assert mock_request.call_count == svc.Action.max_rediscovery_attempts
 
     @mock.patch(
-        'urllib3.PoolManager.request', side_effect=urllib3.exceptions.HTTPError
+        "urllib3.PoolManager.request", side_effect=urllib3.exceptions.HTTPError
     )
     def test_call_throws_when_final_retry_fails(self, mock_request):
         action = self.get_mock_action()

@@ -22,7 +22,7 @@ def interface_addresses() -> list[str]:
         for addr in iface.ips:
             if not (addr.is_IPv4 and isinstance(addr.ip, str)):
                 continue
-            if addr.ip == '127.0.0.1':
+            if addr.ip == "127.0.0.1":
                 continue
 
             addresses.append(addr.ip)
@@ -32,14 +32,14 @@ def interface_addresses() -> list[str]:
 
 def get_callback_address(host: str, port: int) -> str | None:
     """Return IP address & port used by devices to send event notifications."""
-    pywemo_callback_address = os.getenv('PYWEMO_CALLBACK_ADDRESS')
+    pywemo_callback_address = os.getenv("PYWEMO_CALLBACK_ADDRESS")
     if pywemo_callback_address is not None:
         return pywemo_callback_address
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
         sock.connect((host, 9))
-        return f'{sock.getsockname()[0]}:{port}'
+        return f"{sock.getsockname()[0]}:{port}"
     except OSError:
         return None
     finally:

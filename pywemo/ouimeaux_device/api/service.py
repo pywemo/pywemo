@@ -69,7 +69,7 @@ class Session:
 
     # Retry strategy for requests that fail.
     retries: int | urllib3.Retry | None = urllib3.Retry(
-        total=6, backoff_factor=1.5, allowed_methods=['GET', 'POST']
+        total=6, backoff_factor=1.5, allowed_methods=["GET", "POST"]
     )
 
     # Seconds that a request can be idle before retrying.
@@ -137,11 +137,11 @@ class Session:
 
     def get(self, url: str, **kwargs: Any) -> urllib3.HTTPResponse:
         """HTTP GET request."""
-        return self.request('GET', url, **kwargs)
+        return self.request("GET", url, **kwargs)
 
     def post(self, url: str, **kwargs: Any) -> urllib3.HTTPResponse:
         """HTTP POST request."""
-        return self.request('POST', url, **kwargs)
+        return self.request("POST", url, **kwargs)
 
     def urljoin(self, path: str) -> str:
         """Build an absolute URL from a path."""
@@ -191,10 +191,10 @@ class Action:
         """Create an instance of an Action."""
         self.name = action_config.name
         self.service = service
-        self.soap_action = f'{service.serviceType}#{self.name}'
+        self.soap_action = f"{service.serviceType}#{self.name}"
         self.headers = {
-            'Content-Type': 'text/xml',
-            'SOAPACTION': f'"{self.soap_action}"',
+            "Content-Type": "text/xml",
+            "SOAPACTION": f'"{self.soap_action}"',
         }
 
         self.args = [
@@ -212,8 +212,8 @@ class Action:
         self, *, pywemo_timeout: float | None = None, **kwargs: Any
     ) -> dict[str, str]:
         """Representations a method or function call."""
-        arglist = '\n'.join(
-            f'<{arg}>{value}</{arg}>' for arg, value in kwargs.items()
+        arglist = "\n".join(
+            f"<{arg}>{value}</{arg}>" for arg, value in kwargs.items()
         )
         body = REQUEST_TEMPLATE.format(
             action=self.name, service=self.service.serviceType, args=arglist
@@ -278,11 +278,11 @@ class Action:
 class Service(WeMoAllActionsMixin):
     """Representation of a service for a WeMo device."""
 
-    def __init__(self, device: 'Device', service: ServiceProperties) -> None:
+    def __init__(self, device: "Device", service: ServiceProperties) -> None:
         """Create an instance of a Service."""
         self.device = device
         self._config = service
-        self.name = self.serviceType.split(':')[-2]
+        self.name = self.serviceType.split(":")[-2]
         self.actions = {}
 
         url = device.session.urljoin(service.description_url)

@@ -26,10 +26,10 @@ class Test_F7C030(Base, long_press_helpers.TestLongPress):
 
     @pytest.fixture
     def lightswitch(self, vcr):
-        with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-LS'):
+        with vcr.use_cassette("WeMo_WW_2.00.11408.PVT-OWRT-LS"):
             return device_from_uuid_and_location(
-                'uuid:Lightswitch-1_0-SERIALNUMBER',
-                'http://192.168.1.100:49153/setup.xml',
+                "uuid:Lightswitch-1_0-SERIALNUMBER",
+                "http://192.168.1.100:49153/setup.xml",
             )
 
     device = lightswitch  # for TestLongPress
@@ -40,10 +40,10 @@ class Test_WLS040(Base, long_press_helpers.TestLongPress):
 
     @pytest.fixture
     def lightswitch(self, vcr):
-        with vcr.use_cassette('WeMo_WW_2.00.11563.PVT-OWRT-LIGHTV2-WLS040'):
+        with vcr.use_cassette("WeMo_WW_2.00.11563.PVT-OWRT-LIGHTV2-WLS040"):
             return device_from_uuid_and_location(
-                'uuid:Lightswitch-2_0-SERIALNUMBER',
-                'http://192.168.1.100:49153/setup.xml',
+                "uuid:Lightswitch-2_0-SERIALNUMBER",
+                "http://192.168.1.100:49153/setup.xml",
             )
 
     device = lightswitch  # for TestLongPress
@@ -54,10 +54,10 @@ class Test_WLS0403(Base, long_press_helpers.TestLongPress):
 
     @pytest.fixture
     def lightswitch(self, vcr):
-        with vcr.use_cassette('WeMo_WW_2.00.11563.PVT-OWRT-LIGHTV2-WLS0403'):
+        with vcr.use_cassette("WeMo_WW_2.00.11563.PVT-OWRT-LIGHTV2-WLS0403"):
             return device_from_uuid_and_location(
-                'uuid:Lightswitch-3_0-SERIALNUMBER',
-                'http://192.168.1.100:49153/setup.xml',
+                "uuid:Lightswitch-3_0-SERIALNUMBER",
+                "http://192.168.1.100:49153/setup.xml",
             )
 
     device = lightswitch  # for TestLongPress

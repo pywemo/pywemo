@@ -15,7 +15,7 @@ DISCOVER_TIMEOUT = 5
 
 LOG = logging.getLogger(__name__)
 
-RESPONSE_REGEX = re.compile(r'\n(.*)\: (.*)\r')
+RESPONSE_REGEX = re.compile(r"\n(.*)\: (.*)\r")
 
 MIN_TIME_BETWEEN_SCANS = timedelta(seconds=59)
 
@@ -24,7 +24,7 @@ MULTICAST_PORT = 1900
 
 # Wemo specific urn:
 ST = "urn:Belkin:service:basicevent:1"
-VIRTUAL_DEVICE_USN = f'{VIRTUAL_DEVICE_UDN}::{ST}'
+VIRTUAL_DEVICE_USN = f"{VIRTUAL_DEVICE_UDN}::{ST}"
 
 SSDP_REPLY = f"""HTTP/1.1 200 OK
 CACHE-CONTROL: max-age=86400
@@ -35,7 +35,7 @@ ST: {ST}
 USN: {VIRTUAL_DEVICE_USN}
 
 """  # Newline characters at the the end of SSDP_REPLY are intentional.
-SSDP_REPLY = SSDP_REPLY.replace('\n', '\r\n')
+SSDP_REPLY = SSDP_REPLY.replace("\n", "\r\n")
 
 SSDP_NOTIFY = f"""NOTIFY * HTTP/1.1
 HOST: {MULTICAST_GROUP}:{MULTICAST_PORT}
@@ -47,7 +47,7 @@ NTS: ssdp:alive
 USN: {VIRTUAL_DEVICE_USN}
 
 """  # Newline characters at the the end of SSDP_NOTIFY are intentional.
-SSDP_NOTIFY = SSDP_NOTIFY.replace('\n', '\r\n')
+SSDP_NOTIFY = SSDP_NOTIFY.replace("\n", "\r\n")
 
 EXPECTED_ST_HEADER = ("ST: " + ST).encode("UTF-8")
 EXPECTED_MAN_HEADER = b'MAN: "ssdp:discover"'
@@ -62,31 +62,31 @@ class UPNPEntry:
         self._created = datetime.now()
         self._expires: datetime | None = None
 
-        if 'cache-control' in self.values:
-            cache_seconds = int(self.values['cache-control'].split('=')[1])
+        if "cache-control" in self.values:
+            cache_seconds = int(self.values["cache-control"].split("=")[1])
 
             self._expires = self._created + timedelta(seconds=cache_seconds)
 
     @property
     def st(self) -> str | None:
         """Return ST value."""
-        return self.values.get('st')
+        return self.values.get("st")
 
     @property
     def location(self) -> str | None:
         """Return location value."""
-        return self.values.get('location')
+        return self.values.get("location")
 
     @property
     def usn(self) -> str | None:
         """Return unique service name."""
-        return self.values.get('usn')
+        return self.values.get("usn")
 
     @property
     def udn(self) -> str:
         """Return unique device name."""
-        usn = self.usn or ''
-        return usn.split('::')[0]
+        usn = self.usn or ""
+        return usn.split("::")[0]
 
     @classmethod
     def from_response(cls, response: str) -> UPNPEntry:
@@ -109,13 +109,13 @@ class UPNPEntry:
 
     def __hash__(self) -> int:
         """Generate hash of instance."""
-        return hash(('UPNPEntry', self._key))
+        return hash(("UPNPEntry", self._key))
 
     def __repr__(self) -> str:
         """Return the string representation of the object."""
-        st = self.st or ''
-        location = self.location or ''
-        udn = self.udn or ''
+        st = self.st or ""
+        location = self.location or ""
+        udn = self.udn or ""
         return f"<UPNPEntry {st} - {location} - {udn}>"
 
 
@@ -123,15 +123,15 @@ def build_ssdp_request(ssdp_st: str, ssdp_mx: int) -> bytes:
     """Build the standard request to send during SSDP discovery."""
     return "\r\n".join(
         [
-            'M-SEARCH * HTTP/1.1',
-            f'ST: {ssdp_st}',
-            f'MX: {ssdp_mx}',
+            "M-SEARCH * HTTP/1.1",
+            f"ST: {ssdp_st}",
+            f"MX: {ssdp_mx}",
             'MAN: "ssdp:discover"',
-            f'HOST: {MULTICAST_GROUP}:{MULTICAST_PORT}',
-            '',
-            '',
+            f"HOST: {MULTICAST_GROUP}:{MULTICAST_PORT}",
+            "",
+            "",
         ]
-    ).encode('ascii')
+    ).encode("ascii")
 
 
 def scan(
@@ -327,7 +327,7 @@ class DiscoveryResponder:
         self._thread_exception = None
         self._thread = threading.Thread(
             target=self.respond_to_discovery,
-            name='Wemo DiscoveryResponder Thread',
+            name="Wemo DiscoveryResponder Thread",
         )
         self._thread.start()
 

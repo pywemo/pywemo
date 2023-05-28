@@ -33,7 +33,7 @@ def generate_module(xsd_path: str) -> None:
         existing = in_file.read()
     if existing != module:
         # Write the Python module.
-        with open(existing_path, 'w', encoding="utf-8") as out_file:
+        with open(existing_path, "w", encoding="utf-8") as out_file:
             out_file.write(module)
         print(f"Wrote {existing_path}")
 

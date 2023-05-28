@@ -53,7 +53,7 @@ def probe_wemo(
     for port in ports:
         try:
             response = requests.get(
-                f'http://{host}:{port}/setup.xml', timeout=probe_timeout
+                f"http://{host}:{port}/setup.xml", timeout=probe_timeout
             )
             try:
                 device = DeviceDescription.from_xml(response.content)
@@ -61,8 +61,8 @@ def probe_wemo(
                 continue
             if match_udn and match_udn != device.udn:
                 LOG.error(
-                    'Reconnected to a different WeMo. '
-                    'Expected %s / Received %s',
+                    "Reconnected to a different WeMo. "
+                    "Expected %s / Received %s",
                     match_udn,
                     device.udn,
                 )
@@ -72,7 +72,7 @@ def probe_wemo(
             # If we timed out connecting, then the wemo is gone,
             # no point in trying further.
             LOG.debug(
-                'Timed out connecting to %s on port %i, wemo is offline',
+                "Timed out connecting to %s on port %i, wemo is offline",
                 host,
                 port,
             )
@@ -81,7 +81,7 @@ def probe_wemo(
             # Apparently sometimes wemos get into a wedged state where
             # they still accept connections on an old port, but do not
             # respond. If that happens, we should keep searching.
-            LOG.debug('No response from %s on port %i, continuing', host, port)
+            LOG.debug("No response from %s on port %i, continuing", host, port)
             continue
         except requests.exceptions.ConnectionError:
             pass
@@ -159,11 +159,11 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         port = probe_device(self)
 
         if port is None:
-            LOG.error('Unable to re-probe wemo %s at %s', self, self.host)
+            LOG.error("Unable to re-probe wemo %s at %s", self, self.host)
             return False
 
-        LOG.info('Reconnected to wemo %s on port %i', self, port)
-        self.session.url = f'http://{self.host}:{port}/setup.xml'
+        LOG.info("Reconnected to wemo %s on port %i", self, port)
+        self.session.url = f"http://{self.host}:{port}/setup.xml"
         return True
 
     def reconnect_with_device(self) -> None:
@@ -186,7 +186,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         #   1
         # In both formats, the first integer value indicates the state.
         # 0 if off, 1 if on,
-        return {'state': params.split('|')[0]}
+        return {"state": params.split("|")[0]}
 
     def update_binary_state(self) -> None:
         """Update the cached copy of the basic state response."""
@@ -216,7 +216,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
             try:
                 self._state = int(
-                    self.basic_state_params.get('BinaryState', 0)
+                    self.basic_state_params.get("BinaryState", 0)
                 )
             except ValueError:
                 self._state = 0
@@ -238,14 +238,14 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         """Print information about the device and its actions."""
         for name, svc in self.services.items():
             print(name)
-            print('-' * len(name))
+            print("-" * len(name))
             for aname, action in svc.actions.items():
-                inputs = ', '.join(str(val) for val in action.args)
-                outputs = ', '.join(str(val) for val in action.returns)
+                inputs = ", ".join(str(val) for val in action.args)
+                outputs = ", ".join(str(val) for val in action.returns)
                 if len(action.returns) > 1:
-                    outputs = '(' + outputs + ')'
+                    outputs = "(" + outputs + ")"
                 if outputs:
-                    outputs = ' -> ' + outputs
+                    outputs = " -> " + outputs
                 print(f"  {aname}({inputs}){outputs}")
             print()
 
@@ -281,32 +281,32 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             action = self.basicevent.ReSetup
         except AttributeError as exc:
             raise ResetException(
-                'Cannot reset device: ReSetup action not found'
+                "Cannot reset device: ReSetup action not found"
             ) from exc
 
         if data and wifi:
-            LOG.info('Clearing data and wifi (factory reset)')
+            LOG.info("Clearing data and wifi (factory reset)")
             result = action(Reset=2)
         elif data:
-            LOG.info('Clearing data (icon, rules, etc)')
+            LOG.info("Clearing data (icon, rules, etc)")
             result = action(Reset=1)
         elif wifi:
-            LOG.info('Clearing wifi information')
+            LOG.info("Clearing wifi information")
             result = action(Reset=5)
         else:
-            raise ResetException('no action requested')
+            raise ResetException("no action requested")
 
         try:
-            status = result['Reset'].strip().lower()
+            status = result["Reset"].strip().lower()
         except KeyError:
-            status = 'unknown'
+            status = "unknown"
 
-        if status == 'success':
-            LOG.info('reset successful')
+        if status == "success":
+            LOG.info("reset successful")
         else:
             # one test unit always returns "reset_remote" here instead of
             # "success", but it appears to still reset successfully
-            LOG.warning('result of reset (may be successful): %s', status)
+            LOG.warning("result of reset (may be successful): %s", status)
 
         return status
 
@@ -325,7 +325,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         https://github.com/vadimkantorov/wemosetup
         """
         if not password:
-            raise SetupException('password required for AES')
+            raise SetupException("password required for AES")
 
         # Wemo uses some meta information for salt and iv
         meta_info = MetaInfo.from_meta_info(wemo_metadata)
@@ -333,41 +333,41 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             meta_info.mac[:6] + meta_info.serial_number + meta_info.mac[6:12]
         )
         if is_rtos:
-            keydata += 'b3{8t;80dIN{ra83eC1s?M70?683@2Yf'
+            keydata += "b3{8t;80dIN{ra83eC1s?M70?683@2Yf"
 
         salt, initialization_vector = keydata[:8], keydata[:16]
         if len(salt) != 8 or len(initialization_vector) != 16:
-            LOG.warning('device meta information may not be supported')
+            LOG.warning("device meta information may not be supported")
 
         # call OpenSSL to encrypt the data
         try:
             openssl = subprocess.run(
                 [
-                    'openssl',
-                    'enc',
-                    '-aes-128-cbc',
-                    '-md',
-                    'md5',
-                    '-S',
-                    salt.encode('utf-8').hex(),
-                    '-iv',
-                    initialization_vector.encode('utf-8').hex(),
-                    '-pass',
-                    'pass:' + keydata,
+                    "openssl",
+                    "enc",
+                    "-aes-128-cbc",
+                    "-md",
+                    "md5",
+                    "-S",
+                    salt.encode("utf-8").hex(),
+                    "-iv",
+                    initialization_vector.encode("utf-8").hex(),
+                    "-pass",
+                    "pass:" + keydata,
                 ],
                 check=True,
                 capture_output=True,
-                input=password.encode('utf-8'),
+                input=password.encode("utf-8"),
             )
         except FileNotFoundError as exc:
             raise SetupException(
-                'openssl command failed (openssl not installed / not on path?)'
+                "openssl command failed (openssl not installed / not on path?)"
             ) from exc
         except subprocess.CalledProcessError as exc:
-            raise SetupException('openssl command failed') from exc
+            raise SetupException("openssl command failed") from exc
 
         output = openssl.stdout
-        if output.startswith(b'Salted__'):
+        if output.startswith(b"Salted__"):
             # remove 16byte magic and salt prefix inserted by OpenSSL, which
             # is of the form "Salted__XXXXXXXX" before the actual password
             output = output[16:]
@@ -378,19 +378,19 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         #     yy: length of the original password as hexadecimal
         n_encrypted = len(encrypted_password)
         n_password = len(password)
-        LOG.debug('password length (before encryption): %s', n_password)
-        LOG.debug('password length (after encryption): %s', n_encrypted)
+        LOG.debug("password length (before encryption): %s", n_password)
+        LOG.debug("password length (after encryption): %s", n_encrypted)
         if n_encrypted > 255 or n_password > 255:
             # untested, but over 255 characters would require >2 hex digits
             raise SetupException(
-                'Wemo requires the wifi password (including after encryption) '
-                'to be 255 or less characters, but found password of length '
-                f'{n_password} (and {n_encrypted} after encryption).'
+                "Wemo requires the wifi password (including after encryption) "
+                "to be 255 or less characters, but found password of length "
+                f"{n_password} (and {n_encrypted} after encryption)."
             )
 
         if not is_rtos:
-            encrypted_password += f'{n_encrypted:#04x}'[2:]
-            encrypted_password += f'{n_password:#04x}'[2:]
+            encrypted_password += f"{n_encrypted:#04x}"[2:]
+            encrypted_password += f"{n_password:#04x}"[2:]
         return encrypted_password
 
     def setup(self, *args: Any, **kwargs: Any) -> tuple[str, str]:
@@ -442,7 +442,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             #    KeyError        | an expected result (return from an action)
             #                    | does not exist (e.g. ApList)
             #    --------------------------------------------------------------
-            raise SetupException(f'pywemo cannot setup {self}') from exc
+            raise SetupException(f"pywemo cannot setup {self}") from exc
         except ActionException as exc:
             #    Exception       | Reason to catch it
             #    --------------------------------------------------------------
@@ -451,9 +451,9 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             #                    | lost power (been unplugged).
             #    --------------------------------------------------------------
             raise SetupException(
-                f'pywemo lost device {self} and was unable to reconnect.  '
-                'Setup status is uncertain, re-probing and checking is '
-                'required.'
+                f"pywemo lost device {self} and was unable to reconnect.  "
+                "Setup status is uncertain, re-probing and checking is "
+                "required."
             ) from exc
 
     def _setup(  # noqa: C901
@@ -477,49 +477,49 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
         # find all access points that the device can see, and select the one
         # matching the desired SSID
-        LOG.info('scanning for AP\'s...')
-        wifisetup = self.get_service('WiFiSetup')
-        access_points = wifisetup.GetApList()['ApList']
+        LOG.info("scanning for AP's...")
+        wifisetup = self.get_service("WiFiSetup")
+        access_points = wifisetup.GetApList()["ApList"]
 
         selected_ap = None
-        for access_point in access_points.split('\n')[1:]:
-            access_point = access_point.strip().rstrip(',')
-            if not access_point.strip() or '|' not in access_point:
+        for access_point in access_points.split("\n")[1:]:
+            access_point = access_point.strip().rstrip(",")
+            if not access_point.strip() or "|" not in access_point:
                 continue
-            LOG.debug('found AP: %s', access_point)
-            if access_point.startswith(f'{ssid}|'):
+            LOG.debug("found AP: %s", access_point)
+            if access_point.startswith(f"{ssid}|"):
                 selected_ap = access_point
-                LOG.info('selecting AP: %s', selected_ap)
+                LOG.info("selecting AP: %s", selected_ap)
                 break
 
         if selected_ap is None:
-            raise APNotFound(f'AP with SSID {ssid} not found.  Try again.')
+            raise APNotFound(f"AP with SSID {ssid} not found.  Try again.")
 
         # get some information about the access point
-        columns = selected_ap.split('|')
+        columns = selected_ap.split("|")
         channel = columns[1].strip()
-        auth_mode, encryption_method = columns[-1].strip().split('/')
-        LOG.debug('AP channel: %s', channel)
-        LOG.debug('AP authorization mode(s): %s', auth_mode)
-        LOG.debug('AP encryption method: %s', encryption_method)
+        auth_mode, encryption_method = columns[-1].strip().split("/")
+        LOG.debug("AP channel: %s", channel)
+        LOG.debug("AP authorization mode(s): %s", auth_mode)
+        LOG.debug("AP encryption method: %s", encryption_method)
 
         # check if the encryption type is supported by this script
-        supported_encryptions = {'NONE', 'AES'}
+        supported_encryptions = {"NONE", "AES"}
         if encryption_method not in supported_encryptions:
             raise SetupException(
-                f'Encryption {encryption_method} not currently supported.  '
+                f"Encryption {encryption_method} not currently supported.  "
                 f'Supported encryptions are: {",".join(supported_encryptions)}'
             )
 
         # try to connect the device to the selected network
-        if encryption_method == 'NONE':
-            LOG.debug('selected network has no encryption (password ignored)')
-            auth_mode = 'OPEN'
-            encrypted_password = ''
+        if encryption_method == "NONE":
+            LOG.debug("selected network has no encryption (password ignored)")
+            auth_mode = "OPEN"
+            encrypted_password = ""
         else:
             # get the meta information of the device and encrypt the password
-            meta_info = self.get_service('metainfo').GetMetaInfo()['MetaInfo']
-            is_rtos = self._config_any.get('rtos', '0') == '1'
+            meta_info = self.get_service("metainfo").GetMetaInfo()["MetaInfo"]
+            is_rtos = self._config_any.get("rtos", "0") == "1"
             encrypted_password = self.encrypt_aes128(
                 password, meta_info, is_rtos
             )
@@ -534,10 +534,10 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         #     3: performing handshake? (uncertain, but devices generally
         #        go to status 3 for a few moments before switching to
         #        successful status 1)
-        skip = {'1', '2'}
+        skip = {"1", "2"}
 
         for attempt in range(connection_attempts):
-            LOG.info('sending connection request (try %s)', attempt + 1)
+            LOG.info("sending connection request (try %s)", attempt + 1)
             # success rate is much higher if the ConnectHomeNetwork command is
             # sent twice (not sure why!)
             for i in range(2):
@@ -549,29 +549,29 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                     channel=channel,
                 )
                 try:
-                    status = result['PairingStatus']
+                    status = result["PairingStatus"]
                 except KeyError:
                     # print entire dictionary if PairingStatus doesn't exist
                     status = repr(result)
-                LOG.debug('pairing status (send %s): %s', i + 1, status)
+                LOG.debug("pairing status (send %s): %s", i + 1, status)
                 if i == 0:
                     # only delay on the first call
                     time.sleep(0.10)
 
             timeout_start = time.time()
-            LOG.info('starting status checks (%s second timeout)', timeout)
-            status = ''
+            LOG.info("starting status checks (%s second timeout)", timeout)
+            status = ""
 
             # Make an initial, quicker check
             time.sleep(min(0.50, status_delay / 3.0))
-            status = wifisetup.GetNetworkStatus()['NetworkStatus']
-            LOG.debug('initial status check: %s', status)
+            status = wifisetup.GetNetworkStatus()["NetworkStatus"]
+            LOG.debug("initial status check: %s", status)
 
             while time.time() - timeout_start < timeout and status not in skip:
                 time.sleep(status_delay)
-                status = wifisetup.GetNetworkStatus()['NetworkStatus']
+                status = wifisetup.GetNetworkStatus()["NetworkStatus"]
                 LOG.debug(
-                    'network status after %.2f seconds: %s',
+                    "network status after %.2f seconds: %s",
                     time.time() - timeout_start,
                     status,
                 )
@@ -582,71 +582,71 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         # status 3 usually (always?) occurs shortly before it switches to
         # status 1, so if the status is 3 here, then delay a few more seconds
         # to see if it switches to status 1.
-        if status == '3':
-            LOG.debug('delaying a little longer (status 3)...')
+        if status == "3":
+            LOG.debug("delaying a little longer (status 3)...")
             loops = 3  # 3 seconds with default status_delay
             while loops > 0 and status not in skip:
                 time.sleep(status_delay)
-                status = wifisetup.GetNetworkStatus()['NetworkStatus']
+                status = wifisetup.GetNetworkStatus()["NetworkStatus"]
                 loops -= 1
 
         try:
             result = wifisetup.CloseSetup()
         except AttributeError:
             # if CloseSetup doesn't exist, it may still work
-            result = {'status': 'CloseSetup action not available'}
+            result = {"status": "CloseSetup action not available"}
 
         try:
-            close_status = result['status']
+            close_status = result["status"]
         except KeyError:
             # print entire dictionary if status doesn't exist
             close_status = repr(result)
-        LOG.debug('network status: %s', status)
-        LOG.debug('close status: %s', close_status)
+        LOG.debug("network status: %s", status)
+        LOG.debug("close status: %s", close_status)
 
-        if status == '2':
+        if status == "2":
             # we could check the password length way earlier (start of the
             # function), but perhaps Wemo will change this requirement some
             # day to make it longer, so instead just use the status '2' return
             # code.
             raise ShortPassword(
-                'Password is too short (Wemo requires at least 8 characters).'
+                "Password is too short (Wemo requires at least 8 characters)."
             )
 
-        if status == '1' and close_status == 'success':
+        if status == "1" and close_status == "success":
             try:
                 self.basicevent.SetSetupDoneStatus()
             except AttributeError:
                 LOG.debug(
-                    'SetSetupDoneStatus not available (some devices do not '
-                    'have this method)'
+                    "SetSetupDoneStatus not available (some devices do not "
+                    "have this method)"
                 )
             LOG.info(
                 'Wemo device connected to "%s" in %.2f seconds (%s connection '
-                'attempts(s))',
+                "attempts(s))",
                 ssid,
                 time.time() - start_time,
                 attempt + 1,
             )
-        elif status == '1':
+        elif status == "1":
             LOG.warning(
                 'Wemo device likely connected to "%s", but should be verified '
                 '(CloseSetup returned "%s").',
                 ssid,
                 close_status,
             )
-        elif status == '3':
+        elif status == "3":
             raise SetupException(
                 f'Wemo device failed to connect to "{ssid}", but has status=3,'
-                'which usually precedes a successful connection.  Thus it may '
-                'still connect to the network shortly.  Otherwise, please try '
-                'again.'
+                "which usually precedes a successful connection.  Thus it may "
+                "still connect to the network shortly.  Otherwise, please try "
+                "again."
             )
         else:
             raise SetupException(
                 f'Wemo device failed to connect to "{ssid}".  It could be a '
-                'wrong password or Wemo device/firmware issue.  Please try '
-                'again.'
+                "wrong password or Wemo device/firmware issue.  Please try "
+                "again."
             )
 
         return status, close_status

@@ -191,7 +191,7 @@ except ModulenotfoundExp_ as exp:
 
     class GeneratedsSuper(GeneratedsSuperSuper):
         __hash__ = object.__hash__
-        tzoff_pattern = re_.compile(r'(\+|-)((0\d|1[0-3]):[0-5]\d|14:00)$')
+        tzoff_pattern = re_.compile(r"(\+|-)((0\d|1[0-3]):[0-5]\d|14:00)$")
 
         class _FixedOffsetTZ(datetime_.tzinfo):
             def __init__(self, offset, name):
@@ -209,11 +209,11 @@ except ModulenotfoundExp_ as exp:
 
         def __str__(self):
             settings = {
-                'str_pretty_print': True,
-                'str_indent_level': 0,
-                'str_namespaceprefix': '',
-                'str_name': self.__class__.__name__,
-                'str_namespacedefs': '',
+                "str_pretty_print": True,
+                "str_indent_level": 0,
+                "str_namespaceprefix": "",
+                "str_name": self.__class__.__name__,
+                "str_namespacedefs": "",
             }
             for n in settings:
                 if hasattr(self, n):
@@ -225,60 +225,60 @@ except ModulenotfoundExp_ as exp:
             output = StringIO()
             self.export(
                 output,
-                settings['str_indent_level'],
-                pretty_print=settings['str_pretty_print'],
-                namespaceprefix_=settings['str_namespaceprefix'],
-                name_=settings['str_name'],
-                namespacedef_=settings['str_namespacedefs'],
+                settings["str_indent_level"],
+                pretty_print=settings["str_pretty_print"],
+                namespaceprefix_=settings["str_namespaceprefix"],
+                name_=settings["str_name"],
+                namespacedef_=settings["str_namespacedefs"],
             )
             strval = output.getvalue()
             output.close()
             return strval
 
-        def gds_format_string(self, input_data, input_name=''):
+        def gds_format_string(self, input_data, input_name=""):
             return input_data
 
-        def gds_parse_string(self, input_data, node=None, input_name=''):
+        def gds_parse_string(self, input_data, node=None, input_name=""):
             return input_data
 
-        def gds_validate_string(self, input_data, node=None, input_name=''):
+        def gds_validate_string(self, input_data, node=None, input_name=""):
             if not input_data:
-                return ''
+                return ""
             else:
                 return input_data
 
-        def gds_format_base64(self, input_data, input_name=''):
-            return base64.b64encode(input_data).decode('ascii')
+        def gds_format_base64(self, input_data, input_name=""):
+            return base64.b64encode(input_data).decode("ascii")
 
-        def gds_validate_base64(self, input_data, node=None, input_name=''):
+        def gds_validate_base64(self, input_data, node=None, input_name=""):
             return input_data
 
-        def gds_format_integer(self, input_data, input_name=''):
-            return '%d' % int(input_data)
+        def gds_format_integer(self, input_data, input_name=""):
+            return "%d" % int(input_data)
 
-        def gds_parse_integer(self, input_data, node=None, input_name=''):
+        def gds_parse_integer(self, input_data, node=None, input_name=""):
             try:
                 ival = int(input_data)
             except (TypeError, ValueError) as exp:
-                raise_parse_error(node, 'Requires integer value: %s' % exp)
+                raise_parse_error(node, "Requires integer value: %s" % exp)
             return ival
 
-        def gds_validate_integer(self, input_data, node=None, input_name=''):
+        def gds_validate_integer(self, input_data, node=None, input_name=""):
             try:
                 value = int(input_data)
             except (TypeError, ValueError):
-                raise_parse_error(node, 'Requires integer value')
+                raise_parse_error(node, "Requires integer value")
             return value
 
-        def gds_format_integer_list(self, input_data, input_name=''):
+        def gds_format_integer_list(self, input_data, input_name=""):
             if len(input_data) > 0 and not isinstance(
                 input_data[0], BaseStrType_
             ):
                 input_data = [str(s) for s in input_data]
-            return '%s' % ' '.join(input_data)
+            return "%s" % " ".join(input_data)
 
         def gds_validate_integer_list(
-            self, input_data, node=None, input_name=''
+            self, input_data, node=None, input_name=""
         ):
             values = input_data.split()
             for value in values:
@@ -286,41 +286,41 @@ except ModulenotfoundExp_ as exp:
                     int(value)
                 except (TypeError, ValueError):
                     raise_parse_error(
-                        node, 'Requires sequence of integer values'
+                        node, "Requires sequence of integer values"
                     )
             return values
 
-        def gds_format_float(self, input_data, input_name=''):
-            value = ('%.15f' % float(input_data)).rstrip('0')
-            if value.endswith('.'):
-                value += '0'
+        def gds_format_float(self, input_data, input_name=""):
+            value = ("%.15f" % float(input_data)).rstrip("0")
+            if value.endswith("."):
+                value += "0"
             return value
 
-        def gds_parse_float(self, input_data, node=None, input_name=''):
+        def gds_parse_float(self, input_data, node=None, input_name=""):
             try:
                 fval_ = float(input_data)
             except (TypeError, ValueError) as exp:
                 raise_parse_error(
-                    node, 'Requires float or double value: %s' % exp
+                    node, "Requires float or double value: %s" % exp
                 )
             return fval_
 
-        def gds_validate_float(self, input_data, node=None, input_name=''):
+        def gds_validate_float(self, input_data, node=None, input_name=""):
             try:
                 value = float(input_data)
             except (TypeError, ValueError):
-                raise_parse_error(node, 'Requires float value')
+                raise_parse_error(node, "Requires float value")
             return value
 
-        def gds_format_float_list(self, input_data, input_name=''):
+        def gds_format_float_list(self, input_data, input_name=""):
             if len(input_data) > 0 and not isinstance(
                 input_data[0], BaseStrType_
             ):
                 input_data = [str(s) for s in input_data]
-            return '%s' % ' '.join(input_data)
+            return "%s" % " ".join(input_data)
 
         def gds_validate_float_list(
-            self, input_data, node=None, input_name=''
+            self, input_data, node=None, input_name=""
         ):
             values = input_data.split()
             for value in values:
@@ -328,43 +328,43 @@ except ModulenotfoundExp_ as exp:
                     float(value)
                 except (TypeError, ValueError):
                     raise_parse_error(
-                        node, 'Requires sequence of float values'
+                        node, "Requires sequence of float values"
                     )
             return values
 
-        def gds_format_decimal(self, input_data, input_name=''):
-            return_value = '%s' % input_data
-            if '.' in return_value:
-                return_value = return_value.rstrip('0')
-                if return_value.endswith('.'):
-                    return_value = return_value.rstrip('.')
+        def gds_format_decimal(self, input_data, input_name=""):
+            return_value = "%s" % input_data
+            if "." in return_value:
+                return_value = return_value.rstrip("0")
+                if return_value.endswith("."):
+                    return_value = return_value.rstrip(".")
             return return_value
 
-        def gds_parse_decimal(self, input_data, node=None, input_name=''):
+        def gds_parse_decimal(self, input_data, node=None, input_name=""):
             try:
                 decimal_value = decimal_.Decimal(input_data)
             except (TypeError, ValueError):
-                raise_parse_error(node, 'Requires decimal value')
+                raise_parse_error(node, "Requires decimal value")
             return decimal_value
 
-        def gds_validate_decimal(self, input_data, node=None, input_name=''):
+        def gds_validate_decimal(self, input_data, node=None, input_name=""):
             try:
                 value = decimal_.Decimal(input_data)
             except (TypeError, ValueError):
-                raise_parse_error(node, 'Requires decimal value')
+                raise_parse_error(node, "Requires decimal value")
             return value
 
-        def gds_format_decimal_list(self, input_data, input_name=''):
+        def gds_format_decimal_list(self, input_data, input_name=""):
             if len(input_data) > 0 and not isinstance(
                 input_data[0], BaseStrType_
             ):
                 input_data = [str(s) for s in input_data]
-            return ' '.join(
+            return " ".join(
                 [self.gds_format_decimal(item) for item in input_data]
             )
 
         def gds_validate_decimal_list(
-            self, input_data, node=None, input_name=''
+            self, input_data, node=None, input_name=""
         ):
             values = input_data.split()
             for value in values:
@@ -372,38 +372,38 @@ except ModulenotfoundExp_ as exp:
                     decimal_.Decimal(value)
                 except (TypeError, ValueError):
                     raise_parse_error(
-                        node, 'Requires sequence of decimal values'
+                        node, "Requires sequence of decimal values"
                     )
             return values
 
-        def gds_format_double(self, input_data, input_name=''):
-            return '%s' % input_data
+        def gds_format_double(self, input_data, input_name=""):
+            return "%s" % input_data
 
-        def gds_parse_double(self, input_data, node=None, input_name=''):
+        def gds_parse_double(self, input_data, node=None, input_name=""):
             try:
                 fval_ = float(input_data)
             except (TypeError, ValueError) as exp:
                 raise_parse_error(
-                    node, 'Requires double or float value: %s' % exp
+                    node, "Requires double or float value: %s" % exp
                 )
             return fval_
 
-        def gds_validate_double(self, input_data, node=None, input_name=''):
+        def gds_validate_double(self, input_data, node=None, input_name=""):
             try:
                 value = float(input_data)
             except (TypeError, ValueError):
-                raise_parse_error(node, 'Requires double or float value')
+                raise_parse_error(node, "Requires double or float value")
             return value
 
-        def gds_format_double_list(self, input_data, input_name=''):
+        def gds_format_double_list(self, input_data, input_name=""):
             if len(input_data) > 0 and not isinstance(
                 input_data[0], BaseStrType_
             ):
                 input_data = [str(s) for s in input_data]
-            return '%s' % ' '.join(input_data)
+            return "%s" % " ".join(input_data)
 
         def gds_validate_double_list(
-            self, input_data, node=None, input_name=''
+            self, input_data, node=None, input_name=""
         ):
             values = input_data.split()
             for value in values:
@@ -411,24 +411,24 @@ except ModulenotfoundExp_ as exp:
                     float(value)
                 except (TypeError, ValueError):
                     raise_parse_error(
-                        node, 'Requires sequence of double or float values'
+                        node, "Requires sequence of double or float values"
                     )
             return values
 
-        def gds_format_boolean(self, input_data, input_name=''):
-            return ('%s' % input_data).lower()
+        def gds_format_boolean(self, input_data, input_name=""):
+            return ("%s" % input_data).lower()
 
-        def gds_parse_boolean(self, input_data, node=None, input_name=''):
+        def gds_parse_boolean(self, input_data, node=None, input_name=""):
             input_data = input_data.strip()
-            if input_data in ('true', '1'):
+            if input_data in ("true", "1"):
                 bval = True
-            elif input_data in ('false', '0'):
+            elif input_data in ("false", "0"):
                 bval = False
             else:
-                raise_parse_error(node, 'Requires boolean value')
+                raise_parse_error(node, "Requires boolean value")
             return bval
 
-        def gds_validate_boolean(self, input_data, node=None, input_name=''):
+        def gds_validate_boolean(self, input_data, node=None, input_name=""):
             if input_data not in (
                 True,
                 1,
@@ -437,19 +437,19 @@ except ModulenotfoundExp_ as exp:
             ):
                 raise_parse_error(
                     node,
-                    'Requires boolean value ' '(one of True, 1, False, 0)',
+                    "Requires boolean value " "(one of True, 1, False, 0)",
                 )
             return input_data
 
-        def gds_format_boolean_list(self, input_data, input_name=''):
+        def gds_format_boolean_list(self, input_data, input_name=""):
             if len(input_data) > 0 and not isinstance(
                 input_data[0], BaseStrType_
             ):
                 input_data = [str(s) for s in input_data]
-            return '%s' % ' '.join(input_data)
+            return "%s" % " ".join(input_data)
 
         def gds_validate_boolean_list(
-            self, input_data, node=None, input_name=''
+            self, input_data, node=None, input_name=""
         ):
             values = input_data.split()
             for value in values:
@@ -462,17 +462,17 @@ except ModulenotfoundExp_ as exp:
                 ):
                     raise_parse_error(
                         node,
-                        'Requires sequence of boolean values '
-                        '(one of True, 1, False, 0)',
+                        "Requires sequence of boolean values "
+                        "(one of True, 1, False, 0)",
                     )
             return values
 
-        def gds_validate_datetime(self, input_data, node=None, input_name=''):
+        def gds_validate_datetime(self, input_data, node=None, input_name=""):
             return input_data
 
-        def gds_format_datetime(self, input_data, input_name=''):
+        def gds_format_datetime(self, input_data, input_name=""):
             if input_data.microsecond == 0:
-                _svalue = '%04d-%02d-%02dT%02d:%02d:%02d' % (
+                _svalue = "%04d-%02d-%02dT%02d:%02d:%02d" % (
                     input_data.year,
                     input_data.month,
                     input_data.day,
@@ -481,71 +481,71 @@ except ModulenotfoundExp_ as exp:
                     input_data.second,
                 )
             else:
-                _svalue = '%04d-%02d-%02dT%02d:%02d:%02d.%s' % (
+                _svalue = "%04d-%02d-%02dT%02d:%02d:%02d.%s" % (
                     input_data.year,
                     input_data.month,
                     input_data.day,
                     input_data.hour,
                     input_data.minute,
                     input_data.second,
-                    ('%f' % (float(input_data.microsecond) / 1000000))[2:],
+                    ("%f" % (float(input_data.microsecond) / 1000000))[2:],
                 )
             if input_data.tzinfo is not None:
                 tzoff = input_data.tzinfo.utcoffset(input_data)
                 if tzoff is not None:
                     total_seconds = tzoff.seconds + (86400 * tzoff.days)
                     if total_seconds == 0:
-                        _svalue += 'Z'
+                        _svalue += "Z"
                     else:
                         if total_seconds < 0:
-                            _svalue += '-'
+                            _svalue += "-"
                             total_seconds *= -1
                         else:
-                            _svalue += '+'
+                            _svalue += "+"
                         hours = total_seconds // 3600
                         minutes = (total_seconds - (hours * 3600)) // 60
-                        _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
+                        _svalue += "{0:02d}:{1:02d}".format(hours, minutes)
             return _svalue
 
         @classmethod
         def gds_parse_datetime(cls, input_data):
             tz = None
-            if input_data[-1] == 'Z':
-                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+            if input_data[-1] == "Z":
+                tz = GeneratedsSuper._FixedOffsetTZ(0, "UTC")
                 input_data = input_data[:-1]
             else:
                 results = GeneratedsSuper.tzoff_pattern.search(input_data)
                 if results is not None:
-                    tzoff_parts = results.group(2).split(':')
+                    tzoff_parts = results.group(2).split(":")
                     tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
-                    if results.group(1) == '-':
+                    if results.group(1) == "-":
                         tzoff *= -1
                     tz = GeneratedsSuper._FixedOffsetTZ(
                         tzoff, results.group(0)
                     )
                     input_data = input_data[:-6]
-            time_parts = input_data.split('.')
+            time_parts = input_data.split(".")
             if len(time_parts) > 1:
-                micro_seconds = int(float('0.' + time_parts[1]) * 1000000)
-                input_data = '%s.%s' % (
+                micro_seconds = int(float("0." + time_parts[1]) * 1000000)
+                input_data = "%s.%s" % (
                     time_parts[0],
                     "{}".format(micro_seconds).rjust(6, "0"),
                 )
                 dt = datetime_.datetime.strptime(
-                    input_data, '%Y-%m-%dT%H:%M:%S.%f'
+                    input_data, "%Y-%m-%dT%H:%M:%S.%f"
                 )
             else:
                 dt = datetime_.datetime.strptime(
-                    input_data, '%Y-%m-%dT%H:%M:%S'
+                    input_data, "%Y-%m-%dT%H:%M:%S"
                 )
             dt = dt.replace(tzinfo=tz)
             return dt
 
-        def gds_validate_date(self, input_data, node=None, input_name=''):
+        def gds_validate_date(self, input_data, node=None, input_name=""):
             return input_data
 
-        def gds_format_date(self, input_data, input_name=''):
-            _svalue = '%04d-%02d-%02d' % (
+        def gds_format_date(self, input_data, input_name=""):
+            _svalue = "%04d-%02d-%02d" % (
                 input_data.year,
                 input_data.month,
                 input_data.day,
@@ -556,16 +556,16 @@ except ModulenotfoundExp_ as exp:
                     if tzoff is not None:
                         total_seconds = tzoff.seconds + (86400 * tzoff.days)
                         if total_seconds == 0:
-                            _svalue += 'Z'
+                            _svalue += "Z"
                         else:
                             if total_seconds < 0:
-                                _svalue += '-'
+                                _svalue += "-"
                                 total_seconds *= -1
                             else:
-                                _svalue += '+'
+                                _svalue += "+"
                             hours = total_seconds // 3600
                             minutes = (total_seconds - (hours * 3600)) // 60
-                            _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
+                            _svalue += "{0:02d}:{1:02d}".format(hours, minutes)
             except AttributeError:
                 pass
             return _svalue
@@ -573,56 +573,56 @@ except ModulenotfoundExp_ as exp:
         @classmethod
         def gds_parse_date(cls, input_data):
             tz = None
-            if input_data[-1] == 'Z':
-                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+            if input_data[-1] == "Z":
+                tz = GeneratedsSuper._FixedOffsetTZ(0, "UTC")
                 input_data = input_data[:-1]
             else:
                 results = GeneratedsSuper.tzoff_pattern.search(input_data)
                 if results is not None:
-                    tzoff_parts = results.group(2).split(':')
+                    tzoff_parts = results.group(2).split(":")
                     tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
-                    if results.group(1) == '-':
+                    if results.group(1) == "-":
                         tzoff *= -1
                     tz = GeneratedsSuper._FixedOffsetTZ(
                         tzoff, results.group(0)
                     )
                     input_data = input_data[:-6]
-            dt = datetime_.datetime.strptime(input_data, '%Y-%m-%d')
+            dt = datetime_.datetime.strptime(input_data, "%Y-%m-%d")
             dt = dt.replace(tzinfo=tz)
             return dt.date()
 
-        def gds_validate_time(self, input_data, node=None, input_name=''):
+        def gds_validate_time(self, input_data, node=None, input_name=""):
             return input_data
 
-        def gds_format_time(self, input_data, input_name=''):
+        def gds_format_time(self, input_data, input_name=""):
             if input_data.microsecond == 0:
-                _svalue = '%02d:%02d:%02d' % (
+                _svalue = "%02d:%02d:%02d" % (
                     input_data.hour,
                     input_data.minute,
                     input_data.second,
                 )
             else:
-                _svalue = '%02d:%02d:%02d.%s' % (
+                _svalue = "%02d:%02d:%02d.%s" % (
                     input_data.hour,
                     input_data.minute,
                     input_data.second,
-                    ('%f' % (float(input_data.microsecond) / 1000000))[2:],
+                    ("%f" % (float(input_data.microsecond) / 1000000))[2:],
                 )
             if input_data.tzinfo is not None:
                 tzoff = input_data.tzinfo.utcoffset(input_data)
                 if tzoff is not None:
                     total_seconds = tzoff.seconds + (86400 * tzoff.days)
                     if total_seconds == 0:
-                        _svalue += 'Z'
+                        _svalue += "Z"
                     else:
                         if total_seconds < 0:
-                            _svalue += '-'
+                            _svalue += "-"
                             total_seconds *= -1
                         else:
-                            _svalue += '+'
+                            _svalue += "+"
                         hours = total_seconds // 3600
                         minutes = (total_seconds - (hours * 3600)) // 60
-                        _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
+                        _svalue += "{0:02d}:{1:02d}".format(hours, minutes)
             return _svalue
 
         def gds_validate_simple_patterns(self, patterns, target):
@@ -646,24 +646,24 @@ except ModulenotfoundExp_ as exp:
         @classmethod
         def gds_parse_time(cls, input_data):
             tz = None
-            if input_data[-1] == 'Z':
-                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+            if input_data[-1] == "Z":
+                tz = GeneratedsSuper._FixedOffsetTZ(0, "UTC")
                 input_data = input_data[:-1]
             else:
                 results = GeneratedsSuper.tzoff_pattern.search(input_data)
                 if results is not None:
-                    tzoff_parts = results.group(2).split(':')
+                    tzoff_parts = results.group(2).split(":")
                     tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
-                    if results.group(1) == '-':
+                    if results.group(1) == "-":
                         tzoff *= -1
                     tz = GeneratedsSuper._FixedOffsetTZ(
                         tzoff, results.group(0)
                     )
                     input_data = input_data[:-6]
-            if len(input_data.split('.')) > 1:
-                dt = datetime_.datetime.strptime(input_data, '%H:%M:%S.%f')
+            if len(input_data.split(".")) > 1:
+                dt = datetime_.datetime.strptime(input_data, "%H:%M:%S.%f")
             else:
-                dt = datetime_.datetime.strptime(input_data, '%H:%M:%S')
+                dt = datetime_.datetime.strptime(input_data, "%H:%M:%S")
             dt = dt.replace(tzinfo=tz)
             return dt.time()
 
@@ -743,25 +743,25 @@ except ModulenotfoundExp_ as exp:
             path_list = []
             self.get_path_list_(node, path_list)
             path_list.reverse()
-            path = '/'.join(path_list)
+            path = "/".join(path_list)
             return path
 
-        Tag_strip_pattern_ = re_.compile(r'\{.*\}')
+        Tag_strip_pattern_ = re_.compile(r"\{.*\}")
 
         def get_path_list_(self, node, path_list):
             if node is None:
                 return
-            tag = GeneratedsSuper.Tag_strip_pattern_.sub('', node.tag)
+            tag = GeneratedsSuper.Tag_strip_pattern_.sub("", node.tag)
             if tag:
                 path_list.append(tag)
             self.get_path_list_(node.getparent(), path_list)
 
         def get_class_obj_(self, node, default_class=None):
             class_obj1 = default_class
-            if 'xsi' in node.nsmap:
-                classname = node.get('{%s}type' % node.nsmap['xsi'])
+            if "xsi" in node.nsmap:
+                classname = node.get("{%s}type" % node.nsmap["xsi"])
                 if classname is not None:
-                    names = classname.split(':')
+                    names = classname.split(":")
                     if len(names) == 2:
                         classname = names[1]
                     class_obj2 = globals().get(classname)
@@ -785,7 +785,7 @@ except ModulenotfoundExp_ as exp:
                 if ExternalEncoding:
                     encoding = ExternalEncoding
                 else:
-                    encoding = 'utf-8'
+                    encoding = "utf-8"
                 return instring.encode(encoding)
             else:
                 return instring
@@ -795,7 +795,7 @@ except ModulenotfoundExp_ as exp:
             if isinstance(instring, str):
                 result = quote_xml(instring)
             elif sys.version_info.major == 2 and isinstance(instring, unicode):
-                result = quote_xml(instring).encode('utf8')
+                result = quote_xml(instring).encode("utf8")
             else:
                 result = GeneratedsSuper.gds_encode(str(instring))
             return result
@@ -803,7 +803,7 @@ except ModulenotfoundExp_ as exp:
         def __eq__(self, other):
             def excl_select_objs_(obj):
                 return (
-                    obj[0] != 'parent_object_' and obj[0] != 'gds_collector_'
+                    obj[0] != "parent_object_" and obj[0] != "gds_collector_"
                 )
 
             if type(self) != type(other):
@@ -838,15 +838,15 @@ except ModulenotfoundExp_ as exp:
                 hasattr(self, "gds_elementtree_node_")
                 and self.gds_elementtree_node_ is not None
             ):
-                return ' near line {}'.format(
+                return " near line {}".format(
                     self.gds_elementtree_node_.sourceline
                 )
             else:
                 return ""
 
     def getSubclassFromModule_(module, class_):
-        '''Get the subclass of a class from a specific module.'''
-        name = class_.__name__ + 'Sub'
+        """Get the subclass of a class from a specific module."""
+        name = class_.__name__ + "Sub"
         if hasattr(module, name):
             return getattr(module, name)
         else:
@@ -872,14 +872,14 @@ except ModulenotfoundExp_ as exp:
 # Globals
 #
 
-ExternalEncoding = ''
+ExternalEncoding = ""
 # Set this to false in order to deactivate during export, the use of
 # name space prefixes captured from the input document.
 UseCapturedNS_ = True
 CapturedNsmap_ = {}
-Tag_pattern_ = re_.compile(r'({.*})?(.*)')
+Tag_pattern_ = re_.compile(r"({.*})?(.*)")
 String_cleanup_pat_ = re_.compile(r"[\n\r\s]+")
-Namespace_extract_pat_ = re_.compile(r'{(.*)}(.*)')
+Namespace_extract_pat_ = re_.compile(r"{(.*)}(.*)")
 CDATA_pattern_ = re_.compile(r"<!\[CDATA\[.*?\]\]>", re_.DOTALL)
 
 # Change this to redirect the generated superclass module to use a
@@ -894,15 +894,15 @@ CurrentSubclassModule_ = None
 def showIndent(outfile, level, pretty_print=True):
     if pretty_print:
         for idx in range(level):
-            outfile.write('    ')
+            outfile.write("    ")
 
 
 def quote_xml(inStr):
     "Escape markup chars, but do not modify CDATA sections."
     if not inStr:
-        return ''
-    s1 = isinstance(inStr, BaseStrType_) and inStr or '%s' % inStr
-    s2 = ''
+        return ""
+    s1 = isinstance(inStr, BaseStrType_) and inStr or "%s" % inStr
+    s2 = ""
     pos = 0
     matchobjects = CDATA_pattern_.finditer(s1)
     for mo in matchobjects:
@@ -916,18 +916,18 @@ def quote_xml(inStr):
 
 
 def quote_xml_aux(inStr):
-    s1 = inStr.replace('&', '&amp;')
-    s1 = s1.replace('<', '&lt;')
-    s1 = s1.replace('>', '&gt;')
+    s1 = inStr.replace("&", "&amp;")
+    s1 = s1.replace("<", "&lt;")
+    s1 = s1.replace(">", "&gt;")
     return s1
 
 
 def quote_attrib(inStr):
-    s1 = isinstance(inStr, BaseStrType_) and inStr or '%s' % inStr
-    s1 = s1.replace('&', '&amp;')
-    s1 = s1.replace('<', '&lt;')
-    s1 = s1.replace('>', '&gt;')
-    s1 = s1.replace('\n', '&#10;')
+    s1 = isinstance(inStr, BaseStrType_) and inStr or "%s" % inStr
+    s1 = s1.replace("&", "&amp;")
+    s1 = s1.replace("<", "&lt;")
+    s1 = s1.replace(">", "&gt;")
+    s1 = s1.replace("\n", "&#10;")
     if '"' in s1:
         if "'" in s1:
             s1 = '"%s"' % s1.replace('"', "&quot;")
@@ -941,14 +941,14 @@ def quote_attrib(inStr):
 def quote_python(inStr):
     s1 = inStr
     if s1.find("'") == -1:
-        if s1.find('\n') == -1:
+        if s1.find("\n") == -1:
             return "'%s'" % s1
         else:
             return "'''%s'''" % s1
     else:
         if s1.find('"') != -1:
             s1 = s1.replace('"', '\\"')
-        if s1.find('\n') == -1:
+        if s1.find("\n") == -1:
             return '"%s"' % s1
         else:
             return '"""%s"""' % s1
@@ -958,7 +958,7 @@ def get_all_text_(node):
     if node.text is not None:
         text = node.text
     else:
-        text = ''
+        text = ""
     for child in node:
         if child.tail is not None:
             text += child.tail
@@ -967,19 +967,19 @@ def get_all_text_(node):
 
 def find_attr_value_(attr_name, node):
     attrs = node.attrib
-    attr_parts = attr_name.split(':')
+    attr_parts = attr_name.split(":")
     value = None
     if len(attr_parts) == 1:
         value = attrs.get(attr_name)
     elif len(attr_parts) == 2:
         prefix, name = attr_parts
-        if prefix == 'xml':
-            namespace = 'http://www.w3.org/XML/1998/namespace'
+        if prefix == "xml":
+            namespace = "http://www.w3.org/XML/1998/namespace"
         else:
             namespace = node.nsmap.get(prefix)
         if namespace is not None:
             value = attrs.get(
-                '{%s}%s'
+                "{%s}%s"
                 % (
                     namespace,
                     name,
@@ -998,7 +998,7 @@ class GDSParseError(Exception):
 
 def raise_parse_error(node, msg):
     if node is not None:
-        msg = '%s (element %s/line %d)' % (
+        msg = "%s (element %s/line %d)" % (
             msg,
             node.tag,
             node.sourceline,
@@ -1059,22 +1059,22 @@ class MixedContainer:
 
     def exportSimple(self, outfile, level, name):
         if self.content_type == MixedContainer.TypeString:
-            outfile.write('<%s>%s</%s>' % (self.name, self.value, self.name))
+            outfile.write("<%s>%s</%s>" % (self.name, self.value, self.name))
         elif (
             self.content_type == MixedContainer.TypeInteger
             or self.content_type == MixedContainer.TypeBoolean
         ):
-            outfile.write('<%s>%d</%s>' % (self.name, self.value, self.name))
+            outfile.write("<%s>%d</%s>" % (self.name, self.value, self.name))
         elif (
             self.content_type == MixedContainer.TypeFloat
             or self.content_type == MixedContainer.TypeDecimal
         ):
-            outfile.write('<%s>%f</%s>' % (self.name, self.value, self.name))
+            outfile.write("<%s>%f</%s>" % (self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeDouble:
-            outfile.write('<%s>%g</%s>' % (self.name, self.value, self.name))
+            outfile.write("<%s>%g</%s>" % (self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeBase64:
             outfile.write(
-                '<%s>%s</%s>'
+                "<%s>%s</%s>"
                 % (self.name, base64.b64encode(self.value), self.name)
             )
 
@@ -1095,7 +1095,7 @@ class MixedContainer:
                     else:
                         element.text += self.value
         elif self.category == MixedContainer.CategorySimple:
-            subelement = etree_.SubElement(element, '%s' % self.name)
+            subelement = etree_.SubElement(element, "%s" % self.name)
             subelement.text = self.to_etree_simple()
         else:  # category == MixedContainer.CategoryComplex
             self.value.to_etree(element)
@@ -1109,16 +1109,16 @@ class MixedContainer:
             self.content_type == MixedContainer.TypeInteger
             or self.content_type == MixedContainer.TypeBoolean
         ):
-            text = '%d' % self.value
+            text = "%d" % self.value
         elif (
             self.content_type == MixedContainer.TypeFloat
             or self.content_type == MixedContainer.TypeDecimal
         ):
-            text = '%f' % self.value
+            text = "%f" % self.value
         elif self.content_type == MixedContainer.TypeDouble:
-            text = '%g' % self.value
+            text = "%g" % self.value
         elif self.content_type == MixedContainer.TypeBase64:
-            text = '%s' % base64.b64encode(self.value)
+            text = "%s" % base64.b64encode(self.value)
         return text
 
     def exportLiteral(self, outfile, level, name):
@@ -1146,14 +1146,14 @@ class MixedContainer:
             )
             self.value.exportLiteral(outfile, level + 1)
             showIndent(outfile, level)
-            outfile.write(')\n')
+            outfile.write(")\n")
 
 
 class MemberSpec_(object):
     def __init__(
         self,
-        name='',
-        data_type='',
+        name="",
+        data_type="",
         container=0,
         optional=0,
         child_attrs=None,
@@ -1183,7 +1183,7 @@ class MemberSpec_(object):
             if len(self.data_type) > 0:
                 return self.data_type[-1]
             else:
-                return 'xs:string'
+                return "xs:string"
         else:
             return self.data_type
 
@@ -1239,7 +1239,7 @@ class root(GeneratedsSuper):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
+        self.parent_object_ = kwargs_.get("parent_object_")
         self.ns_prefix_ = None
         self.specVersion = specVersion
         self.specVersion_nsprefix_ = None
@@ -1305,73 +1305,73 @@ class root(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='root',
+        name_="root",
         pretty_print=True,
     ):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('root')
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get("root")
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'root':
+            eol_ = ""
+        if self.original_tagname_ is not None and name_ == "root":
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
+            namespaceprefix_ = self.ns_prefix_ + ":"
         showIndent(outfile, level, pretty_print)
         outfile.write(
-            '<%s%s%s'
+            "<%s%s%s"
             % (
                 namespaceprefix_,
                 name_,
-                namespacedef_ and ' ' + namespacedef_ or '',
+                namespacedef_ and " " + namespacedef_ or "",
             )
         )
         already_processed = set()
         self._exportAttributes(
-            outfile, level, already_processed, namespaceprefix_, name_='root'
+            outfile, level, already_processed, namespaceprefix_, name_="root"
         )
         if self.has__content():
-            outfile.write('>%s' % (eol_,))
+            outfile.write(">%s" % (eol_,))
             self._exportChildren(
                 outfile,
                 level + 1,
                 namespaceprefix_,
                 namespacedef_,
-                name_='root',
+                name_="root",
                 pretty_print=pretty_print,
             )
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+            outfile.write("</%s%s>%s" % (namespaceprefix_, name_, eol_))
         else:
-            outfile.write('/>%s' % (eol_,))
+            outfile.write("/>%s" % (eol_,))
 
     def _exportAttributes(
         self,
         outfile,
         level,
         already_processed,
-        namespaceprefix_='',
-        name_='root',
+        namespaceprefix_="",
+        name_="root",
     ):
         unique_counter = 0
         for name, value in self.anyAttributes_.items():
-            xsinamespaceprefix = 'xsi'
-            xsinamespace1 = 'http://www.w3.org/2001/XMLSchema-instance'
-            xsinamespace2 = '{%s}' % (xsinamespace1,)
+            xsinamespaceprefix = "xsi"
+            xsinamespace1 = "http://www.w3.org/2001/XMLSchema-instance"
+            xsinamespace2 = "{%s}" % (xsinamespace1,)
             if name.startswith(xsinamespace2):
                 name1 = name[len(xsinamespace2) :]
-                name2 = '%s:%s' % (
+                name2 = "%s:%s" % (
                     xsinamespaceprefix,
                     name1,
                 )
                 if name2 not in already_processed:
                     already_processed.add(name2)
                     outfile.write(
-                        ' %s=%s'
+                        " %s=%s"
                         % (
                             name2,
                             quote_attrib(value),
@@ -1383,9 +1383,9 @@ class root(GeneratedsSuper):
                     namespace, name = mo.group(1, 2)
                     if name not in already_processed:
                         already_processed.add(name)
-                        if namespace == 'http://www.w3.org/XML/1998/namespace':
+                        if namespace == "http://www.w3.org/XML/1998/namespace":
                             outfile.write(
-                                ' %s=%s'
+                                " %s=%s"
                                 % (
                                     name,
                                     quote_attrib(value),
@@ -1401,7 +1401,7 @@ class root(GeneratedsSuper):
                                 )
                             )
                             outfile.write(
-                                ' %d:%s=%s'
+                                " %d:%s=%s"
                                 % (
                                     unique_counter,
                                     name,
@@ -1412,7 +1412,7 @@ class root(GeneratedsSuper):
                     if name not in already_processed:
                         already_processed.add(name)
                         outfile.write(
-                            ' %s=%s'
+                            " %s=%s"
                             % (
                                 name,
                                 quote_attrib(value),
@@ -1424,44 +1424,44 @@ class root(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='root',
+        name_="root",
         fromsubclass_=False,
         pretty_print=True,
     ):
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
+            eol_ = ""
         if self.specVersion is not None:
             namespaceprefix_ = (
-                self.specVersion_nsprefix_ + ':'
+                self.specVersion_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.specVersion_nsprefix_)
-                else ''
+                else ""
             )
             self.specVersion.export(
                 outfile,
                 level,
                 namespaceprefix_,
-                namespacedef_='',
-                name_='specVersion',
+                namespacedef_="",
+                name_="specVersion",
                 pretty_print=pretty_print,
             )
         if self.URLBase is not None:
             namespaceprefix_ = (
-                self.URLBase_nsprefix_ + ':'
+                self.URLBase_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.URLBase_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sURLBase>%s</%sURLBase>%s'
+                "<%sURLBase>%s</%sURLBase>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.URLBase), input_name='URLBase'
+                            quote_xml(self.URLBase), input_name="URLBase"
                         )
                     ),
                     namespaceprefix_,
@@ -1470,16 +1470,16 @@ class root(GeneratedsSuper):
             )
         if self.device is not None:
             namespaceprefix_ = (
-                self.device_nsprefix_ + ':'
+                self.device_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.device_nsprefix_)
-                else ''
+                else ""
             )
             self.device.export(
                 outfile,
                 level,
                 namespaceprefix_,
-                namespacedef_='',
-                name_='device',
+                namespacedef_="",
+                name_="device",
                 pretty_print=pretty_print,
             )
 
@@ -1506,22 +1506,22 @@ class root(GeneratedsSuper):
     def _buildChildren(
         self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None
     ):
-        if nodeName_ == 'specVersion':
+        if nodeName_ == "specVersion":
             obj_ = SpecVersionType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.specVersion = obj_
-            obj_.original_tagname_ = 'specVersion'
-        elif nodeName_ == 'URLBase':
+            obj_.original_tagname_ = "specVersion"
+        elif nodeName_ == "URLBase":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'URLBase')
-            value_ = self.gds_validate_string(value_, node, 'URLBase')
+            value_ = self.gds_parse_string(value_, node, "URLBase")
+            value_ = self.gds_validate_string(value_, node, "URLBase")
             self.URLBase = value_
             self.URLBase_nsprefix_ = child_.prefix
-        elif nodeName_ == 'device':
+        elif nodeName_ == "device":
             obj_ = DeviceType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.device = obj_
-            obj_.original_tagname_ = 'device'
+            obj_.original_tagname_ = "device"
 
 
 # end class root
@@ -1536,7 +1536,7 @@ class SpecVersionType(GeneratedsSuper):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
+        self.parent_object_ = kwargs_.get("parent_object_")
         self.ns_prefix_ = None
         self.major = major
         self.major_nsprefix_ = None
@@ -1585,29 +1585,29 @@ class SpecVersionType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='SpecVersionType',
+        name_="SpecVersionType",
         pretty_print=True,
     ):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('SpecVersionType')
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get("SpecVersionType")
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'SpecVersionType':
+            eol_ = ""
+        if self.original_tagname_ is not None and name_ == "SpecVersionType":
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
+            namespaceprefix_ = self.ns_prefix_ + ":"
         showIndent(outfile, level, pretty_print)
         outfile.write(
-            '<%s%s%s'
+            "<%s%s%s"
             % (
                 namespaceprefix_,
                 name_,
-                namespacedef_ and ' ' + namespacedef_ or '',
+                namespacedef_ and " " + namespacedef_ or "",
             )
         )
         already_processed = set()
@@ -1616,30 +1616,30 @@ class SpecVersionType(GeneratedsSuper):
             level,
             already_processed,
             namespaceprefix_,
-            name_='SpecVersionType',
+            name_="SpecVersionType",
         )
         if self.has__content():
-            outfile.write('>%s' % (eol_,))
+            outfile.write(">%s" % (eol_,))
             self._exportChildren(
                 outfile,
                 level + 1,
                 namespaceprefix_,
                 namespacedef_,
-                name_='SpecVersionType',
+                name_="SpecVersionType",
                 pretty_print=pretty_print,
             )
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+            outfile.write("</%s%s>%s" % (namespaceprefix_, name_, eol_))
         else:
-            outfile.write('/>%s' % (eol_,))
+            outfile.write("/>%s" % (eol_,))
 
     def _exportAttributes(
         self,
         outfile,
         level,
         already_processed,
-        namespaceprefix_='',
-        name_='SpecVersionType',
+        namespaceprefix_="",
+        name_="SpecVersionType",
     ):
         pass
 
@@ -1647,44 +1647,44 @@ class SpecVersionType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='SpecVersionType',
+        name_="SpecVersionType",
         fromsubclass_=False,
         pretty_print=True,
     ):
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
+            eol_ = ""
         if self.major is not None:
             namespaceprefix_ = (
-                self.major_nsprefix_ + ':'
+                self.major_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.major_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%smajor>%s</%smajor>%s'
+                "<%smajor>%s</%smajor>%s"
                 % (
                     namespaceprefix_,
-                    self.gds_format_integer(self.major, input_name='major'),
+                    self.gds_format_integer(self.major, input_name="major"),
                     namespaceprefix_,
                     eol_,
                 )
             )
         if self.minor is not None:
             namespaceprefix_ = (
-                self.minor_nsprefix_ + ':'
+                self.minor_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.minor_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sminor>%s</%sminor>%s'
+                "<%sminor>%s</%sminor>%s"
                 % (
                     namespaceprefix_,
-                    self.gds_format_integer(self.minor, input_name='minor'),
+                    self.gds_format_integer(self.minor, input_name="minor"),
                     namespaceprefix_,
                     eol_,
                 )
@@ -1710,16 +1710,16 @@ class SpecVersionType(GeneratedsSuper):
     def _buildChildren(
         self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None
     ):
-        if nodeName_ == 'major' and child_.text:
+        if nodeName_ == "major" and child_.text:
             sval_ = child_.text
-            ival_ = self.gds_parse_integer(sval_, node, 'major')
-            ival_ = self.gds_validate_integer(ival_, node, 'major')
+            ival_ = self.gds_parse_integer(sval_, node, "major")
+            ival_ = self.gds_validate_integer(ival_, node, "major")
             self.major = ival_
             self.major_nsprefix_ = child_.prefix
-        elif nodeName_ == 'minor' and child_.text:
+        elif nodeName_ == "minor" and child_.text:
             sval_ = child_.text
-            ival_ = self.gds_parse_integer(sval_, node, 'minor')
-            ival_ = self.gds_validate_integer(ival_, node, 'minor')
+            ival_ = self.gds_parse_integer(sval_, node, "minor")
+            ival_ = self.gds_validate_integer(ival_, node, "minor")
             self.minor = ival_
             self.minor_nsprefix_ = child_.prefix
 
@@ -1757,7 +1757,7 @@ class DeviceType(GeneratedsSuper):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
+        self.parent_object_ = kwargs_.get("parent_object_")
         self.ns_prefix_ = None
         self.deviceType = deviceType
         self.deviceType_nsprefix_ = None
@@ -1952,29 +1952,29 @@ class DeviceType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='DeviceType',
+        name_="DeviceType",
         pretty_print=True,
     ):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('DeviceType')
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get("DeviceType")
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'DeviceType':
+            eol_ = ""
+        if self.original_tagname_ is not None and name_ == "DeviceType":
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
+            namespaceprefix_ = self.ns_prefix_ + ":"
         showIndent(outfile, level, pretty_print)
         outfile.write(
-            '<%s%s%s'
+            "<%s%s%s"
             % (
                 namespaceprefix_,
                 name_,
-                namespacedef_ and ' ' + namespacedef_ or '',
+                namespacedef_ and " " + namespacedef_ or "",
             )
         )
         already_processed = set()
@@ -1983,30 +1983,30 @@ class DeviceType(GeneratedsSuper):
             level,
             already_processed,
             namespaceprefix_,
-            name_='DeviceType',
+            name_="DeviceType",
         )
         if self.has__content():
-            outfile.write('>%s' % (eol_,))
+            outfile.write(">%s" % (eol_,))
             self._exportChildren(
                 outfile,
                 level + 1,
                 namespaceprefix_,
                 namespacedef_,
-                name_='DeviceType',
+                name_="DeviceType",
                 pretty_print=pretty_print,
             )
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+            outfile.write("</%s%s>%s" % (namespaceprefix_, name_, eol_))
         else:
-            outfile.write('/>%s' % (eol_,))
+            outfile.write("/>%s" % (eol_,))
 
     def _exportAttributes(
         self,
         outfile,
         level,
         already_processed,
-        namespaceprefix_='',
-        name_='DeviceType',
+        namespaceprefix_="",
+        name_="DeviceType",
     ):
         pass
 
@@ -2014,30 +2014,30 @@ class DeviceType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='DeviceType',
+        name_="DeviceType",
         fromsubclass_=False,
         pretty_print=True,
     ):
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
+            eol_ = ""
         if self.deviceType is not None:
             namespaceprefix_ = (
-                self.deviceType_nsprefix_ + ':'
+                self.deviceType_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.deviceType_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sdeviceType>%s</%sdeviceType>%s'
+                "<%sdeviceType>%s</%sdeviceType>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.deviceType), input_name='deviceType'
+                            quote_xml(self.deviceType), input_name="deviceType"
                         )
                     ),
                     namespaceprefix_,
@@ -2046,19 +2046,19 @@ class DeviceType(GeneratedsSuper):
             )
         if self.friendlyName is not None:
             namespaceprefix_ = (
-                self.friendlyName_nsprefix_ + ':'
+                self.friendlyName_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.friendlyName_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sfriendlyName>%s</%sfriendlyName>%s'
+                "<%sfriendlyName>%s</%sfriendlyName>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
                             quote_xml(self.friendlyName),
-                            input_name='friendlyName',
+                            input_name="friendlyName",
                         )
                     ),
                     namespaceprefix_,
@@ -2067,19 +2067,19 @@ class DeviceType(GeneratedsSuper):
             )
         if self.manufacturer is not None:
             namespaceprefix_ = (
-                self.manufacturer_nsprefix_ + ':'
+                self.manufacturer_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.manufacturer_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%smanufacturer>%s</%smanufacturer>%s'
+                "<%smanufacturer>%s</%smanufacturer>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
                             quote_xml(self.manufacturer),
-                            input_name='manufacturer',
+                            input_name="manufacturer",
                         )
                     ),
                     namespaceprefix_,
@@ -2088,19 +2088,19 @@ class DeviceType(GeneratedsSuper):
             )
         if self.manufacturerURL is not None:
             namespaceprefix_ = (
-                self.manufacturerURL_nsprefix_ + ':'
+                self.manufacturerURL_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.manufacturerURL_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%smanufacturerURL>%s</%smanufacturerURL>%s'
+                "<%smanufacturerURL>%s</%smanufacturerURL>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
                             quote_xml(self.manufacturerURL),
-                            input_name='manufacturerURL',
+                            input_name="manufacturerURL",
                         )
                     ),
                     namespaceprefix_,
@@ -2109,19 +2109,19 @@ class DeviceType(GeneratedsSuper):
             )
         if self.modelDescription is not None:
             namespaceprefix_ = (
-                self.modelDescription_nsprefix_ + ':'
+                self.modelDescription_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.modelDescription_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%smodelDescription>%s</%smodelDescription>%s'
+                "<%smodelDescription>%s</%smodelDescription>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
                             quote_xml(self.modelDescription),
-                            input_name='modelDescription',
+                            input_name="modelDescription",
                         )
                     ),
                     namespaceprefix_,
@@ -2130,18 +2130,18 @@ class DeviceType(GeneratedsSuper):
             )
         if self.modelName is not None:
             namespaceprefix_ = (
-                self.modelName_nsprefix_ + ':'
+                self.modelName_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.modelName_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%smodelName>%s</%smodelName>%s'
+                "<%smodelName>%s</%smodelName>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.modelName), input_name='modelName'
+                            quote_xml(self.modelName), input_name="modelName"
                         )
                     ),
                     namespaceprefix_,
@@ -2150,19 +2150,19 @@ class DeviceType(GeneratedsSuper):
             )
         if self.modelNumber is not None:
             namespaceprefix_ = (
-                self.modelNumber_nsprefix_ + ':'
+                self.modelNumber_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.modelNumber_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%smodelNumber>%s</%smodelNumber>%s'
+                "<%smodelNumber>%s</%smodelNumber>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
                             quote_xml(self.modelNumber),
-                            input_name='modelNumber',
+                            input_name="modelNumber",
                         )
                     ),
                     namespaceprefix_,
@@ -2171,18 +2171,18 @@ class DeviceType(GeneratedsSuper):
             )
         if self.modelURL is not None:
             namespaceprefix_ = (
-                self.modelURL_nsprefix_ + ':'
+                self.modelURL_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.modelURL_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%smodelURL>%s</%smodelURL>%s'
+                "<%smodelURL>%s</%smodelURL>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.modelURL), input_name='modelURL'
+                            quote_xml(self.modelURL), input_name="modelURL"
                         )
                     ),
                     namespaceprefix_,
@@ -2191,19 +2191,19 @@ class DeviceType(GeneratedsSuper):
             )
         if self.serialNumber is not None:
             namespaceprefix_ = (
-                self.serialNumber_nsprefix_ + ':'
+                self.serialNumber_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.serialNumber_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sserialNumber>%s</%sserialNumber>%s'
+                "<%sserialNumber>%s</%sserialNumber>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
                             quote_xml(self.serialNumber),
-                            input_name='serialNumber',
+                            input_name="serialNumber",
                         )
                     ),
                     namespaceprefix_,
@@ -2212,18 +2212,18 @@ class DeviceType(GeneratedsSuper):
             )
         if self.UDN is not None:
             namespaceprefix_ = (
-                self.UDN_nsprefix_ + ':'
+                self.UDN_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.UDN_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sUDN>%s</%sUDN>%s'
+                "<%sUDN>%s</%sUDN>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.UDN), input_name='UDN'
+                            quote_xml(self.UDN), input_name="UDN"
                         )
                     ),
                     namespaceprefix_,
@@ -2232,18 +2232,18 @@ class DeviceType(GeneratedsSuper):
             )
         if self.macAddress is not None:
             namespaceprefix_ = (
-                self.macAddress_nsprefix_ + ':'
+                self.macAddress_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.macAddress_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%smacAddress>%s</%smacAddress>%s'
+                "<%smacAddress>%s</%smacAddress>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.macAddress), input_name='macAddress'
+                            quote_xml(self.macAddress), input_name="macAddress"
                         )
                     ),
                     namespaceprefix_,
@@ -2252,18 +2252,18 @@ class DeviceType(GeneratedsSuper):
             )
         if self.UPC is not None:
             namespaceprefix_ = (
-                self.UPC_nsprefix_ + ':'
+                self.UPC_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.UPC_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sUPC>%s</%sUPC>%s'
+                "<%sUPC>%s</%sUPC>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.UPC), input_name='UPC'
+                            quote_xml(self.UPC), input_name="UPC"
                         )
                     ),
                     namespaceprefix_,
@@ -2272,61 +2272,61 @@ class DeviceType(GeneratedsSuper):
             )
         if self.iconList is not None:
             namespaceprefix_ = (
-                self.iconList_nsprefix_ + ':'
+                self.iconList_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.iconList_nsprefix_)
-                else ''
+                else ""
             )
             self.iconList.export(
                 outfile,
                 level,
                 namespaceprefix_,
-                namespacedef_='',
-                name_='iconList',
+                namespacedef_="",
+                name_="iconList",
                 pretty_print=pretty_print,
             )
         if self.serviceList is not None:
             namespaceprefix_ = (
-                self.serviceList_nsprefix_ + ':'
+                self.serviceList_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.serviceList_nsprefix_)
-                else ''
+                else ""
             )
             self.serviceList.export(
                 outfile,
                 level,
                 namespaceprefix_,
-                namespacedef_='',
-                name_='serviceList',
+                namespacedef_="",
+                name_="serviceList",
                 pretty_print=pretty_print,
             )
         if self.deviceList is not None:
             namespaceprefix_ = (
-                self.deviceList_nsprefix_ + ':'
+                self.deviceList_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.deviceList_nsprefix_)
-                else ''
+                else ""
             )
             self.deviceList.export(
                 outfile,
                 level,
                 namespaceprefix_,
-                namespacedef_='',
-                name_='deviceList',
+                namespacedef_="",
+                name_="deviceList",
                 pretty_print=pretty_print,
             )
         if self.presentationURL is not None:
             namespaceprefix_ = (
-                self.presentationURL_nsprefix_ + ':'
+                self.presentationURL_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.presentationURL_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%spresentationURL>%s</%spresentationURL>%s'
+                "<%spresentationURL>%s</%spresentationURL>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
                             quote_xml(self.presentationURL),
-                            input_name='presentationURL',
+                            input_name="presentationURL",
                         )
                     ),
                     namespaceprefix_,
@@ -2337,7 +2337,7 @@ class DeviceType(GeneratedsSuper):
             for obj_ in self.anytypeobjs_:
                 showIndent(outfile, level, pretty_print)
                 outfile.write(str(obj_))
-                outfile.write('\n')
+                outfile.write("\n")
 
     def build(self, node, gds_collector_=None):
         self.gds_collector_ = gds_collector_
@@ -2359,101 +2359,101 @@ class DeviceType(GeneratedsSuper):
     def _buildChildren(
         self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None
     ):
-        if nodeName_ == 'deviceType':
+        if nodeName_ == "deviceType":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'deviceType')
-            value_ = self.gds_validate_string(value_, node, 'deviceType')
+            value_ = self.gds_parse_string(value_, node, "deviceType")
+            value_ = self.gds_validate_string(value_, node, "deviceType")
             self.deviceType = value_
             self.deviceType_nsprefix_ = child_.prefix
-        elif nodeName_ == 'friendlyName':
+        elif nodeName_ == "friendlyName":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'friendlyName')
-            value_ = self.gds_validate_string(value_, node, 'friendlyName')
+            value_ = self.gds_parse_string(value_, node, "friendlyName")
+            value_ = self.gds_validate_string(value_, node, "friendlyName")
             self.friendlyName = value_
             self.friendlyName_nsprefix_ = child_.prefix
-        elif nodeName_ == 'manufacturer':
+        elif nodeName_ == "manufacturer":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'manufacturer')
-            value_ = self.gds_validate_string(value_, node, 'manufacturer')
+            value_ = self.gds_parse_string(value_, node, "manufacturer")
+            value_ = self.gds_validate_string(value_, node, "manufacturer")
             self.manufacturer = value_
             self.manufacturer_nsprefix_ = child_.prefix
-        elif nodeName_ == 'manufacturerURL':
+        elif nodeName_ == "manufacturerURL":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'manufacturerURL')
-            value_ = self.gds_validate_string(value_, node, 'manufacturerURL')
+            value_ = self.gds_parse_string(value_, node, "manufacturerURL")
+            value_ = self.gds_validate_string(value_, node, "manufacturerURL")
             self.manufacturerURL = value_
             self.manufacturerURL_nsprefix_ = child_.prefix
-        elif nodeName_ == 'modelDescription':
+        elif nodeName_ == "modelDescription":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'modelDescription')
-            value_ = self.gds_validate_string(value_, node, 'modelDescription')
+            value_ = self.gds_parse_string(value_, node, "modelDescription")
+            value_ = self.gds_validate_string(value_, node, "modelDescription")
             self.modelDescription = value_
             self.modelDescription_nsprefix_ = child_.prefix
-        elif nodeName_ == 'modelName':
+        elif nodeName_ == "modelName":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'modelName')
-            value_ = self.gds_validate_string(value_, node, 'modelName')
+            value_ = self.gds_parse_string(value_, node, "modelName")
+            value_ = self.gds_validate_string(value_, node, "modelName")
             self.modelName = value_
             self.modelName_nsprefix_ = child_.prefix
-        elif nodeName_ == 'modelNumber':
+        elif nodeName_ == "modelNumber":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'modelNumber')
-            value_ = self.gds_validate_string(value_, node, 'modelNumber')
+            value_ = self.gds_parse_string(value_, node, "modelNumber")
+            value_ = self.gds_validate_string(value_, node, "modelNumber")
             self.modelNumber = value_
             self.modelNumber_nsprefix_ = child_.prefix
-        elif nodeName_ == 'modelURL':
+        elif nodeName_ == "modelURL":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'modelURL')
-            value_ = self.gds_validate_string(value_, node, 'modelURL')
+            value_ = self.gds_parse_string(value_, node, "modelURL")
+            value_ = self.gds_validate_string(value_, node, "modelURL")
             self.modelURL = value_
             self.modelURL_nsprefix_ = child_.prefix
-        elif nodeName_ == 'serialNumber':
+        elif nodeName_ == "serialNumber":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'serialNumber')
-            value_ = self.gds_validate_string(value_, node, 'serialNumber')
+            value_ = self.gds_parse_string(value_, node, "serialNumber")
+            value_ = self.gds_validate_string(value_, node, "serialNumber")
             self.serialNumber = value_
             self.serialNumber_nsprefix_ = child_.prefix
-        elif nodeName_ == 'UDN':
+        elif nodeName_ == "UDN":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'UDN')
-            value_ = self.gds_validate_string(value_, node, 'UDN')
+            value_ = self.gds_parse_string(value_, node, "UDN")
+            value_ = self.gds_validate_string(value_, node, "UDN")
             self.UDN = value_
             self.UDN_nsprefix_ = child_.prefix
-        elif nodeName_ == 'macAddress':
+        elif nodeName_ == "macAddress":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'macAddress')
-            value_ = self.gds_validate_string(value_, node, 'macAddress')
+            value_ = self.gds_parse_string(value_, node, "macAddress")
+            value_ = self.gds_validate_string(value_, node, "macAddress")
             self.macAddress = value_
             self.macAddress_nsprefix_ = child_.prefix
-        elif nodeName_ == 'UPC':
+        elif nodeName_ == "UPC":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'UPC')
-            value_ = self.gds_validate_string(value_, node, 'UPC')
+            value_ = self.gds_parse_string(value_, node, "UPC")
+            value_ = self.gds_validate_string(value_, node, "UPC")
             self.UPC = value_
             self.UPC_nsprefix_ = child_.prefix
-        elif nodeName_ == 'iconList':
+        elif nodeName_ == "iconList":
             obj_ = IconListType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.iconList = obj_
-            obj_.original_tagname_ = 'iconList'
-        elif nodeName_ == 'serviceList':
+            obj_.original_tagname_ = "iconList"
+        elif nodeName_ == "serviceList":
             obj_ = ServiceListType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.serviceList = obj_
-            obj_.original_tagname_ = 'serviceList'
-        elif nodeName_ == 'deviceList':
+            obj_.original_tagname_ = "serviceList"
+        elif nodeName_ == "deviceList":
             obj_ = DeviceListType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.deviceList = obj_
-            obj_.original_tagname_ = 'deviceList'
-        elif nodeName_ == 'presentationURL':
+            obj_.original_tagname_ = "deviceList"
+        elif nodeName_ == "presentationURL":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'presentationURL')
-            value_ = self.gds_validate_string(value_, node, 'presentationURL')
+            value_ = self.gds_parse_string(value_, node, "presentationURL")
+            value_ = self.gds_validate_string(value_, node, "presentationURL")
             self.presentationURL = value_
             self.presentationURL_nsprefix_ = child_.prefix
         else:
-            content_ = self.gds_build_any(child_, 'DeviceType')
+            content_ = self.gds_build_any(child_, "DeviceType")
             self.anytypeobjs_.append(content_)
 
 
@@ -2469,7 +2469,7 @@ class IconListType(GeneratedsSuper):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
+        self.parent_object_ = kwargs_.get("parent_object_")
         self.ns_prefix_ = None
         if icon is None:
             self.icon = []
@@ -2522,29 +2522,29 @@ class IconListType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='IconListType',
+        name_="IconListType",
         pretty_print=True,
     ):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('IconListType')
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get("IconListType")
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'IconListType':
+            eol_ = ""
+        if self.original_tagname_ is not None and name_ == "IconListType":
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
+            namespaceprefix_ = self.ns_prefix_ + ":"
         showIndent(outfile, level, pretty_print)
         outfile.write(
-            '<%s%s%s'
+            "<%s%s%s"
             % (
                 namespaceprefix_,
                 name_,
-                namespacedef_ and ' ' + namespacedef_ or '',
+                namespacedef_ and " " + namespacedef_ or "",
             )
         )
         already_processed = set()
@@ -2553,30 +2553,30 @@ class IconListType(GeneratedsSuper):
             level,
             already_processed,
             namespaceprefix_,
-            name_='IconListType',
+            name_="IconListType",
         )
         if self.has__content():
-            outfile.write('>%s' % (eol_,))
+            outfile.write(">%s" % (eol_,))
             self._exportChildren(
                 outfile,
                 level + 1,
                 namespaceprefix_,
                 namespacedef_,
-                name_='IconListType',
+                name_="IconListType",
                 pretty_print=pretty_print,
             )
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+            outfile.write("</%s%s>%s" % (namespaceprefix_, name_, eol_))
         else:
-            outfile.write('/>%s' % (eol_,))
+            outfile.write("/>%s" % (eol_,))
 
     def _exportAttributes(
         self,
         outfile,
         level,
         already_processed,
-        namespaceprefix_='',
-        name_='IconListType',
+        namespaceprefix_="",
+        name_="IconListType",
     ):
         pass
 
@@ -2584,28 +2584,28 @@ class IconListType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='IconListType',
+        name_="IconListType",
         fromsubclass_=False,
         pretty_print=True,
     ):
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
+            eol_ = ""
         for icon_ in self.icon:
             namespaceprefix_ = (
-                self.icon_nsprefix_ + ':'
+                self.icon_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.icon_nsprefix_)
-                else ''
+                else ""
             )
             icon_.export(
                 outfile,
                 level,
                 namespaceprefix_,
-                namespacedef_='',
-                name_='icon',
+                namespacedef_="",
+                name_="icon",
                 pretty_print=pretty_print,
             )
 
@@ -2629,11 +2629,11 @@ class IconListType(GeneratedsSuper):
     def _buildChildren(
         self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None
     ):
-        if nodeName_ == 'icon':
+        if nodeName_ == "icon":
             obj_ = iconType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.icon.append(obj_)
-            obj_.original_tagname_ = 'icon'
+            obj_.original_tagname_ = "icon"
 
 
 # end class IconListType
@@ -2648,7 +2648,7 @@ class ServiceListType(GeneratedsSuper):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
+        self.parent_object_ = kwargs_.get("parent_object_")
         self.ns_prefix_ = None
         if service is None:
             self.service = []
@@ -2701,29 +2701,29 @@ class ServiceListType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='ServiceListType',
+        name_="ServiceListType",
         pretty_print=True,
     ):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ServiceListType')
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get("ServiceListType")
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'ServiceListType':
+            eol_ = ""
+        if self.original_tagname_ is not None and name_ == "ServiceListType":
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
+            namespaceprefix_ = self.ns_prefix_ + ":"
         showIndent(outfile, level, pretty_print)
         outfile.write(
-            '<%s%s%s'
+            "<%s%s%s"
             % (
                 namespaceprefix_,
                 name_,
-                namespacedef_ and ' ' + namespacedef_ or '',
+                namespacedef_ and " " + namespacedef_ or "",
             )
         )
         already_processed = set()
@@ -2732,30 +2732,30 @@ class ServiceListType(GeneratedsSuper):
             level,
             already_processed,
             namespaceprefix_,
-            name_='ServiceListType',
+            name_="ServiceListType",
         )
         if self.has__content():
-            outfile.write('>%s' % (eol_,))
+            outfile.write(">%s" % (eol_,))
             self._exportChildren(
                 outfile,
                 level + 1,
                 namespaceprefix_,
                 namespacedef_,
-                name_='ServiceListType',
+                name_="ServiceListType",
                 pretty_print=pretty_print,
             )
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+            outfile.write("</%s%s>%s" % (namespaceprefix_, name_, eol_))
         else:
-            outfile.write('/>%s' % (eol_,))
+            outfile.write("/>%s" % (eol_,))
 
     def _exportAttributes(
         self,
         outfile,
         level,
         already_processed,
-        namespaceprefix_='',
-        name_='ServiceListType',
+        namespaceprefix_="",
+        name_="ServiceListType",
     ):
         pass
 
@@ -2763,28 +2763,28 @@ class ServiceListType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='ServiceListType',
+        name_="ServiceListType",
         fromsubclass_=False,
         pretty_print=True,
     ):
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
+            eol_ = ""
         for service_ in self.service:
             namespaceprefix_ = (
-                self.service_nsprefix_ + ':'
+                self.service_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.service_nsprefix_)
-                else ''
+                else ""
             )
             service_.export(
                 outfile,
                 level,
                 namespaceprefix_,
-                namespacedef_='',
-                name_='service',
+                namespacedef_="",
+                name_="service",
                 pretty_print=pretty_print,
             )
 
@@ -2808,11 +2808,11 @@ class ServiceListType(GeneratedsSuper):
     def _buildChildren(
         self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None
     ):
-        if nodeName_ == 'service':
+        if nodeName_ == "service":
             obj_ = serviceType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.service.append(obj_)
-            obj_.original_tagname_ = 'service'
+            obj_.original_tagname_ = "service"
 
 
 # end class ServiceListType
@@ -2827,7 +2827,7 @@ class DeviceListType(GeneratedsSuper):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
+        self.parent_object_ = kwargs_.get("parent_object_")
         self.ns_prefix_ = None
         if device is None:
             self.device = []
@@ -2880,29 +2880,29 @@ class DeviceListType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='DeviceListType',
+        name_="DeviceListType",
         pretty_print=True,
     ):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('DeviceListType')
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get("DeviceListType")
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'DeviceListType':
+            eol_ = ""
+        if self.original_tagname_ is not None and name_ == "DeviceListType":
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
+            namespaceprefix_ = self.ns_prefix_ + ":"
         showIndent(outfile, level, pretty_print)
         outfile.write(
-            '<%s%s%s'
+            "<%s%s%s"
             % (
                 namespaceprefix_,
                 name_,
-                namespacedef_ and ' ' + namespacedef_ or '',
+                namespacedef_ and " " + namespacedef_ or "",
             )
         )
         already_processed = set()
@@ -2911,30 +2911,30 @@ class DeviceListType(GeneratedsSuper):
             level,
             already_processed,
             namespaceprefix_,
-            name_='DeviceListType',
+            name_="DeviceListType",
         )
         if self.has__content():
-            outfile.write('>%s' % (eol_,))
+            outfile.write(">%s" % (eol_,))
             self._exportChildren(
                 outfile,
                 level + 1,
                 namespaceprefix_,
                 namespacedef_,
-                name_='DeviceListType',
+                name_="DeviceListType",
                 pretty_print=pretty_print,
             )
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+            outfile.write("</%s%s>%s" % (namespaceprefix_, name_, eol_))
         else:
-            outfile.write('/>%s' % (eol_,))
+            outfile.write("/>%s" % (eol_,))
 
     def _exportAttributes(
         self,
         outfile,
         level,
         already_processed,
-        namespaceprefix_='',
-        name_='DeviceListType',
+        namespaceprefix_="",
+        name_="DeviceListType",
     ):
         pass
 
@@ -2942,28 +2942,28 @@ class DeviceListType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='DeviceListType',
+        name_="DeviceListType",
         fromsubclass_=False,
         pretty_print=True,
     ):
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
+            eol_ = ""
         for device_ in self.device:
             namespaceprefix_ = (
-                self.device_nsprefix_ + ':'
+                self.device_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.device_nsprefix_)
-                else ''
+                else ""
             )
             device_.export(
                 outfile,
                 level,
                 namespaceprefix_,
-                namespacedef_='',
-                name_='device',
+                namespacedef_="",
+                name_="device",
                 pretty_print=pretty_print,
             )
 
@@ -2987,11 +2987,11 @@ class DeviceListType(GeneratedsSuper):
     def _buildChildren(
         self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None
     ):
-        if nodeName_ == 'device':
+        if nodeName_ == "device":
             obj_ = DeviceType.factory(parent_object_=self)
             obj_.build(child_, gds_collector_=gds_collector_)
             self.device.append(obj_)
-            obj_.original_tagname_ = 'device'
+            obj_.original_tagname_ = "device"
 
 
 # end class DeviceListType
@@ -3015,7 +3015,7 @@ class iconType(GeneratedsSuper):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
+        self.parent_object_ = kwargs_.get("parent_object_")
         self.ns_prefix_ = None
         self.mimetype = mimetype
         self.mimetype_nsprefix_ = None
@@ -3092,29 +3092,29 @@ class iconType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='iconType',
+        name_="iconType",
         pretty_print=True,
     ):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('iconType')
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get("iconType")
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'iconType':
+            eol_ = ""
+        if self.original_tagname_ is not None and name_ == "iconType":
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
+            namespaceprefix_ = self.ns_prefix_ + ":"
         showIndent(outfile, level, pretty_print)
         outfile.write(
-            '<%s%s%s'
+            "<%s%s%s"
             % (
                 namespaceprefix_,
                 name_,
-                namespacedef_ and ' ' + namespacedef_ or '',
+                namespacedef_ and " " + namespacedef_ or "",
             )
         )
         already_processed = set()
@@ -3123,30 +3123,30 @@ class iconType(GeneratedsSuper):
             level,
             already_processed,
             namespaceprefix_,
-            name_='iconType',
+            name_="iconType",
         )
         if self.has__content():
-            outfile.write('>%s' % (eol_,))
+            outfile.write(">%s" % (eol_,))
             self._exportChildren(
                 outfile,
                 level + 1,
                 namespaceprefix_,
                 namespacedef_,
-                name_='iconType',
+                name_="iconType",
                 pretty_print=pretty_print,
             )
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+            outfile.write("</%s%s>%s" % (namespaceprefix_, name_, eol_))
         else:
-            outfile.write('/>%s' % (eol_,))
+            outfile.write("/>%s" % (eol_,))
 
     def _exportAttributes(
         self,
         outfile,
         level,
         already_processed,
-        namespaceprefix_='',
-        name_='iconType',
+        namespaceprefix_="",
+        name_="iconType",
     ):
         pass
 
@@ -3154,30 +3154,30 @@ class iconType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='iconType',
+        name_="iconType",
         fromsubclass_=False,
         pretty_print=True,
     ):
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
+            eol_ = ""
         if self.mimetype is not None:
             namespaceprefix_ = (
-                self.mimetype_nsprefix_ + ':'
+                self.mimetype_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.mimetype_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%smimetype>%s</%smimetype>%s'
+                "<%smimetype>%s</%smimetype>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.mimetype), input_name='mimetype'
+                            quote_xml(self.mimetype), input_name="mimetype"
                         )
                     ),
                     namespaceprefix_,
@@ -3186,66 +3186,66 @@ class iconType(GeneratedsSuper):
             )
         if self.width is not None:
             namespaceprefix_ = (
-                self.width_nsprefix_ + ':'
+                self.width_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.width_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%swidth>%s</%swidth>%s'
+                "<%swidth>%s</%swidth>%s"
                 % (
                     namespaceprefix_,
-                    self.gds_format_integer(self.width, input_name='width'),
+                    self.gds_format_integer(self.width, input_name="width"),
                     namespaceprefix_,
                     eol_,
                 )
             )
         if self.height is not None:
             namespaceprefix_ = (
-                self.height_nsprefix_ + ':'
+                self.height_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.height_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sheight>%s</%sheight>%s'
+                "<%sheight>%s</%sheight>%s"
                 % (
                     namespaceprefix_,
-                    self.gds_format_integer(self.height, input_name='height'),
+                    self.gds_format_integer(self.height, input_name="height"),
                     namespaceprefix_,
                     eol_,
                 )
             )
         if self.depth is not None:
             namespaceprefix_ = (
-                self.depth_nsprefix_ + ':'
+                self.depth_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.depth_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sdepth>%s</%sdepth>%s'
+                "<%sdepth>%s</%sdepth>%s"
                 % (
                     namespaceprefix_,
-                    self.gds_format_integer(self.depth, input_name='depth'),
+                    self.gds_format_integer(self.depth, input_name="depth"),
                     namespaceprefix_,
                     eol_,
                 )
             )
         if self.url is not None:
             namespaceprefix_ = (
-                self.url_nsprefix_ + ':'
+                self.url_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.url_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%surl>%s</%surl>%s'
+                "<%surl>%s</%surl>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.url), input_name='url'
+                            quote_xml(self.url), input_name="url"
                         )
                     ),
                     namespaceprefix_,
@@ -3273,34 +3273,34 @@ class iconType(GeneratedsSuper):
     def _buildChildren(
         self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None
     ):
-        if nodeName_ == 'mimetype':
+        if nodeName_ == "mimetype":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'mimetype')
-            value_ = self.gds_validate_string(value_, node, 'mimetype')
+            value_ = self.gds_parse_string(value_, node, "mimetype")
+            value_ = self.gds_validate_string(value_, node, "mimetype")
             self.mimetype = value_
             self.mimetype_nsprefix_ = child_.prefix
-        elif nodeName_ == 'width' and child_.text:
+        elif nodeName_ == "width" and child_.text:
             sval_ = child_.text
-            ival_ = self.gds_parse_integer(sval_, node, 'width')
-            ival_ = self.gds_validate_integer(ival_, node, 'width')
+            ival_ = self.gds_parse_integer(sval_, node, "width")
+            ival_ = self.gds_validate_integer(ival_, node, "width")
             self.width = ival_
             self.width_nsprefix_ = child_.prefix
-        elif nodeName_ == 'height' and child_.text:
+        elif nodeName_ == "height" and child_.text:
             sval_ = child_.text
-            ival_ = self.gds_parse_integer(sval_, node, 'height')
-            ival_ = self.gds_validate_integer(ival_, node, 'height')
+            ival_ = self.gds_parse_integer(sval_, node, "height")
+            ival_ = self.gds_validate_integer(ival_, node, "height")
             self.height = ival_
             self.height_nsprefix_ = child_.prefix
-        elif nodeName_ == 'depth' and child_.text:
+        elif nodeName_ == "depth" and child_.text:
             sval_ = child_.text
-            ival_ = self.gds_parse_integer(sval_, node, 'depth')
-            ival_ = self.gds_validate_integer(ival_, node, 'depth')
+            ival_ = self.gds_parse_integer(sval_, node, "depth")
+            ival_ = self.gds_validate_integer(ival_, node, "depth")
             self.depth = ival_
             self.depth_nsprefix_ = child_.prefix
-        elif nodeName_ == 'url':
+        elif nodeName_ == "url":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'url')
-            value_ = self.gds_validate_string(value_, node, 'url')
+            value_ = self.gds_parse_string(value_, node, "url")
+            value_ = self.gds_validate_string(value_, node, "url")
             self.url = value_
             self.url_nsprefix_ = child_.prefix
 
@@ -3326,7 +3326,7 @@ class serviceType(GeneratedsSuper):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
         self.original_tagname_ = None
-        self.parent_object_ = kwargs_.get('parent_object_')
+        self.parent_object_ = kwargs_.get("parent_object_")
         self.ns_prefix_ = None
         self.serviceType = serviceType_member
         self.serviceType_nsprefix_ = None
@@ -3405,29 +3405,29 @@ class serviceType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='serviceType',
+        name_="serviceType",
         pretty_print=True,
     ):
-        imported_ns_def_ = GenerateDSNamespaceDefs_.get('serviceType')
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get("serviceType")
         if imported_ns_def_ is not None:
             namespacedef_ = imported_ns_def_
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
-        if self.original_tagname_ is not None and name_ == 'serviceType':
+            eol_ = ""
+        if self.original_tagname_ is not None and name_ == "serviceType":
             name_ = self.original_tagname_
         if UseCapturedNS_ and self.ns_prefix_:
-            namespaceprefix_ = self.ns_prefix_ + ':'
+            namespaceprefix_ = self.ns_prefix_ + ":"
         showIndent(outfile, level, pretty_print)
         outfile.write(
-            '<%s%s%s'
+            "<%s%s%s"
             % (
                 namespaceprefix_,
                 name_,
-                namespacedef_ and ' ' + namespacedef_ or '',
+                namespacedef_ and " " + namespacedef_ or "",
             )
         )
         already_processed = set()
@@ -3436,30 +3436,30 @@ class serviceType(GeneratedsSuper):
             level,
             already_processed,
             namespaceprefix_,
-            name_='serviceType',
+            name_="serviceType",
         )
         if self.has__content():
-            outfile.write('>%s' % (eol_,))
+            outfile.write(">%s" % (eol_,))
             self._exportChildren(
                 outfile,
                 level + 1,
                 namespaceprefix_,
                 namespacedef_,
-                name_='serviceType',
+                name_="serviceType",
                 pretty_print=pretty_print,
             )
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
+            outfile.write("</%s%s>%s" % (namespaceprefix_, name_, eol_))
         else:
-            outfile.write('/>%s' % (eol_,))
+            outfile.write("/>%s" % (eol_,))
 
     def _exportAttributes(
         self,
         outfile,
         level,
         already_processed,
-        namespaceprefix_='',
-        name_='serviceType',
+        namespaceprefix_="",
+        name_="serviceType",
     ):
         pass
 
@@ -3467,31 +3467,31 @@ class serviceType(GeneratedsSuper):
         self,
         outfile,
         level,
-        namespaceprefix_='',
+        namespaceprefix_="",
         namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0" xmlns:None="urn:schemas-upnp-org:device-1-0" ',
-        name_='serviceType',
+        name_="serviceType",
         fromsubclass_=False,
         pretty_print=True,
     ):
         if pretty_print:
-            eol_ = '\n'
+            eol_ = "\n"
         else:
-            eol_ = ''
+            eol_ = ""
         if self.serviceType is not None:
             namespaceprefix_ = (
-                self.serviceType_nsprefix_ + ':'
+                self.serviceType_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.serviceType_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sserviceType>%s</%sserviceType>%s'
+                "<%sserviceType>%s</%sserviceType>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
                             quote_xml(self.serviceType),
-                            input_name='serviceType',
+                            input_name="serviceType",
                         )
                     ),
                     namespaceprefix_,
@@ -3500,18 +3500,18 @@ class serviceType(GeneratedsSuper):
             )
         if self.serviceId is not None:
             namespaceprefix_ = (
-                self.serviceId_nsprefix_ + ':'
+                self.serviceId_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.serviceId_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sserviceId>%s</%sserviceId>%s'
+                "<%sserviceId>%s</%sserviceId>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.serviceId), input_name='serviceId'
+                            quote_xml(self.serviceId), input_name="serviceId"
                         )
                     ),
                     namespaceprefix_,
@@ -3520,18 +3520,18 @@ class serviceType(GeneratedsSuper):
             )
         if self.SCPDURL is not None:
             namespaceprefix_ = (
-                self.SCPDURL_nsprefix_ + ':'
+                self.SCPDURL_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.SCPDURL_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%sSCPDURL>%s</%sSCPDURL>%s'
+                "<%sSCPDURL>%s</%sSCPDURL>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.SCPDURL), input_name='SCPDURL'
+                            quote_xml(self.SCPDURL), input_name="SCPDURL"
                         )
                     ),
                     namespaceprefix_,
@@ -3540,18 +3540,18 @@ class serviceType(GeneratedsSuper):
             )
         if self.controlURL is not None:
             namespaceprefix_ = (
-                self.controlURL_nsprefix_ + ':'
+                self.controlURL_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.controlURL_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%scontrolURL>%s</%scontrolURL>%s'
+                "<%scontrolURL>%s</%scontrolURL>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
-                            quote_xml(self.controlURL), input_name='controlURL'
+                            quote_xml(self.controlURL), input_name="controlURL"
                         )
                     ),
                     namespaceprefix_,
@@ -3560,19 +3560,19 @@ class serviceType(GeneratedsSuper):
             )
         if self.eventSubURL is not None:
             namespaceprefix_ = (
-                self.eventSubURL_nsprefix_ + ':'
+                self.eventSubURL_nsprefix_ + ":"
                 if (UseCapturedNS_ and self.eventSubURL_nsprefix_)
-                else ''
+                else ""
             )
             showIndent(outfile, level, pretty_print)
             outfile.write(
-                '<%seventSubURL>%s</%seventSubURL>%s'
+                "<%seventSubURL>%s</%seventSubURL>%s"
                 % (
                     namespaceprefix_,
                     self.gds_encode(
                         self.gds_format_string(
                             quote_xml(self.eventSubURL),
-                            input_name='eventSubURL',
+                            input_name="eventSubURL",
                         )
                     ),
                     namespaceprefix_,
@@ -3600,34 +3600,34 @@ class serviceType(GeneratedsSuper):
     def _buildChildren(
         self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None
     ):
-        if nodeName_ == 'serviceType':
+        if nodeName_ == "serviceType":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'serviceType')
-            value_ = self.gds_validate_string(value_, node, 'serviceType')
+            value_ = self.gds_parse_string(value_, node, "serviceType")
+            value_ = self.gds_validate_string(value_, node, "serviceType")
             self.serviceType = value_
             self.serviceType_nsprefix_ = child_.prefix
-        elif nodeName_ == 'serviceId':
+        elif nodeName_ == "serviceId":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'serviceId')
-            value_ = self.gds_validate_string(value_, node, 'serviceId')
+            value_ = self.gds_parse_string(value_, node, "serviceId")
+            value_ = self.gds_validate_string(value_, node, "serviceId")
             self.serviceId = value_
             self.serviceId_nsprefix_ = child_.prefix
-        elif nodeName_ == 'SCPDURL':
+        elif nodeName_ == "SCPDURL":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'SCPDURL')
-            value_ = self.gds_validate_string(value_, node, 'SCPDURL')
+            value_ = self.gds_parse_string(value_, node, "SCPDURL")
+            value_ = self.gds_validate_string(value_, node, "SCPDURL")
             self.SCPDURL = value_
             self.SCPDURL_nsprefix_ = child_.prefix
-        elif nodeName_ == 'controlURL':
+        elif nodeName_ == "controlURL":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'controlURL')
-            value_ = self.gds_validate_string(value_, node, 'controlURL')
+            value_ = self.gds_parse_string(value_, node, "controlURL")
+            value_ = self.gds_validate_string(value_, node, "controlURL")
             self.controlURL = value_
             self.controlURL_nsprefix_ = child_.prefix
-        elif nodeName_ == 'eventSubURL':
+        elif nodeName_ == "eventSubURL":
             value_ = child_.text
-            value_ = self.gds_parse_string(value_, node, 'eventSubURL')
-            value_ = self.gds_validate_string(value_, node, 'eventSubURL')
+            value_ = self.gds_parse_string(value_, node, "eventSubURL")
+            value_ = self.gds_validate_string(value_, node, "eventSubURL")
             self.eventSubURL = value_
             self.eventSubURL_nsprefix_ = child_.prefix
 
@@ -3658,16 +3658,16 @@ def get_root_tag(node):
 
 
 def get_required_ns_prefix_defs(rootNode):
-    '''Get all name space prefix definitions required in this XML doc.
+    """Get all name space prefix definitions required in this XML doc.
     Return a dictionary of definitions and a char string of definitions.
-    '''
+    """
     nsmap = {
         prefix: uri
         for node in rootNode.iter()
         for (prefix, uri) in node.nsmap.items()
         if prefix is not None
     }
-    namespacedefs = ' '.join(
+    namespacedefs = " ".join(
         ['xmlns:{}="{}"'.format(prefix, uri) for prefix, uri in nsmap.items()]
     )
     return nsmap, namespacedefs
@@ -3681,7 +3681,7 @@ def parse(inFileName, silence=False, print_warnings=True):
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'root'
+        rootTag = "root"
         rootClass = root
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
@@ -3699,10 +3699,10 @@ def parse(inFileName, silence=False, print_warnings=True):
             pretty_print=True,
         )
     if print_warnings and len(gds_collector.get_messages()) > 0:
-        separator = ('-' * 50) + '\n'
+        separator = ("-" * 50) + "\n"
         sys.stderr.write(separator)
         sys.stderr.write(
-            '----- Warnings -- count: {} -----\n'.format(
+            "----- Warnings -- count: {} -----\n".format(
                 len(gds_collector.get_messages()),
             )
         )
@@ -3725,7 +3725,7 @@ def parseEtree(
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'root'
+        rootTag = "root"
         rootClass = root
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
@@ -3753,12 +3753,12 @@ def parseEtree(
             encoding="utf-8",
         )
         sys.stdout.write(str(content))
-        sys.stdout.write('\n')
+        sys.stdout.write("\n")
     if print_warnings and len(gds_collector.get_messages()) > 0:
-        separator = ('-' * 50) + '\n'
+        separator = ("-" * 50) + "\n"
         sys.stderr.write(separator)
         sys.stderr.write(
-            '----- Warnings -- count: {} -----\n'.format(
+            "----- Warnings -- count: {} -----\n".format(
                 len(gds_collector.get_messages()),
             )
         )
@@ -3768,20 +3768,20 @@ def parseEtree(
 
 
 def parseString(inString, silence=False, print_warnings=True):
-    '''Parse a string, create the object tree, and export it.
+    """Parse a string, create the object tree, and export it.
 
     Arguments:
     - inString -- A string.  This XML fragment should not start
       with an XML declaration containing an encoding.
     - silence -- A boolean.  If False, export the object.
     Returns -- The root object in the tree.
-    '''
+    """
     parser = None
     rootNode = parsexmlstring_(inString, parser)
     gds_collector = GdsCollector_()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'root'
+        rootTag = "root"
         rootClass = root
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
@@ -3796,10 +3796,10 @@ def parseString(inString, silence=False, print_warnings=True):
             namespacedef_='xmlns:tns="urn:schemas-upnp-org:device-1-0"',
         )
     if print_warnings and len(gds_collector.get_messages()) > 0:
-        separator = ('-' * 50) + '\n'
+        separator = ("-" * 50) + "\n"
         sys.stderr.write(separator)
         sys.stderr.write(
-            '----- Warnings -- count: {} -----\n'.format(
+            "----- Warnings -- count: {} -----\n".format(
                 len(gds_collector.get_messages()),
             )
         )
@@ -3815,7 +3815,7 @@ def parseLiteral(inFileName, silence=False, print_warnings=True):
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
-        rootTag = 'root'
+        rootTag = "root"
         rootClass = root
     rootObj = rootClass.factory()
     rootObj.build(rootNode, gds_collector_=gds_collector)
@@ -3824,16 +3824,16 @@ def parseLiteral(inFileName, silence=False, print_warnings=True):
         doc = None
         rootNode = None
     if not silence:
-        sys.stdout.write('#from device import *\n\n')
-        sys.stdout.write('import device as model_\n\n')
-        sys.stdout.write('rootObj = model_.rootClass(\n')
+        sys.stdout.write("#from device import *\n\n")
+        sys.stdout.write("import device as model_\n\n")
+        sys.stdout.write("rootObj = model_.rootClass(\n")
         rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
-        sys.stdout.write(')\n')
+        sys.stdout.write(")\n")
     if print_warnings and len(gds_collector.get_messages()) > 0:
-        separator = ('-' * 50) + '\n'
+        separator = ("-" * 50) + "\n"
         sys.stderr.write(separator)
         sys.stderr.write(
-            '----- Warnings -- count: {} -----\n'.format(
+            "----- Warnings -- count: {} -----\n".format(
                 len(gds_collector.get_messages()),
             )
         )
@@ -3850,7 +3850,7 @@ def main():
         usage()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # import pdb; pdb.set_trace()
     main()
 
@@ -3861,12 +3861,12 @@ RenameMappings_ = {}
 # and the file in which each is defined.
 # simpleTypes are marked "ST" and complexTypes "CT".
 NamespaceToDefMappings_ = {
-    'urn:schemas-upnp-org:device-1-0': [
-        ('SpecVersionType', 'pywemo/ouimeaux_device/api/xsd/device.xsd', 'CT'),
-        ('DeviceType', 'pywemo/ouimeaux_device/api/xsd/device.xsd', 'CT'),
-        ('IconListType', 'pywemo/ouimeaux_device/api/xsd/device.xsd', 'CT'),
-        ('ServiceListType', 'pywemo/ouimeaux_device/api/xsd/device.xsd', 'CT'),
-        ('DeviceListType', 'pywemo/ouimeaux_device/api/xsd/device.xsd', 'CT'),
+    "urn:schemas-upnp-org:device-1-0": [
+        ("SpecVersionType", "pywemo/ouimeaux_device/api/xsd/device.xsd", "CT"),
+        ("DeviceType", "pywemo/ouimeaux_device/api/xsd/device.xsd", "CT"),
+        ("IconListType", "pywemo/ouimeaux_device/api/xsd/device.xsd", "CT"),
+        ("ServiceListType", "pywemo/ouimeaux_device/api/xsd/device.xsd", "CT"),
+        ("DeviceListType", "pywemo/ouimeaux_device/api/xsd/device.xsd", "CT"),
     ]
 }
 

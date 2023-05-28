@@ -36,12 +36,12 @@ class Base:
 
     def test_subscription_update_brightness(self, dimmer):
         # Invalid value fails gracefully.
-        assert dimmer.subscription_update('Brightness', 'invalid') is False
+        assert dimmer.subscription_update("Brightness", "invalid") is False
 
-        assert dimmer.subscription_update('BinaryState', '1') is True
+        assert dimmer.subscription_update("BinaryState", "1") is True
         assert dimmer.get_state() == 1
 
-        assert dimmer.subscription_update('Brightness', '52') is True
+        assert dimmer.subscription_update("Brightness", "52") is True
         assert dimmer.get_brightness() == 52
 
 
@@ -50,10 +50,10 @@ class Test_PVT_OWRT_Dimmer_v1(Base, long_press_helpers.TestLongPress):
 
     @pytest.fixture
     def dimmer(self, vcr):
-        with vcr.use_cassette('WeMo_WW_2.00.11453.PVT-OWRT-Dimmer'):
+        with vcr.use_cassette("WeMo_WW_2.00.11453.PVT-OWRT-Dimmer"):
             return device_from_uuid_and_location(
-                'uuid:Dimmer-1_0-SERIALNUMBER',
-                'http://192.168.1.100:49153/setup.xml',
+                "uuid:Dimmer-1_0-SERIALNUMBER",
+                "http://192.168.1.100:49153/setup.xml",
             )
 
     device = dimmer  # for TestLongPress
@@ -64,10 +64,10 @@ class Test_PVT_RTOS_Dimmer_v2(Base):
 
     @pytest.fixture
     def dimmer(self, vcr):
-        with vcr.use_cassette('WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2'):
+        with vcr.use_cassette("WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2"):
             return device_from_uuid_and_location(
-                'uuid:Dimmer-2_0-SERIALNUMBER',
-                'http://192.168.1.100:49153/setup.xml',
+                "uuid:Dimmer-2_0-SERIALNUMBER",
+                "http://192.168.1.100:49153/setup.xml",
             )
 
     @pytest.mark.vcr()
@@ -89,8 +89,8 @@ class Test_PVT_RTOS_Dimmer_v2(Base):
         subscription_registry.event(
             dimmer,
             EVENT_TYPE_BINARY_STATE,
-            '1',  # Dimmer is On.
-            '/sub/basicevent',
+            "1",  # Dimmer is On.
+            "/sub/basicevent",
         )
         assert dimmer.get_state() == 1
         assert subscription_registry.is_subscribed(dimmer) is False
@@ -99,8 +99,8 @@ class Test_PVT_RTOS_Dimmer_v2(Base):
         subscription_registry.event(
             dimmer,
             EVENT_TYPE_BINARY_STATE,
-            '0',  # Dimmer is Off.
-            '/sub/basicevent',
+            "0",  # Dimmer is Off.
+            "/sub/basicevent",
         )
         assert dimmer.get_state() == 0
         assert subscription_registry.is_subscribed(dimmer)
