@@ -71,7 +71,7 @@ def get_response_for_url_endswith(
         if request.url.endswith(ending)
     ][0]
     response = cassette.responses_of(request)[0]
-    return cast(bytes, response['body']['string'])
+    return cast(bytes, response["body"]["string"])
 
 
 def update_services_from_cassette(cassette_file_name: str) -> None:
@@ -82,7 +82,7 @@ def update_services_from_cassette(cassette_file_name: str) -> None:
     )
 
     for service in device._services:  # pylint: disable=protected-access
-        service_name = service.service_type.split(':')[-2]
+        service_name = service.service_type.split(":")[-2]
         scpd = ServiceDescription.from_xml(
             get_response_for_url_endswith(cassette, service.description_url),
         )

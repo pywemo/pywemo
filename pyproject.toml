@@ -82,7 +82,6 @@ ignore_missing = [
 
 [tool.black]
 line-length = 79
-skip-string-normalization = true
 include = '\.pyi?$'
 force-exclude = '''
 (
@@ -99,7 +98,6 @@ force-exclude = '''
     | build
     | dist
   )/
-  | pywemo/ouimeaux_device/api/xsd/
 )
 '''
 

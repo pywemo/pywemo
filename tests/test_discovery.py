@@ -54,7 +54,7 @@ def test_discover_devices_empty():
 
 
 def test_device_from_description(vcr):
-    with vcr.use_cassette('WeMo_US_2.00.2769.PVT.yaml'):
+    with vcr.use_cassette("WeMo_US_2.00.2769.PVT.yaml"):
         switch = discovery.device_from_description(
             "http://192.168.1.100:49153/setup.xml"
         )

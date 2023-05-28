@@ -24,8 +24,8 @@ class Test_WSP090(Base):
 
     @pytest.fixture
     def outdoor_plug(self, vcr):
-        with vcr.use_cassette('WEMO_WW_1.00.20081401.PVT-RTOS-OutdoorV1'):
+        with vcr.use_cassette("WEMO_WW_1.00.20081401.PVT-RTOS-OutdoorV1"):
             return device_from_uuid_and_location(
-                'uuid:OutdoorPlug-1_0-SERIALNUMBER',
-                'http://192.168.1.100:49153/setup.xml',
+                "uuid:OutdoorPlug-1_0-SERIALNUMBER",
+                "http://192.168.1.100:49153/setup.xml",
             )

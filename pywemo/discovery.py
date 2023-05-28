@@ -78,37 +78,37 @@ def device_from_uuid_and_location(  # noqa: C901
     if not (uuid and location):
         return None
     try:
-        if uuid.startswith('uuid:Socket'):
+        if uuid.startswith("uuid:Socket"):
             return Switch(location)
-        if uuid.startswith('uuid:Lightswitch-1_0'):
+        if uuid.startswith("uuid:Lightswitch-1_0"):
             return LightSwitchLongPress(location)
-        if uuid.startswith('uuid:Lightswitch-2_0'):
+        if uuid.startswith("uuid:Lightswitch-2_0"):
             return LightSwitchLongPress(location)
-        if uuid.startswith('uuid:Lightswitch-3_0'):
+        if uuid.startswith("uuid:Lightswitch-3_0"):
             return LightSwitchLongPress(location)
-        if uuid.startswith('uuid:Lightswitch'):
+        if uuid.startswith("uuid:Lightswitch"):
             return LightSwitch(location)
-        if uuid.startswith('uuid:Dimmer-1_0'):
+        if uuid.startswith("uuid:Dimmer-1_0"):
             return DimmerLongPress(location)
-        if uuid.startswith('uuid:Dimmer-2_0'):
+        if uuid.startswith("uuid:Dimmer-2_0"):
             return DimmerV2(location)
-        if uuid.startswith('uuid:Dimmer'):
+        if uuid.startswith("uuid:Dimmer"):
             return Dimmer(location)
-        if uuid.startswith('uuid:Insight'):
+        if uuid.startswith("uuid:Insight"):
             return Insight(location)
-        if uuid.startswith('uuid:Sensor'):
+        if uuid.startswith("uuid:Sensor"):
             return Motion(location)
-        if uuid.startswith('uuid:Maker'):
+        if uuid.startswith("uuid:Maker"):
             return Maker(location)
-        if uuid.startswith('uuid:Bridge'):
+        if uuid.startswith("uuid:Bridge"):
             return Bridge(location)
-        if uuid.startswith('uuid:CoffeeMaker'):
+        if uuid.startswith("uuid:CoffeeMaker"):
             return CoffeeMaker(location)
-        if uuid.startswith('uuid:Crockpot'):
+        if uuid.startswith("uuid:Crockpot"):
             return CrockPot(location)
-        if uuid.startswith('uuid:Humidifier'):
+        if uuid.startswith("uuid:Humidifier"):
             return Humidifier(location)
-        if uuid.startswith('uuid:OutdoorPlug'):
+        if uuid.startswith("uuid:OutdoorPlug"):
             return OutdoorPlug(location)
     except (InvalidSchemaError, MissingServiceError) as err:
         _call_once_per_uuid(
@@ -126,7 +126,7 @@ def device_from_uuid_and_location(  # noqa: C901
         )
         # Fall-through: Try UnsupportedDevice if debug is enabled.
 
-    if uuid.startswith('uuid:') and debug:
+    if uuid.startswith("uuid:") and debug:
         # unsupported device, but if this function was called from
         # discover_devices then this should be a Belkin product and is probably
         # a WeMo product without a custom class yet.  So attempt to return a
@@ -137,8 +137,8 @@ def device_from_uuid_and_location(  # noqa: C901
             LOG.exception("Device setup failed %s %s", uuid, location)
         else:
             LOG.info(
-                'Device with %s is not supported by pywemo, returning '
-                'UnsupportedDevice object to allow manual interaction',
+                "Device with %s is not supported by pywemo, returning "
+                "UnsupportedDevice object to allow manual interaction",
                 uuid,
             )
             return device
@@ -155,13 +155,13 @@ def hostname_lookup(hostname: str) -> str:
 
         # Reset {host} to the resolved address.
         LOG.debug(
-            'Resolved hostname %s to IP address %s.', hostname, host_address
+            "Resolved hostname %s to IP address %s.", hostname, host_address
         )
         return host_address
 
     except gaierror:
         # The {host}-as-hostname did not resolve to an IP address.
-        LOG.debug('Could not resolve hostname %s to an IP address.', hostname)
+        LOG.debug("Could not resolve hostname %s to an IP address.", hostname)
         return hostname
 
 

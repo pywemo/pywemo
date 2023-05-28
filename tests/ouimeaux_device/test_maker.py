@@ -38,8 +38,8 @@ class Test_Maker:
             # Sensor/sensorstate
             (
                 (
-                    '<attribute><name>Sensor</name><value>0</value>'
-                    '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
+                    "<attribute><name>Sensor</name><value>0</value>"
+                    "<prevalue>1</prevalue><ts>1627869840</ts></attribute>"
                 ),
                 1,
                 0,
@@ -49,8 +49,8 @@ class Test_Maker:
             # Switch/switchstate
             (
                 (
-                    '<attribute><name>Switch</name><value>1</value>'
-                    '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
+                    "<attribute><name>Switch</name><value>1</value>"
+                    "<prevalue>1</prevalue><ts>1627869840</ts></attribute>"
                 ),
                 1,
                 1,
@@ -60,8 +60,8 @@ class Test_Maker:
             # SwitchMode/switchmode
             (
                 (
-                    '<attribute><name>SwitchMode</name><value>0</value>'
-                    '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
+                    "<attribute><name>SwitchMode</name><value>0</value>"
+                    "<prevalue>1</prevalue><ts>1627869840</ts></attribute>"
                 ),
                 1,
                 1,
@@ -71,8 +71,8 @@ class Test_Maker:
             # SensorPresent/hassensor
             (
                 (
-                    '<attribute><name>SensorPresent</name><value>0</value>'
-                    '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
+                    "<attribute><name>SensorPresent</name><value>0</value>"
+                    "<prevalue>1</prevalue><ts>1627869840</ts></attribute>"
                 ),
                 0,
                 1,
@@ -82,8 +82,8 @@ class Test_Maker:
             # Invalid state value.
             (
                 (
-                    '<attribute><name>SensorPresent</name><value>ABC</value>'
-                    '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
+                    "<attribute><name>SensorPresent</name><value>ABC</value>"
+                    "<prevalue>1</prevalue><ts>1627869840</ts></attribute>"
                 ),
                 1,
                 1,
@@ -93,8 +93,8 @@ class Test_Maker:
             # Unexpected State name
             (
                 (
-                    '<attribute><name>Unexpected</name><value>ABC</value>'
-                    '<prevalue>1</prevalue><ts>1627869840</ts></attribute>'
+                    "<attribute><name>Unexpected</name><value>ABC</value>"
+                    "<prevalue>1</prevalue><ts>1627869840</ts></attribute>"
                 ),
                 1,
                 1,
@@ -113,7 +113,7 @@ class Test_Maker:
         maker,
     ):
         """Test that subscription updates happen as expected."""
-        updated = maker.subscription_update('attributeList', update)
+        updated = maker.subscription_update("attributeList", update)
         assert updated is True
         assert maker.has_sensor == has_sensor
         assert maker.sensor_state == sensor_state
@@ -122,5 +122,5 @@ class Test_Maker:
 
     @pytest.fixture
     def maker(self, vcr):
-        with vcr.use_cassette('WeMo_WW_2.00.11423.PVT-OWRT-Maker.yaml'):
-            return Maker('http://192.168.1.100:49153/setup.xml')
+        with vcr.use_cassette("WeMo_WW_2.00.11423.PVT-OWRT-Maker.yaml"):
+            return Maker("http://192.168.1.100:49153/setup.xml")

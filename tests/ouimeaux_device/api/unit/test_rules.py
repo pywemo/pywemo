@@ -22,7 +22,7 @@ MOCK_RULE_TYPE = "RuleType"
 @pytest.fixture()
 def temp_file_name():
     with tempfile.TemporaryDirectory(prefix="wemorules_") as temp_dir:
-        yield os.path.join(temp_dir, 'rules.db')
+        yield os.path.join(temp_dir, "rules.db")
 
 
 @pytest.fixture()
@@ -38,7 +38,7 @@ def sqldb(temp_file_name):
 
 def test_create_empty_db(sqldb):
     statements = set(
-        line for line in sqldb.iterdump() if line.startswith('CREATE TABLE')
+        line for line in sqldb.iterdump() if line.startswith("CREATE TABLE")
     )
     # flake8: noqa: E501 (long lines)
     assert statements == set(
@@ -59,7 +59,7 @@ def test_create_empty_db(sqldb):
 
 def test_pack_unpack_db(temp_file_name, sqldb):
     orig_statements = set(
-        line for line in sqldb.iterdump() if line.startswith('CREATE TABLE')
+        line for line in sqldb.iterdump() if line.startswith("CREATE TABLE")
     )
     sqldb.close()
     packed = rules_db._pack_db(temp_file_name, "inner.db")
@@ -70,7 +70,7 @@ def test_pack_unpack_db(temp_file_name, sqldb):
     conn = sqlite3.connect(temp_file_name)
     try:
         unpacked_statements = set(
-            line for line in conn.iterdump() if line.startswith('CREATE TABLE')
+            line for line in conn.iterdump() if line.startswith("CREATE TABLE")
         )
     finally:
         conn.close()
@@ -310,11 +310,11 @@ def test_rules_db_from_device_raises_http_exception():
     device.session = Session("http://localhost/")
     device.rules = Mock()
     device.rules.FetchRules.return_value = {
-        'ruleDbVersion': 1,
-        'ruleDbPath': 'http://localhost/',
+        "ruleDbVersion": 1,
+        "ruleDbPath": "http://localhost/",
     }
     with patch(
-        'urllib3.PoolManager.request', side_effect=urllib3.exceptions.HTTPError
+        "urllib3.PoolManager.request", side_effect=urllib3.exceptions.HTTPError
     ):
         with pytest.raises(HTTPException):
             with rules_db.rules_db_from_device(device):

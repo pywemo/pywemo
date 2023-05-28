@@ -59,7 +59,7 @@ class Insight(Switch):
 
     def update_insight_params(self) -> None:
         """Get and parse the device attributes."""
-        params = self.insight.GetInsightParams().get('InsightParams')
+        params = self.insight.GetInsightParams().get("InsightParams")
         assert params
         self.insight_params = self.parse_insight_params(params)
 
@@ -101,18 +101,18 @@ class Insight(Switch):
             todaymw,
             totalmw,
             powerthreshold,
-        ) = params.split('|')
+        ) = params.split("|")
         return {
-            'state': state,
-            'lastchange': datetime.fromtimestamp(int(lastchange)),
-            'onfor': int(onfor),
-            'ontoday': int(ontoday),
-            'ontotal': int(ontotal),
-            'todaymw': int(float(todaymw)),
-            'totalmw': int(float(totalmw)),
-            'currentpower': int(float(currentmw)),
-            'wifipower': int(float(wifipower)),
-            'powerthreshold': int(float(powerthreshold)),
+            "state": state,
+            "lastchange": datetime.fromtimestamp(int(lastchange)),
+            "onfor": int(onfor),
+            "ontoday": int(ontoday),
+            "ontotal": int(ontotal),
+            "todaymw": int(float(todaymw)),
+            "totalmw": int(float(totalmw)),
+            "currentpower": int(float(currentmw)),
+            "wifipower": int(float(wifipower)),
+            "powerthreshold": int(float(powerthreshold)),
         }
 
     def get_state(self, force_update: bool = False) -> int:
@@ -130,17 +130,17 @@ class Insight(Switch):
     @property
     def today_kwh(self) -> float:
         """Return the number of kWh consumed today."""
-        return float(self.insight_params['todaymw']) * 1.6666667e-8
+        return float(self.insight_params["todaymw"]) * 1.6666667e-8
 
     @property
     def total_kwh(self) -> float:
         """Return the total kWh consumed for the device."""
-        return float(self.insight_params['totalmw']) * 1.6666667e-8
+        return float(self.insight_params["totalmw"]) * 1.6666667e-8
 
     @property
     def current_power(self) -> int:
         """Return the current power usage in mW."""
-        return self.insight_params['currentpower']
+        return self.insight_params["currentpower"]
 
     @property
     def current_power_watts(self) -> float:
@@ -150,7 +150,7 @@ class Insight(Switch):
     @property
     def wifi_power(self) -> int:
         """Return the current rssi wifi signal."""
-        return self.insight_params['wifipower']
+        return self.insight_params["wifipower"]
 
     @property
     def threshold_power(self) -> int:
@@ -158,7 +158,7 @@ class Insight(Switch):
 
         Above this the device is on, below it is standby.
         """
-        return self.insight_params['powerthreshold']
+        return self.insight_params["powerthreshold"]
 
     @property
     def threshold_power_watts(self) -> float:
@@ -168,24 +168,24 @@ class Insight(Switch):
     @property
     def today_on_time(self) -> int:
         """Return the number of seconds the device has been on today."""
-        return self.insight_params['ontoday']
+        return self.insight_params["ontoday"]
 
     @property
     def total_on_time(self) -> int:
         """Return the number of seconds the device has been on."""
-        return self.insight_params['ontotal']
+        return self.insight_params["ontotal"]
 
     @property
     def on_for(self) -> int:
         """Return the number of seconds the device was last on for."""
-        return self.insight_params['onfor']
+        return self.insight_params["onfor"]
 
     @property
     def last_change(self) -> datetime:
         """Return the last change datetime."""
-        return self.insight_params['lastchange']
+        return self.insight_params["lastchange"]
 
     @property
     def standby_state(self) -> StandbyState:
         """Return the standby state of the device."""
-        return StandbyState(int(self.insight_params['state']))
+        return StandbyState(int(self.insight_params["state"]))

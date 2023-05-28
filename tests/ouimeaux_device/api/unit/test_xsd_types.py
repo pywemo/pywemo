@@ -59,7 +59,7 @@ def test_service():
 
     with mock.patch(SERVICE_PARSER) as mock_parser:
         mock_parser.parseString.return_value = xsd_scpd
-        scpd = xsd_types.ServiceDescription.from_xml(b'')
+        scpd = xsd_types.ServiceDescription.from_xml(b"")
 
     assert scpd.actions[0].name == "action_name"
 
@@ -69,7 +69,7 @@ def test_services_parse_string_raises():
         InvalidSchemaError
     ):
         mock_parser.parseString.side_effect = Exception
-        xsd_types.ServiceDescription.from_xml(b'')
+        xsd_types.ServiceDescription.from_xml(b"")
 
 
 def test_service_no_action():
@@ -77,7 +77,7 @@ def test_service_no_action():
 
     with mock.patch(SERVICE_PARSER) as mock_parser:
         mock_parser.parseString.return_value = xsd_scpd
-        scpd = xsd_types.ServiceDescription.from_xml(b'')
+        scpd = xsd_types.ServiceDescription.from_xml(b"")
 
     assert isinstance(scpd.actions, list)
 
@@ -154,7 +154,7 @@ def test_device():
 
     with mock.patch(DEVICE_PARSER) as mock_parser:
         mock_parser.parseString.return_value = root
-        device = xsd_types.DeviceDescription.from_xml(b'')
+        device = xsd_types.DeviceDescription.from_xml(b"")
 
     assert device.firmware_version == "FirmwareVersionValue"
     assert device.name == "FriendlyNameValue"
@@ -180,7 +180,7 @@ def test_device_missing_required_fields(exclude):
         InvalidSchemaError
     ):
         mock_parser.parseString.return_value = root
-        xsd_types.DeviceDescription.from_xml(b'')
+        xsd_types.DeviceDescription.from_xml(b"")
 
 
 def test_device_missing_optional_fields():
@@ -193,7 +193,7 @@ def test_device_missing_optional_fields():
     root = device_parser.root(device=xsd_device)
     with mock.patch(DEVICE_PARSER) as mock_parser:
         mock_parser.parseString.return_value = root
-        device = xsd_types.DeviceDescription.from_xml(b'')
+        device = xsd_types.DeviceDescription.from_xml(b"")
 
     assert device.firmware_version == ""
     assert device.mac == ""
@@ -210,7 +210,7 @@ def test_device_missing_device():
         InvalidSchemaError
     ):
         mock_parser.parseString.return_value = root
-        xsd_types.DeviceDescription.from_xml(b'')
+        xsd_types.DeviceDescription.from_xml(b"")
 
 
 def test_device_wrong_manufacturer():
@@ -222,7 +222,7 @@ def test_device_wrong_manufacturer():
         InvalidSchemaError
     ):
         mock_parser.parseString.return_value = root
-        xsd_types.DeviceDescription.from_xml(b'')
+        xsd_types.DeviceDescription.from_xml(b"")
 
 
 def test_device_parser_raises():
@@ -230,7 +230,7 @@ def test_device_parser_raises():
         InvalidSchemaError
     ):
         mock_parser.parseString.side_effect = Exception
-        xsd_types.DeviceDescription.from_xml(b'')
+        xsd_types.DeviceDescription.from_xml(b"")
 
 
 def test_no_six_import():
@@ -242,11 +242,11 @@ def test_no_six_import():
     import_modules = [
         e.module for e in device_ast.body if isinstance(e, ast.ImportFrom)
     ]
-    assert 'six.moves' not in import_modules
+    assert "six.moves" not in import_modules
 
     with open("pywemo/ouimeaux_device/api/xsd/service.py") as service_py:
         service_ast = ast.parse(service_py.read())
     import_modules = [
         e.module for e in service_ast.body if isinstance(e, ast.ImportFrom)
     ]
-    assert 'six.moves' not in import_modules
+    assert "six.moves" not in import_modules

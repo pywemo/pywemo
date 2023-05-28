@@ -29,8 +29,8 @@ EVENT_TYPE_LONG_PRESS = "LongPress"
 
 LOG = logging.getLogger(__name__)
 NS = "{urn:schemas-upnp-org:event-1-0}"
-RESPONSE_SUCCESS = '<html><body><h1>200 OK</h1></body></html>'
-RESPONSE_NOT_FOUND = '<html><body><h1>404 Not Found</h1></body></html>'
+RESPONSE_SUCCESS = "<html><body><h1>200 OK</h1></body></html>"
+RESPONSE_NOT_FOUND = "<html><body><h1>404 Not Found</h1></body></html>"
 SUBSCRIPTION_RETRY = 60
 
 VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
@@ -156,18 +156,18 @@ class Subscription:
         subscription will be created.
         """
         if self.subscription_id:  # Renew existing subscription.
-            headers = {'SID': self.subscription_id}
+            headers = {"SID": self.subscription_id}
         else:  # Start a new subscription.
             callback_address = get_callback_address(
                 host=self.device.host,
                 port=self.callback_port,
             )
 
-            callback = f'<http://{callback_address}{self.path}>'
-            headers = {'CALLBACK': callback, 'NT': 'upnp:event'}
-        headers['TIMEOUT'] = f'Second-{self.default_timeout_seconds}'
+            callback = f"<http://{callback_address}{self.path}>"
+            headers = {"CALLBACK": callback, "NT": "upnp:event"}
+        headers["TIMEOUT"] = f"Second-{self.default_timeout_seconds}"
         return requests.request(
-            method='SUBSCRIBE',
+            method="SUBSCRIBE",
             url=self.url,
             headers=headers,
             timeout=REQUESTS_TIMEOUT,
@@ -181,9 +181,9 @@ class Subscription:
         """
         if self.subscription_id:
             requests.request(
-                method='UNSUBSCRIBE',
+                method="UNSUBSCRIBE",
                 url=self.url,
-                headers={'SID': self.subscription_id},
+                headers={"SID": self.subscription_id},
                 timeout=REQUESTS_TIMEOUT,
             )
             self.subscription_id = None
@@ -194,10 +194,10 @@ class Subscription:
         Returns:
             The duration of the subscription in seconds.
         """
-        self.subscription_id = headers.get('SID', self.subscription_id)
-        if timeout_header := headers.get('TIMEOUT', None):
+        self.subscription_id = headers.get("SID", self.subscription_id)
+        if timeout_header := headers.get("TIMEOUT", None):
             timeout = min(
-                int(timeout_header.replace('Second-', '')),
+                int(timeout_header.replace("Second-", "")),
                 self.default_timeout_seconds,
             )
         else:
@@ -221,7 +221,7 @@ class Subscription:
     @property
     def path(self) -> str:
         """Path for the callback to disambiguate multiple subscriptions."""
-        return f'/sub/{self.service_name}'
+        return f"/sub/{self.service_name}"
 
     @property
     def is_subscribed(self) -> bool:
@@ -245,7 +245,7 @@ class HTTPServer(ThreadingHTTPServer):
 
 def _start_server(port: int | None) -> HTTPServer:
     """Find a valid open port and start the HTTP server."""
-    requested_port = port or os.getenv('PYWEMO_HTTP_SERVER_PORT')
+    requested_port = port or os.getenv("PYWEMO_HTTP_SERVER_PORT")
     if requested_port is not None:
         start_port = int(requested_port)
         ports_to_check = 1
@@ -256,7 +256,7 @@ def _start_server(port: int | None) -> HTTPServer:
     for i in range(0, ports_to_check):
         port = start_port + i
         try:
-            return HTTPServer(('', port), RequestHandler)
+            return HTTPServer(("", port), RequestHandler)
         except OSError as error:
             last_error = error
     raise last_error
@@ -335,13 +335,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         outer = self.server.outer
         if (device := outer.devices.get(sender_ip)) is None:
             LOG.warning(
-                'Received %s event for unregistered device %s',
+                "Received %s event for unregistered device %s",
                 self.path,
                 sender_ip,
             )
         else:
             doc = self._get_xml_from_http_body()
-            for propnode in doc.findall(f'./{NS}property'):
+            for propnode in doc.findall(f"./{NS}property"):
                 for property_ in list(propnode):
                     text = property_.text or ""
                     outer.event(device, property_.tag, text, path=self.path)
@@ -364,11 +364,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             outer = self.server.outer
             if (device := outer.devices.get(sender_ip)) is None:
                 LOG.warning(
-                    'Received event for unregistered device %s', sender_ip
+                    "Received event for unregistered device %s", sender_ip
                 )
             else:
                 doc = self._get_xml_from_http_body()
-                binary_state = doc.find('.//BinaryState')
+                binary_state = doc.find(".//BinaryState")
                 if binary_state is not None:
                     text = binary_state.text
                     outer.event(device, EVENT_TYPE_LONG_PRESS, text)
@@ -386,7 +386,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_header(
                 "SID", "uuid:a74b23d5-34b9-4f71-9f87-bed24353f304"
             )
-            self.send_header('Connection', 'close')
+            self.send_header("Connection", "close")
             self.end_headers()
         else:
             self._send_response(404, RESPONSE_NOT_FOUND)
@@ -395,16 +395,16 @@ class RequestHandler(BaseHTTPRequestHandler):
         self, code: int, body: str, *, content_type: str = "text/html"
     ) -> None:
         self.send_response(code)
-        self.send_header('Content-Type', content_type)
-        self.send_header('Content-Length', str(len(body)))
-        self.send_header('Connection', 'close')
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Connection", "close")
         self.end_headers()
         if body:
             self.wfile.write(body.encode("UTF-8"))
 
     def _get_xml_from_http_body(self) -> et.Element:
         """Build the element tree root from the body of the http request."""
-        content_len = int(self.headers.get('content-length', 0))
+        content_len = int(self.headers.get("content-length", 0))
         data = self.rfile.read(content_len)
         # trim garbage from end, if any
         data = data.strip()
@@ -425,9 +425,9 @@ class SubscriptionRegistry:
     # Potential service endpoints for subscriptions. A Subscription will be
     # created for each entry as long as the service is supported by the device.
     subscription_service_names: Iterable[str] = (
-        'basicevent',
-        'bridge',
-        'insight',
+        "basicevent",
+        "bridge",
+        "insight",
     )
 
     def __init__(self, requested_port: int | None = None) -> None:
@@ -544,7 +544,7 @@ class SubscriptionRegistry:
         """Execute the callback for a received event."""
         LOG.debug(
             "Received %s event from %s(%s) - %s %s",
-            path or 'an',
+            path or "an",
             device,
             device.host,
             type_,
@@ -558,7 +558,7 @@ class SubscriptionRegistry:
                     break
             else:
                 LOG.warning(
-                    'Received unexpected subscription path (%s) for device %s',
+                    "Received unexpected subscription path (%s) for device %s",
                     path,
                     device,
                 )
@@ -595,16 +595,16 @@ class SubscriptionRegistry:
         self._httpd = _start_server(self._requested_port)
         if self._httpd is None:
             raise SubscriptionRegistryFailed(
-                'Unable to bind a port for listening'
+                "Unable to bind a port for listening"
             )
         self._http_thread = threading.Thread(
-            target=self._run_http_server, name='Wemo HTTP Thread'
+            target=self._run_http_server, name="Wemo HTTP Thread"
         )
         self._http_thread.daemon = True
         self._http_thread.start()
 
         self._event_thread = threading.Thread(
-            target=self._run_event_loop, name='Wemo Events Thread'
+            target=self._run_event_loop, name="Wemo Events Thread"
         )
         self._event_thread.daemon = True
         self._event_thread.start()

@@ -73,14 +73,14 @@ class CrockPot(Switch):
     def subscription_update(self, _type: str, _params: str) -> bool:
         """Handle reports from device."""
         if _type == self.EVENT_TYPE_MODE:
-            self._attributes['mode'] = _params
+            self._attributes["mode"] = _params
             self._state = self.mode
             return True
         if _type == self.EVENT_TYPE_TIME:
-            self._attributes['time'] = _params
+            self._attributes["time"] = _params
             return True
         if _type == self.EVENT_TYPE_COOKED_TIME:
-            self._attributes['cookedTime'] = _params
+            self._attributes["cookedTime"] = _params
             return True
 
         return super().subscription_update(_type, _params)
@@ -88,7 +88,7 @@ class CrockPot(Switch):
     @property
     def mode(self) -> CrockPotMode:
         """Return the mode of the device."""
-        return CrockPotMode(int(self._attributes.get('mode', _UNKNOWN)))
+        return CrockPotMode(int(self._attributes.get("mode", _UNKNOWN)))
 
     @property
     def mode_string(self) -> str:
@@ -98,12 +98,12 @@ class CrockPot(Switch):
     @property
     def remaining_time(self) -> int:
         """Return the remaining time in minutes."""
-        return int(self._attributes.get('time', 0))
+        return int(self._attributes.get("time", 0))
 
     @property
     def cooked_time(self) -> int:
         """Return the cooked time in minutes."""
-        return int(self._attributes.get('cookedTime', 0))
+        return int(self._attributes.get("cookedTime", 0))
 
     def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""

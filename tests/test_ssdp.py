@@ -10,7 +10,7 @@ from pywemo import ssdp
 
 MOCK_CALLBACK_PORT = 8989
 MOCK_IP_ADDRESS = "5.6.7.8"
-MOCK_CALLBACK_ADDRESS = f'{MOCK_IP_ADDRESS}:{MOCK_CALLBACK_PORT}'
+MOCK_CALLBACK_ADDRESS = f"{MOCK_IP_ADDRESS}:{MOCK_CALLBACK_PORT}"
 
 
 @pytest.fixture()
@@ -124,8 +124,8 @@ def test_discovery_responder_notify(
     resp = ssdp.DiscoveryResponder(callback_port=MOCK_CALLBACK_PORT)
     resp.send_notify()
     mock_socket.sendto.assert_called_with(
-        (ssdp.SSDP_NOTIFY % MOCK_CALLBACK_ADDRESS).encode('utf-8'),
-        ('239.255.255.250', 1900),
+        (ssdp.SSDP_NOTIFY % MOCK_CALLBACK_ADDRESS).encode("utf-8"),
+        ("239.255.255.250", 1900),
     )
 
 
@@ -199,38 +199,38 @@ HOST: 239.255.255.250:1900
 class TestScan:
     """Tests for the ssdp.scan method."""
 
-    _R1 = '\r\n'.join(
+    _R1 = "\r\n".join(
         [
-            'HTTP/1.1 200 OK',
-            'HOST: 239.255.255.250:1900',
-            'CACHE-CONTROL: max-age=1800',
-            'LOCATION: http://192.168.1.100:49158/setup.xml',
-            'SERVER: Unspecified, UPnP/1.0, Unspecified',
-            'ST: urn:Belkin:service:basicevent:1',
-            'USN: uuid:Socket-1_0-SERIAL::urn:Belkin:service:basicevent:1',
-            '',
+            "HTTP/1.1 200 OK",
+            "HOST: 239.255.255.250:1900",
+            "CACHE-CONTROL: max-age=1800",
+            "LOCATION: http://192.168.1.100:49158/setup.xml",
+            "SERVER: Unspecified, UPnP/1.0, Unspecified",
+            "ST: urn:Belkin:service:basicevent:1",
+            "USN: uuid:Socket-1_0-SERIAL::urn:Belkin:service:basicevent:1",
+            "",
         ]
     ).encode()
-    _R2 = '\r\n'.join(
+    _R2 = "\r\n".join(
         [
-            'HTTP/1.1 200 OK',
-            'HOST: 239.255.255.250:1900',
-            'CACHE-CONTROL: max-age=1800',
-            'LOCATION: http://192.168.1.100:49158/setup.xml',
-            'SERVER: Unspecified, UPnP/1.0, Unspecified',
-            'ST: upnp:rootdevice',
-            'USN: uuid:Socket-1_0-SERIAL2::upnp:rootdevice',
-            '',
+            "HTTP/1.1 200 OK",
+            "HOST: 239.255.255.250:1900",
+            "CACHE-CONTROL: max-age=1800",
+            "LOCATION: http://192.168.1.100:49158/setup.xml",
+            "SERVER: Unspecified, UPnP/1.0, Unspecified",
+            "ST: upnp:rootdevice",
+            "USN: uuid:Socket-1_0-SERIAL2::upnp:rootdevice",
+            "",
         ]
     ).encode()
 
     @pytest.mark.parametrize(
         "kwargs,expected_count",
         [
-            ({'match_udn': 'no_match'}, 0),
+            ({"match_udn": "no_match"}, 0),
             ({}, 2),
-            ({'match_udn': 'uuid:Socket-1_0-SERIAL'}, 1),
-            ({'match_udn': 'uuid:Socket-1_0-SERIAL2'}, 1),
+            ({"match_udn": "uuid:Socket-1_0-SERIAL"}, 1),
+            ({"match_udn": "uuid:Socket-1_0-SERIAL2"}, 1),
         ],
     )
     def test_scan(

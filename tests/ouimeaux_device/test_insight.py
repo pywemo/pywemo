@@ -14,8 +14,8 @@ class Test_Insight:
 
     @pytest.fixture
     def insight(self, vcr):
-        with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml'):
-            return Insight('http://192.168.1.100:49153/setup.xml')
+        with vcr.use_cassette("WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml"):
+            return Insight("http://192.168.1.100:49153/setup.xml")
 
     @pytest.mark.vcr()
     def test_turn_on(self, insight):
@@ -70,14 +70,14 @@ class Test_Insight:
         subscription_registry.event(
             insight,
             EVENT_TYPE_BINARY_STATE,
-            '1',
+            "1",
         )
         assert insight.get_state() == 1
 
         subscription_registry.event(
             insight,
             EVENT_TYPE_INSIGHT_PARAMS,
-            '8|1611105078|2607|0|12416|1209600|328|500|457600|69632638|9500',
+            "8|1611105078|2607|0|12416|1209600|328|500|457600|69632638|9500",
         )
         assert insight.today_kwh == pytest.approx(0.0076266668)
         assert insight.total_kwh == pytest.approx(1.1605439898)

@@ -14,14 +14,14 @@ from pywemo import Bridge, Insight, LightSwitch, subscribe
 @pytest.fixture
 def device(vcr):
     """Mock WeMo Insight device."""
-    with vcr.use_cassette('WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml'):
-        return Insight('http://192.168.1.100:49153/setup.xml')
+    with vcr.use_cassette("WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml"):
+        return Insight("http://192.168.1.100:49153/setup.xml")
 
 
 @pytest.fixture
 def bridge(vcr):
-    with vcr.use_cassette('WeMo_WW_2.00.11057.PVT-OWRT-Link.yaml'):
-        return Bridge('http://192.168.1.100:49153/setup.xml')
+    with vcr.use_cassette("WeMo_WW_2.00.11057.PVT-OWRT-Link.yaml"):
+        return Bridge("http://192.168.1.100:49153/setup.xml")
 
 
 class Test_RequestHandler:
@@ -94,19 +94,19 @@ class Test_RequestHandler:
         response = requests.request(
             "NOTIFY",
             f"{server_url}/path",
-            data='''<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">
+            data="""<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">
 <e:property>
 <BinaryState>0</BinaryState>
 </e:property>
-</e:propertyset>''',
+</e:propertyset>""",
         )
         assert response.status_code == 200
         assert response.content == subscribe.RESPONSE_SUCCESS.encode("UTF-8")
         outer.event.assert_called_once_with(
             mock_light_switch,
             subscribe.EVENT_TYPE_BINARY_STATE,
-            '0',
-            path='/path',
+            "0",
+            path="/path",
         )
 
     def test_GET_setup_xml(self, server_url):
@@ -133,19 +133,19 @@ class Test_RequestHandler:
         outer.devices[server_address] = mock_light_switch
         response = requests.post(
             f"{server_url}/upnp/control/basicevent1",
-            data='''<?xml version="1.0" encoding="utf-8"?>
+            data="""<?xml version="1.0" encoding="utf-8"?>
 <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
 <s:Body>
 <u:SetBinaryState xmlns:u="urn:Belkin:service:basicevent:1">
 <BinaryState>0</BinaryState>
 </u:SetBinaryState>
 </s:Body>
-</s:Envelope>''',  # noqa: E501
+</s:Envelope>""",  # noqa: E501
         )
         assert response.status_code == 200
         assert response.content == subscribe.RESPONSE_SUCCESS.encode("UTF-8")
         outer.event.assert_called_once_with(
-            mock_light_switch, subscribe.EVENT_TYPE_LONG_PRESS, '0'
+            mock_light_switch, subscribe.EVENT_TYPE_LONG_PRESS, "0"
         )
 
     def test_POST_default_404(self, server_url):
@@ -181,63 +181,63 @@ class Test_Subscription:
     @pytest.fixture(autouse=True)
     def get_callback_address(self):
         with mock.patch(
-            'pywemo.subscribe.get_callback_address'
+            "pywemo.subscribe.get_callback_address"
         ) as mock_ip_address:
-            mock_ip_address.return_value = f'192.168.1.1:{self.http_port}'
+            mock_ip_address.return_value = f"192.168.1.1:{self.http_port}"
             yield mock_ip_address
 
     @pytest.fixture(
         params=subscribe.SubscriptionRegistry.subscription_service_names
     )
     def subscription(self, request, device, bridge):
-        if request.param == 'bridge':
+        if request.param == "bridge":
             return subscribe.Subscription(
                 bridge, self.http_port, request.param
             )
         return subscribe.Subscription(device, self.http_port, request.param)
 
     def test_url(self, subscription):
-        base_url = 'http://192.168.1.100:49153/upnp/event'
-        assert subscription.url == f'{base_url}/{subscription.service_name}1'
+        base_url = "http://192.168.1.100:49153/upnp/event"
+        assert subscription.url == f"{base_url}/{subscription.service_name}1"
 
-    @mock.patch('requests.request')
+    @mock.patch("requests.request")
     def test_maintain(self, mock_request, subscription):
         mock_response = mock.create_autospec(requests.Response, instance=True)
-        mock_response.headers = {'SID': 'uuid:123', 'TIMEOUT': 'Second-222'}
+        mock_response.headers = {"SID": "uuid:123", "TIMEOUT": "Second-222"}
         mock_response.status_code = requests.codes.ok
         mock_request.return_value = mock_response
 
         assert subscription.maintain() == 222
-        assert subscription.subscription_id == 'uuid:123'
+        assert subscription.subscription_id == "uuid:123"
         assert subscription.expiration_time == pytest.approx(
             time.time() + 222, abs=2
         )
         mock_request.assert_called_once_with(
-            method='SUBSCRIBE',
+            method="SUBSCRIBE",
             url=subscription.url,
             headers={
-                'CALLBACK': f'<http://192.168.1.1:8989{subscription.path}>',
-                'NT': 'upnp:event',
-                'TIMEOUT': 'Second-300',
+                "CALLBACK": f"<http://192.168.1.1:8989{subscription.path}>",
+                "NT": "upnp:event",
+                "TIMEOUT": "Second-300",
             },
             timeout=subscribe.REQUESTS_TIMEOUT,
         )
 
         # Now test subscription renewal.
         mock_request.reset_mock()
-        mock_response.headers = {'SID': 'uuid:321', 'TIMEOUT': 'Second-765'}
+        mock_response.headers = {"SID": "uuid:321", "TIMEOUT": "Second-765"}
         mock_response.status_code = requests.codes.ok
         mock_request.return_value = mock_response
 
         assert subscription.maintain() == 300
-        assert subscription.subscription_id == 'uuid:321'
+        assert subscription.subscription_id == "uuid:321"
         assert subscription.expiration_time == pytest.approx(
             time.time() + 300, abs=2
         )
         mock_request.assert_called_once_with(
-            method='SUBSCRIBE',
+            method="SUBSCRIBE",
             url=subscription.url,
-            headers={'SID': 'uuid:123', 'TIMEOUT': 'Second-300'},
+            headers={"SID": "uuid:123", "TIMEOUT": "Second-300"},
             timeout=subscribe.REQUESTS_TIMEOUT,
         )
 
@@ -248,46 +248,46 @@ class Test_Subscription:
         mock_request.side_effect = requests.ReadTimeout
         with pytest.raises(requests.ReadTimeout):
             subscription.maintain()
-        assert subscription.subscription_id == 'uuid:321'
+        assert subscription.subscription_id == "uuid:321"
 
         # Now test with the renewal failing with code 412.
         mock_request.reset_mock(side_effect=True)
         mock_response = mock.Mock()
-        mock_response.headers = {'SID': 'uuid:222', 'TIMEOUT': 'Second-333'}
+        mock_response.headers = {"SID": "uuid:222", "TIMEOUT": "Second-333"}
         type(mock_response).status_code = mock.PropertyMock(
             side_effect=[412, requests.codes.ok, requests.codes.ok]
         )
         mock_request.return_value = mock_response
 
         assert subscription.maintain() == 300
-        assert subscription.subscription_id == 'uuid:222'
+        assert subscription.subscription_id == "uuid:222"
         assert subscription.expiration_time == pytest.approx(
             time.time() + 300, abs=2
         )
         mock_request.assert_any_call(
-            method='SUBSCRIBE',
+            method="SUBSCRIBE",
             url=subscription.url,
-            headers={'SID': 'uuid:321', 'TIMEOUT': 'Second-300'},
+            headers={"SID": "uuid:321", "TIMEOUT": "Second-300"},
             timeout=subscribe.REQUESTS_TIMEOUT,
         )
         mock_request.assert_any_call(
-            method='UNSUBSCRIBE',
+            method="UNSUBSCRIBE",
             url=subscription.url,
-            headers={'SID': 'uuid:321'},
+            headers={"SID": "uuid:321"},
             timeout=subscribe.REQUESTS_TIMEOUT,
         )
         mock_request.assert_called_with(
-            method='SUBSCRIBE',
+            method="SUBSCRIBE",
             url=subscription.url,
             headers={
-                'CALLBACK': f'<http://192.168.1.1:8989{subscription.path}>',
-                'NT': 'upnp:event',
-                'TIMEOUT': 'Second-300',
+                "CALLBACK": f"<http://192.168.1.1:8989{subscription.path}>",
+                "NT": "upnp:event",
+                "TIMEOUT": "Second-300",
             },
             timeout=subscribe.REQUESTS_TIMEOUT,
         )
 
-    @mock.patch('requests.request', side_effect=requests.ReadTimeout)
+    @mock.patch("requests.request", side_effect=requests.ReadTimeout)
     def test_maintain_requests_exception(self, mock_request, subscription):
         with pytest.raises(requests.ReadTimeout):
             subscription.maintain()
@@ -297,14 +297,14 @@ class Test_Subscription:
         with pytest.raises(requests.HTTPError):
             subscription.maintain()
 
-    @mock.patch('requests.request')
+    @mock.patch("requests.request")
     def test_unsubscribe(self, mock_request, subscription):
-        subscription.subscription_id = 'uuid:321'
+        subscription.subscription_id = "uuid:321"
         subscription._unsubscribe()
         mock_request.called_once_with(
-            method='UNSUBSCRIBE',
+            method="UNSUBSCRIBE",
             url=subscription.url,
-            headers={'SID': 'uuid:321'},
+            headers={"SID": "uuid:321"},
             timeout=subscribe.REQUESTS_TIMEOUT,
         )
         assert subscription.subscription_id is None
@@ -320,14 +320,14 @@ class Test_Subscription:
             time.time() + 300, abs=2
         )
 
-        subscription._update_subscription({'SID': 'uuid:123'})
-        assert subscription.subscription_id == 'uuid:123'
+        subscription._update_subscription({"SID": "uuid:123"})
+        assert subscription.subscription_id == "uuid:123"
         assert subscription.expiration_time == pytest.approx(
             time.time() + 300, abs=2
         )
 
-        subscription._update_subscription({'TIMEOUT': 'Second-200'})
-        assert subscription.subscription_id == 'uuid:123'
+        subscription._update_subscription({"TIMEOUT": "Second-200"})
+        assert subscription.subscription_id == "uuid:123"
         assert subscription.expiration_time == pytest.approx(
             time.time() + 200, abs=2
         )
@@ -359,22 +359,22 @@ class Test_SubscriptionRegistry:
 
         device._state = 1
         assert subscription_registry.is_subscribed(device) is False
-        subscription_registry.event(device, '', '', path='/sub/insight')
+        subscription_registry.event(device, "", "", path="/sub/insight")
         assert subscription_registry.is_subscribed(device) is False
-        subscription_registry.event(device, '', '', path='/sub/basicevent')
+        subscription_registry.event(device, "", "", path="/sub/basicevent")
         assert subscription_registry.is_subscribed(device) is True
         device._state = 0
         assert subscription_registry.is_subscribed(device) is False
-        subscription_registry.event(device, '', '', path='invalid_path')
+        subscription_registry.event(device, "", "", path="invalid_path")
 
-        assert subscription_registry.devices['192.168.1.100'] == device
+        assert subscription_registry.devices["192.168.1.100"] == device
 
         subscription_registry.unregister(device)
 
         assert len(subscription_registry._sched.queue) == 0
 
     @mock.patch(
-        'requests.request', side_effect=requests.exceptions.ReadTimeout
+        "requests.request", side_effect=requests.exceptions.ReadTimeout
     )
     def test_subscribe_read_timeout_and_reconnect(
         self, mock_request, device, subscription_registry
@@ -391,10 +391,10 @@ class Test_SubscriptionRegistry:
 
         # Simulate a second failure to trigger a reconnect with the device.
         subscription_registry._sched.cancel(basic)
-        with mock.patch.object(device, 'reconnect_with_device') as reconnect:
+        with mock.patch.object(device, "reconnect_with_device") as reconnect:
 
             def change_url():
-                device.session.url = 'http://192.168.1.100:1234/'
+                device.session.url = "http://192.168.1.100:1234/"
 
             reconnect.side_effect = change_url
 
@@ -406,8 +406,8 @@ class Test_SubscriptionRegistry:
             basic.action(*basic.argument, **basic.kwargs)
 
         mock_request.assert_called_with(
-            method='SUBSCRIBE',
-            url='http://192.168.1.100:1234/upnp/event/basicevent1',
+            method="SUBSCRIBE",
+            url="http://192.168.1.100:1234/upnp/event/basicevent1",
             headers=mock.ANY,
             timeout=10,
         )
