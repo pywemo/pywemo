@@ -1,8 +1,13 @@
 """Tests for the pywemo.discovery module."""
+from __future__ import annotations
+
 import unittest.mock as mock
+from socket import gaierror
 
 import pytest
 import requests
+from hypothesis import given
+from hypothesis import strategies as st
 
 from pywemo import discovery, exceptions, ssdp
 
@@ -166,3 +171,24 @@ def test_call_once_per_uuid():
 
         discovery._call_once_per_uuid(uuid, decrement_call_count)
         assert call_count == 0
+
+
+@given(
+    host=st.one_of(st.ip_addresses(), st.text()),
+    port=st.one_of(st.none(), st.integers()),
+    raises=st.booleans(),
+)
+def test_setup_url_for_address(
+    host: str, port: int | None, raises: bool
+) -> None:
+    kwargs = {}
+    if raises:
+        kwargs["side_effect"] = gaierror
+    else:
+        kwargs["return_value"] = "127.0.0.1"
+    with mock.patch.object(
+        discovery, "gethostbyname", **kwargs
+    ), mock.patch.object(discovery, "probe_wemo", return_value=port):
+        url = discovery.setup_url_for_address(host=host, port=port)
+    if port:
+        assert url.endswith(f":{port}/setup.xml")
