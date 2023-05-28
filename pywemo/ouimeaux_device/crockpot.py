@@ -40,7 +40,7 @@ MODE_NAMES = {
 
 
 class _Attributes(TypedDict, total=False):
-    """LinkedDevice state dictionary type."""
+    """CrockPot state dictionary type."""
 
     cookedTime: int
     mode: int
