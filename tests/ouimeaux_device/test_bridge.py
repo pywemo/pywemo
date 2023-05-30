@@ -17,15 +17,15 @@ def bridge(vcr):
 
 @pytest.fixture
 def light(bridge):
-    assert LIGHT_ID in bridge.Lights
-    light = bridge.Lights[LIGHT_ID]
+    assert LIGHT_ID in bridge.lights
+    light = bridge.lights[LIGHT_ID]
     return light
 
 
 @pytest.fixture
 def group(bridge):
-    assert GROUP_ID in bridge.Groups
-    group = bridge.Groups[GROUP_ID]
+    assert GROUP_ID in bridge.groups
+    group = bridge.groups[GROUP_ID]
     return group
 
 
@@ -274,4 +274,4 @@ def test_subscription_update(update, expected_updated, expected_state, bridge):
     updated = bridge.subscription_update("StatusChange", update)
     assert updated == expected_updated
     if updated:
-        assert bridge.Lights[LIGHT_ID].get_state() == expected_state
+        assert bridge.lights[LIGHT_ID].get_state() == expected_state
