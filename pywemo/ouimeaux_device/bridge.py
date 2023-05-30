@@ -41,14 +41,16 @@ def limit(value: int, min_val: int, max_val: int) -> int:
 class Bridge(Device):
     """Representation of a WeMo Bridge (Link) device."""
 
-    Lights: dict[str, Light] = {}
-    Groups: dict[str, Group] = {}
+    Lights: dict[str, Light]
+    Groups: dict[str, Group]
 
     EVENT_TYPE_STATUS_CHANGE = "StatusChange"
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo Bridge (Link) device."""
         super().__init__(*args, **kwargs)
+        self.Lights = {}  # pylint: disable=invalid-name
+        self.Groups = {}  # pylint: disable=invalid-name
         self.bridge_update()
 
     def __repr__(self) -> str:
