@@ -41,14 +41,16 @@ def limit(value: int, min_val: int, max_val: int) -> int:
 class Bridge(Device):
     """Representation of a WeMo Bridge (Link) device."""
 
-    Lights: dict[str, Light] = {}
-    Groups: dict[str, Group] = {}
+    lights: dict[str, Light]
+    groups: dict[str, Group]
 
     EVENT_TYPE_STATUS_CHANGE = "StatusChange"
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a WeMo Bridge (Link) device."""
         super().__init__(*args, **kwargs)
+        self.lights = {}
+        self.groups = {}
         self.bridge_update()
 
     def __repr__(self) -> str:
@@ -56,7 +58,7 @@ class Bridge(Device):
         return (
             '<WeMo Bridge "{name}", Lights: {lights}, ' + "Groups: {groups}>"
         ).format(
-            name=self.name, lights=len(self.Lights), groups=len(self.Groups)
+            name=self.name, lights=len(self.lights), groups=len(self.groups)
         )
 
     @property
@@ -73,7 +75,7 @@ class Bridge(Device):
         self, force_update: bool = True
     ) -> tuple[dict[str, Light], dict[str, Group]]:
         """Get updated status information for the bridge and its lights."""
-        if force_update or self.Lights is None or self.Groups is None:
+        if force_update or self.lights is None or self.groups is None:
             plugin_udn = self.basicevent.GetMacAddr().get("PluginUDN")
 
             if hasattr(self.bridge, "GetEndDevicesWithStatus"):
@@ -86,7 +88,7 @@ class Bridge(Device):
                 )
 
             if not (end_devices_xml := end_devices.get("DeviceLists")):
-                return self.Lights, self.Groups
+                return self.lights, self.groups
 
             end_device_list = et.fromstring(
                 end_devices_xml.encode("utf-8"),
@@ -94,18 +96,18 @@ class Bridge(Device):
             )
 
             for light in end_device_list.iter("DeviceInfo"):
-                if (uniqueID := light.find("DeviceID").text) in self.Lights:
-                    self.Lights[uniqueID].update_state(light)
+                if (uniqueID := light.find("DeviceID").text) in self.lights:
+                    self.lights[uniqueID].update_state(light)
                 else:
-                    self.Lights[uniqueID] = Light(self, light)
+                    self.lights[uniqueID] = Light(self, light)
 
             for group in end_device_list.iter("GroupInfo"):
-                if (uniqueID := group.find("GroupID").text) in self.Groups:
-                    self.Groups[uniqueID].update_state(group)
+                if (uniqueID := group.find("GroupID").text) in self.groups:
+                    self.groups[uniqueID].update_state(group)
                 else:
-                    self.Groups[uniqueID] = Group(self, group)
+                    self.groups[uniqueID] = Group(self, group)
 
-        return self.Lights, self.Groups
+        return self.lights, self.groups
 
     def get_state(self, force_update: bool = False) -> int:
         """Update the state of the Bridge device."""
@@ -125,11 +127,11 @@ class Bridge(Device):
                 return False
             if not (key := state_event.findtext("DeviceID")):
                 return False
-            if key in self.Lights:
-                return self.Lights[key].subscription_update(state_event)
+            if key in self.lights:
+                return self.lights[key].subscription_update(state_event)
 
-            if key in self.Groups:
-                return self.Groups[key].subscription_update(state_event)
+            if key in self.groups:
+                return self.groups[key].subscription_update(state_event)
 
             return False
         return super().subscription_update(_type, _param)
