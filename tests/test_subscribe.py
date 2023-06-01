@@ -8,7 +8,7 @@ from http.server import HTTPServer
 import pytest
 import requests
 
-from pywemo import Bridge, Insight, LightSwitch, subscribe
+from pywemo import Bridge, Insight, LightSwitch, exceptions, subscribe
 
 
 @pytest.fixture
@@ -164,6 +164,16 @@ class Test_RequestHandler:
         """POST request for unrecognized path returns 404 error."""
         response = requests.post(f"{server_url}/")
         assert response.status_code == 404
+
+    def test_POST_from_pywemo(self, server_url, light_switch):
+        """Validate the POST request handler using a pyWeMo device."""
+        light_switch.session.url = server_url
+        assert light_switch.get_state(True) == 0
+        light_switch.on()
+        assert light_switch.get_state() == 1
+        assert light_switch.get_state(True) == 0
+        with pytest.raises(exceptions.SOAPFault):
+            light_switch.basicevent.GetFriendlyName()
 
     def test_SUBSCRIBE_state(self, server_url):
         """SUBSCRIBE response contains appropriate UPnP headers."""
