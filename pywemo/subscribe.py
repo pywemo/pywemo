@@ -391,6 +391,16 @@ class RequestHandler(BaseHTTPRequestHandler):
         else:
             self._send_response(404, RESPONSE_NOT_FOUND)
 
+    def do_UNSUBSCRIBE(self) -> None:  # pylint: disable=invalid-name
+        """Handle UNSUBSCRIBE requests for a Virtual WeMo device."""
+        if self.path.endswith("/upnp/event/basicevent1"):
+            self.send_response(200)
+            self.send_header("CONTENT-LENGTH", "0")
+            self.send_header("Connection", "close")
+            self.end_headers()
+        else:
+            self._send_response(404, RESPONSE_NOT_FOUND)
+
     def _send_response(
         self, code: int, body: str, *, content_type: str = "text/html"
     ) -> None:

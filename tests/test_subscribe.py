@@ -24,6 +24,12 @@ def bridge(vcr):
         return Bridge("http://192.168.1.100:49153/setup.xml")
 
 
+@pytest.fixture
+def light_switch(vcr):
+    with vcr.use_cassette("WeMo_WW_2.00.11408.PVT-OWRT-LS"):
+        return LightSwitch("http://192.168.1.100:49153/setup.xml")
+
+
 class Test_RequestHandler:
     """Test the server request handler."""
 
@@ -171,6 +177,32 @@ class Test_RequestHandler:
         """SUBSCRIBE request for unrecognized path returns 404 error."""
         response = requests.request("SUBSCRIBE", f"{server_url}/")
         assert response.status_code == 404
+
+    def test_UNSUBSCRIBE_state(self, server_url):
+        """UNSUBSCRIBE response contains appropriate UPnP headers."""
+        response = requests.request(
+            "UNSUBSCRIBE", f"{server_url}/upnp/event/basicevent1"
+        )
+        assert response.status_code == 200
+        assert response.content == b""
+        assert response.headers["CONTENT-LENGTH"] == "0"
+
+    def test_UNSUBSCRIBE_default_404(self, server_url):
+        """UNSUBSCRIBE request for unrecognized path returns 404 error."""
+        response = requests.request("UNSUBSCRIBE", f"{server_url}/")
+        assert response.status_code == 404
+
+    def test_SUBSCRIBE_and_UNSUBSCRIBE_from_subscription(
+        self, server_url, light_switch, http_server
+    ):
+        """Validate SUBSCRIBE/UNSUBSCRIBE work for a pyWeMo Subscription."""
+        light_switch.session.url = server_url
+        subscription = subscribe.Subscription(
+            light_switch, http_server.server_address[0], "basicevent"
+        )
+        subscription.default_timeout_seconds = 3600
+        assert subscription.maintain() == 1801
+        subscription._unsubscribe()
 
 
 class Test_Subscription:
