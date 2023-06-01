@@ -61,7 +61,10 @@ class AttributeDevice(Switch):
                 for attribute in et.fromstring(
                     xml_blob, parser=et.XMLParser(resolve_entities=False)
                 )
-                if len(attribute) >= 2 and _is_int_or_float(attribute[1].text)
+                if len(attribute) >= 2
+                and attribute[0].text is not None
+                and attribute[1].text is not None
+                and _is_int_or_float(attribute[1].text)
             }
         )
 
