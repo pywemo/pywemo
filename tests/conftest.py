@@ -6,8 +6,14 @@ import unittest.mock as mock
 from http.server import HTTPServer
 
 import pytest
+from hypothesis import settings
 
 from pywemo import SubscriptionRegistry
+
+settings.register_profile(
+    "ci", max_examples=1000, deadline=1000.0  # Milliseconds
+)
+settings.load_profile("ci" if os.getenv("CI") else "default")
 
 
 @pytest.fixture(scope="module")
