@@ -257,7 +257,7 @@ class Action:
                         fault_element=response_element,
                     )
                 return {
-                    response_item.tag: response_item.text
+                    response_item.tag: response_item.text or ""
                     for response_item in response_element
                 }
 

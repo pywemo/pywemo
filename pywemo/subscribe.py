@@ -343,8 +343,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             doc = self._get_xml_from_http_body()
             for propnode in doc.findall(f"./{NS}property"):
                 for property_ in list(propnode):
-                    text = property_.text or ""
-                    outer.event(device, property_.tag, text, path=self.path)
+                    outer.event(
+                        device,
+                        property_.tag,
+                        property_.text or "",
+                        path=self.path,
+                    )
 
         self._send_response(200, RESPONSE_SUCCESS)
 
@@ -368,10 +372,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                 )
             else:
                 doc = self._get_xml_from_http_body()
-                binary_state = doc.find(".//BinaryState")
-                if binary_state is not None:
-                    text = binary_state.text
-                    outer.event(device, EVENT_TYPE_LONG_PRESS, text)
+                if binary_state := doc.findtext(".//BinaryState"):
+                    outer.event(device, EVENT_TYPE_LONG_PRESS, binary_state)
             self._send_response(200, RESPONSE_SUCCESS)
         else:
             self._send_response(404, RESPONSE_NOT_FOUND)
@@ -412,7 +414,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         if body:
             self.wfile.write(body.encode("UTF-8"))
 
-    def _get_xml_from_http_body(self) -> et.Element:
+    def _get_xml_from_http_body(self) -> et._Element:
         """Build the element tree root from the body of the http request."""
         content_len = int(self.headers.get("content-length", 0))
         data = self.rfile.read(content_len)

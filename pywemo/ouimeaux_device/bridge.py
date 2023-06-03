@@ -9,6 +9,7 @@ from typing import Any, TypedDict
 from lxml import etree as et
 
 from ..color import ColorXY, get_profiles, limit_to_gamut
+from ..exceptions import InvalidSchemaError
 from . import Device
 from .api.service import RequiredService
 
@@ -96,16 +97,24 @@ class Bridge(Device):
             )
 
             for light in end_device_list.iter("DeviceInfo"):
-                if (uniqueID := light.find("DeviceID").text) in self.lights:
-                    self.lights[uniqueID].update_state(light)
+                if not (device_id := light.findtext("DeviceID")):
+                    raise InvalidSchemaError(
+                        f"DeviceID missing: {et.tostring(light).decode()}"
+                    )
+                if device_id in self.lights:
+                    self.lights[device_id].update_state(light)
                 else:
-                    self.lights[uniqueID] = Light(self, light)
+                    self.lights[device_id] = Light(self, light)
 
             for group in end_device_list.iter("GroupInfo"):
-                if (uniqueID := group.find("GroupID").text) in self.groups:
-                    self.groups[uniqueID].update_state(group)
+                if not (group_id := group.findtext("GroupID")):
+                    raise InvalidSchemaError(
+                        f"GroupID missing: {et.tostring(group).decode()}"
+                    )
+                if group_id in self.groups:
+                    self.groups[group_id].update_state(group)
                 else:
-                    self.groups[uniqueID] = Group(self, group)
+                    self.groups[group_id] = Group(self, group)
 
         return self.lights, self.groups
 
@@ -136,7 +145,7 @@ class Bridge(Device):
             return False
         return super().subscription_update(_type, _param)
 
-    def bridge_getdevicestatus(self, deviceid: str) -> et.Element | None:
+    def bridge_getdevicestatus(self, deviceid: str) -> et._Element | None:
         """Return the list of device statuses for the bridge's lights."""
         status_list = self.bridge.GetDeviceStatus(DeviceIDs=deviceid)
         device_status_list_xml = status_list.get("DeviceStatusList")
@@ -180,20 +189,20 @@ class DeviceState(TypedDict, total=False):
 class LinkedDevice:
     """Representation of a device connected to the bridge."""
 
-    def __init__(self, bridge: Bridge, info: et.Element) -> None:
+    def __init__(self, bridge: Bridge, info: et._Element) -> None:
         """Create a Linked Device."""
-        self.bridge = bridge
-        self.host = self.bridge.host
-        self.port = self.bridge.port
-        self.name = ""
+        self.bridge: Bridge = bridge
+        self.host: str = self.bridge.host
+        self.port: int = self.bridge.port
+        self.name: str = ""
         self.state: DeviceState = {}
         self.capabilities: list[str] = []
         self._values: list[str] = []
         self.update_state(info)
         self._last_err: dict[str, str] = {}
-        self.mac = self.bridge.mac
-        self.serial_number = self.bridge.serial_number
-        self.uniqueID = ""
+        self.mac: str = self.bridge.mac
+        self.serial_number: str = self.bridge.serial_number
+        self.uniqueID: str = ""
 
     def get_state(self, force_update: bool = False) -> DeviceState:
         """Return the status of the device."""
@@ -241,10 +250,11 @@ class LinkedDevice:
             colorx, colory = colorx / 65535.0, colory / 65535.0
             self.state["color_xy"] = colorx, colory
 
-    def subscription_update(self, state_event: et.Element) -> bool:
+    def subscription_update(self, state_event: et._Element) -> bool:
         """Update the light values due to a subscription update event."""
-        device_id = state_event.find("DeviceID")
-        if device_id.get("available", "YES").upper() == "YES":
+        if (
+            device_id := state_event.find("DeviceID")
+        ) is None or device_id.get("available", "YES").upper() == "YES":
             capability = state_event.findtext("CapabilityId")
             value = state_event.findtext("Value")
         else:
@@ -317,17 +327,17 @@ class LinkedDevice:
 class Light(LinkedDevice):
     """Representation of a Light connected to the Bridge."""
 
-    def __init__(self, bridge: Bridge, info: et.Element) -> None:
+    def __init__(self, bridge: Bridge, info: et._Element) -> None:
         """Create a Light device."""
         super().__init__(bridge, info)
 
-        self.device_index = info.findtext("DeviceIndex")
-        self.uniqueID = info.findtext("DeviceID")
-        self.iconvalue = info.findtext("IconVersion")
-        self.firmware = info.findtext("FirmwareVersion")
-        self.manufacturer = info.findtext("Manufacturer")
-        self.model = info.findtext("ModelCode")
-        self.certified = info.findtext("WeMoCertified")
+        self.device_index: str = info.findtext("DeviceIndex", "")
+        self.uniqueID: str = info.findtext("DeviceID", "")
+        self.iconvalue: str = info.findtext("IconVersion", "")
+        self.firmware: str = info.findtext("FirmwareVersion", "")
+        self.manufacturer: str = info.findtext("Manufacturer", "")
+        self.model: str = info.findtext("ModelCode", "")
+        self.certified: str = info.findtext("WeMoCertified", "")
 
         self.temperature_range, self.gamut = get_profiles(self.model)
         self._pending: dict[str, Any] = {}
@@ -342,10 +352,10 @@ class Light(LinkedDevice):
 
         return self
 
-    def update_state(self, status: et.Element) -> None:
+    def update_state(self, status: et._Element) -> None:
         """Update the device state."""
         if status.tag == "DeviceInfo":
-            self.name = status.findtext("FriendlyName")
+            self.name = status.findtext("FriendlyName", "")
 
         capabilities = status.findtext("CapabilityIDs") or status.findtext(
             "CapabilityID"
@@ -454,15 +464,15 @@ class Light(LinkedDevice):
 class Group(LinkedDevice):
     """Representation of a Group of lights connected to the Bridge."""
 
-    def __init__(self, bridge: Bridge, info: et.Element) -> None:
+    def __init__(self, bridge: Bridge, info: et._Element) -> None:
         """Create a Group device."""
         super().__init__(bridge, info)
-        self.uniqueID = info.findtext("GroupID")
+        self.uniqueID: str = info.findtext("GroupID", "")
 
-    def update_state(self, status: et.Element) -> None:
+    def update_state(self, status: et._Element) -> None:
         """Update the device state."""
         if status.tag == "GroupInfo":
-            self.name = status.findtext("GroupName")
+            self.name = status.findtext("GroupName", "")
 
         capabilities = status.findtext(
             "GroupCapabilityIDs"

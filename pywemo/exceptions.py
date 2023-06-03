@@ -21,7 +21,7 @@ class SOAPFault(ActionException):
     error_description: str = ""
 
     def __init__(
-        self, message: str = "", fault_element: et.Element | None = None
+        self, message: str = "", fault_element: et._Element | None = None
     ) -> None:
         """Initialize from a SOAP Fault lxml.etree Element."""
         details = ""
@@ -31,14 +31,13 @@ class SOAPFault(ActionException):
                 "/{urn:schemas-upnp-org:control-1-0}UPnPError/"
                 "{urn:schemas-upnp-org:control-1-0}"
             )
-            self.fault_code = fault_element.findtext("faultcode") or ""
-            self.fault_string = fault_element.findtext("faultstring") or ""
-            self.error_code = (
-                fault_element.findtext(f"{upnp_error_prefix}errorCode") or ""
+            self.fault_code = fault_element.findtext("faultcode", "")
+            self.fault_string = fault_element.findtext("faultstring", "")
+            self.error_code = fault_element.findtext(
+                f"{upnp_error_prefix}errorCode", ""
             )
-            self.error_description = (
-                fault_element.findtext(f"{upnp_error_prefix}errorDescription")
-                or ""
+            self.error_description = fault_element.findtext(
+                f"{upnp_error_prefix}errorDescription", ""
             )
             details = (
                 f" SOAP Fault {self.fault_code}:{self.fault_string}, "
