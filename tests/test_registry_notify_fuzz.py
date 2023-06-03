@@ -364,6 +364,99 @@ def registry(request):
 @given(name=st.sampled_from(DEVICE_NAMES), properties=properties())
 # Previous problem cases.
 @example(name="Bridge", properties=[("StatusChange", "1")])
+@example(
+    name="Bridge",
+    properties=[
+        (
+            ConvertChildrenToText("StatusChange"),
+            [
+                (
+                    "StateEvent",
+                    [
+                        (
+                            ElementWithAttributes(
+                                "DeviceID", {"available": "NO"}
+                            ),
+                            "0017880108DA898B",
+                        ),
+                    ],
+                )
+            ],
+        )
+    ],
+)
+@example(
+    name="Bridge",
+    properties=[
+        (
+            ConvertChildrenToText("StatusChange"),
+            [
+                (
+                    "StateEvent",
+                    [
+                        ("DeviceID", "0017880108DA898B"),
+                        ("CapabilityId", "10008"),
+                        ("Value", "-1"),
+                    ],
+                )
+            ],
+        )
+    ],
+)
+@example(
+    name="Bridge",
+    properties=[
+        (
+            ConvertChildrenToText("StatusChange"),
+            [
+                (
+                    "StateEvent",
+                    [
+                        ("DeviceID", "0017880108DA898B"),
+                        ("CapabilityId", "10006"),
+                        ("Value", "1"),
+                    ],
+                )
+            ],
+        )
+    ],
+)
+@example(
+    name="Bridge",
+    properties=[
+        (
+            ConvertChildrenToText("StatusChange"),
+            [
+                (
+                    "StateEvent",
+                    [
+                        ("DeviceID", "0017880108DA898B"),
+                        ("CapabilityId", "10006"),
+                        ("Value", "m50"),
+                    ],
+                )
+            ],
+        )
+    ],
+)
+@example(
+    name="Bridge",
+    properties=[
+        (
+            ConvertChildrenToText("StatusChange"),
+            [
+                (
+                    "StateEvent",
+                    [
+                        ("Value", "1"),
+                        ("DeviceID", "F0D1B8000001420C"),
+                        ("CapabilityId", "10008"),
+                    ],
+                )
+            ],
+        )
+    ],
+)
 @example(name="CoffeeMaker", properties=[("attributeList", None)])
 @example(name="CoffeeMaker", properties=[("attributeList", "<")])
 @example(name="CrockPot", properties=[("cookedTime", "'")])
