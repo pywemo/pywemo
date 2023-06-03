@@ -376,21 +376,21 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         # the last 4 digits that wemo expects is xxyy, where:
         #     xx: length of the encrypted password as hexadecimal
         #     yy: length of the original password as hexadecimal
-        n_encrypted = len(encrypted_password)
-        n_password = len(password)
-        LOG.debug("password length (before encryption): %s", n_password)
-        LOG.debug("password length (after encryption): %s", n_encrypted)
-        if n_encrypted > 255 or n_password > 255:
+        len_encrypted = len(encrypted_password)
+        len_original = len(password)
+        LOG.debug("password length (before encryption): %s", len_original)
+        LOG.debug("password length (after encryption): %s", len_encrypted)
+        if len_encrypted > 255 or len_original > 255:
             # untested, but over 255 characters would require >2 hex digits
             raise SetupException(
                 "Wemo requires the wifi password (including after encryption) "
                 "to be 255 or less characters, but found password of length "
-                f"{n_password} (and {n_encrypted} after encryption)."
+                f"{len_original} (and {len_encrypted} after encryption)."
             )
 
         if not is_rtos:
-            encrypted_password += f"{n_encrypted:#04x}"[2:]
-            encrypted_password += f"{n_password:#04x}"[2:]
+            encrypted_password += f"{len_encrypted:#04x}"[2:]
+            encrypted_password += f"{len_original:#04x}"[2:]
         return encrypted_password
 
     def setup(self, *args: Any, **kwargs: Any) -> tuple[str, str]:
