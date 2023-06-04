@@ -459,6 +459,15 @@ def registry(request):
 )
 @example(name="CoffeeMaker", properties=[("attributeList", None)])
 @example(name="CoffeeMaker", properties=[("attributeList", "<")])
+@example(
+    name="CoffeeMaker",
+    properties=[
+        (
+            ConvertChildrenToText("attributeList"),
+            [("attribute", [("name", "Mode"), ("values", "0.5")])],
+        )
+    ],
+)
 @example(name="CrockPot", properties=[("cookedTime", "'")])
 @example(name="CrockPot", properties=[("mode", "'")])
 @example(name="CrockPot", properties=[("time", "'")])
