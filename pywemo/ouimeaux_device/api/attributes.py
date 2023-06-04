@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import Any, get_type_hints
 
 from lxml import etree as et
 
@@ -13,13 +13,6 @@ from .xsd_types import quote_xml
 LOG = logging.getLogger(__name__)
 
 
-def _is_int_or_float(value: str) -> bool:
-    if value.isdecimal():
-        return True
-    values = value.split(".")
-    return len(values) == 2 and values[0].isdecimal() and values[1].isdecimal()
-
-
 class AttributeDevice(Switch):
     """Handles all parsing/getting/setting of attribute lists.
 
@@ -28,17 +21,24 @@ class AttributeDevice(Switch):
 
     Subclasses can use the _attributes property to fetch the string values of
     all attributes. Subclasses must provide the name of the property to use
-    for self._state in a property named _state_property.
+    for self._state in a property named _state_property. Subclasses must also
+    define a TypedDict to hold the attributes and add the TypedDict subclass as
+    a type hint for the _attributes property of the class.
     """
 
     EVENT_TYPE_ATTRIBUTE_LIST = "attributeList"
 
     _state_property: str
+    # Name of the TypedDict attribute that holds the values for this device.
+    _attr_name = "_attributes"
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a Attributes device."""
         assert isinstance(self._state_property, str)
-        self._attributes: dict[str, str] = {}
+        setattr(self, self._attr_name, {})
+        class_hints = get_type_hints(type(self))
+        assert (attr_type := class_hints.get(self._attr_name)) is not None
+        self._attribute_type_hints = get_type_hints(attr_type)
         super().__init__(*args, **kwargs)
         self.update_attributes()
 
@@ -55,18 +55,31 @@ class AttributeDevice(Switch):
         xml_blob = xml_blob.replace("&gt;", ">")
         xml_blob = xml_blob.replace("&lt;", "<")
 
-        self._attributes.update(
-            {
-                attribute[0].text: attribute[1].text
-                for attribute in et.fromstring(
-                    xml_blob, parser=et.XMLParser(resolve_entities=False)
+        for attribute in et.fromstring(
+            xml_blob, parser=et.XMLParser(resolve_entities=False)
+        ):
+            if len(attribute) < 2:
+                raise ValueError(
+                    f"Too few elements: {et.tostring(attribute).decode()}"
                 )
-                if len(attribute) >= 2
-                and attribute[0].text is not None
-                and attribute[1].text is not None
-                and _is_int_or_float(attribute[1].text)
-            }
-        )
+            if (key := attribute[0].text) is None:
+                raise ValueError(
+                    f"Key is not present: {et.tostring(attribute[0]).decode()}"
+                )
+            if (value := attribute[1].text) is None:
+                raise ValueError(
+                    "Value is not present: "
+                    f"{et.tostring(attribute[1]).decode()}"
+                )
+
+            if (constructor := self._attribute_type_hints.get(key)) is None:
+                continue  # Ignore unexpected attributes
+            try:
+                getattr(self, self._attr_name)[key] = constructor(value)
+            except (TypeError, ValueError) as err:
+                raise ValueError(
+                    f"Unexpected value for {key}: {value}"
+                ) from err
 
         state: int | None = getattr(self, self._state_property)
         self._state = state
@@ -84,12 +97,13 @@ class AttributeDevice(Switch):
         if _type == self.EVENT_TYPE_ATTRIBUTE_LIST:
             try:
                 self._update_attributes_dict(_params)
-            except et.XMLSyntaxError:
+            except (et.XMLSyntaxError, ValueError) as err:
                 LOG.error(
-                    "Unexpected %s value `%s` for device %s.",
+                    "Unexpected %s value `%s` for device %s: %s",
                     self.EVENT_TYPE_ATTRIBUTE_LIST,
                     _params,
                     self.name,
+                    repr(err),
                 )
             return True
 

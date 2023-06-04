@@ -1,14 +1,24 @@
 """Representation of a WeMo Maker device."""
 from __future__ import annotations
 
+from typing import TypedDict
+
 from .api.attributes import AttributeDevice
 from .api.service import RequiredService
+
+
+class _Attributes(TypedDict, total=False):
+    Switch: int
+    Sensor: int
+    SwitchMode: int
+    SensorPresent: int
 
 
 class Maker(AttributeDevice):
     """Representation of a WeMo Maker device."""
 
     _state_property = "switch_state"  # Required by AttributeDevice.
+    _attributes: _Attributes  # Required by AttributeDevice.
 
     @property
     def _required_services(self) -> list[RequiredService]:
@@ -26,19 +36,19 @@ class Maker(AttributeDevice):
     @property
     def switch_state(self) -> int:
         """Return the state of the switch."""
-        return int(self._attributes["Switch"])
+        return self._attributes["Switch"]
 
     @property
     def sensor_state(self) -> int:
         """Return the state of the sensor."""
-        return int(self._attributes["Sensor"])
+        return self._attributes["Sensor"]
 
     @property
     def switch_mode(self) -> int:
         """Return the switch mode of the sensor."""
-        return int(self._attributes["SwitchMode"])
+        return self._attributes["SwitchMode"]
 
     @property
     def has_sensor(self) -> int:
         """Return whether the device has a sensor."""
-        return int(self._attributes["SensorPresent"])
+        return self._attributes["SensorPresent"]
