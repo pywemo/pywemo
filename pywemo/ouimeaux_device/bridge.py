@@ -266,7 +266,7 @@ class LinkedDevice:
             self.state["temperature_kelvin"] = int(1000000 / temperature)
 
         if (color_control := status.get("colorcontrol")) is not None:
-            if not len(color_control) >= 2:
+            if len(color_control) < 2:
                 raise ValueError(
                     f"Too few values for colorcontrol: {repr(color_control)}"
                 )
