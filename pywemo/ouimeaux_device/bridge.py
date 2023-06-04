@@ -4,7 +4,7 @@ from __future__ import annotations
 import io
 import time
 from html import escape
-from typing import Any, TypedDict
+from typing import Any, Iterable, TypedDict
 
 from lxml import etree as et
 
@@ -189,6 +189,10 @@ class DeviceState(TypedDict, total=False):
 class LinkedDevice:
     """Representation of a device connected to the bridge."""
 
+    _NAME_TAG: str
+    _CAPABILITIES_TAGS: tuple[str, ...]
+    _VALUES_TAGS: tuple[str, ...]
+
     def __init__(self, bridge: Bridge, info: et._Element) -> None:
         """Create a Linked Device."""
         self.bridge: Bridge = bridge
@@ -196,8 +200,7 @@ class LinkedDevice:
         self.port: int = self.bridge.port
         self.name: str = ""
         self.state: DeviceState = {}
-        self.capabilities: list[str] = []
-        self._values: list[str] = []
+        self.capabilities: Iterable[str] = tuple()
         self.update_state(info)
         self._last_err: dict[str, str] = {}
         self.mac: str = self.bridge.mac
@@ -210,45 +213,66 @@ class LinkedDevice:
             self.bridge.bridge_update()
         return self.state
 
-    def update_state(self, status: Any) -> None:
-        """
-        Set the device state based on capabilities and values.
+    def update_state(self, status: et._Element) -> None:
+        """Fetch the capabilities and values then update the device state."""
+        if name := status.findtext(self._NAME_TAG, ""):
+            self.name = name
 
-        Subclasses should parse status into self.capabilities and
-        self._values and then call this to populate self.state.
-        """
-        status = {}
-        for capability, value in zip(self.capabilities, self._values):
+        def get_first_text(tags: Iterable[str]) -> str | None:
+            candidates = (status.findtext(tag) for tag in tags)
+            return next(filter(bool, candidates), None)
+
+        if capabilities := get_first_text(self._CAPABILITIES_TAGS):
+            self.capabilities = tuple(
+                CAPABILITY_ID2NAME.get(c, c) for c in capabilities.split(",")
+            )
+            if current_state := get_first_text(self._VALUES_TAGS):
+                self._update_values(
+                    zip(self.capabilities, current_state.split(","))
+                )
+
+    def _update_values(self, values: Iterable[tuple[str, str]]) -> None:
+        """Set the device state based on capabilities and values."""
+        status: dict[str, tuple[int, ...] | None] = {}
+        for capability, value in values:
+            if capability not in CAPABILITY_NAME2ID:
+                continue  # Ignore unsupported capabilities.
             if not value:
                 status[capability] = None
-            elif ":" in value:
+                continue
+            try:
                 status[capability] = tuple(
                     int(round(float(v))) for v in value.split(":")
                 )
-            else:
-                status[capability] = int(round(float(value)))
+            except ValueError as err:
+                raise ValueError(
+                    f"Invalid value for {capability}: {repr(value)}"
+                ) from err
 
         # unreachable devices have empty strings for all capability values
-        if status.get("onoff") is None:
+        if (on_off := status.get("onoff", ("Missing",))) is None:
             self.state["available"] = False
             self.state["onoff"] = 0
-            return
+        elif isinstance(on_off[0], int):
+            self.state["available"] = True
+            self.state["onoff"] = on_off[0]
 
-        self.state["available"] = True
-        self.state["onoff"] = status["onoff"]
+        if (level_control := status.get("levelcontrol")) is not None:
+            self.state["level"] = level_control[0]
 
-        if status.get("levelcontrol") is not None:
-            self.state["level"] = status["levelcontrol"][0]
-
-        if status.get("colortemperature") is not None:
-            temperature = status["colortemperature"][0]
+        if (color_temperature := status.get("colortemperature")) is not None:
+            temperature = color_temperature[0]
             self.state["temperature_mireds"] = temperature
             self.state["temperature_kelvin"] = int(1000000 / temperature)
 
-        if status.get("colorcontrol") is not None:
-            colorx, colory = status["colorcontrol"][:2]
-            colorx, colory = colorx / 65535.0, colory / 65535.0
-            self.state["color_xy"] = colorx, colory
+        if (color_control := status.get("colorcontrol")) is not None:
+            if not len(color_control) >= 2:
+                raise ValueError(
+                    f"Too few values for colorcontrol: {repr(color_control)}"
+                )
+            color_x, color_y = float(color_control[0]), float(color_control[1])
+            color_x, color_y = color_x / 65535.0, color_y / 65535.0
+            self.state["color_xy"] = color_x, color_y
 
     def subscription_update(self, state_event: et._Element) -> bool:
         """Update the light values due to a subscription update event."""
@@ -263,20 +287,17 @@ class LinkedDevice:
 
         if capability is None or value is None:
             return False
+
         name = CAPABILITY_ID2NAME.get(capability, capability)
-        # Update only the capability/value pair that changed.
-        try:
-            index = self.capabilities.index(name)
-        except ValueError:
+        if name not in self.capabilities:
             # Should't receive updates for capabilities that were not
             # originally present.
             return False
-        self._values[index] = value
 
-        # Don't call the subclass. It expects to have a list of all the
-        # capability/value pairs. The subscription_update only receives a
-        # single capability/value pair.
-        LinkedDevice.update_state(self, {})
+        try:
+            self._update_values([(name, value)])
+        except ValueError:
+            return False
         return True
 
     def _setdevicestatus(self, **kwargs: Any) -> LinkedDevice:
@@ -327,6 +348,10 @@ class LinkedDevice:
 class Light(LinkedDevice):
     """Representation of a Light connected to the Bridge."""
 
+    _NAME_TAG = "FriendlyName"
+    _CAPABILITIES_TAGS = ("CapabilityIDs", "CapabilityID")
+    _VALUES_TAGS = ("CurrentState", "CapabilityValue")
+
     def __init__(self, bridge: Bridge, info: et._Element) -> None:
         """Create a Light device."""
         super().__init__(bridge, info)
@@ -351,27 +376,6 @@ class Light(LinkedDevice):
             self._pending = {}
 
         return self
-
-    def update_state(self, status: et._Element) -> None:
-        """Update the device state."""
-        if status.tag == "DeviceInfo":
-            self.name = status.findtext("FriendlyName", "")
-
-        capabilities = status.findtext("CapabilityIDs") or status.findtext(
-            "CapabilityID"
-        )
-        currentstate = status.findtext("CurrentState") or status.findtext(
-            "CapabilityValue"
-        )
-
-        if capabilities is not None:
-            self.capabilities = [
-                CAPABILITY_ID2NAME.get(c, c) for c in capabilities.split(",")
-            ]
-        if currentstate is not None:
-            self._values = currentstate.split(",")
-
-        super().update_state(status)
 
     def turn_on(
         self,
@@ -464,27 +468,11 @@ class Light(LinkedDevice):
 class Group(LinkedDevice):
     """Representation of a Group of lights connected to the Bridge."""
 
+    _NAME_TAG = "GroupName"
+    _CAPABILITIES_TAGS = ("GroupCapabilityIDs", "CapabilityID")
+    _VALUES_TAGS = ("GroupCapabilityValues", "CapabilityValue")
+
     def __init__(self, bridge: Bridge, info: et._Element) -> None:
         """Create a Group device."""
         super().__init__(bridge, info)
         self.uniqueID: str = info.findtext("GroupID", "")
-
-    def update_state(self, status: et._Element) -> None:
-        """Update the device state."""
-        if status.tag == "GroupInfo":
-            self.name = status.findtext("GroupName", "")
-
-        capabilities = status.findtext(
-            "GroupCapabilityIDs"
-        ) or status.findtext("CapabilityID")
-        currentstate = status.findtext(
-            "GroupCapabilityValues"
-        ) or status.findtext("CapabilityValue")
-
-        if capabilities is not None:
-            self.capabilities = [
-                CAPABILITY_ID2NAME.get(c, c) for c in capabilities.split(",")
-            ]
-        if currentstate is not None:
-            self._values = currentstate.split(",")
-        super().update_state(status)

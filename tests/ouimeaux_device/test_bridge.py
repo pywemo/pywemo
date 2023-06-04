@@ -102,6 +102,13 @@ def test_bridge_getdevicestatus(bridge):
     assert et.tostring(status) == expected
 
 
+@pytest.mark.vcr()
+def test_bridge_unavailable_light(bridge, light):
+    assert light.get_state()["available"] is True
+    bridge.bridge_update(force_update=True)
+    assert light.get_state()["available"] is False
+
+
 @pytest.mark.parametrize(
     "update,expected_updated,expected_state",
     [
@@ -263,6 +270,39 @@ def test_bridge_getdevicestatus(bridge):
                 f"<DeviceID>{LIGHT_ID}</DeviceID>"
                 "<CapabilityId>10006</CapabilityId>"
                 "<MissingValue/>"
+                "</StateEvent>"
+            ),
+            False,
+            {},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f"<DeviceID>{LIGHT_ID}</DeviceID>"
+                "<CapabilityId>10006</CapabilityId>"
+                "<Value>Invalid</Value>"
+                "</StateEvent>"
+            ),
+            False,
+            {},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f"<DeviceID>{LIGHT_ID}</DeviceID>"
+                "<CapabilityId>NewCapability</CapabilityId>"
+                "<Value>0</Value>"
+                "</StateEvent>"
+            ),
+            False,
+            {},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f"<DeviceID>{LIGHT_ID}</DeviceID>"
+                "<CapabilityId>10300</CapabilityId>"
+                "<Value>0</Value>"
                 "</StateEvent>"
             ),
             False,
