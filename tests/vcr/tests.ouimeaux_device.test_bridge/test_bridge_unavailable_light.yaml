@@ -1,0 +1,100 @@
+interactions:
+- request:
+    body: '<?xml version="1.0" encoding="utf-8"?>
+
+      <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+
+      <s:Body>
+
+      <u:GetMacAddr xmlns:u="urn:Belkin:service:basicevent:1">
+
+
+      </u:GetMacAddr>
+
+      </s:Body>
+
+      </s:Envelope>'
+    headers:
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:basicevent:1#GetMacAddr"'
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/basicevent1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:GetMacAddrResponse
+        xmlns:u=\"urn:Belkin:service:basicevent:1\">\r\n<MacAddr>001122334455</MacAddr>\r\n<SerialNo>SERIALNUMBER</SerialNo>\r\n<PluginUDN>uuid:Bridge-1_0-SERIALNUMBER</PluginUDN>\r\n</u:GetMacAddrResponse>\r\n</s:Body>
+        </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '372'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Sun, 04 Jun 2023 02:33:27 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '<?xml version="1.0" encoding="utf-8"?>
+
+      <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+
+      <s:Body>
+
+      <u:GetEndDevicesWithStatus xmlns:u="urn:Belkin:service:bridge:1">
+
+      <DevUDN>uuid:Bridge-1_0-SERIALNUMBER</DevUDN>
+
+      <ReqListType>PAIRED_LIST</ReqListType>
+
+      </u:GetEndDevicesWithStatus>
+
+      </s:Body>
+
+      </s:Envelope>'
+    headers:
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:bridge:1#GetEndDevicesWithStatus"'
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/bridge1
+  response:
+    body:
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body>\n<u:GetEndDevicesWithStatusResponse
+        xmlns:u=\"urn:Belkin:service:bridge:1\">\r\n<DeviceLists>&lt;?xml version=&quot;1.0&quot;
+        encoding=&quot;utf-8&quot;?&gt;&lt;DeviceLists&gt;&lt;DeviceList&gt;&lt;DeviceListType&gt;Paired&lt;/DeviceListType&gt;&lt;DeviceInfos&gt;&lt;DeviceInfo&gt;&lt;DeviceIndex&gt;0&lt;/DeviceIndex&gt;&lt;DeviceID\navailable=&quot;NO&quot;&gt;F0D1B8000001420C&lt;/DeviceID&gt;&lt;FriendlyName&gt;Shelf
+        Light&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;01&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,10300,30008,30009,3000A,30301&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;,,,,,,&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;NO&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;LEDVANCE&lt;/Manufacturer&gt;&lt;ModelCode&gt;A19
+        RGBW&lt;/ModelCode&gt;&lt;productName&gt;lighting&lt;/productName&gt;&lt;WeMoCertified&gt;NO&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;DeviceInfo&gt;&lt;DeviceIndex&gt;1&lt;/DeviceIndex&gt;&lt;DeviceID\navailable=&quot;YES&quot;&gt;F0D1B800001A4493&lt;/DeviceID&gt;&lt;FriendlyName&gt;Sylvania
+        Strip&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;01&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,10300,30008,30009,3000A,30301&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;0,74:0,44563:19726:0,,,,370:0&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;NO&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;LEDVANCE&lt;/Manufacturer&gt;&lt;ModelCode&gt;FLEX
+        RGBW&lt;/ModelCode&gt;&lt;productName&gt;lighting&lt;/productName&gt;&lt;WeMoCertified&gt;NO&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;DeviceInfo&gt;&lt;DeviceIndex&gt;2&lt;/DeviceIndex&gt;&lt;DeviceID\navailable=&quot;YES&quot;&gt;0017880108DA898B&lt;/DeviceID&gt;&lt;FriendlyName&gt;Living
+        Room Couch Light&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;02&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;0,254:0,,,&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;NO&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;Philips&lt;/Manufacturer&gt;&lt;ModelCode&gt;LWA008&lt;/ModelCode&gt;&lt;productName&gt;lighting&lt;/productName&gt;&lt;WeMoCertified&gt;NO&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;DeviceInfo&gt;&lt;DeviceIndex&gt;4&lt;/DeviceIndex&gt;&lt;DeviceID\navailable=&quot;NO&quot;&gt;94103EA2B277BD6E&lt;/DeviceID&gt;&lt;FriendlyName&gt;Test
+        Bulb 1&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;7E&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;,,,,&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;NO&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;MRVL&lt;/Manufacturer&gt;&lt;ModelCode&gt;MZ100&lt;/ModelCode&gt;&lt;productName&gt;Lighting&lt;/productName&gt;&lt;WeMoCertified&gt;YES&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;/DeviceInfos&gt;&lt;GroupInfos&gt;&lt;GroupInfo&gt;&lt;GroupID&gt;12345678&lt;/GroupID&gt;&lt;GroupName&gt;Testing
+        Group&lt;/GroupName&gt;&lt;GroupCapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/GroupCapabilityIDs&gt;&lt;GroupCapabilityValues&gt;0,255:0,0:0,,&lt;/GroupCapabilityValues&gt;&lt;DeviceInfos&gt;&lt;DeviceInfo&gt;&lt;DeviceIndex&gt;0&lt;/DeviceIndex&gt;&lt;DeviceID\navailable=&quot;YES&quot;&gt;94103EA2B27751AB&lt;/DeviceID&gt;&lt;FriendlyName&gt;Test
+        Bulb 2&lt;/FriendlyName&gt;&lt;IconVersion&gt;1&lt;/IconVersion&gt;&lt;FirmwareVersion&gt;83&lt;/FirmwareVersion&gt;&lt;CapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/CapabilityIDs&gt;&lt;CapabilityValue&gt;0,255:0,,,&lt;/CapabilityValue&gt;&lt;IsGroupAction&gt;YES&lt;/IsGroupAction&gt;&lt;LastEventTimeStamp&gt;0&lt;/LastEventTimeStamp&gt;&lt;Manufacturer&gt;MRVL&lt;/Manufacturer&gt;&lt;ModelCode&gt;MZ100&lt;/ModelCode&gt;&lt;productName&gt;Lighting&lt;/productName&gt;&lt;WeMoCertified&gt;YES&lt;/WeMoCertified&gt;&lt;/DeviceInfo&gt;&lt;/DeviceInfos&gt;&lt;/GroupInfo&gt;&lt;/GroupInfos&gt;&lt;/DeviceList&gt;&lt;/DeviceLists&gt;\n</DeviceLists>\r\n</u:GetEndDevicesWithStatusResponse>\r\n</s:Body>
+        </s:Envelope>"
+    headers:
+      CONTENT-LENGTH:
+      - '4439'
+      CONTENT-TYPE:
+      - text/xml; charset="utf-8"
+      DATE:
+      - Sun, 04 Jun 2023 02:33:27 GMT
+      EXT:
+      - ''
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+      X-User-Agent:
+      - redsonic
+    status:
+      code: 200
+      message: OK
+version: 1
