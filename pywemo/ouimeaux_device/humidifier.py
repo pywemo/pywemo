@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from typing import Any
+from typing import Any, TypedDict
 
 from .api.attributes import AttributeDevice
 
@@ -81,15 +81,26 @@ WATER_LEVEL_NAMES = {
 FILTER_LIFE_MAX = 60480
 
 
+class _Attributes(TypedDict, total=False):
+    FanMode: int
+    DesiredHumidity: int
+    CurrentHumidity: float
+    NoWater: int
+    WaterAdvise: int
+    FilterLife: float
+    ExpiredFilterTime: int
+
+
 class Humidifier(AttributeDevice):
     """Representation of a WeMo Humidifier device."""
 
     _state_property = "fan_mode"  # Required by AttributeDevice.
+    _attributes: _Attributes  # Required by AttributeDevice.
 
     @property
     def fan_mode(self) -> FanMode:
         """Return the FanMode setting (as an int index of the IntEnum)."""
-        return FanMode(int(self._attributes.get("FanMode", _UNKNOWN)))
+        return FanMode(self._attributes.get("FanMode", _UNKNOWN))
 
     @property
     def fan_mode_string(self) -> str:
@@ -103,7 +114,7 @@ class Humidifier(AttributeDevice):
     def desired_humidity(self) -> DesiredHumidity:
         """Return the desired humidity (as an int index of the IntEnum)."""
         return DesiredHumidity(
-            int(self._attributes.get("DesiredHumidity", _UNKNOWN))
+            self._attributes.get("DesiredHumidity", _UNKNOWN)
         )
 
     @property
@@ -114,14 +125,14 @@ class Humidifier(AttributeDevice):
     @property
     def current_humidity_percent(self) -> float:
         """Return the observed relative humidity in percent (float)."""
-        return float(self._attributes.get("CurrentHumidity", 0.0))
+        return self._attributes.get("CurrentHumidity", 0.0)
 
     @property
     def water_level(self) -> WaterLevel:
         """Return 0 if water level is Empty, 1 if Low, and 2 if Good."""
-        if self._attributes.get("NoWater") == "1":
+        if self._attributes.get("NoWater") == 1:
             return WaterLevel.Empty
-        if self._attributes.get("WaterAdvise") == "1":
+        if self._attributes.get("WaterAdvise") == 1:
             return WaterLevel.Low
         return WaterLevel.Good
 
@@ -133,13 +144,13 @@ class Humidifier(AttributeDevice):
     @property
     def filter_life_percent(self) -> float:
         """Return the percentage (float) of filter life remaining."""
-        filter_life = float(self._attributes.get("FilterLife", 0.0))
+        filter_life = self._attributes.get("FilterLife", 0.0)
         return round(filter_life / float(FILTER_LIFE_MAX) * 100.0, 2)
 
     @property
     def filter_expired(self) -> bool:
         """Return False if filter is OK, or True if it needs to be changed."""
-        return bool(int(self._attributes.get("ExpiredFilterTime", 0)))
+        return bool(self._attributes.get("ExpiredFilterTime", 0))
 
     def get_state(self, force_update: bool = False) -> int:
         """Return 0 if off and 1 if on."""

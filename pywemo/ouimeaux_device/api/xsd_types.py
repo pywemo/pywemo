@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Dict, List
 
 from lxml import etree as et
 
@@ -133,9 +133,9 @@ class DeviceDescription:
     model_name: str
     serial_number: str
     udn: str
-    _config_any: dict[str, str]
+    _config_any: Dict[str, str]
     _device_type: str
-    _services: list[ServiceProperties]
+    _services: List[ServiceProperties]
 
     @staticmethod
     def dict_from_xml(setup_xml_content: bytes) -> dict[str, Any]:

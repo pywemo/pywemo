@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
-from typing import Any
+from typing import Any, TypedDict
 
 from .api.attributes import AttributeDevice
 
@@ -46,15 +46,20 @@ MODE_NAMES = {
 }
 
 
+class _Attributes(TypedDict, total=False):
+    Mode: int
+
+
 class CoffeeMaker(AttributeDevice):
     """Representation of a WeMo CoffeeMaker device."""
 
     _state_property = "mode"  # Required by AttributeDevice.
+    _attributes: _Attributes  # Required by AttributeDevice.
 
     @property
     def mode(self) -> CoffeeMakerMode:
         """Return the mode of the device."""
-        return CoffeeMakerMode(int(self._attributes.get("Mode", _UNKNOWN)))
+        return CoffeeMakerMode(self._attributes.get("Mode", _UNKNOWN))
 
     @property
     def mode_string(self) -> str:

@@ -90,12 +90,53 @@ class Test_Maker:
                 1,
                 0,
             ),
-            # Unexpected State name
+            # Unexpected State name.
             (
                 (
                     "<attribute><name>Unexpected</name><value>ABC</value>"
                     "<prevalue>1</prevalue><ts>1627869840</ts></attribute>"
                 ),
+                1,
+                1,
+                1,
+                0,
+            ),
+            # Invalid state.
+            (
+                (
+                    "<attribute><name>Switch</name><value>0.5</value>"
+                    "<prevalue>1</prevalue><ts>1627869840</ts></attribute>"
+                ),
+                1,
+                1,
+                1,
+                0,
+            ),
+            # Missing value text.
+            (
+                (
+                    "<attribute><name>Switch</name><value/>"
+                    "<prevalue>1</prevalue><ts>1627869840</ts></attribute>"
+                ),
+                1,
+                1,
+                1,
+                0,
+            ),
+            # Missing name text.
+            (
+                (
+                    "<attribute><name/><value>0</value>"
+                    "<prevalue>1</prevalue><ts>1627869840</ts></attribute>"
+                ),
+                1,
+                1,
+                1,
+                0,
+            ),
+            # Missing value.
+            (
+                ("<attribute><name>Switch</name></attribute>"),
                 1,
                 1,
                 1,
