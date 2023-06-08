@@ -1,18 +1,23 @@
 """Exercise the NOTIFY subscription http endpoint."""
 from __future__ import annotations
 
+import contextlib
 import string
+import sys
 import unittest.mock as mock
+
+from tests import atheris_stub as atheris
+
+with atheris.instrument_imports():
+    from lxml import etree
+    import pywemo
 
 import pytest
 import requests
 from hypothesis import example, given
 from hypothesis import strategies as st
-from lxml import etree
 
-import pywemo
-
-from .ouimeaux_device.test_device import mocked_requests_get
+from tests.ouimeaux_device.test_device import mocked_requests_get
 
 MOCK_SERVICE_RETURN_VALUES = {
     "bridge": {
@@ -131,6 +136,18 @@ MOCK_SERVICE_RETURN_VALUES = {
 @mock.patch("urllib3.PoolManager.request", side_effect=mocked_requests_get)
 def make_device(device_class, *args):
     class WrappedDevice(device_class):
+        @property
+        def device_type(self) -> str:
+            return device_class.__name__
+
+        @property
+        def name(self):
+            return device_class.__name__
+
+        @name.setter
+        def name(self, name):
+            pass
+
         def _check_required_services(self, services):
             for service in self._required_services:
                 service_mock = mock.Mock()
@@ -141,7 +158,9 @@ def make_device(device_class, *args):
                 self.services[service.name] = service_mock
                 setattr(self, service.name, service_mock)
 
-    return WrappedDevice("http://192.168.1.100:49158/setup.xml")
+    device = WrappedDevice("http://192.168.1.100:49158/setup.xml")
+    device.session.url = "http://127.0.0.1:49158/"
+    return device
 
 
 DEVICES = {
@@ -156,6 +175,24 @@ DEVICES = {
     )
 }
 DEVICE_NAMES = sorted(DEVICES.keys())
+REGISTRY = pywemo.SubscriptionRegistry()
+
+
+@contextlib.contextmanager
+def registry():
+    REGISTRY.start()
+    pywemo.subscribe.Subscription.scheduler_active = False
+    try:
+        yield REGISTRY
+    finally:
+        pywemo.subscribe.Subscription.scheduler_active = True
+        REGISTRY.stop()
+
+
+@pytest.fixture(scope="module", autouse=True)
+def pytest_registry():
+    with registry():
+        yield
 
 
 class ConvertChildrenToText:
@@ -353,14 +390,6 @@ def properties(names=PROPERTY_NAMES, values=PROPERTY_VALUES):
     )
 
 
-@pytest.fixture(scope="module")
-def registry(request):
-    sub = pywemo.SubscriptionRegistry()
-    sub.start()
-    request.addfinalizer(sub.stop)
-    return sub
-
-
 @given(name=st.sampled_from(DEVICE_NAMES), properties=properties())
 # Previous problem cases.
 @example(name="Bridge", properties=[("StatusChange", "1")])
@@ -481,17 +510,25 @@ def registry(request):
         )
     ],
 )
-def test_notify(name, properties, registry):
+def test_notify(name, properties):
     device = DEVICES[name]
-    registry.devices["127.0.0.1"] = device
+    REGISTRY.register(device)
+    REGISTRY.on(device, None, lambda d, t, v: d.subscription_update(t, v))
+    try:
+        response = requests.request(
+            "NOTIFY",
+            f"http://127.0.0.1:{REGISTRY.port}/sub/basicevent",
+            data=toXml(properties),
+        )
+        assert response.status_code == 200
+    finally:
+        REGISTRY.unregister(device)
 
-    def callback(device, type_, value):
-        device.subscription_update(type_, value)
 
-    registry.on(device, None, callback)
-    response = requests.request(
-        "NOTIFY",
-        f"http://127.0.0.1:{registry.port}/",
-        data=toXml(properties),
+if __name__ == "__main__":
+    atheris.Setup(
+        sys.argv,
+        atheris.instrument_func(test_notify.hypothesis.fuzz_one_input),
     )
-    assert response.status_code == 200
+    with registry():
+        atheris.Fuzz()
