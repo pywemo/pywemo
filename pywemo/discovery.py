@@ -43,17 +43,17 @@ def _call_once_per_uuid(
     method(*args, *kwargs)
 
 
-def discover_devices(debug: bool = False, **kwargs: Any) -> list[Device]:
+def discover_devices(*, debug: bool = False, **kwargs: Any) -> list[Device]:
     """Find WeMo devices on the local network."""
     devices = (
-        device_from_uuid_and_location(entry.udn, entry.location, debug)
+        device_from_uuid_and_location(entry.udn, entry.location, debug=debug)
         for entry in ssdp.scan(**kwargs)
     )
     return [d for d in devices if d is not None]
 
 
 def device_from_description(
-    description_url: str, debug: bool = False
+    description_url: str, *, debug: bool = False
 ) -> Device | None:
     """Return object representing WeMo device running at host, else None."""
     try:
@@ -68,11 +68,13 @@ def device_from_description(
         LOG.exception("Failed to parse description %s", description_url)
         return None
 
-    return device_from_uuid_and_location(device.udn, description_url, debug)
+    return device_from_uuid_and_location(
+        device.udn, description_url, debug=debug
+    )
 
 
 def device_from_uuid_and_location(  # noqa: C901
-    uuid: str | None, location: str | None, debug: bool = False
+    uuid: str | None, location: str | None, *, debug: bool = False
 ) -> Device | None:
     """Determine device class based on the device uuid."""
     if not (uuid and location):
