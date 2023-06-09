@@ -264,7 +264,7 @@ class LinkedDevice:
             temperature = color_temperature[0]
             if temperature <= 0:
                 raise ValueError(
-                    "Invalid value for color temperature: {temperature}"
+                    f"Invalid value for color temperature: {temperature}"
                 )
             self.state["temperature_mireds"] = temperature
             self.state["temperature_kelvin"] = int(1000000 / temperature)
