@@ -81,7 +81,7 @@ jobs:
     # by their git commit SHA digest.
     # TODO: Pin this workflow with a git commit SHA digest.
     #   https://github.com/slsa-framework/slsa-verifier/issues/12
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.6.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v1.7.0
     with:
       # SHA-256 hashes of the Python distributions.
       base64-subjects: ${{ needs.hash.outputs.hashes }}
