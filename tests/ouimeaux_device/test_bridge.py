@@ -224,6 +224,17 @@ def test_bridge_unavailable_light(bridge, light):
             (
                 '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
                 f"<DeviceID>{LIGHT_ID}</DeviceID>"
+                "<CapabilityId>30301</CapabilityId>"
+                "<Value>0:0</Value>"
+                "</StateEvent>"
+            ),
+            False,
+            {},
+        ),
+        (
+            (
+                '<?xml version="1.0" encoding="utf-8"?><StateEvent>'
+                f"<DeviceID>{LIGHT_ID}</DeviceID>"
                 "<CapabilityId>99999</CapabilityId>"
                 "<Value>2700:0</Value>"
                 "</StateEvent>"
