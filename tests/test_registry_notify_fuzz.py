@@ -486,6 +486,24 @@ def properties(names=PROPERTY_NAMES, values=PROPERTY_VALUES):
         )
     ],
 )
+@example(
+    name="Bridge",
+    properties=[
+        (
+            ConvertChildrenToText("StatusChange"),
+            [
+                (
+                    "StateEvent",
+                    [
+                        ("Value", "0"),
+                        ("DeviceID", "F0D1B8000001420C"),
+                        ("CapabilityId", "30301"),
+                    ],
+                )
+            ],
+        )
+    ],
+)
 @example(name="CoffeeMaker", properties=[("attributeList", None)])
 @example(name="CoffeeMaker", properties=[("attributeList", "<")])
 @example(
