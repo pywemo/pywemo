@@ -20,11 +20,15 @@ class CrockPotMode(IntEnum):
     """Modes for the CrockPot."""
 
     _UNKNOWN = _UNKNOWN
-    # pylint: disable=invalid-name
-    Off = 0
-    Warm = 50
-    Low = 51
-    High = 52
+    # Note: The UpperMixedCase (invalid) names are deprecated.
+    OFF = 0
+    Off = 0  # pylint: disable=invalid-name
+    WARM = 50
+    Warm = 50  # pylint: disable=invalid-name
+    LOW = 51
+    Low = 51  # pylint: disable=invalid-name
+    HIGH = 52
+    High = 52  # pylint: disable=invalid-name
 
     @classmethod
     def _missing_(cls, value: Any) -> CrockPotMode:
@@ -32,10 +36,10 @@ class CrockPotMode(IntEnum):
 
 
 MODE_NAMES = {
-    CrockPotMode.Off: "Turned Off",
-    CrockPotMode.Warm: "Warm",
-    CrockPotMode.Low: "Low",
-    CrockPotMode.High: "High",
+    CrockPotMode.OFF: "Turned Off",
+    CrockPotMode.WARM: "Warm",
+    CrockPotMode.LOW: "Low",
+    CrockPotMode.HIGH: "High",
 }
 
 
@@ -133,14 +137,14 @@ class CrockPot(Switch):
         if force_update or self._attributes.get("mode") is None:
             self.update_attributes()
 
-        return int(self.mode != CrockPotMode.Off)
+        return int(self.mode != CrockPotMode.OFF)
 
     def set_state(self, state: int) -> None:
         """Set the state of this device to on or off."""
         if state:
-            self.update_settings(CrockPotMode.High, self.remaining_time)
+            self.update_settings(CrockPotMode.HIGH, self.remaining_time)
         else:
-            self.update_settings(CrockPotMode.Off, 0)
+            self.update_settings(CrockPotMode.OFF, 0)
 
     def update_settings(self, mode: CrockPotMode, time: int) -> None:
         """Update mode and cooking time."""

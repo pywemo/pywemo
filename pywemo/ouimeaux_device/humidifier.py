@@ -15,13 +15,19 @@ class FanMode(IntEnum):
     """Enum to map WeMo FanModes to human-readable strings."""
 
     _UNKNOWN = _UNKNOWN
-    # pylint: disable=invalid-name
-    Off = 0  # Fan and device turned off
-    Minimum = 1
-    Low = 2
-    Medium = 3
-    High = 4
-    Maximum = 5
+    # Note: The UpperMixedCase (invalid) names are deprecated.
+    OFF = 0  # Fan and device turned off
+    Off = 0  # pylint: disable=invalid-name
+    MINIMUM = 1
+    Minimum = 1  # pylint: disable=invalid-name
+    LOW = 3
+    Low = 2  # pylint: disable=invalid-name
+    MEDIUM = 3
+    Medium = 3  # pylint: disable=invalid-name
+    HIGH = 4
+    High = 4  # pylint: disable=invalid-name
+    MAXIMUM = 5
+    Maximum = 5  # pylint: disable=invalid-name
 
     @classmethod
     def _missing_(cls, value: Any) -> FanMode:
@@ -29,12 +35,12 @@ class FanMode(IntEnum):
 
 
 FAN_MODE_NAMES = {
-    FanMode.Off: "Off",
-    FanMode.Minimum: "Minimum",
-    FanMode.Low: "Low",
-    FanMode.Medium: "Medium",
-    FanMode.High: "High",
-    FanMode.Maximum: "Maximum",
+    FanMode.OFF: "Off",
+    FanMode.MINIMUM: "Minimum",
+    FanMode.LOW: "Low",
+    FanMode.MEDIUM: "Medium",
+    FanMode.HIGH: "High",
+    FanMode.MAXIMUM: "Maximum",
 }
 
 
@@ -42,12 +48,17 @@ class DesiredHumidity(IntEnum):
     """Enum to map WeMo DesiredHumidity to human-readable strings."""
 
     _UNKNOWN = _UNKNOWN
-    # pylint: disable=invalid-name
-    FortyFivePercent = 0
-    FiftyPercent = 1
-    FiftyFivePercent = 2
-    SixtyPercent = 3
-    OneHundredPercent = 4  # "Always On" Mode
+    # Note: The UpperMixedCase (invalid) names are deprecated.
+    PERCENT_45 = 0
+    FortyFivePercent = 0  # pylint: disable=invalid-name
+    PERCENT_50 = 1
+    FiftyPercent = 1  # pylint: disable=invalid-name
+    PERCENT_55 = 2
+    FiftyFivePercent = 2  # pylint: disable=invalid-name
+    PERCENT_60 = 3
+    SixtyPercent = 3  # pylint: disable=invalid-name
+    PERCENT_100 = 4  # "Always On" Mode
+    OneHundredPercent = 4  # pylint: disable=invalid-name
 
     @classmethod
     def _missing_(cls, value: Any) -> DesiredHumidity:
@@ -55,27 +66,30 @@ class DesiredHumidity(IntEnum):
 
 
 DESIRED_HUMIDITY_NAMES = {
-    DesiredHumidity.FortyFivePercent: "45",
-    DesiredHumidity.FiftyPercent: "50",
-    DesiredHumidity.FiftyFivePercent: "55",
-    DesiredHumidity.SixtyPercent: "60",
-    DesiredHumidity.OneHundredPercent: "100",
+    DesiredHumidity.PERCENT_45: "45",
+    DesiredHumidity.PERCENT_50: "50",
+    DesiredHumidity.PERCENT_55: "55",
+    DesiredHumidity.PERCENT_60: "60",
+    DesiredHumidity.PERCENT_100: "100",
 }
 
 
 class WaterLevel(IntEnum):
     """Enum to map WeMo WaterLevel to human-readable strings."""
 
-    # pylint: disable=invalid-name
-    Empty = 0
-    Low = 1
-    Good = 2
+    # Note: The UpperMixedCase (invalid) names are deprecated.
+    EMPTY = 0
+    Empty = 0  # pylint: disable=invalid-name
+    LOW = 1
+    Low = 1  # pylint: disable=invalid-name
+    GOOD = 2
+    Good = 2  # pylint: disable=invalid-name
 
 
 WATER_LEVEL_NAMES = {
-    WaterLevel.Empty: "Empty",
-    WaterLevel.Low: "Low",
-    WaterLevel.Good: "Good",
+    WaterLevel.EMPTY: "Empty",
+    WaterLevel.LOW: "Low",
+    WaterLevel.GOOD: "Good",
 }
 
 FILTER_LIFE_MAX = 60480
@@ -131,10 +145,10 @@ class Humidifier(AttributeDevice):
     def water_level(self) -> WaterLevel:
         """Return 0 if water level is Empty, 1 if Low, and 2 if Good."""
         if self._attributes.get("NoWater") == 1:
-            return WaterLevel.Empty
+            return WaterLevel.EMPTY
         if self._attributes.get("WaterAdvise") == 1:
-            return WaterLevel.Low
-        return WaterLevel.Good
+            return WaterLevel.LOW
+        return WaterLevel.GOOD
 
     @property
     def water_level_string(self) -> str:

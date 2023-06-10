@@ -17,16 +17,25 @@ class CoffeeMakerMode(IntEnum):
     """Enum to map WeMo modes to human-readable strings."""
 
     _UNKNOWN = _UNKNOWN
-    # pylint: disable=invalid-name
-    Refill = 0  # reservoir empty and carafe not in place
-    PlaceCarafe = 1  # reservoir has water but carafe not present
-    RefillWater = 2  # carafe present but reservoir is empty
-    Ready = 3
-    Brewing = 4
-    Brewed = 5
-    CleaningBrewing = 6
-    CleaningSoaking = 7
-    BrewFailCarafeRemoved = 8
+    # Note: The UpperMixedCase (invalid) names are deprecated.
+    REFILL = 0  # reservoir empty and carafe not in place
+    Refill = 0  # pylint: disable=invalid-name
+    PLACE_CARAFE = 1  # reservoir has water but carafe not present
+    PlaceCarafe = 1  # pylint: disable=invalid-name
+    REFILL_WATER = 2  # carafe present but reservoir is empty
+    RefillWater = 2  # pylint: disable=invalid-name
+    READY = 3
+    Ready = 3  # pylint: disable=invalid-name
+    BREWING = 4
+    Brewing = 4  # pylint: disable=invalid-name
+    BREWED = 5
+    Brewed = 5  # pylint: disable=invalid-name
+    CLEANING_BREWING = 6
+    CleaningBrewing = 6  # pylint: disable=invalid-name
+    CLEANING_SOAKING = 7
+    CleaningSoaking = 7  # pylint: disable=invalid-name
+    BREW_FAILED_CARAFE_REMOVED = 8
+    BrewFailCarafeRemoved = 8  # pylint: disable=invalid-name
 
     @classmethod
     def _missing_(cls, value: Any) -> CoffeeMakerMode:
@@ -34,15 +43,15 @@ class CoffeeMakerMode(IntEnum):
 
 
 MODE_NAMES = {
-    CoffeeMakerMode.Refill: "Refill",
-    CoffeeMakerMode.PlaceCarafe: "PlaceCarafe",
-    CoffeeMakerMode.RefillWater: "RefillWater",
-    CoffeeMakerMode.Ready: "Ready",
-    CoffeeMakerMode.Brewing: "Brewing",
-    CoffeeMakerMode.Brewed: "Brewed",
-    CoffeeMakerMode.CleaningBrewing: "CleaningBrewing",
-    CoffeeMakerMode.CleaningSoaking: "CleaningSoaking",
-    CoffeeMakerMode.BrewFailCarafeRemoved: "BrewFailCarafeRemoved",
+    CoffeeMakerMode.REFILL: "Refill",
+    CoffeeMakerMode.PLACE_CARAFE: "PlaceCarafe",
+    CoffeeMakerMode.REFILL_WATER: "RefillWater",
+    CoffeeMakerMode.READY: "Ready",
+    CoffeeMakerMode.BREWING: "Brewing",
+    CoffeeMakerMode.BREWED: "Brewed",
+    CoffeeMakerMode.CLEANING_BREWING: "CleaningBrewing",
+    CoffeeMakerMode.CLEANING_SOAKING: "CleaningSoaking",
+    CoffeeMakerMode.BREW_FAILED_CARAFE_REMOVED: "BrewFailCarafeRemoved",
 }
 
 
@@ -71,7 +80,7 @@ class CoffeeMaker(AttributeDevice):
         # The base implementation using GetBinaryState doesn't work for
         # CoffeeMaker (always returns 0), so use mode instead.
         # Consider the Coffee Maker to be "on" if it's currently brewing.
-        return int(super().get_state(force_update) == CoffeeMakerMode.Brewing)
+        return int(super().get_state(force_update) == CoffeeMakerMode.BREWING)
 
     def set_state(self, state: int) -> None:
         """Set the state of this device to on or off."""
@@ -80,4 +89,4 @@ class CoffeeMaker(AttributeDevice):
         if state:
             # Coffee Maker always responds with an error if SetBinaryState is
             # called. Use SetAttributes to change the Mode to "Brewing"
-            self._set_attributes(("Mode", CoffeeMakerMode.Brewing))
+            self._set_attributes(("Mode", CoffeeMakerMode.BREWING))
