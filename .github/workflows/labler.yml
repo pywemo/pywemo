@@ -1,0 +1,16 @@
+name: "Pull Request Labeler"
+on:
+- pull_request_target
+
+permissions: {}  # No permissions by default. Permissions are added per-job.
+
+jobs:
+  triage:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/labeler@9fcb2c2f5584144ca754f8bfe8c6f81e77753375 # v4.1.0
+      with:
+        dot: true

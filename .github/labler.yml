@@ -1,0 +1,7 @@
+# See https://github.com/actions/labeler for examples
+ignore-for-release:
+  - any: ['**']
+    all:
+      - '!pywemo/*'
+      - '!pywemo/ouimeaux_device/*'
+      - '!pywemo/ouimeaux_device/api/*'
