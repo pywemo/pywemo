@@ -64,7 +64,7 @@ def ensure_long_press_rule_exists(
     rules_db.add_rule(new_rule)
     rules_db.add_rule_devices(
         RuleDevicesRow(
-            RuleID=new_rule.RuleID,
+            RuleID=new_rule.RuleID,  # pylint: disable=no-member
             DeviceID=device_udn,
             GroupID=0,
             DayID=-1,

@@ -285,8 +285,8 @@ def _start_server(port: int | None) -> HTTPServer:
         start_port = 8989
         ports_to_check = 128
 
-    for i in range(0, ports_to_check):
-        port = start_port + i
+    for offset in range(0, ports_to_check):
+        port = start_port + offset
         try:
             return HTTPServer(("", port), RequestHandler)
         except OSError as error:
@@ -470,7 +470,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 SubscriberCallback = Callable[[Device, str, str], Any]
 
 
-class SubscriptionRegistry:
+class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
     """Holds device subscriptions and callbacks for wemo events."""
 
     # Potential service endpoints for subscriptions. A Subscription will be
@@ -617,7 +617,7 @@ class SubscriptionRegistry:
             if type_filter is None or type_ == type_filter:
                 callback(device, type_, value)
 
-    def on(
+    def on(  # pylint: disable=invalid-name
         self,
         device: Device,
         type_filter: str | None,

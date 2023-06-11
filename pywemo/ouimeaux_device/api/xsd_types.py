@@ -122,7 +122,7 @@ class ServiceProperties:
 
 
 @dataclass(frozen=True)
-class DeviceDescription:
+class DeviceDescription:  # pylint: disable=too-many-instance-attributes
     """Device properties from the DeviceType xsd type."""
 
     firmware_version: str

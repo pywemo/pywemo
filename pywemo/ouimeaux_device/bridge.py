@@ -186,7 +186,7 @@ class DeviceState(TypedDict, total=False):
     color_xy: ColorXY
 
 
-class LinkedDevice:
+class LinkedDevice:  # pylint: disable=too-many-instance-attributes
     """Representation of a device connected to the bridge."""
 
     _NAME_TAG: str
@@ -205,7 +205,7 @@ class LinkedDevice:
         self._last_err: dict[str, str] = {}
         self.mac: str = self.bridge.mac
         self.serial_number: str = self.bridge.serial_number
-        self.uniqueID: str = ""
+        self.uniqueID: str = ""  # pylint: disable=invalid-name
 
     def get_state(self, force_update: bool = False) -> DeviceState:
         """Return the status of the device."""
@@ -322,7 +322,7 @@ class LinkedDevice:
         )
         return self
 
-    def turn_on(
+    def turn_on(  # pylint: disable=unused-argument
         self,
         level: int | None = None,
         transition: int = 0,
@@ -331,7 +331,9 @@ class LinkedDevice:
         """Turn on the device."""
         return self._setdevicestatus(onoff=ON)
 
-    def turn_off(self, transition: int = 0) -> LinkedDevice:
+    def turn_off(  # pylint: disable=unused-argument
+        self, transition: int = 0
+    ) -> LinkedDevice:
         """Turn off the device."""
         return self._setdevicestatus(onoff=OFF)
 
@@ -349,7 +351,7 @@ class LinkedDevice:
         return f'<{self.device_type.upper()} "{self.name}">'
 
 
-class Light(LinkedDevice):
+class Light(LinkedDevice):  # pylint: disable=too-many-instance-attributes
     """Representation of a Light connected to the Bridge."""
 
     _NAME_TAG = "FriendlyName"
