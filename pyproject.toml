@@ -134,7 +134,7 @@ ignore_errors = true
   [tool.pylint.master]
   jobs = 0
   max-line-length = 79
-  ignore-paths = "^(pywemo/ouimeaux_device/api/xsd/|tests/)"
+  ignore-paths = "^tests/"
   extension-pkg-whitelist = "lxml"
   max-parents = 15
 
