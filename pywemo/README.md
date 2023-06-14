@@ -33,8 +33,8 @@ http://192.168.1.192:49153/setup.xml
 ### Devices
 
 The device(s) returned by the discovery methods above will be instances of one
-of the classes below. These classes, used for communicating with the various,
-WeMo devices are in submodules under the `pywemo.ouimeaux_device` module. They
+of the classes below. These classes, used for communicating with the various
+WeMo devices, are in submodules under the `pywemo.ouimeaux_device` module. They
 can also be accessed as top-level members of the pywemo module.
 
 WeMo Model|Alias / Class
