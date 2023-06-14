@@ -136,23 +136,9 @@ ignore_errors = true
   [tool.pylint.master]
   jobs = 0
   max-line-length = 79
-  ignore-paths = "^(pywemo/ouimeaux_device/api/xsd/|tests/)"
+  ignore-paths = "^tests/"
   extension-pkg-whitelist = "lxml"
   max-parents = 15
-
-  [tool.pylint.message_control]
-  disable = [
-    "duplicate-code",
-    "too-few-public-methods",
-    "too-many-arguments",
-    "too-many-branches",
-    "too-many-instance-attributes",
-    "too-many-locals",
-    "too-many-public-methods",
-    "too-many-return-statements",
-    "too-many-statements",
-    "unused-argument",
-  ]
 
   [tool.pylint.typecheck]
   generated-members = [
@@ -163,32 +149,6 @@ ignore_errors = true
     "self.bridge",
     "self.insight",
   ]
-  ignored-classes = [
-    # these have dynamically assigned attributes, so ignore their attributes
-    "DatabaseRow",
-    "RulesRow",
-    "RuleDevicesRow",
-    "DeviceCombinationRow",
-    "GroupDevicesRow",
-    "LocationInfoRow",
-    "BlockedRulesRow",
-    "RulesNotifyMessageRow",
-    "SensorNotificationRow",
-    "TargetDevicesRow",
-  ]
 
   [tool.pylint.reports]
   reports = "no"
-
-  [tool.pylint.format]
-  good-names = [
-    "i",
-    "s",
-    "st",
-    "db",
-    "eventSubURL",
-    "uniqueID",
-    "on",
-    "controlURL",
-    "serviceType",
-  ]

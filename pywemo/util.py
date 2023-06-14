@@ -100,7 +100,7 @@ class MetaInfo:
 
 
 @dataclass
-class ExtMetaInfo:
+class ExtMetaInfo:  # pylint: disable=too-many-instance-attributes
     """Parsed output of the metainfo.GetExtMetaInfo() Action."""
 
     current_client_state: int

@@ -23,7 +23,7 @@ class Switch(Device):
         """Turn this device off. If already off, will return "Error"."""
         self.set_state(0)
 
-    def on(self) -> None:
+    def on(self) -> None:  # pylint: disable=invalid-name
         """Turn this device on. If already on, will return "Error"."""
         self.set_state(1)
 

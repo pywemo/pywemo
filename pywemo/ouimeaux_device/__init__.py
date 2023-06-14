@@ -449,6 +449,8 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             ) from exc
 
     def _setup(  # noqa: C901
+        # pylint: disable=too-many-arguments,too-many-branches,too-many-locals
+        # pylint: disable=too-many-statements
         self,
         ssid: str,
         password: str,
@@ -531,7 +533,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             LOG.info("sending connection request (try %s)", attempt + 1)
             # success rate is much higher if the ConnectHomeNetwork command is
             # sent twice (not sure why!)
-            for i in range(2):
+            for retry in range(2):
                 result = wifisetup.ConnectHomeNetwork(
                     ssid=ssid,
                     auth=auth_mode,
@@ -544,8 +546,8 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                 except KeyError:
                     # print entire dictionary if PairingStatus doesn't exist
                     status = repr(result)
-                LOG.debug("pairing status (send %s): %s", i + 1, status)
-                if i == 0:
+                LOG.debug("pairing status (send %s): %s", retry + 1, status)
+                if retry == 0:
                     # only delay on the first call
                     time.sleep(0.10)
 

@@ -300,17 +300,17 @@ class Service(WeMoAllActionsMixin):
             setattr(self, act.name, act)
 
     @property
-    def controlURL(self) -> str:
+    def controlURL(self) -> str:  # pylint: disable=invalid-name
         """Get the controlURL for interacting with this Service."""
         return self.device.session.urljoin(self._config.control_url)
 
     @property
-    def eventSubURL(self) -> str:
+    def eventSubURL(self) -> str:  # pylint: disable=invalid-name
         """Get the eventSubURL for interacting with this Service."""
         return self.device.session.urljoin(self._config.event_subscription_url)
 
     @property
-    def serviceType(self) -> str:
+    def serviceType(self) -> str:  # pylint: disable=invalid-name
         """Get the type of this Service."""
         return self._config.service_type
 
@@ -327,7 +327,7 @@ class RequiredService:
     actions: list[str]
 
 
-class RequiredServicesMixin:
+class RequiredServicesMixin:  # pylint: disable=too-few-public-methods
     """Provide and check for required services."""
 
     @property

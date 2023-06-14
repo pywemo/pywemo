@@ -68,7 +68,7 @@ class UPNPEntry:
             self._expires = self._created + timedelta(seconds=cache_seconds)
 
     @property
-    def st(self) -> str | None:
+    def st(self) -> str | None:  # pylint: disable=invalid-name
         """Return ST value."""
         return self.values.get("st")
 
@@ -113,7 +113,7 @@ class UPNPEntry:
 
     def __repr__(self) -> str:
         """Return the string representation of the object."""
-        st = self.st or ""
+        st = self.st or ""  # pylint: disable=invalid-name
         location = self.location or ""
         udn = self.udn or ""
         return f"<UPNPEntry {st} - {location} - {udn}>"
@@ -134,8 +134,8 @@ def build_ssdp_request(ssdp_st: str, ssdp_mx: int) -> bytes:
     ).encode("ascii")
 
 
-def scan(
-    st: str = ST,
+def scan(  # pylint: disable=too-many-branches,too-many-locals
+    st: str = ST,  # pylint: disable=invalid-name
     timeout: float = DISCOVER_TIMEOUT,
     max_entries: int | None = None,
     match_udn: str | None = None,
@@ -157,16 +157,16 @@ def scan(
     sockets = []
     try:
         for addr in interface_addresses():
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             try:
-                s.bind((addr, 0))
-                s.sendto(ssdp_request, ssdp_target)
-                sockets.append(s)
+                sock.bind((addr, 0))
+                sock.sendto(ssdp_request, ssdp_target)
+                sockets.append(sock)
             except OSError:
                 pass
             finally:
-                if s not in sockets:
-                    s.close()
+                if sock not in sockets:
+                    sock.close()
 
         start = calc_now()
         while sockets:
@@ -181,8 +181,8 @@ def scan(
                 # time remaining.
                 if seconds_left <= 0:
                     return entries
-                for s in sockets:
-                    s.sendto(ssdp_request, ssdp_target)
+                for sock in sockets:
+                    sock.sendto(ssdp_request, ssdp_target)
 
             for sock in ready:
                 response = sock.recv(1024).decode("UTF-8", "replace")
@@ -204,8 +204,8 @@ def scan(
     except OSError:
         LOG.exception("Socket error while discovering SSDP devices")
     finally:
-        for s in sockets:
-            s.close()
+        for sock in sockets:
+            sock.close()
 
     return entries
 

@@ -74,7 +74,11 @@ def device_from_description(
 
 
 def device_from_uuid_and_location(  # noqa: C901
-    uuid: str | None, location: str | None, *, debug: bool = False
+    # pylint: disable=too-many-branches,too-many-return-statements
+    uuid: str | None,
+    location: str | None,
+    *,
+    debug: bool = False,
 ) -> Device | None:
     """Determine device class based on the device uuid."""
     if not (uuid and location):

@@ -179,7 +179,7 @@ class SQLType:
         return self._sql_type.lstrip()
 
 
-class PrimaryKey(SQLType):
+class PrimaryKey(SQLType):  # pylint: disable=too-few-public-methods
     """Class used to indicate the primary key field for a Row."""
 
     def __init__(self, *args, auto_increment=False, **kwargs):
