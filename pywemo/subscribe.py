@@ -1,4 +1,36 @@
-"""Module to listen for wemo events."""
+"""Module to listen for WeMo events.
+
+Example usage:
+
+```python
+import pywemo
+# The SubscriptionRegistry maintains push subscriptions to each endpoint
+# of a device.
+registry = pywemo.SubscriptionRegistry()
+registry.start()
+
+device = ... # See example of discovering devices in the pywemo module.
+
+# Start subscribing to push notifications of state changes.
+registry.register(device)
+
+def push_notification(device, event, params):
+    '''Notify device of state change and get new device state.'''
+    processed_update = device.subscription_update(event, params)
+    state = device.get_state(force_update=not processed_update)
+    print(f"Device state: {state}")
+
+# Register a callback to receive state push notifications.
+registry.on(device, None, push_notification)
+
+# Do some work.
+# time.sleep(60)
+
+# Stop the registry
+registry.unregister(device)
+registry.stop()
+```
+"""
 from __future__ import annotations
 
 import collections
