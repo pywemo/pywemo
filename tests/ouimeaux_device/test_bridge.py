@@ -326,3 +326,10 @@ def test_subscription_update(update, expected_updated, expected_state, bridge):
     assert updated == expected_updated
     if updated:
         assert bridge.lights[LIGHT_ID].get_state() == expected_state
+
+
+def test_deprecation_warnings(bridge):
+    with pytest.deprecated_call():
+        assert isinstance(bridge.Lights, dict)
+    with pytest.deprecated_call():
+        assert isinstance(bridge.Groups, dict)
