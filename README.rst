@@ -1,5 +1,5 @@
-pyWeMo |Build Badge| |PyPI Version Badge| |Coverage| |PyPI Downloads Badge|
-===========================================================================
+pyWeMo |Build Badge| |PyPI Version Badge| |Coverage| |PyPI Downloads Badge| |Docs Badge|
+========================================================================================
 Python 3 module to setup, discover and control WeMo devices.
 
 Dependencies
@@ -154,3 +154,6 @@ The rest of pyWeMo is released under the MIT license. See the top-level LICENSE 
 .. |PyPI Downloads Badge| image:: https://img.shields.io/pypi/dm/pywemo
     :target: https://pypi.org/project/pywemo/
     :alt: Number of PyPI downloads
+.. |Docs Badge| image:: https://github.com/pywemo/pywemo/actions/workflows/docs.yml/badge.svg
+    :target: https://pywemo.github.io/pywemo/
+    :alt: API Documentation

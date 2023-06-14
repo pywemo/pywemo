@@ -1,4 +1,36 @@
-"""Module to listen for wemo events."""
+"""Module to listen for WeMo events.
+
+Example usage:
+
+```python
+import pywemo
+# The SubscriptionRegistry maintains push subscriptions to each endpoint
+# of a device.
+registry = pywemo.SubscriptionRegistry()
+registry.start()
+
+device = ... # See example of discovering devices in the pywemo module.
+
+# Start subscribing to push notifications of state changes.
+registry.register(device)
+
+def push_notification(device, event, params):
+    '''Notify device of state change and get new device state.'''
+    processed_update = device.subscription_update(event, params)
+    state = device.get_state(force_update=not processed_update)
+    print(f"Device state: {state}")
+
+# Register a callback to receive state push notifications.
+registry.on(device, None, push_notification)
+
+# Do some work.
+# time.sleep(60)
+
+# Stop the registry
+registry.unregister(device)
+registry.stop()
+```
+"""
 from __future__ import annotations
 
 import collections
@@ -100,36 +132,42 @@ ERROR_SOAP_ACTION_RESPONSE = """<?xml version='1.0' encoding='UTF-8'?>
 class Subscription:
     """Subscription to a single UPnP service endpoint."""
 
-    # Scheduler Event used to periodically maintain the subscription.
     scheduler_event: sched.Event | None = None
+    """Scheduler Event used to periodically maintain the subscription."""
 
-    # Controls whether or not the subscription will continue to be periodically
-    # scheduled by the Scheduler. Set to False when the device us unregistered.
     scheduler_active: bool = True
+    """
+    Controls whether or not the subscription will continue to be periodically
+    scheduled by the Scheduler. Set to False when the device us unregistered.
+    """
 
-    # Time that the subscription will expire, or 0.0 if not subscribed.
-    # time.time() value.
     expiration_time: float = 0.0
+    """Time that the subscription will expire, or 0.0 if not subscribed.
+    time.time() value.
+    """
 
-    # Has a notification event been received for this subscription?
     event_received: bool = False
+    """Has a notification event been received for this subscription?"""
 
-    # Subscription Identifier (SID) used to maintain/refresh the subscription.
-    # `None` when the subscription is not active.
     subscription_id: str | None = None
+    """Subscription Identifier (SID) used to maintain/refresh the subscription.
+    `None` when the subscription is not active.
+    """
 
-    # Request that the device keep the subscription active for this number of
-    # seconds.
     default_timeout_seconds: int = 300
+    """
+    Request that the device keep the subscription active for this number of
+    seconds.
+    """
 
-    # WeMo device instance.
     device: Device
+    """WeMo device instance."""
 
-    # HTTP port used by devices to send event notifications.
     callback_port: int
+    """HTTP port used by devices to send event notifications."""
 
-    # Name of the subscription endpoint service.
     service_name: str
+    """Name of the subscription endpoint service."""
 
     def __init__(
         self, device: Device, callback_port: int, service_name: str
@@ -357,8 +395,9 @@ class RequestHandler(BaseHTTPRequestHandler):
       action is EVENT_TYPE_LONG_PRESS.
     """
 
-    # Do not wait for more than 10 seconds for any request to complete.
     timeout = 10
+    """Do not wait for more than 10 seconds for any request to complete."""
+
     server: HTTPServer
     server_version = f"{BaseHTTPRequestHandler.server_version} UPnP/1.0"
 
@@ -473,13 +512,15 @@ SubscriberCallback = Callable[[Device, str, str], Any]
 class SubscriptionRegistry:
     """Holds device subscriptions and callbacks for wemo events."""
 
-    # Potential service endpoints for subscriptions. A Subscription will be
-    # created for each entry as long as the service is supported by the device.
     subscription_service_names: Iterable[str] = (
         "basicevent",
         "bridge",
         "insight",
     )
+    """Potential service endpoints for subscriptions.
+    A Subscription will be created for each entry as long as the service is
+    supported by the device.
+    """
 
     def __init__(self, requested_port: int | None = None) -> None:
         """Create the subscription registry object."""

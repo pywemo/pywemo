@@ -29,8 +29,9 @@ class AttributeDevice(Switch):
     EVENT_TYPE_ATTRIBUTE_LIST = "attributeList"
 
     _state_property: str
-    # Name of the TypedDict attribute that holds the values for this device.
+
     _attr_name = "_attributes"
+    """Name of the TypedDict attribute that holds values for this device."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Create a Attributes device."""

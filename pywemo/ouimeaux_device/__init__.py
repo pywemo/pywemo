@@ -43,8 +43,7 @@ def probe_wemo(
     probe_timeout: float = REQUESTS_TIMEOUT,
     match_udn: str | None = None,
 ) -> int | None:
-    """
-    Probe a host for the current port.
+    """Probe a host for the current port.
 
     This probes a host for known-to-be-possible ports and
     returns the one currently in use. If no port is discovered
@@ -250,16 +249,14 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             print()
 
     def reset(self, data: bool, wifi: bool) -> str:
-        """
-        Reset Wemo device.
+        """Reset Wemo device.
 
-        Parameters
-        ----------
-        data : bool
+        Args:
+          data (bool):
             Set to True to reset the data ("Clear Personalized Info" in the
             Wemo app), which resets the device name and cleans the icon and
             rules.
-        wifi : bool
+          wifi (bool):
             Set to True to clear wifi information ("Change Wi-Fi" in the Wemo
             app), which does not clear the rules, name, etc.
 
@@ -275,7 +272,6 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         ReSetup action below were consistent.  These could potentially change
         in a future firmware revision or may be different for other untested
         devices.
-
         """
         try:
             action = self.basicevent.ReSetup
@@ -318,8 +314,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
     def encrypt_aes128(
         password: str, wemo_metadata: str, is_rtos: bool
     ) -> str:
-        """
-        Encrypt a password using OpenSSL.
+        """Encrypt a password using OpenSSL.
 
         Function borrows heavily from Vadim Kantorov's "wemosetup" script:
         https://github.com/vadimkantorov/wemosetup
@@ -394,29 +389,27 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         return encrypted_password
 
     def setup(self, *args: Any, **kwargs: Any) -> tuple[str, str]:
-        """
-        Connect Wemo to wifi network.
+        """Connect Wemo to wifi network.
 
         This function should be used and will capture several potential
         exceptions to indicate when the setup method won't work on a device.
 
-        Parameters
-        ----------
-        ssid : str
+        Args:
+          ssid (str):
             SSID to connect the device to.
-        password : str
+          password (str):
             Password for the indicated SSID.  This password will be encrypted
             with OpenSSL and then sent to the device.  To connect to an open,
             unsecured network, pass anything for the password as it will be
             ignored.
-        timeout : float, optional
+          timeout (float, optional):
             Number of seconds to wait and poll a device to see if it has
             successfully connected to the network.  The minimum value allows is
             15 seconds as devices sometimes take 10-15 seconds to connect.
-        connection_attempts : int, optional
+          connection_attempts (int, optional):
             Number of times to try connecting a debice to the network, if it
             has failed to connect within `timeout` seconds.
-        status_delay : float, optional
+          status_delay (float, optional):
             Number of seconds to delay between each called to the connection
             status of the device.  Generally should prefer this to be as short
             as possible, but not too quick to overload the device with
@@ -425,8 +418,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         Notes
         -----
         The timeout applies to each connection attempt, so the total wait time
-        will be approximately timeout * connection_attempts
-
+        will be approximately `timeout * connection_attempts`.
         """
         try:
             return self._setup(*args, **kwargs)
@@ -464,8 +456,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         connection_attempts: int = 1,
         status_delay: float = 1.0,
     ) -> tuple[str, str]:
-        """
-        Connect Wemo to wifi network.
+        """Connect Wemo to wifi network.
 
         See the setup method for details.
         """
