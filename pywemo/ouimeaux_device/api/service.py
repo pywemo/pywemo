@@ -67,13 +67,13 @@ class Session:
     field on HTTPResponse is populated from the `data` field.
     """
 
-    # Retry strategy for requests that fail.
     retries: int | urllib3.Retry | None = urllib3.Retry(
         total=6, backoff_factor=1.5, allowed_methods=["GET", "POST"]
     )
+    """Retry strategy for requests that fail."""
 
-    # Seconds that a request can be idle before retrying.
     timeout = 3.0
+    """Seconds that a request can be idle before retrying."""
 
     def __init__(
         self,
@@ -175,13 +175,13 @@ class Session:
 class Action:
     """Representation of an Action for a WeMo device."""
 
-    # A few actions take longer than the default timeout. Override the default
-    # timeout value for those actions.
     soap_action_timeout_override = {
         "urn:Belkin:service:bridge:1#AddDevice": 30,
         "urn:Belkin:service:bridge:1#OpenNetwork": 30,
         "urn:Belkin:service:WiFiSetup:1#GetApList": 10,
     }
+    """A few actions take longer than the default timeout. Override the default
+    timeout value for those actions."""
 
     max_rediscovery_attempts = 3
 
