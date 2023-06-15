@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import io
 import time
+import warnings
 from html import escape
 from typing import Any, Iterable, TypedDict
 
@@ -32,6 +33,15 @@ CAPABILITY_NAME2ID = dict(
 OFF = 0
 ON = 1
 TOGGLE = 2
+
+
+def _warn_rename(old: str, new: str, stacklevel: int = 3) -> None:
+    warnings.warn(
+        f"{old} is deprecated and will be removed in a future release. "
+        f"Use {new} instead",
+        DeprecationWarning,
+        stacklevel=stacklevel,
+    )
 
 
 def limit(value: int, min_val: int, max_val: int) -> int:
@@ -71,6 +81,18 @@ class Bridge(Device):
                 actions=["GetDeviceStatus", "SetDeviceStatus"],
             ),
         ]
+
+    @property
+    def Lights(self) -> dict[str, Light]:  # pylint: disable=invalid-name
+        """Deprecated method for accessing .lights."""
+        _warn_rename("Lights", "lights")
+        return self.lights
+
+    @property
+    def Groups(self) -> dict[str, Group]:  # pylint: disable=invalid-name
+        """Deprecated method for accessing .groups."""
+        _warn_rename("Groups", "groups")
+        return self.groups
 
     def bridge_update(
         self, force_update: bool = True
