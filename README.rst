@@ -1,5 +1,5 @@
-pyWeMo |Build Badge| |PyPI Version Badge| |Coverage| |PyPI Downloads Badge| |Docs Badge|
-========================================================================================
+pyWeMo |Build Badge| |PyPI Version Badge| |Coverage| |PyPI Downloads Badge| |Docs Badge| |Scorecard Badge| |Best Practices Badge| |SLSA 3 Badge|
+================================================================================================================================================
 Python 3 module to setup, discover and control WeMo devices.
 
 Dependencies
@@ -157,3 +157,12 @@ The rest of pyWeMo is released under the MIT license. See the top-level LICENSE 
 .. |Docs Badge| image:: https://github.com/pywemo/pywemo/actions/workflows/docs.yml/badge.svg
     :target: https://pywemo.github.io/pywemo/
     :alt: API Documentation
+.. |Scorecard Badge| image:: https://api.securityscorecards.dev/projects/github.com/pywemo/pywemo/badge
+    :target: https://api.securityscorecards.dev/projects/github.com/pywemo/pywemo
+    :alt: OpenSSF Scorecard
+.. |Best Practices Badge| image:: https://bestpractices.coreinfrastructure.org/projects/7467/badge
+    :target: https://bestpractices.coreinfrastructure.org/projects/7467
+    :alt: OpenSSF Best Practices
+.. |SLSA 3 Badge| image:: https://slsa.dev/images/gh-badge-level3.svg
+    :target: https://github.com/pywemo/pywemo/releases/latest#user-content-SLSA
+    :alt: SLSA level 3
