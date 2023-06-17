@@ -69,7 +69,7 @@ wget https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME
 
 # Verify that the wheel was built from this release.
 slsa-verifier verify-artifact \
-    --provenance-path provenance-pywemo-${GITHUB_REF_NAME}.intoto.jsonl \
+    --provenance-path pywemo-${GITHUB_REF_NAME}.intoto.jsonl \
     --source-uri github.com/${GITHUB_REPOSITORY} \
     --source-tag ${GITHUB_REF_NAME} \
     pywemo-${GITHUB_REF_NAME}-py3-none-any.whl
