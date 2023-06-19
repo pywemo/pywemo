@@ -25,9 +25,10 @@ MULTICAST_PORT = 1900
 # Wemo specific urn:
 ST = "urn:Belkin:service:basicevent:1"
 VIRTUAL_DEVICE_USN = f"{VIRTUAL_DEVICE_UDN}::{ST}"
+MAX_AGE = 86400
 
 SSDP_REPLY = f"""HTTP/1.1 200 OK
-CACHE-CONTROL: max-age=86400
+CACHE-CONTROL: max-age={MAX_AGE}
 EXT:
 LOCATION: http://%s/setup.xml
 OPT: "http://schemas.upnp.org/upnp/1/0/"; ns=01
@@ -39,7 +40,7 @@ SSDP_REPLY = SSDP_REPLY.replace("\n", "\r\n")
 
 SSDP_NOTIFY = f"""NOTIFY * HTTP/1.1
 HOST: {MULTICAST_GROUP}:{MULTICAST_PORT}
-CACHE-CONTROL: max-age=1800
+CACHE-CONTROL: max-age={MAX_AGE}
 LOCATION: http://%s/setup.xml
 SERVER: Unspecified, UPnP/1.0, Unspecified
 NT: {ST}
@@ -285,7 +286,7 @@ class DiscoveryResponder:
                 # Periodically send NOTIFY messages.
                 now = datetime.now()
                 if now > next_notify and self._notify_enabled:
-                    next_notify = now + timedelta(minutes=2)
+                    next_notify = now + timedelta(seconds=MAX_AGE - 60)
                     self.send_notify()
 
                 # Check for new discovery requests.
