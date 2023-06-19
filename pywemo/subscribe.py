@@ -82,6 +82,7 @@ VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
     <hwVersion>v1</hwVersion>
     <modelURL>http://www.belkin.com/plugin/</modelURL>
     <serialNumber>VirtualDevice</serialNumber>
+    <firmwareVersion>WeMo_US_2.00.2769.PVT</firmwareVersion>
     <UDN>{VIRTUAL_DEVICE_UDN}</UDN>
     <binaryState>0</binaryState>
     <serviceList>
@@ -93,6 +94,7 @@ VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
         <SCPDURL>/eventservice.xml</SCPDURL>
       </service>
     </serviceList>
+  <presentationURL>/pluginpres.html</presentationURL>
 </device>
 </root>"""
 
