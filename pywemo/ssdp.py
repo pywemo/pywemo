@@ -6,7 +6,10 @@ import re
 import select
 import socket
 import threading
+import time
+import uuid
 from datetime import datetime, timedelta
+from wsgiref.handlers import format_date_time
 
 from .ouimeaux_device.api.long_press import VIRTUAL_DEVICE_UDN
 from .util import get_callback_address, interface_addresses
@@ -29,9 +32,13 @@ MAX_AGE = 86400
 
 SSDP_REPLY = f"""HTTP/1.1 200 OK
 CACHE-CONTROL: max-age={MAX_AGE}
+DATE: %(date)s
 EXT:
-LOCATION: http://%s/setup.xml
+LOCATION: http://%(callback)s/setup.xml
 OPT: "http://schemas.upnp.org/upnp/1/0/"; ns=01
+01-NLS: %(nls)s
+SERVER: Unspecified, UPnP/1.0, Unspecified
+X-User-Agent: pywemo
 ST: {ST}
 USN: {VIRTUAL_DEVICE_USN}
 
@@ -41,10 +48,13 @@ SSDP_REPLY = SSDP_REPLY.replace("\n", "\r\n")
 SSDP_NOTIFY = f"""NOTIFY * HTTP/1.1
 HOST: {MULTICAST_GROUP}:{MULTICAST_PORT}
 CACHE-CONTROL: max-age={MAX_AGE}
-LOCATION: http://%s/setup.xml
-SERVER: Unspecified, UPnP/1.0, Unspecified
+LOCATION: http://%(callback)s/setup.xml
+OPT: "http://schemas.upnp.org/upnp/1/0/"; ns=01
+01-NLS: %(nls)s
 NT: {ST}
 NTS: ssdp:alive
+SERVER: Unspecified, UPnP/1.0, Unspecified
+X-User-Agent: pywemo
 USN: {VIRTUAL_DEVICE_USN}
 
 """  # Newline characters at the the end of SSDP_NOTIFY are intentional.
@@ -240,17 +250,21 @@ class DiscoveryResponder:
         self._exit = threading.Event()
         self._thread_exception: Exception | None = None
         self._notify_enabled = True  # Only ever set to False in tests.
+        self._nls_uuid = str(uuid.uuid4())
 
     def send_notify(self) -> None:
         """Send a UPnP NOTIFY message containing the virtual device URL."""
         ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
         for addr in interface_addresses():  # Send on all interfaces.
-            callback_addr = get_callback_address(addr, self.callback_port)
+            params = {
+                "callback": get_callback_address(addr, self.callback_port),
+                "nls": self._nls_uuid,
+            }
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             try:
                 sock.bind((addr, 0))
                 sock.sendto(
-                    (SSDP_NOTIFY % callback_addr).encode("UTF-8"), ssdp_target
+                    (SSDP_NOTIFY % params).encode("UTF-8"), ssdp_target
                 )
             except OSError:
                 pass
@@ -303,13 +317,16 @@ class DiscoveryResponder:
                     or EXPECTED_MAN_HEADER not in lines
                 ):
                     continue
-                callback_addr = get_callback_address(
-                    sock_addr[0],
-                    self.callback_port,
-                )
+                params = {
+                    "callback": get_callback_address(
+                        sock_addr[0], self.callback_port
+                    ),
+                    "date": format_date_time(time.time()),
+                    "nls": self._nls_uuid,
+                }
                 try:
                     send_sock.sendto(
-                        (SSDP_REPLY % callback_addr).encode("UTF-8"), sock_addr
+                        (SSDP_REPLY % params).encode("UTF-8"), sock_addr
                     )
                 except OSError as err:
                     LOG.error(

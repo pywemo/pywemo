@@ -11,6 +11,7 @@ from pywemo import ssdp
 MOCK_CALLBACK_PORT = 8989
 MOCK_IP_ADDRESS = "5.6.7.8"
 MOCK_CALLBACK_ADDRESS = f"{MOCK_IP_ADDRESS}:{MOCK_CALLBACK_PORT}"
+MOCK_DATE = "Tue, 20 Jun 2023 16:16:15 GMT"
 
 
 @pytest.fixture()
@@ -96,12 +97,16 @@ def discovery_responder(
         mock_socket.recvfrom.return_value = (req.encode("UTF-8"), source)
         # Unblock the select.select call with a socket, indicating data
         # is ready.
-        mock_select.put(([mock_socket],))
-        if expect_sendto:
-            return send_queue.get()
+        with mock.patch(
+            "pywemo.ssdp.format_date_time", return_value=MOCK_DATE
+        ):
+            mock_select.put(([mock_socket],))
+            if expect_sendto:
+                return send_queue.get()
 
     resp = ssdp.DiscoveryResponder(callback_port=MOCK_CALLBACK_PORT)
     resp._notify_enabled = False
+    resp._nls_uuid = "UUID"
     resp.start()
     try:
         yield do_once
@@ -123,8 +128,12 @@ def test_discovery_responder_notify(
 ):
     resp = ssdp.DiscoveryResponder(callback_port=MOCK_CALLBACK_PORT)
     resp.send_notify()
+    params = {
+        "callback": MOCK_CALLBACK_ADDRESS,
+        "nls": resp._nls_uuid,
+    }
     mock_socket.sendto.assert_called_with(
-        (ssdp.SSDP_NOTIFY % MOCK_CALLBACK_ADDRESS).encode("utf-8"),
+        (ssdp.SSDP_NOTIFY % params).encode("utf-8"),
         ("239.255.255.250", 1900),
     )
 
@@ -141,7 +150,12 @@ HOST: 239.255.255.250:1900
 """
     resp_msg, resp_to_addr = discovery_responder(msg, from_addr)
 
-    expected_response = ssdp.SSDP_REPLY % MOCK_CALLBACK_ADDRESS
+    params = {
+        "callback": MOCK_CALLBACK_ADDRESS,
+        "nls": "UUID",
+        "date": MOCK_DATE,
+    }
+    expected_response = ssdp.SSDP_REPLY % params
 
     assert resp_msg.decode("UTF-8") == expected_response
     # The reply should go back to the source.
