@@ -286,7 +286,7 @@ class DiscoveryResponder:
                 # Periodically send NOTIFY messages.
                 now = datetime.now()
                 if now > next_notify and self._notify_enabled:
-                    next_notify = now + timedelta(seconds=MAX_AGE / 2)
+                    next_notify = now + timedelta(seconds=(MAX_AGE - 60) / 2)
                     self.send_notify()
 
                 # Check for new discovery requests.
