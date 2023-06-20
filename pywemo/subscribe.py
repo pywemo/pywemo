@@ -72,7 +72,7 @@ VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
     <minor>0</minor>
   </specVersion>
   <device>
-    <deviceType>urn:Belkin:device:switch:1</deviceType>
+    <deviceType>urn:Belkin:device:controllee:1</deviceType>
     <friendlyName>pywemo virtual device</friendlyName>
     <manufacturer>pywemo</manufacturer>
     <manufacturerURL>https://github.com/pywemo/pywemo</manufacturerURL>
