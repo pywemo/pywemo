@@ -517,13 +517,13 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "deptry"
-version = "0.11.0"
+version = "0.12.0"
 description = "A command line utility to check for unused, missing and transitive dependencies in a Python project."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "deptry-0.11.0-py3-none-any.whl", hash = "sha256:e6d713806c0aff3ed3ac4f425b5b05b4473759a25a5ecfe5f93ddf224bfef57e"},
-    {file = "deptry-0.11.0.tar.gz", hash = "sha256:fcd778cd5539458dbc665489404932135651dc1a2c9c7bc45b92455e57268802"},
+    {file = "deptry-0.12.0-py3-none-any.whl", hash = "sha256:69c801a6ae1b39c7b8e0daf40dbe8b75f1f161277d206dd8f921f32cd22dad91"},
+    {file = "deptry-0.12.0.tar.gz", hash = "sha256:ac3cd32d149c92a9af12f63cd9486ddd1760f0277ed0cf306c6ef0388f57ff0a"},
 ]
 
 [package.dependencies]
@@ -2706,4 +2706,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "61fe243b455e70854a904a4ba8e59f89187000577004d6a3764d5397d559c8b8"
+content-hash = "bf1c13d77b5bf74bf081cb4db1fd76954ffa01479f547558e61437ed64a5260e"
