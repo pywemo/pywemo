@@ -52,7 +52,7 @@ LOCATION: http://%(callback)s/setup.xml
 OPT: "http://schemas.upnp.org/upnp/1/0/"; ns=01
 01-NLS: %(nls)s
 NT: {ST}
-NTS: ssdp:alive
+NTS: %(nts)s
 SERVER: Unspecified, UPnP/1.0, Unspecified
 X-User-Agent: pywemo
 USN: {VIRTUAL_DEVICE_USN}
@@ -252,13 +252,14 @@ class DiscoveryResponder:
         self._notify_enabled = True  # Only ever set to False in tests.
         self._nls_uuid = str(uuid.uuid4())
 
-    def send_notify(self) -> None:
+    def send_notify(self, nts: str) -> None:
         """Send a UPnP NOTIFY message containing the virtual device URL."""
         ssdp_target = (MULTICAST_GROUP, MULTICAST_PORT)
         for addr in interface_addresses():  # Send on all interfaces.
             params = {
                 "callback": get_callback_address(addr, self.callback_port),
                 "nls": self._nls_uuid,
+                "nts": nts,
             }
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             try:
@@ -301,7 +302,7 @@ class DiscoveryResponder:
                 now = datetime.now()
                 if now > next_notify and self._notify_enabled:
                     next_notify = now + timedelta(seconds=(MAX_AGE / 2) - 30)
-                    self.send_notify()
+                    self.send_notify("ssdp:alive")
 
                 # Check for new discovery requests.
                 if not select.select([recv_sock], [], [], 1)[0]:
@@ -332,6 +333,9 @@ class DiscoveryResponder:
                     LOG.error(
                         "Failed to send SSDP reply to %r: %s", sock_addr, err
                     )
+
+            if self._notify_enabled:
+                self.send_notify("ssdp:byebye")
         except Exception as exp:
             self._thread_exception = exp  # Used in the stop() method.
             raise
