@@ -72,7 +72,7 @@ extend_exclude = ["scripts"]
 
 [tool.deptry.per_rule_ignores]
 DEP001 = [
-  # These are created by generateDS.
+  # Ignore missing dependencies created by generateDS.
   "StringIO",
   "generatedsnamespaces",
   "generatedscollector",
