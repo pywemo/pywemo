@@ -69,7 +69,9 @@ poetry = ">=1.2.0"
 
 [tool.deptry]
 extend_exclude = ["scripts"]
-ignore_missing = [
+
+[tool.deptry.per_rule_ignores]
+DEP001 = [
   # These are created by generateDS.
   "StringIO",
   "generatedsnamespaces",
