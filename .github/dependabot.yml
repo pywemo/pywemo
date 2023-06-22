@@ -8,6 +8,9 @@ updates:
     schedule:
       # Check for updates to Poetry dependencies every week
       interval: "weekly"
+    allow:
+      # Allow both direct and indirect updates for all packages
+      - dependency-type: "all"
 
   - package-ecosystem: "github-actions"
     directory: "/"
