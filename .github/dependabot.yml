@@ -10,7 +10,8 @@ updates:
       interval: "weekly"
     allow:
       # Allow both direct and indirect updates for all packages
-      - dependency-type: "all"
+      - dependency-type: direct
+      - dependency-type: indirect
 
   - package-ecosystem: "github-actions"
     directory: "/"
