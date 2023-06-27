@@ -72,16 +72,17 @@ VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
     <minor>0</minor>
   </specVersion>
   <device>
-    <deviceType>urn:Belkin:device:switch:1</deviceType>
+    <deviceType>urn:Belkin:device:controllee:1</deviceType>
     <friendlyName>pywemo virtual device</friendlyName>
     <manufacturer>pywemo</manufacturer>
     <manufacturerURL>https://github.com/pywemo/pywemo</manufacturerURL>
     <modelDescription>pywemo virtual device</modelDescription>
-    <modelName>LightSwitch</modelName>
+    <modelName>Socket</modelName>
     <modelNumber>1.0</modelNumber>
     <hwVersion>v1</hwVersion>
     <modelURL>http://www.belkin.com/plugin/</modelURL>
-    <serialNumber>VirtualDevice</serialNumber>
+    <serialNumber>PyWemoVirtualDevice</serialNumber>
+    <firmwareVersion>WeMo_US_2.00.2769.PVT</firmwareVersion>
     <UDN>{VIRTUAL_DEVICE_UDN}</UDN>
     <binaryState>0</binaryState>
     <serviceList>
@@ -93,6 +94,7 @@ VIRTUAL_SETUP_XML = f"""<?xml version="1.0"?>
         <SCPDURL>/eventservice.xml</SCPDURL>
       </service>
     </serviceList>
+  <presentationURL>/pluginpres.html</presentationURL>
 </device>
 </root>"""
 
