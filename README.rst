@@ -158,7 +158,7 @@ The rest of pyWeMo is released under the MIT license. See the top-level LICENSE 
     :target: https://pywemo.github.io/pywemo/
     :alt: API Documentation
 .. |Scorecard Badge| image:: https://api.securityscorecards.dev/projects/github.com/pywemo/pywemo/badge
-    :target: https://api.securityscorecards.dev/projects/github.com/pywemo/pywemo
+    :target: https://securityscorecards.dev/viewer/?uri=github.com/pywemo/pywemo
     :alt: OpenSSF Scorecard
 .. |Best Practices Badge| image:: https://bestpractices.coreinfrastructure.org/projects/7467/badge
     :target: https://bestpractices.coreinfrastructure.org/projects/7467
