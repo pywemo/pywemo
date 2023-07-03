@@ -127,10 +127,11 @@ def test_discovery_responder_notify(
     mock_socket, mock_interface_addresses, mock_get_callback_address
 ):
     resp = ssdp.DiscoveryResponder(callback_port=MOCK_CALLBACK_PORT)
-    resp.send_notify()
+    resp.send_notify("ssdp:alive")
     params = {
         "callback": MOCK_CALLBACK_ADDRESS,
         "nls": resp._nls_uuid,
+        "nts": "ssdp:alive",
     }
     mock_socket.sendto.assert_called_with(
         (ssdp.SSDP_NOTIFY % params).encode("utf-8"),
