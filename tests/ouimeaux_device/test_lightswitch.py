@@ -61,3 +61,15 @@ class Test_WLS0403(Base, long_press_helpers.TestLongPress):
             )
 
     device = lightswitch  # for TestLongPress
+
+
+class Test_NoLongPress(Base):
+    """Tests for the WeMo WeMo_WW_2.00.2263.PVT firmware."""
+
+    @pytest.fixture
+    def lightswitch(self, vcr):
+        with vcr.use_cassette("WeMo_WW_2.00.2263.PVT"):
+            return device_from_uuid_and_location(
+                "uuid:Lightswitch-1_0-SERIALNUMBER",
+                "http://192.168.1.100:49153/Lightsetup.xml",
+            )

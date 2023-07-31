@@ -87,6 +87,8 @@ def device_from_uuid_and_location(  # noqa: C901
         if uuid.startswith("uuid:Socket"):
             return Switch(location)
         if uuid.startswith("uuid:Lightswitch-1_0"):
+            if not location.endswith("/setup.xml"):
+                return LightSwitch(location)
             return LightSwitchLongPress(location)
         if uuid.startswith("uuid:Lightswitch-2_0"):
             return LightSwitchLongPress(location)
