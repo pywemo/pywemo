@@ -78,7 +78,7 @@ class HTTPNotOkException(HTTPException):
     """Raised when a non-200 status is returned."""
 
 
-class RulesDbError(Exception):
+class RulesDbError(PyWeMoException):
     """Base class for errors related to the Rules database."""
 
 
