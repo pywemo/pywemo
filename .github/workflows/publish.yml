@@ -101,7 +101,7 @@ jobs:
       - name: Sign the release
         uses: sigstore/gh-action-sigstore-python@1e232a0c9f448840dce4eb982e4a0a7f50fee0bf # v2.0.0
         with:
-          inputs: ./${DIST_ARTIFACT}/* ./hashes/*
+          inputs: ./${{env.DIST_ARTIFACT}}/* ./hashes/*
           upload-signing-artifacts: true
 
   assets:
