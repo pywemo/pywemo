@@ -6,7 +6,7 @@
 # pylint: skip-file
 
 #
-# Generated  by generateDS.py version 2.42.2.
+# Generated  by generateDS.py version 2.43.1.
 # Python [sys.version]
 #
 # Command line options:
@@ -1219,10 +1219,11 @@ def _cast(typ, value):
 
 
 #
-# Data representation classes.
+# Start enum classes
 #
-
-
+#
+# Start data representation classes
+#
 class scpd(GeneratedsSuper):
     __hash__ = GeneratedsSuper.__hash__
     subclass = None
@@ -3591,6 +3592,11 @@ class retvalType(GeneratedsSuper):
 
 
 # end class retvalType
+
+
+#
+# End data representation classes.
+#
 
 
 GDSClassesMapping = {}
