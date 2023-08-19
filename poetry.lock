@@ -2277,17 +2277,6 @@ files = [
 ]
 
 [[package]]
-name = "types-docutils"
-version = "0.20.0.3"
-description = "Typing stubs for docutils"
-optional = false
-python-versions = "*"
-files = [
-    {file = "types-docutils-0.20.0.3.tar.gz", hash = "sha256:4928e790f42b99d5833990f99c8dd9fa9f16825f6ed30380ca981846d36870cd"},
-    {file = "types_docutils-0.20.0.3-py3-none-any.whl", hash = "sha256:a930150d8e01a9170f9bca489f46808ddebccdd8bc1e47c07968a77e49fb9321"},
-]
-
-[[package]]
 name = "types-requests"
 version = "2.31.0.2"
 description = "Typing stubs for requests"
