@@ -476,9 +476,9 @@ rapidfuzz==2.15.1 ; python_full_version >= "3.8.1" and python_version < "4.0" \
     --hash=sha256:f976e76ac72f650790b3a5402431612175b2ac0363179446285cb3c901136ca9 \
     --hash=sha256:fc0bc259ebe3b93e7ce9df50b3d00e7345335d35acbd735163b7c4b1957074d3 \
     --hash=sha256:fc4528b7736e5c30bc954022c2cf410889abc19504a023abadbc59cdf9f37cae
-referencing==0.30.0 ; python_full_version >= "3.8.1" and python_version < "4.0" \
-    --hash=sha256:47237742e990457f7512c7d27486394a9aadaf876cbfaa4be65b27b4f4d47c6b \
-    --hash=sha256:c257b08a399b6c2f5a3510a50d28ab5dbc7bbde049bcaf954d43c446f83ab548
+referencing==0.30.2 ; python_full_version >= "3.8.1" and python_version < "4.0" \
+    --hash=sha256:449b6669b6121a9e96a7f9e410b245d471e8d48964c67113ce9afe50c8dd7bdf \
+    --hash=sha256:794ad8003c65938edcdbc027f1933215e0d0ccc0291e3ce20a4d87432b59efc0
 requests-toolbelt==1.0.0 ; python_full_version >= "3.8.1" and python_version < "4.0" \
     --hash=sha256:7681a0a3d047012b5bdc0ee37d7f8f07ebe76ab08caeccfc3921ce23c88d5bc6 \
     --hash=sha256:cccfdd665f0a24fcf4726e690f65639d272bb0637b9b92dfd91a5568ccf6bd06
