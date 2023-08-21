@@ -1656,13 +1656,13 @@ files = [
 
 [[package]]
 name = "poetry-plugin-export"
-version = "1.4.0"
+version = "1.5.0"
 description = "Poetry plugin to export the dependencies to various formats"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = ">=3.8,<4.0"
 files = [
-    {file = "poetry_plugin_export-1.4.0-py3-none-any.whl", hash = "sha256:5d9186d6f77cf2bf35fc96bd11fe650cc7656e515b17d99cb65018d50ba22589"},
-    {file = "poetry_plugin_export-1.4.0.tar.gz", hash = "sha256:f16974cd9f222d4ef640fa97a8d661b04d4fb339e51da93973f1bc9d578e183f"},
+    {file = "poetry_plugin_export-1.5.0-py3-none-any.whl", hash = "sha256:cd8267597970375ca29868daec5e7718bad500c7584663af3eeb0ed16f24e2bd"},
+    {file = "poetry_plugin_export-1.5.0.tar.gz", hash = "sha256:ecc8738da0c81c3758e36b4e72e04ae59648a547492af2ffe6245af3594bb00f"},
 ]
 
 [package.dependencies]
