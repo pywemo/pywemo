@@ -183,7 +183,7 @@ class Subscription:
         self.device = device
         self.callback_port = callback_port
         self.service_name = service_name
-        self.path = f"/{secrets.token_urlsafe(24)}"
+        self.path = f"/sub/{service_name}/{secrets.token_urlsafe(24)}"
 
     def __repr__(self) -> str:
         """Return a string representation of the Subscription."""
