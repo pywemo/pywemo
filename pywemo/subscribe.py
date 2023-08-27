@@ -140,7 +140,7 @@ class Subscription:
     scheduler_active: bool = True
     """
     Controls whether or not the subscription will continue to be periodically
-    scheduled by the Scheduler. Set to False when the device us unregistered.
+    scheduled by the Scheduler. Set to False when the device is unregistered.
     """
 
     expiration_time: float = 0.0
@@ -220,6 +220,16 @@ class Subscription:
             raise
 
         return self._update_subscription(response.headers)
+
+    def cancel(self) -> None:
+        """Cancel a subscription."""
+        if self.expiration_time > time.time():
+            try:
+                self._unsubscribe()
+            except requests.RequestException:
+                pass
+
+        self._reset_subscription()
 
     def _subscribe(self) -> requests.Response:
         """Start/renew a subscription with a UPnP SUBSCRIBE request.
@@ -346,6 +356,8 @@ def _cancel_events(
             # event might execute and be removed from queue
             # concurrently.  Safe to ignore
             pass
+        if subscription.scheduler_active:
+            scheduler.enter(0, 0, subscription.cancel)
         # Prevent the subscription from being scheduled again.
         subscription.scheduler_active = False
         subscription.scheduler_event = None
