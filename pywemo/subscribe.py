@@ -40,6 +40,7 @@ import sched
 import secrets
 import threading
 import time
+import warnings
 from collections.abc import Iterable, MutableMapping
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Callable
@@ -753,3 +754,14 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
                 while not self._exiting and self._sched.empty():
                     self._event_thread_cond.wait(10)
             self._sched.run()
+
+    @property
+    def devices(self) -> dict[str, Device]:
+        """Deprecated mapping of IP address to device."""
+        warnings.warn(
+            "The devices dict is deprecated "
+            "and will be removed in a future release.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
+        return {device.host: device for device in self._subscriptions}

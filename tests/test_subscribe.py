@@ -483,3 +483,8 @@ class Test_SubscriptionRegistry:
 
         with pytest.raises(requests.ConnectionError):
             requests.request("NOTIFY", f"http://127.0.0.1:{port}/", timeout=5)
+
+    def test_deprecations(self):
+        registry = subscribe.SubscriptionRegistry(requested_port=0)
+        with pytest.deprecated_call():
+            registry.devices
