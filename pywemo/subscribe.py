@@ -408,7 +408,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         sender_ip, _ = self.client_address
         outer = self.server.outer
         if (
-            subscription := outer.subscription_paths.get(self.path)
+            # pylint: disable=protected-access
+            subscription := outer._subscription_paths.get(self.path)
         ) is None or subscription.device.host != sender_ip:
             LOG.warning(
                 "Received %s event for unregistered device %s",
@@ -541,7 +542,7 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
         self._event_thread: threading.Thread | None = None
         self._event_thread_cond = threading.Condition()
         self._subscriptions: dict[Device, list[Subscription]] = {}
-        self.subscription_paths: dict[str, Subscription] = {}
+        self._subscription_paths: dict[str, Subscription] = {}
 
         def sleep(secs: float) -> None:
             with self._event_thread_cond:
@@ -572,7 +573,7 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
                 if service in device.services:
                     subscription = Subscription(device, self.port, service)
                     subscriptions.append(subscription)
-                    self.subscription_paths[subscription.path] = subscription
+                    self._subscription_paths[subscription.path] = subscription
                     self._schedule(0, subscription)
             self._event_thread_cond.notify()
 
@@ -593,7 +594,7 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
                 del self._subscriptions[device]
                 _cancel_events(self._sched, subscriptions)
                 for subscription in subscriptions:
-                    del self.subscription_paths[subscription.path]
+                    del self._subscription_paths[subscription.path]
             self._event_thread_cond.notify()
 
     def _resubscribe(self, subscription: Subscription, retry: int = 0) -> None:
@@ -653,7 +654,9 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
         )
         if path:
             # Update the event_received property for the subscription.
-            if (subscription := self.subscription_paths.get(path)) is not None:
+            if (
+                subscription := self._subscription_paths.get(path)
+            ) is not None:
                 subscription.event_received = True
             else:
                 LOG.warning(

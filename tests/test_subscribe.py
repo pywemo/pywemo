@@ -40,7 +40,7 @@ class Test_RequestHandler:
             subscribe.SubscriptionRegistry, instance=True
         )
         obj._subscriptions = {}
-        obj.subscription_paths = {}
+        obj._subscription_paths = {}
         return obj
 
     @pytest.fixture
@@ -102,7 +102,7 @@ class Test_RequestHandler:
             subscribe.Subscription, instance=True
         )
         subscription.device = mock_light_switch
-        outer.subscription_paths["/path"] = subscription
+        outer._subscription_paths["/path"] = subscription
         response = requests.request(
             "NOTIFY",
             f"{server_url}/path",
@@ -416,7 +416,7 @@ class Test_SubscriptionRegistry:
 
         device._state = 1
         assert subscription_registry.is_subscribed(device) is False
-        paths = list(subscription_registry.subscription_paths.keys())
+        paths = list(subscription_registry._subscription_paths)
         assert len(paths) == 2
         subscription_registry.event(device, "", "", path=paths[0])
         assert subscription_registry.is_subscribed(device) is False

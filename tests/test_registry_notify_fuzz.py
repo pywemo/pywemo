@@ -532,7 +532,7 @@ def test_notify(name, properties):
     device = DEVICES[name]
     REGISTRY.register(device)
     REGISTRY.on(device, None, lambda d, t, v: d.subscription_update(t, v))
-    path = list(REGISTRY.subscription_paths.keys())[0]
+    path = list(REGISTRY._subscription_paths)[0]
     try:
         response = requests.request(
             "NOTIFY",
