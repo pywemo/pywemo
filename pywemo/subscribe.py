@@ -442,14 +442,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         if self.path.endswith("/upnp/control/basicevent1"):
             sender_ip, _ = self.client_address
             outer = self.server.outer
-            if (device := outer.devices.get(sender_ip)) is None:
-                LOG.warning(
-                    "Received event for unregistered device %s", sender_ip
-                )
-            else:
+            for (
+                device
+            ) in outer._subscriptions:  # pylint: disable=protected-access
+                if device.host != sender_ip:
+                    continue
                 doc = self._get_xml_from_http_body()
                 if binary_state := doc.findtext(".//BinaryState"):
                     outer.event(device, EVENT_TYPE_LONG_PRESS, binary_state)
+                break
+            else:
+                LOG.warning(
+                    "Received event for unregistered device %s", sender_ip
+                )
             action = self.headers.get("SOAPACTION", "")
             response = SOAP_ACTION_RESPONSE.get(
                 action, ERROR_SOAP_ACTION_RESPONSE
@@ -528,7 +533,6 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
 
     def __init__(self, requested_port: int | None = None) -> None:
         """Create the subscription registry object."""
-        self.devices: dict[str, Device] = {}
         self._callbacks: dict[
             Device, list[tuple[str | None, SubscriberCallback]]
         ] = collections.defaultdict(list)
@@ -562,8 +566,6 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
             return
 
         LOG.info("Subscribing to events from %r", device)
-        self.devices[device.host] = device
-
         with self._event_thread_cond:
             subscriptions = self._subscriptions[device] = []
             for service in self.subscription_service_names:
@@ -592,8 +594,6 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
                 _cancel_events(self._sched, subscriptions)
                 for subscription in subscriptions:
                     del self.subscription_paths[subscription.path]
-            if device.host in self.devices:
-                del self.devices[device.host]
             self._event_thread_cond.notify()
 
     def _resubscribe(self, subscription: Subscription, retry: int = 0) -> None:

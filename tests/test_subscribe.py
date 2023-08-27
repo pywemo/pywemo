@@ -39,7 +39,7 @@ class Test_RequestHandler:
         obj = mock.create_autospec(
             subscribe.SubscriptionRegistry, instance=True
         )
-        obj.devices = {}
+        obj._subscriptions = {}
         obj.subscription_paths = {}
         return obj
 
@@ -144,7 +144,8 @@ class Test_RequestHandler:
         self, outer, server_address, server_url, mock_light_switch
     ):
         """POST (LongPress) for known device delivers the appropriate event."""
-        outer.devices[server_address] = mock_light_switch
+        mock_light_switch.host = server_address
+        outer._subscriptions[mock_light_switch] = []
         action = '"urn:Belkin:service:basicevent:1#SetBinaryState"'
         response = requests.post(
             f"{server_url}/upnp/control/basicevent1",
@@ -425,7 +426,7 @@ class Test_SubscriptionRegistry:
         assert subscription_registry.is_subscribed(device) is False
         subscription_registry.event(device, "", "", path="invalid_path")
 
-        assert subscription_registry.devices["192.168.1.100"] == device
+        assert device in subscription_registry._subscriptions
 
         subscription_registry.unregister(device)
 
