@@ -40,6 +40,7 @@ class Test_RequestHandler:
             subscribe.SubscriptionRegistry, instance=True
         )
         obj.devices = {}
+        obj.subscription_paths = {}
         return obj
 
     @pytest.fixture
@@ -96,7 +97,12 @@ class Test_RequestHandler:
         self, outer, server_address, server_url, mock_light_switch
     ):
         """NOTIFY calls the event callback for known devices."""
-        outer.devices[server_address] = mock_light_switch
+        mock_light_switch.host = server_address
+        subscription = mock.create_autospec(
+            subscribe.Subscription, instance=True
+        )
+        subscription.device = mock_light_switch
+        outer.subscription_paths["/path"] = subscription
         response = requests.request(
             "NOTIFY",
             f"{server_url}/path",
@@ -409,9 +415,11 @@ class Test_SubscriptionRegistry:
 
         device._state = 1
         assert subscription_registry.is_subscribed(device) is False
-        subscription_registry.event(device, "", "", path="/sub/insight")
+        paths = list(subscription_registry.subscription_paths.keys())
+        assert len(paths) == 2
+        subscription_registry.event(device, "", "", path=paths[0])
         assert subscription_registry.is_subscribed(device) is False
-        subscription_registry.event(device, "", "", path="/sub/basicevent")
+        subscription_registry.event(device, "", "", path=paths[1])
         assert subscription_registry.is_subscribed(device) is True
         device._state = 0
         assert subscription_registry.is_subscribed(device) is False

@@ -73,6 +73,7 @@ class Test_PVT_RTOS_Dimmer_v2(Base):
     @pytest.mark.vcr()
     def test_is_subscribed(self, dimmer, subscription_registry):
         subscription_registry.register(dimmer)
+        path = list(subscription_registry.subscription_paths.keys())[0]
 
         # Wait for registry to be ready to make sure the Dimmer device has
         # been registered.
@@ -90,7 +91,7 @@ class Test_PVT_RTOS_Dimmer_v2(Base):
             dimmer,
             EVENT_TYPE_BINARY_STATE,
             "1",  # Dimmer is On.
-            "/sub/basicevent",
+            path,
         )
         assert dimmer.get_state() == 1
         assert subscription_registry.is_subscribed(dimmer) is False
@@ -100,7 +101,7 @@ class Test_PVT_RTOS_Dimmer_v2(Base):
             dimmer,
             EVENT_TYPE_BINARY_STATE,
             "0",  # Dimmer is Off.
-            "/sub/basicevent",
+            path,
         )
         assert dimmer.get_state() == 0
         assert subscription_registry.is_subscribed(dimmer)
