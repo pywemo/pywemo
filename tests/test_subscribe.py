@@ -420,6 +420,7 @@ class Test_SubscriptionRegistry:
         assert subscription_registry.devices["192.168.1.100"] == device
 
         subscription_registry.unregister(device)
+        self._wait_for_registry(subscription_registry)
 
         assert len(subscription_registry._sched.queue) == 0
 

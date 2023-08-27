@@ -17,7 +17,7 @@ interactions:
       TIMEOUT:
       - Second-300
       User-Agent:
-      - python-requests/2.26.0
+      - python-requests/2.31.0
     method: SUBSCRIBE
     uri: http://192.168.1.100:49153/upnp/event/basicevent1
   response:
@@ -27,15 +27,39 @@ interactions:
       CONTENT-LENGTH:
       - '0'
       DATE:
-      - Mon, 04 Apr 2022 03:32:29
+      - Mon, 28 Aug 2023 02:41:12
       SERVER:
       - Unspecified, UPnP/1.0, Unspecified
       SID:
-      - uuid:22950699-df04-49a3-a15d-b2517fc84183
+      - uuid:8e002dff-79cf-479a-a337-28e03fbdc4a2
       TIMEOUT:
       - Second-1801
       X-User-Agent:
       - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      SID:
+      - uuid:8e002dff-79cf-479a-a337-28e03fbdc4a2
+      User-Agent:
+      - python-requests/2.31.0
+    method: UNSUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/basicevent1
+  response:
+    body:
+      string: ''
+    headers: {}
     status:
       code: 200
       message: OK

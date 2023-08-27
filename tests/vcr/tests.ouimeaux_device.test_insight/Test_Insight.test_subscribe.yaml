@@ -79,4 +79,72 @@ interactions:
     status:
       code: 200
       message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      SID:
+      - uuid:7a5218fe-1dd2-11b2-849c-b527ba18a01e
+      User-Agent:
+      - python-requests/2.31.0
+    method: UNSUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/basicevent1
+  response:
+    body:
+      string: <html><body><h1>200 OK</h1></body></html>
+    headers:
+      Accept-Ranges:
+      - bytes
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '41'
+      CONTENT-TYPE:
+      - text/html
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      SID:
+      - uuid:7a59e192-1dd2-11b2-849c-b527ba18a01e
+      User-Agent:
+      - python-requests/2.31.0
+    method: UNSUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/insight1
+  response:
+    body:
+      string: <html><body><h1>200 OK</h1></body></html>
+    headers:
+      Accept-Ranges:
+      - bytes
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '41'
+      CONTENT-TYPE:
+      - text/html
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+    status:
+      code: 200
+      message: OK
 version: 1

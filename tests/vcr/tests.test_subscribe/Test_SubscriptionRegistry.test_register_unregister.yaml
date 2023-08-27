@@ -17,21 +17,23 @@ interactions:
       TIMEOUT:
       - Second-300
       User-Agent:
-      - python-requests/2.25.1
+      - python-requests/2.31.0
     method: SUBSCRIBE
     uri: http://192.168.1.100:49153/upnp/event/basicevent1
   response:
     body:
       string: ''
     headers:
+      Accept-Ranges:
+      - bytes
       CONTENT-LENGTH:
       - '0'
       DATE:
-      - Tue, 26 Jan 2021 02:16:36 GMT
+      - Sun, 27 Aug 2023 16:59:22 GMT
       SERVER:
       - Unspecified, UPnP/1.0, Unspecified
       SID:
-      - uuid:84915076-1dd2-11b2-b5fd-dcf7b6ec9aaa
+      - uuid:11fdf778-44fb-11ee-b6e9-d3aaa8ff147f
       TIMEOUT:
       - Second-300
       X-User-Agent:
@@ -47,7 +49,7 @@ interactions:
       Accept-Encoding:
       - gzip, deflate
       CALLBACK:
-      - <http://192.168.1.1:8989/insight1>
+      - <http://192.168.1.1:8989/sub/insight>
       Connection:
       - keep-alive
       Content-Length:
@@ -57,25 +59,95 @@ interactions:
       TIMEOUT:
       - Second-300
       User-Agent:
-      - python-requests/2.25.1
+      - python-requests/2.31.0
     method: SUBSCRIBE
     uri: http://192.168.1.100:49153/upnp/event/insight1
   response:
     body:
       string: ''
     headers:
+      Accept-Ranges:
+      - bytes
       CONTENT-LENGTH:
       - '0'
       DATE:
-      - Tue, 26 Jan 2021 02:16:36 GMT
+      - Sun, 27 Aug 2023 16:59:22 GMT
       SERVER:
       - Unspecified, UPnP/1.0, Unspecified
       SID:
-      - uuid:849c1a56-1dd2-11b2-b5fd-dcf7b6ec9aaa
+      - uuid:12046e46-44fb-11ee-b6e9-d3aaa8ff147f
       TIMEOUT:
       - Second-300
       X-User-Agent:
       - redsonic
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      SID:
+      - uuid:11fdf778-44fb-11ee-b6e9-d3aaa8ff147f
+      User-Agent:
+      - python-requests/2.31.0
+    method: UNSUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/basicevent1
+  response:
+    body:
+      string: <html><body><h1>200 OK</h1></body></html>
+    headers:
+      Accept-Ranges:
+      - bytes
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '41'
+      CONTENT-TYPE:
+      - text/html
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      SID:
+      - uuid:12046e46-44fb-11ee-b6e9-d3aaa8ff147f
+      User-Agent:
+      - python-requests/2.31.0
+    method: UNSUBSCRIBE
+    uri: http://192.168.1.100:49153/upnp/event/insight1
+  response:
+    body:
+      string: <html><body><h1>200 OK</h1></body></html>
+    headers:
+      Accept-Ranges:
+      - bytes
+      CONNECTION:
+      - close
+      CONTENT-LENGTH:
+      - '41'
+      CONTENT-TYPE:
+      - text/html
+      SERVER:
+      - Unspecified, UPnP/1.0, Unspecified
     status:
       code: 200
       message: OK
