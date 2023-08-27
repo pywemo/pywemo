@@ -588,14 +588,11 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
 
         with self._event_thread_cond:
             # Remove any events, callbacks, and the device itself
-            if device in self._callbacks:
-                del self._callbacks[device]
-            if device in self._subscriptions:
-                subscriptions = self._subscriptions[device]
-                del self._subscriptions[device]
-                _cancel_events(self._sched, subscriptions)
-                for subscription in subscriptions:
-                    del self._subscription_paths[subscription.path]
+            self._callbacks.pop(device, None)
+            subscriptions = self._subscriptions.pop(device, [])
+            _cancel_events(self._sched, subscriptions)
+            for subscription in subscriptions:
+                del self._subscription_paths[subscription.path]
             self._event_thread_cond.notify()
 
     def _resubscribe(self, subscription: Subscription, retry: int = 0) -> None:
