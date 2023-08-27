@@ -39,7 +39,8 @@ class Test_RequestHandler:
         obj = mock.create_autospec(
             subscribe.SubscriptionRegistry, instance=True
         )
-        obj.devices = {}
+        obj._subscriptions = {}
+        obj._subscription_paths = {}
         return obj
 
     @pytest.fixture
@@ -96,7 +97,12 @@ class Test_RequestHandler:
         self, outer, server_address, server_url, mock_light_switch
     ):
         """NOTIFY calls the event callback for known devices."""
-        outer.devices[server_address] = mock_light_switch
+        mock_light_switch.host = server_address
+        subscription = mock.create_autospec(
+            subscribe.Subscription, instance=True
+        )
+        subscription.device = mock_light_switch
+        outer._subscription_paths["/path"] = subscription
         response = requests.request(
             "NOTIFY",
             f"{server_url}/path",
@@ -138,7 +144,8 @@ class Test_RequestHandler:
         self, outer, server_address, server_url, mock_light_switch
     ):
         """POST (LongPress) for known device delivers the appropriate event."""
-        outer.devices[server_address] = mock_light_switch
+        mock_light_switch.host = server_address
+        outer._subscriptions[mock_light_switch] = []
         action = '"urn:Belkin:service:basicevent:1#SetBinaryState"'
         response = requests.post(
             f"{server_url}/upnp/control/basicevent1",
@@ -409,15 +416,17 @@ class Test_SubscriptionRegistry:
 
         device._state = 1
         assert subscription_registry.is_subscribed(device) is False
-        subscription_registry.event(device, "", "", path="/sub/insight")
+        paths = list(subscription_registry._subscription_paths)
+        assert len(paths) == 2
+        subscription_registry.event(device, "", "", path=paths[0])
         assert subscription_registry.is_subscribed(device) is False
-        subscription_registry.event(device, "", "", path="/sub/basicevent")
+        subscription_registry.event(device, "", "", path=paths[1])
         assert subscription_registry.is_subscribed(device) is True
         device._state = 0
         assert subscription_registry.is_subscribed(device) is False
         subscription_registry.event(device, "", "", path="invalid_path")
 
-        assert subscription_registry.devices["192.168.1.100"] == device
+        assert device in subscription_registry._subscriptions
 
         subscription_registry.unregister(device)
         self._wait_for_registry(subscription_registry)
@@ -475,3 +484,8 @@ class Test_SubscriptionRegistry:
 
         with pytest.raises(requests.ConnectionError):
             requests.request("NOTIFY", f"http://127.0.0.1:{port}/", timeout=5)
+
+    def test_deprecations(self):
+        registry = subscribe.SubscriptionRegistry(requested_port=0)
+        with pytest.deprecated_call():
+            registry.devices

@@ -532,10 +532,11 @@ def test_notify(name, properties):
     device = DEVICES[name]
     REGISTRY.register(device)
     REGISTRY.on(device, None, lambda d, t, v: d.subscription_update(t, v))
+    path = list(REGISTRY._subscription_paths)[0]
     try:
         response = requests.request(
             "NOTIFY",
-            f"http://127.0.0.1:{REGISTRY.port}/sub/basicevent",
+            f"http://127.0.0.1:{REGISTRY.port}{path}",
             data=toXml(properties),
         )
         assert response.status_code == 200

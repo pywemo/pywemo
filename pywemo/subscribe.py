@@ -37,8 +37,10 @@ import collections
 import logging
 import os
 import sched
+import secrets
 import threading
 import time
+import warnings
 from collections.abc import Iterable, MutableMapping
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Callable
@@ -171,6 +173,9 @@ class Subscription:
     service_name: str
     """Name of the subscription endpoint service."""
 
+    path: str
+    """Unique path used to for the subscription callback."""
+
     def __init__(
         self, device: Device, callback_port: int, service_name: str
     ) -> None:
@@ -178,6 +183,7 @@ class Subscription:
         self.device = device
         self.callback_port = callback_port
         self.service_name = service_name
+        self.path = f"/sub/{service_name}/{secrets.token_urlsafe(24)}"
 
     def __repr__(self) -> str:
         """Return a string representation of the Subscription."""
@@ -301,11 +307,6 @@ class Subscription:
         return self.device.services[self.service_name].eventSubURL
 
     @property
-    def path(self) -> str:
-        """Path for the callback to disambiguate multiple subscriptions."""
-        return f"/sub/{self.service_name}"
-
-    @property
     def is_subscribed(self) -> bool:
         """Return True if the subscription is active, False otherwise.
 
@@ -419,7 +420,16 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Handle subscription responses received from devices."""
         sender_ip, _ = self.client_address
         outer = self.server.outer
-        if (device := outer.devices.get(sender_ip)) is None:
+        # Security consideration: Given that the subscription paths are
+        # randomized, I considered removing the host/IP check below. However,
+        # since these requests are not encrypted, it is possible for someone
+        # to observe the random URL path. I therefore have kept the host/IP
+        # check as a defense-in-depth strategy for preventing the device state
+        # from being changed by someone who could observe the http requests.
+        if (
+            # pylint: disable=protected-access
+            subscription := outer._subscription_paths.get(self.path)
+        ) is None or subscription.device.host != sender_ip:
             LOG.warning(
                 "Received %s event for unregistered device %s",
                 self.path,
@@ -430,7 +440,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             for propnode in doc.findall(f"./{NS}property"):
                 for property_ in list(propnode):
                     outer.event(
-                        device,
+                        subscription.device,
                         property_.tag,
                         property_.text or "",
                         path=self.path,
@@ -452,14 +462,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         if self.path.endswith("/upnp/control/basicevent1"):
             sender_ip, _ = self.client_address
             outer = self.server.outer
-            if (device := outer.devices.get(sender_ip)) is None:
-                LOG.warning(
-                    "Received event for unregistered device %s", sender_ip
-                )
-            else:
+            for (
+                device
+            ) in outer._subscriptions:  # pylint: disable=protected-access
+                if device.host != sender_ip:
+                    continue
                 doc = self._get_xml_from_http_body()
                 if binary_state := doc.findtext(".//BinaryState"):
                     outer.event(device, EVENT_TYPE_LONG_PRESS, binary_state)
+                break
+            else:
+                LOG.warning(
+                    "Received event for unregistered device %s", sender_ip
+                )
             action = self.headers.get("SOAPACTION", "")
             response = SOAP_ACTION_RESPONSE.get(
                 action, ERROR_SOAP_ACTION_RESPONSE
@@ -538,7 +553,6 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
 
     def __init__(self, requested_port: int | None = None) -> None:
         """Create the subscription registry object."""
-        self.devices: dict[str, Device] = {}
         self._callbacks: dict[
             Device, list[tuple[str | None, SubscriberCallback]]
         ] = collections.defaultdict(list)
@@ -547,6 +561,7 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
         self._event_thread: threading.Thread | None = None
         self._event_thread_cond = threading.Condition()
         self._subscriptions: dict[Device, list[Subscription]] = {}
+        self._subscription_paths: dict[str, Subscription] = {}
 
         def sleep(secs: float) -> None:
             with self._event_thread_cond:
@@ -571,14 +586,13 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
             return
 
         LOG.info("Subscribing to events from %r", device)
-        self.devices[device.host] = device
-
         with self._event_thread_cond:
             subscriptions = self._subscriptions[device] = []
             for service in self.subscription_service_names:
                 if service in device.services:
                     subscription = Subscription(device, self.port, service)
                     subscriptions.append(subscription)
+                    self._subscription_paths[subscription.path] = subscription
                     self._schedule(0, subscription)
             self._event_thread_cond.notify()
 
@@ -592,13 +606,11 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
 
         with self._event_thread_cond:
             # Remove any events, callbacks, and the device itself
-            if device in self._callbacks:
-                del self._callbacks[device]
-            if device in self._subscriptions:
-                _cancel_events(self._sched, self._subscriptions[device])
-                del self._subscriptions[device]
-            if device.host in self.devices:
-                del self.devices[device.host]
+            self._callbacks.pop(device, None)
+            subscriptions = self._subscriptions.pop(device, [])
+            _cancel_events(self._sched, subscriptions)
+            for subscription in subscriptions:
+                del self._subscription_paths[subscription.path]
             self._event_thread_cond.notify()
 
     def _resubscribe(self, subscription: Subscription, retry: int = 0) -> None:
@@ -658,10 +670,10 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
         )
         if path:
             # Update the event_received property for the subscription.
-            for subscription in self._subscriptions.get(device, []):
-                if subscription.path == path:
-                    subscription.event_received = True
-                    break
+            if (
+                subscription := self._subscription_paths.get(path)
+            ) is not None:
+                subscription.event_received = True
             else:
                 LOG.warning(
                     "Received unexpected subscription path (%s) for device %s",
@@ -757,3 +769,14 @@ class SubscriptionRegistry:  # pylint: disable=too-many-instance-attributes
                 while not self._exiting and self._sched.empty():
                     self._event_thread_cond.wait(10)
             self._sched.run()
+
+    @property
+    def devices(self) -> dict[str, Device]:
+        """Deprecated mapping of IP address to device."""
+        warnings.warn(
+            "The devices dict is deprecated "
+            "and will be removed in a future release.",
+            DeprecationWarning,
+            stacklevel=1,
+        )
+        return {device.host: device for device in self._subscriptions}
