@@ -408,6 +408,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Handle subscription responses received from devices."""
         sender_ip, _ = self.client_address
         outer = self.server.outer
+        # Security consideration: Given that the subscription paths are
+        # randomized, I considered removing the host/IP check below. However,
+        # since these requests are not encrypted, it is possible for someone
+        # to observe the random URL path. I therefore have kept the host/IP
+        # check as a defense-in-depth strategy for preventing the device state
+        # from being changed by someone who could observe the http requests.
         if (
             # pylint: disable=protected-access
             subscription := outer._subscription_paths.get(self.path)
