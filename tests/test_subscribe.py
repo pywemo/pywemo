@@ -358,7 +358,7 @@ class Test_Subscription:
     def test_unsubscribe(self, mock_request, subscription):
         subscription.subscription_id = "uuid:321"
         subscription._unsubscribe()
-        mock_request.called_once_with(
+        mock_request.assert_called_once_with(
             method="UNSUBSCRIBE",
             url=subscription.url,
             headers={"SID": "uuid:321"},
