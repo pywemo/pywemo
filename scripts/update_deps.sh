@@ -12,7 +12,7 @@ poetryInstall
 
 echo
 echo "===Updating poetry lock file==="
-poetry update --lock
+poetry update --lock --no-cache
 
 echo
 echo "===Updating bootstrap_requirements.txt==="
