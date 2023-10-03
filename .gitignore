@@ -60,8 +60,6 @@ htmlcov/
 .project
 .pydevproject
 
-.python-version
-
 # emacs auto backups
 *~
 *#
