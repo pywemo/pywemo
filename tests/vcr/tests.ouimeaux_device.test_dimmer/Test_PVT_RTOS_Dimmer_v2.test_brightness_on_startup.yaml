@@ -1,41 +1,40 @@
 interactions:
 - request:
-    body: null
+    body: '<?xml version="1.0" encoding="utf-8"?>
+
+      <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+
+      <s:Body>
+
+      <u:SetBinaryState xmlns:u="urn:Belkin:service:basicevent:1">
+
+      <BinaryState>1</BinaryState>
+
+      </u:SetBinaryState>
+
+      </s:Body>
+
+      </s:Envelope>'
     headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      CALLBACK:
-      - <http://192.168.1.1:8989/sub/basicevent>
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '0'
-      NT:
-      - upnp:event
-      TIMEOUT:
-      - Second-300
-      User-Agent:
-      - python-requests/2.31.0
-    method: SUBSCRIBE
-    uri: http://192.168.1.100:49153/upnp/event/basicevent1
+      Content-Type:
+      - text/xml
+      SOAPACTION:
+      - '"urn:Belkin:service:basicevent:1#SetBinaryState"'
+    method: POST
+    uri: http://192.168.1.100:49153/upnp/control/basicevent1
   response:
     body:
-      string: ''
+      string: "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"\
+        http://schemas.xmlsoap.org/soap/encoding/\">\r\n<s:Body>\r\n<u:SetBinaryStateResponse\
+        \ xmlns:u=\"urn:Belkin:service:basicevent:1\"><BinaryState>1</BinaryState><brightness>45</brightness><CountdownEndTime>0</CountdownEndTime><deviceCurrentTime>1698016275</deviceCurrentTime></u:SetBinaryStateResponse></s:Body>\r\
+        \n</s:Envelope>"
     headers:
-      CONTENT-LENGTH:
-      - '0'
-      DATE:
-      - Mon, 23 Oct 2023 09:03:23
-      SERVER:
-      - Unspecified, UPnP/1.0, Unspecified
-      SID:
-      - uuid:8e002dff-79cf-479a-a337-28e03fbdc4a2
-      TIMEOUT:
-      - Second-1801
-      X-User-Agent:
-      - redsonic
+      Connection:
+      - close
+      Content-Length:
+      - '397'
+      Content-Type:
+      - text/xml
     status:
       code: 200
       message: OK
@@ -74,30 +73,6 @@ interactions:
       - '310'
       Content-Type:
       - text/xml
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '0'
-      SID:
-      - uuid:8e002dff-79cf-479a-a337-28e03fbdc4a2
-      User-Agent:
-      - python-requests/2.31.0
-    method: UNSUBSCRIBE
-    uri: http://192.168.1.100:49153/upnp/event/basicevent1
-  response:
-    body:
-      string: ''
-    headers: {}
     status:
       code: 200
       message: OK
