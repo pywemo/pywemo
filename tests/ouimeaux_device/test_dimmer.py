@@ -34,14 +34,19 @@ class Base:
         assert dimmer.get_state(force_update=True) == expected_state
         assert dimmer.get_brightness() == expected_brightness
 
+    @pytest.mark.vcr()
+    def test_brightness_on_startup(self, dimmer):
+        dimmer.on()
+        assert dimmer.get_brightness() != 0
+
     def test_subscription_update_brightness(self, dimmer):
         # Invalid value fails gracefully.
         assert dimmer.subscription_update("Brightness", "invalid") is False
 
         assert dimmer.subscription_update("BinaryState", "1") is True
-        assert dimmer.get_state() == 1
-
         assert dimmer.subscription_update("Brightness", "52") is True
+
+        assert dimmer.get_state() == 1
         assert dimmer.get_brightness() == 52
 
 
