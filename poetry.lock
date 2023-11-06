@@ -709,13 +709,13 @@ pydocstyle = ">=2.1"
 
 [[package]]
 name = "generateds"
-version = "2.43.2"
+version = "2.43.3"
 description = "Generate Python data structures and XML parser from Xschema"
 optional = false
 python-versions = "*"
 files = [
-    {file = "generateDS-2.43.2-py3-none-any.whl", hash = "sha256:63b5dbcb81746f66223c36853a2832dbf0f17dd8740654510377a0b9a50c0e27"},
-    {file = "generateDS-2.43.2.tar.gz", hash = "sha256:e86f033f4d93414dd5b04cab9544a68b8f46d559073d85cd0990266b7b9ec09e"},
+    {file = "generateDS-2.43.3-py3-none-any.whl", hash = "sha256:3e8c9866839544d2d371d3b508464adb270b2ee4aad509ad1502dfd489bbb93d"},
+    {file = "generateDS-2.43.3.tar.gz", hash = "sha256:2d934428a00635e1f2d4685b96093da0f360a4a6d411dbdabf47e2fd3f6861f3"},
 ]
 
 [package.dependencies]
@@ -2746,4 +2746,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8.1"
-content-hash = "1f008542928d6d74d041ce67b8d3a6fc87fc16ffbdc5a5ae374cf6cd494fdf73"
+content-hash = "daee866b1ca4e06512f4cb0cd9fb65b4fe35e727f222afbb56e56afaccaba87c"
