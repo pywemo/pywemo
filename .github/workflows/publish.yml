@@ -136,7 +136,7 @@ jobs:
         env:
           BODY: ${{ github.event.release && github.event.release.body || '' }}
           TEMPLATE_FILE: ./pywemo_checkout/.github/RELEASE_NOTES_TEMPLATE.md
-        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
+        uses: actions/github-script@e69ef5462fd455e02edcaf4dd7708eda96b9eda0 # v6
         with:
           script: |
             const fsp = require('fs').promises;
@@ -179,7 +179,7 @@ jobs:
       - name: Update release text
         env:
           RELEASE_ID: ${{ github.event.release.id }}
-        uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6
+        uses: actions/github-script@e69ef5462fd455e02edcaf4dd7708eda96b9eda0 # v6
         with:
           script: |
             const fsp = require('fs').promises;
