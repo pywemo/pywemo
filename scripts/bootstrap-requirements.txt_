@@ -476,9 +476,9 @@ tomlkit==0.12.3 ; python_full_version >= "3.8.1" and python_version < "4.0" \
 trove-classifiers==2023.11.22 ; python_full_version >= "3.8.1" and python_version < "4.0" \
     --hash=sha256:533df77e284fd645d90deeafd3ef710d290884efafe4f5009aa1663f95aec992 \
     --hash=sha256:c31a7e92f965f060a244b57d8ed5ee6f53fcb413ee17ce790e00577cb369ad99
-urllib3==1.26.18 ; python_full_version >= "3.8.1" and python_version < "4.0" \
-    --hash=sha256:34b97092d7e0a3a8cf7cd10e386f401b3737364026c45e622aa02903dffe0f07 \
-    --hash=sha256:f8ecc1bba5667413457c529ab955bf8c67b45db799d159066261719e328580a0
+urllib3==2.1.0 ; python_full_version >= "3.8.1" and python_version < "4.0" \
+    --hash=sha256:55901e917a5896a349ff771be919f8bd99aff50b79fe58fec595eb37bbc56bb3 \
+    --hash=sha256:df7aa8afb0148fa78488e7899b2c59b5f4ffcfa82e6c54ccb9dd37c1d7b52d54
 virtualenv==20.24.7 ; python_full_version >= "3.8.1" and python_version < "4.0" \
     --hash=sha256:69050ffb42419c91f6c1284a7b24e0475d793447e35929b488bf6a0aade39353 \
     --hash=sha256:a18b3fd0314ca59a2e9f4b556819ed07183b3e9a3702ecfe213f593d44f7b3fd
