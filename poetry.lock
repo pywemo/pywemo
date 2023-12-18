@@ -743,17 +743,17 @@ six = "*"
 
 [[package]]
 name = "hypothesis"
-version = "6.90.0"
+version = "6.92.1"
 description = "A library for property-based testing"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "hypothesis-6.90.0-py3-none-any.whl", hash = "sha256:4d7d3d3d5e4e4a9954b448fc8220cd73573e3e32adb00059f6907de6b55dcd5e"},
-    {file = "hypothesis-6.90.0.tar.gz", hash = "sha256:0ab33900b9362318bd03d911a77a0dda8629c1877420074d87ae466919f6e4c0"},
+    {file = "hypothesis-6.92.1-py3-none-any.whl", hash = "sha256:3cba76a7389bd7245c350fcf7234663314dc81a5be0bbef72a07d8c249bfc210"},
+    {file = "hypothesis-6.92.1.tar.gz", hash = "sha256:fa755ded526e50b7e2f642cdc5d64519f88d4e4ee71d9d29ec3eb2f2fddf1274"},
 ]
 
 [package.dependencies]
-attrs = ">=19.2.0"
+attrs = ">=22.2.0"
 exceptiongroup = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 sortedcontainers = ">=2.1.0,<3.0.0"
 
