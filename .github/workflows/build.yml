@@ -23,10 +23,10 @@ jobs:
     outputs:
       version: ${{ steps.build.outputs.version }}
     strategy:
-      max-parallel: 4  # Set equal to the number of Linux tests.
+      max-parallel: 5  # Set equal to the number of Linux tests.
       matrix:
         os: ['ubuntu-latest']
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
         include:
           - os: windows-latest
             python-version: '3.8'
