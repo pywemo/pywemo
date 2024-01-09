@@ -21,7 +21,7 @@ python = "^3.8.1"
 ifaddr = ">=0.1.0"
 requests = ">=2.0"
 urllib3 = ">=1.26.0"
-lxml = "^4.6"
+lxml = ">=4.6"
 
 [tool.poetry.group.dev.dependencies]
 # toml is used by multiple tools to read this pyproject.toml file
