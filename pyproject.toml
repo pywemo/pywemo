@@ -3,7 +3,10 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [project]
-requires-python = ">=3.8.1"  # for others tools besides Poetry (e.g. ruff)
+# some of these are duplicated information from tool.poetry that are used by
+# other tools (e.g. ruff)
+name = "pywemo"
+requires-python = ">=3.8.1"
 
 [tool.poetry]
 name = "pywemo"
