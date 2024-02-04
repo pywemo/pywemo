@@ -4,7 +4,7 @@ from __future__ import annotations
 import contextlib
 import string
 import sys
-import unittest.mock as mock
+from unittest import mock
 
 from tests import atheris_stub as atheris
 

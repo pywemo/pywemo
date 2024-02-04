@@ -4,7 +4,7 @@ import base64
 import itertools
 import logging
 import shutil
-import unittest.mock as mock
+from unittest import mock
 from subprocess import CalledProcessError
 
 import pytest

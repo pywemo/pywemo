@@ -2,7 +2,7 @@
 
 import threading
 import time
-import unittest.mock as mock
+from unittest import mock
 from http.server import HTTPServer
 
 import pytest
