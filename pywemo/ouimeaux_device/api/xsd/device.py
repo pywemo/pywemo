@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# flake8: noqa
-# isort: skip_file
 # mypy: ignore-errors
 # pylint: skip-file
 
@@ -1235,7 +1233,7 @@ class root(GeneratedsSuper):
         URLBase=None,
         device=None,
         gds_collector_=None,
-        **kwargs_
+        **kwargs_,
     ):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
@@ -1753,7 +1751,7 @@ class DeviceType(GeneratedsSuper):
         presentationURL=None,
         anytypeobjs_=None,
         gds_collector_=None,
-        **kwargs_
+        **kwargs_,
     ):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
@@ -3011,7 +3009,7 @@ class iconType(GeneratedsSuper):
         depth=None,
         url=None,
         gds_collector_=None,
-        **kwargs_
+        **kwargs_,
     ):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
@@ -3322,7 +3320,7 @@ class serviceType(GeneratedsSuper):
         controlURL=None,
         eventSubURL=None,
         gds_collector_=None,
-        **kwargs_
+        **kwargs_,
     ):
         self.gds_collector_ = gds_collector_
         self.gds_elementtree_node_ = None
