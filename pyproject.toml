@@ -90,13 +90,15 @@ unfixable = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "tests/*" = [
+  # entire rule set ignores
+  "ANN",      # do not require type hints
+  "ARG",      # some args are intentionally not used
+  # individual ignores
   "D102",     # do not require doc strings
   "D103",     # do not require doc strings
   "D107",     # do not require doc strings
   "S101",     # allow assert
-  "ANN",      # do not require type hints
   "SLF001",   # allow private access
-  "ARG002",   # some args are intentionally not used
   "N802",     # all uppercase names are intentional for some test functions
   "PLR2004",  # HTTP responses are hard coded in tests
 ]
