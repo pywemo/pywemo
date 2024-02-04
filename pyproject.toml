@@ -89,6 +89,7 @@ unfixable = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
+"scripts/*.py" = ["T201"]
 "tests/*" = [
   # entire rule set ignores
   "ANN",      # do not require type hints
