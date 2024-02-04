@@ -85,7 +85,7 @@ unfixable = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["E402"]
+"__init__.py" = ["F401"]
 "tests/*" = [
   "D102",     # do not require doc strings
   "D103",     # do not require doc strings
