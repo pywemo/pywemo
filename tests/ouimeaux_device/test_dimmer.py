@@ -48,7 +48,7 @@ class Base:
 class Test_PVT_OWRT_Dimmer_v1(Base, long_press_helpers.TestLongPress):
     """Tests for the WeMo Dimmer, hardware version v1."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def dimmer(self, vcr):
         with vcr.use_cassette("WeMo_WW_2.00.11453.PVT-OWRT-Dimmer"):
             return device_from_uuid_and_location(
@@ -62,7 +62,7 @@ class Test_PVT_OWRT_Dimmer_v1(Base, long_press_helpers.TestLongPress):
 class Test_PVT_RTOS_Dimmer_v2(Base):
     """Tests for the WeMo Dimmer, hardware version v2."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def dimmer(self, vcr):
         with vcr.use_cassette("WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2"):
             return device_from_uuid_and_location(

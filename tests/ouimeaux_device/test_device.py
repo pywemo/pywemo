@@ -190,7 +190,7 @@ def mocked_requests_get(*args, url=None, **kwargs):
     return MockUrllib3Response(None, 404)
 
 
-@pytest.fixture
+@pytest.fixture()
 @mock.patch("urllib3.PoolManager.request", side_effect=mocked_requests_get)
 def device(mock_get):
     """Return a Device as created by some actual XML."""

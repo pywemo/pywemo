@@ -81,7 +81,7 @@ def vcr_cassette_dir(request):
     return os.path.join("tests/vcr", request.module.__name__)
 
 
-@pytest.fixture
+@pytest.fixture()
 def subscription_registry():
     """Fixture to simulate HTTPServer for the SubscriptionRegistry."""
     registry = SubscriptionRegistry()
