@@ -2,18 +2,18 @@
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[project]
+requires-python = ">=3.8.1"  # for others tools besides Poetry (e.g. ruff)
+
 [tool.poetry]
 name = "pywemo"
 version = "1.3.0"
 description = "Lightweight Python module to discover and control WeMo devices"
 authors = ["Eric Severance <pywemo@esev.com>"]
 license = "MIT"
-
-readme = 'README.rst'
-
+readme = "README.rst"
 repository = "https://github.com/pywemo/pywemo"
 homepage = "https://github.com/pywemo/pywemo"
-
 keywords = ['wemo', 'api']
 
 [tool.poetry.dependencies]
@@ -24,23 +24,17 @@ urllib3 = ">=1.26.0"
 lxml = "^4.6"
 
 [tool.poetry.group.dev.dependencies]
-# toml is used by multiple tools to read this pyproject.toml file
-toml = ">=0.10"
-# formatters
-black = "23.9.1"
-isort = "^5.6.4"
+# formatter and linter
+ruff = "0.1.14"
 # linters/code analysis
-flake8 = "^6.0.0"
-flake8-docstrings = ">=1.3.0"
-flake8-bugbear = ">=20.11.1"
 pylint = ">=2.17.3,<4.0.0"
 rstcheck = ">=3.3.1,<7.0.0"
 mypy = "^1.2.0"
+types-lxml = "2023.10.21"
+types-requests = ">=2.0"
 # testing and code coverage
-lxml-stubs = "^0.4.0"
 pytest = "^7.3.1"
 pytest-vcr = "1.0.2"
-types-requests = ">=2.0"
 coverage = "^7.2.4"
 hypothesis = "^6.75.3"
 # version of generateDS used to create device.py and service.py in .../api/xsd
@@ -54,18 +48,102 @@ pdoc = ">=13.1.1,<15.0.0"
 [tool.poetry.group.bootstrap.dependencies]
 poetry = ">=1.2.0"
 
+[tool.ruff]
+line-length = 79
+cache-dir = ".cache/ruff"
+force-exclude = true
+extend-exclude = ["pywemo/ouimeaux_device/api/xsd"]
+
+[tool.ruff.lint]
+# Ruff is actively developed, so select all rules so that when ruff is updated,
+# any news rules are automatiaclly included and can be selectively excluded in
+# the ignore list
+select = ["ALL"]
+ignore = [
+  # recommended rules to disable when using ruff formatter
+  "W191",
+  "E111",
+  "E114",
+  "E117",
+  "D206",
+  "D300",
+  "Q000",
+  "Q001",
+  "Q002",
+  "Q003",
+  "COM812",
+  "COM819",
+  "ISC001",
+  "ISC002",
+  # other exlusions below here
+  "D203",    # incompatible with D211
+  "D213",    # incompatible with D212
+  "ANN101",  # not normal (and deprecated/to be removed)
+]
+unfixable = [
+  "ERA001",  # do not automatically remove commented out code
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"tests/*" = [
+  "D102",     # do not require doc strings
+  "D103",     # do not require doc strings
+  "D107",     # do not require doc strings
+  "S101",     # allow assert
+  "ANN",      # do not require type hints
+  "SLF001",   # allow private access
+  "ARG002",   # some args are intentionally not used
+  "N802",     # all uppercase names are intentional for some test functions
+  "PLR2004",  # HTTP responses are hard coded in tests
+]
+
+[tool.ruff.lint.isort]
+lines-after-imports = 1
+
+[tool.ruff.lint.mccabe]
+max-complexity = 20
+
+[tool.ruff.format]
+quote-style = "double"
+docstring-code-format = true
+
+[tool.pytest]
+[tool.pytest.ini_options]
+minversion = "6.2"
+cache_dir = ".cache/pytest"
+
 [tool.coverage]
-  [tool.coverage.run]
-  branch = true
-  data_file = ".cache/coverage"
-  omit = [
-    ".venv/*",
-    "*/tests/*",
-    "*/xsd/device.py",
-    "*/xsd/service.py",
-  ]
-  [tool.coverage.lcov]
-  output = ".cache/coverage.lcov"
+[tool.coverage.run]
+branch = true
+data_file = ".cache/coverage"
+omit = [
+  ".venv/*",
+  "*/tests/*",
+  "*/xsd/device.py",
+  "*/xsd/service.py",
+]
+[tool.coverage.lcov]
+output = ".cache/coverage.lcov"
+
+[tool.mypy]
+cache_dir = ".cache/mypy/"
+strict = true
+warn_incomplete_stub = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["vcr"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+  "pywemo.ouimeaux_device.api.db_orm",
+  "pywemo.ouimeaux_device.api.rules_db",
+  "pywemo.ouimeaux_device.api.xsd.*",
+  "tests.*",
+]
+ignore_errors = true
 
 [tool.deptry]
 extend_exclude = ["scripts"]
@@ -80,77 +158,23 @@ DEP001 = [
   "generatedssupersuper"
 ]
 
-[tool.pytest]
-  [tool.pytest.ini_options]
-  minversion = "6.2"
-  cache_dir = ".cache/pytest"
-
-[tool.black]
-line-length = 79
-include = '\.pyi?$'
-force-exclude = '''
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv*
-    | \venv*
-    | _build
-    | buck-out
-    | build
-    | dist
-  )/
-)
-'''
-
-[tool.isort]
-profile = "black"
-line_length = 79
-src_paths = ["pywemo", "tests"]
-skip_glob = "*/xsd/*"
-
-[tool.mypy]
-cache_dir = ".cache/mypy/"
-strict = true
-warn_incomplete_stub = true
-warn_unreachable = true
-
-[[tool.mypy.overrides]]
-module = [
-  "vcr",
-  "lxml",  # TODO: use either lxml-stubs or types-lxml (maybe more complete?)
-]
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = [
-  "pywemo.ouimeaux_device.api.db_orm",
-  "pywemo.ouimeaux_device.api.rules_db",
-  "pywemo.ouimeaux_device.api.xsd.*",
-  "tests.*",
-]
-ignore_errors = true
-
 [tool.pylint]
-  [tool.pylint.master]
-  jobs = 0
-  max-line-length = 79
-  ignore-paths = "^tests/"
-  extension-pkg-whitelist = "lxml"
-  max-parents = 15
+[tool.pylint.master]
+jobs = 0
+max-line-length = 79
+ignore-paths = "^tests/"
+extension-pkg-whitelist = "lxml"
+max-parents = 15
 
-  [tool.pylint.typecheck]
-  generated-members = [
-    # can switch to qualified names instead when this is merged:
-    # https://github.com/PyCQA/pylint/pull/3634
-    "self.deviceevent",
-    "self.basicevent",
-    "self.bridge",
-    "self.insight",
-  ]
+[tool.pylint.typecheck]
+generated-members = [
+  # can switch to qualified names instead when this is merged:
+  # https://github.com/PyCQA/pylint/pull/3634
+  "self.deviceevent",
+  "self.basicevent",
+  "self.bridge",
+  "self.insight",
+]
 
-  [tool.pylint.reports]
-  reports = "no"
+[tool.pylint.reports]
+reports = "no"

@@ -25,7 +25,7 @@ def generate_module(xsd_path: str) -> None:
     module = remove_python_version(module)
     module = remove_six_import(module)
     module = disable_code_analyzers(module)
-    module = format_with_black(module)
+    module = format_with_ruff(module)
 
     # Read the existing module
     existing_path = xsd_path.replace(".xsd", ".py")
@@ -99,8 +99,6 @@ def disable_code_analyzers(module: str) -> str:
     generated file to disable code analyzers.
     """
     disabling_lines = [
-        "# flake8: noqa",
-        "# isort: skip_file",
         "# mypy: ignore-errors",
         "# pylint: skip-file",
     ]
@@ -112,14 +110,14 @@ def disable_code_analyzers(module: str) -> str:
     )
 
 
-def format_with_black(module: str) -> str:
-    """Format the module using black.
+def format_with_ruff(module: str) -> str:
+    """Format the module using ruff.
 
     This is done as a way to avoid small changes due to whitespace or
     formatting between versions of generateDS.
     """
     process = subprocess.run(
-        ["black", "-"],
+        ["ruff", "format"],
         check=True,
         stdout=subprocess.PIPE,
         text=True,
