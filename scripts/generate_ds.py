@@ -117,7 +117,7 @@ def format_with_ruff(module: str) -> str:
     formatting between versions of generateDS.
     """
     process = subprocess.run(
-        ["ruff", "format"],
+        ["ruff", "format", "-"],
         check=True,
         stdout=subprocess.PIPE,
         text=True,
