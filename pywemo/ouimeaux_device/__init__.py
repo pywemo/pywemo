@@ -497,7 +497,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         LOG.debug("AP encryption method: %s", encryption_method)
 
         # check if the encryption type is supported by this script
-        supported_encryptions = {"NONE", "AES"}
+        supported_encryptions = {"NONE", "AES", "TKIPAES"}
         if encryption_method not in supported_encryptions:
             raise SetupException(
                 f"Encryption {encryption_method} not currently supported.  "
