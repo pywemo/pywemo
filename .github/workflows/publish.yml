@@ -45,7 +45,7 @@ jobs:
       hashes: ${{ steps.hash.outputs.hashes }}
     steps:
       - name: Download dist artifacts
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.DIST_ARTIFACT }}
           path: dist
@@ -58,7 +58,7 @@ jobs:
           sha256sum * | tee "pywemo-${PYWEMO_VERSION}.sha256sum.txt"
           echo "hashes=$(sha256sum * | base64 -w0)" | tee -a "$GITHUB_OUTPUT"
       - name: Archive hashes
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           name: hashes
@@ -94,12 +94,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       # For Sigstore provenance.
-      id-token: write 
+      id-token: write
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+        uses: actions/download-artifact@v4
       - name: Sign the release
-        uses: sigstore/gh-action-sigstore-python@61f6a500bbfdd9a2a339cf033e5421951fbc1cd2 # v2.1.1
+        uses: sigstore/gh-action-sigstore-python@v3
         with:
           inputs: ./${{env.DIST_ARTIFACT}}/* ./hashes/*
           upload-signing-artifacts: true
@@ -110,7 +110,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+        uses: actions/download-artifact@v4
       - name: Populate release assets
         env:
           PROVENANCE_NAME: ${{ needs.slsa.outputs.provenance-name }}
@@ -129,14 +129,14 @@ jobs:
           cat ./hashes/*.sha256sum.txt >> "$GITHUB_ENV"
           echo "$EOF" >> "$GITHUB_ENV"
       - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@v5
         with:
           path: pywemo_checkout
       - name: Update release text
         env:
           BODY: ${{ github.event.release && github.event.release.body || '' }}
           TEMPLATE_FILE: ./pywemo_checkout/.github/RELEASE_NOTES_TEMPLATE.md
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6
+        uses: actions/github-script@v8
         with:
           script: |
             const fsp = require('fs').promises;
@@ -147,7 +147,7 @@ jobs:
             }
             await fsp.writeFile(
               '${{github.workspace}}/release/release-notes.md', body);
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@v4
         with:
           if-no-files-found: error
           name: release
@@ -164,7 +164,7 @@ jobs:
       contents: write
     steps:
       - name: Download release artifacts
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+        uses: actions/download-artifact@v4
         with:
           name: release
           path: release
@@ -179,7 +179,7 @@ jobs:
       - name: Update release text
         env:
           RELEASE_ID: ${{ github.event.release.id }}
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v6
+        uses: actions/github-script@v8
         with:
           script: |
             const fsp = require('fs').promises;
@@ -202,9 +202,9 @@ jobs:
       id-token: write
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.DIST_ARTIFACT }}
           path: dist
       - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@2f6f737ca5f74c637829c0f5c3acd0e29ea5e8bf # v1.8.11
+        uses: pypa/gh-action-pypi-publish@v1
