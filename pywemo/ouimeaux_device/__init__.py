@@ -1,4 +1,5 @@
 """Base WeMo Device class."""
+
 from __future__ import annotations
 
 import base64
@@ -450,7 +451,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
     def _setup(  # noqa: C901
         # pylint: disable=too-many-arguments,too-many-branches,too-many-locals
-        # pylint: disable=too-many-statements
+        # pylint: disable=too-many-statements,too-many-positional-arguments
         self,
         ssid: str,
         password: str,

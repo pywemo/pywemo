@@ -6,7 +6,7 @@
 # pylint: skip-file
 
 #
-# Generated  by generateDS.py version 2.43.3.
+# Generated  by generateDS.py version 2.44.3.
 # Python [sys.version]
 #
 # Command line options:
@@ -139,6 +139,7 @@ try:
 except ModulenotfoundExp_:
 
     class GdsCollector_(object):
+
         def __init__(self, messages=None):
             if messages is None:
                 self.messages = []
@@ -191,7 +192,9 @@ except ModulenotfoundExp_ as exp:
 
     class GeneratedsSuper(GeneratedsSuperSuper):
         __hash__ = object.__hash__
-        tzoff_pattern = re_.compile(r"(\+|-)((0\d|1[0-3]):[0-5]\d|14:00)$")
+        tzoff_pattern = re_.compile(
+            "(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)$"
+        )
 
         class _FixedOffsetTZ(datetime_.tzinfo):
             def __init__(self, offset, name):
@@ -746,7 +749,7 @@ except ModulenotfoundExp_ as exp:
             path = "/".join(path_list)
             return path
 
-        Tag_strip_pattern_ = re_.compile(r"\{.*\}")
+        Tag_strip_pattern_ = re_.compile(r"{.*}")
 
         def get_path_list_(self, node, path_list):
             if node is None:

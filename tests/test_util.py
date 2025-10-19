@@ -1,6 +1,6 @@
 """Tests for pywemo.util."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -86,7 +86,13 @@ def test_ext_meta_info():
         uptime=timedelta(hours=1579, minutes=8, seconds=42),
         firmware_update_state=4,
         utc_time=datetime(
-            year=2021, month=12, day=21, hour=10, minute=16, second=58
+            year=2021,
+            month=12,
+            day=21,
+            hour=10,
+            minute=16,
+            second=58,
+            tzinfo=timezone.utc,
         ),
         home_id="123456",
         remote_access_enabled=True,
