@@ -1,4 +1,5 @@
 """Representation of Services and Actions for WeMo devices."""
+
 from __future__ import annotations
 
 import logging
@@ -95,7 +96,7 @@ class Session:
         retries: int | urllib3.Retry | None = None,
         timeout: float | None = None,
         **kwargs: Any,
-    ) -> urllib3.HTTPResponse:
+    ) -> urllib3.BaseHTTPResponse:
         """Send request and gather response.
 
         A non-200 response code will result in a HTTPException
@@ -122,7 +123,7 @@ class Session:
         # http connection is also closed. This avoids tying up TCP sessions
         # on the device.
         with urllib3.PoolManager(retries=retries, timeout=timeout) as pool:
-            response: urllib3.HTTPResponse
+            response: urllib3.BaseHTTPResponse
             try:
                 response = pool.request(method=method, url=url, **kwargs)
                 if response.status != 200:
@@ -135,11 +136,11 @@ class Session:
             response.content = response.data  # type: ignore
             return response
 
-    def get(self, url: str, **kwargs: Any) -> urllib3.HTTPResponse:
+    def get(self, url: str, **kwargs: Any) -> urllib3.BaseHTTPResponse:
         """HTTP GET request."""
         return self.request("GET", url, **kwargs)
 
-    def post(self, url: str, **kwargs: Any) -> urllib3.HTTPResponse:
+    def post(self, url: str, **kwargs: Any) -> urllib3.BaseHTTPResponse:
         """HTTP POST request."""
         return self.request("POST", url, **kwargs)
 
