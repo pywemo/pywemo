@@ -2210,23 +2210,20 @@ install = ["zstandard (>=0.21.0)"]
 
 [[package]]
 name = "pdoc"
-version = "14.7.0"
+version = "15.0.4"
 description = "API Documentation for Python Projects"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "pdoc-14.7.0-py3-none-any.whl", hash = "sha256:72377a907efc6b2c5b3c56b717ef34f11d93621dced3b663f3aede0b844c0ad2"},
-    {file = "pdoc-14.7.0.tar.gz", hash = "sha256:2d28af9c0acc39180744ad0543e4bbc3223ecba0d1302db315ec521c51f71f93"},
+    {file = "pdoc-15.0.4-py3-none-any.whl", hash = "sha256:f9028e85e7bb8475b054e69bde1f6d26fc4693d25d9fa1b1ce9009bec7f7a5c4"},
+    {file = "pdoc-15.0.4.tar.gz", hash = "sha256:cf9680f10f5b4863381f44ef084b1903f8f356acb0d4cc6b64576ba9fb712c82"},
 ]
 
 [package.dependencies]
 Jinja2 = ">=2.11.0"
-MarkupSafe = "*"
+MarkupSafe = ">=1.1.1"
 pygments = ">=2.12.0"
-
-[package.extras]
-dev = ["hypothesis", "mypy", "pdoc-pyo3-sample-library (==1.0.11)", "pygments (>=2.14.0)", "pytest", "pytest-cov", "pytest-timeout", "ruff", "tox", "types-pygments"]
 
 [[package]]
 name = "pkginfo"
@@ -4011,4 +4008,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9.0"
-content-hash = "04256a04ecc4abe34558247f85d03bcb673806a58524137892d8dfd5364accc5"
+content-hash = "c89697a44c2c2234c231bc54274d18b57021dbecb45f8417152fed809f5cf3f6"
