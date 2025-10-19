@@ -44,6 +44,6 @@ pyinstaller==5.11.0 ; python_full_version >= "3.8.1" and python_version < "3.12"
 pywin32-ctypes==0.2.0 ; python_full_version >= "3.8.1" and python_version < "3.12" and sys_platform == "win32" \
     --hash=sha256:24ffc3b341d457d48e8922352130cf2644024a4ff09762a2261fd34c36ee5942 \
     --hash=sha256:9dc2d991b3479cc2df15930958b674a48a227d5361d413827a4cfd0b5876fc98
-setuptools==67.7.2 ; python_full_version >= "3.8.1" and python_version < "3.12" \
-    --hash=sha256:23aaf86b85ca52ceb801d32703f12d77517b2556af839621c641fca11287952b \
-    --hash=sha256:f104fa03692a2602fa0fec6c6a9e63b6c8a968de13e17c026957dd1f53d80990
+setuptools==78.1.1 ; python_full_version >= "3.8.1" and python_version < "3.12" \
+    --hash=sha256:c3a9c4211ff4c309edb8b8c4f1cbfa7ae324c4ba9f91ff254e3d305b9fd54561 \
+    --hash=sha256:fcc17fd9cd898242f6b4adfaca46137a9edef687f43e6f78469692a5e70d851d
