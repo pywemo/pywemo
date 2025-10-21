@@ -40,8 +40,7 @@ def test_create_empty_db(sqldb):
     statements = set(
         line for line in sqldb.iterdump() if line.startswith("CREATE TABLE")
     )
-    # flake8: noqa: E501 (long lines)
-    assert statements == set(
+    assert statements == set(  # noqa: E501
         [
             # https://github.com/pywemo/pywemo/issues/61#issuecomment-748693894
             "CREATE TABLE RULES(RuleID PRIMARY KEY, Name TEXT NOT NULL, Type TEXT NOT NULL, RuleOrder INTEGER, StartDate TEXT, EndDate TEXT, State TEXT, Sync INTEGER);",

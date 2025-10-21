@@ -16,7 +16,7 @@ class TestLongPress:
 
     method = "pywemo.ouimeaux_device.api.long_press.rules_db_from_device"
 
-    @pytest.fixture
+    @pytest.fixture()
     def rules_db_from_device(self, device):
         with tempfile.TemporaryDirectory(prefix="wemorules_") as temp_dir:
             rules_file_name = os.path.join(temp_dir, "rules.db")

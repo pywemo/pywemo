@@ -22,7 +22,7 @@ class Base:
 class Test_WSP090(Base):
     """Tests for the WeMo WSP090 OutdoorPlug."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def outdoor_plug(self, vcr):
         with vcr.use_cassette("WEMO_WW_1.00.20081401.PVT-RTOS-OutdoorV1"):
             return device_from_uuid_and_location(

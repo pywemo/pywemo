@@ -2,7 +2,7 @@
 
 import threading
 import time
-import unittest.mock as mock
+from unittest import mock
 from http.server import HTTPServer
 
 import pytest
@@ -11,20 +11,20 @@ import requests
 from pywemo import Bridge, Insight, LightSwitch, exceptions, subscribe
 
 
-@pytest.fixture
+@pytest.fixture()
 def device(vcr):
     """Mock WeMo Insight device."""
     with vcr.use_cassette("WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml"):
         return Insight("http://192.168.1.100:49153/setup.xml")
 
 
-@pytest.fixture
+@pytest.fixture()
 def bridge(vcr):
     with vcr.use_cassette("WeMo_WW_2.00.11057.PVT-OWRT-Link.yaml"):
         return Bridge("http://192.168.1.100:49153/setup.xml")
 
 
-@pytest.fixture
+@pytest.fixture()
 def light_switch(vcr):
     with vcr.use_cassette("WeMo_WW_2.00.11408.PVT-OWRT-LS"):
         return LightSwitch("http://192.168.1.100:49153/setup.xml")
@@ -33,7 +33,7 @@ def light_switch(vcr):
 class Test_RequestHandler:
     """Test the server request handler."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def outer(self):
         """Mock SubscriptionRegistry used for testing the http server."""
         obj = mock.create_autospec(
@@ -43,7 +43,7 @@ class Test_RequestHandler:
         obj._subscription_paths = {}
         return obj
 
-    @pytest.fixture
+    @pytest.fixture()
     def http_server(self, outer):
         """Fixture for RequestHandler http server."""
         server = HTTPServer(("localhost", 0), subscribe.RequestHandler)
@@ -71,18 +71,18 @@ class Test_RequestHandler:
             if exception is not None:
                 raise exception
 
-    @pytest.fixture
+    @pytest.fixture()
     def server_address(self, http_server):
         """IP address of the http server."""
         return http_server.server_address[0]
 
-    @pytest.fixture
+    @pytest.fixture()
     def server_url(self, http_server):
         """URL for accessing the http server."""
         host, port = http_server.server_address
         return f"http://{host}:{port}"
 
-    @pytest.fixture
+    @pytest.fixture()
     def mock_light_switch(self):
         """Mock LightSwitch device."""
         return mock.create_autospec(LightSwitch, instance=True)

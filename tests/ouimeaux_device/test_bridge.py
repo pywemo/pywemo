@@ -9,20 +9,20 @@ LIGHT_ID = "F0D1B8000001420C"
 GROUP_ID = "12345678"
 
 
-@pytest.fixture
+@pytest.fixture()
 def bridge(vcr):
     with vcr.use_cassette("WeMo_WW_2.00.11057.PVT-OWRT-Link.yaml"):
         return Bridge("http://192.168.1.100:49153/setup.xml")
 
 
-@pytest.fixture
+@pytest.fixture()
 def light(bridge):
     assert LIGHT_ID in bridge.lights
     light = bridge.lights[LIGHT_ID]
     return light
 
 
-@pytest.fixture
+@pytest.fixture()
 def group(bridge):
     assert GROUP_ID in bridge.groups
     group = bridge.groups[GROUP_ID]

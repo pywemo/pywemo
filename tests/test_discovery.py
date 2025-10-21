@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import unittest.mock as mock
+from unittest import mock
 from socket import gaierror
 
 import pytest

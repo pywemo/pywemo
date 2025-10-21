@@ -1,7 +1,7 @@
 """Tests for interfacing with the generated XSD classes."""
 
 import ast
-import unittest.mock as mock
+from unittest import mock
 
 import pytest
 

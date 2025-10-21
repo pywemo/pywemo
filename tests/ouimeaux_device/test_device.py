@@ -4,7 +4,7 @@ import base64
 import itertools
 import logging
 import shutil
-import unittest.mock as mock
+from unittest import mock
 from subprocess import CalledProcessError
 
 import pytest
@@ -190,7 +190,7 @@ def mocked_requests_get(*args, url=None, **kwargs):
     return MockUrllib3Response(None, 404)
 
 
-@pytest.fixture
+@pytest.fixture()
 @mock.patch("urllib3.PoolManager.request", side_effect=mocked_requests_get)
 def device(mock_get):
     """Return a Device as created by some actual XML."""

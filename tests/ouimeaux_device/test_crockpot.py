@@ -9,7 +9,7 @@ from hypothesis import strategies as st
 from pywemo.ouimeaux_device.crockpot import CrockPot, CrockPotMode
 
 
-@pytest.fixture
+@pytest.fixture()
 def crockpot(vcr):
     with vcr.use_cassette("crockpot_setup.yaml"):
         return CrockPot("http://192.168.1.100:49153/setup.xml")

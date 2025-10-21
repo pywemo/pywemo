@@ -12,7 +12,7 @@ from pywemo.subscribe import EVENT_TYPE_BINARY_STATE, EVENT_TYPE_INSIGHT_PARAMS
 class Test_Insight:
     """Integration tests for the Insight class."""
 
-    @pytest.fixture
+    @pytest.fixture()
     def insight(self, vcr):
         with vcr.use_cassette("WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml"):
             return Insight("http://192.168.1.100:49153/setup.xml")
