@@ -208,8 +208,9 @@ def device(mock_get):
 @pytest.fixture(autouse=True)
 def lightspeed():
     """Skip sleeps in the code and auto-increment time.time calls."""
-    with mock.patch("time.sleep", return_value=None), mock.patch(
-        "time.time", side_effect=itertools.count(0, 20)
+    with (
+        mock.patch("time.sleep", return_value=None),
+        mock.patch("time.time", side_effect=itertools.count(0, 20)),
     ):
         yield
 
@@ -573,12 +574,13 @@ class TestDevice:
 
         requests_get.side_effect = get_resp
 
-        with mock.patch.object(
-            device, "_reconnect_with_device_by_discovery"
-        ), mock.patch(
-            "pywemo.ouimeaux_device.api.service.Session.url",
-            new_callable=mock.PropertyMock,
-        ) as url_mock:
+        with (
+            mock.patch.object(device, "_reconnect_with_device_by_discovery"),
+            mock.patch(
+                "pywemo.ouimeaux_device.api.service.Session.url",
+                new_callable=mock.PropertyMock,
+            ) as url_mock,
+        ):
             device.reconnect_with_device()
             url_mock.assert_not_called()
 

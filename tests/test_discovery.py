@@ -39,8 +39,11 @@ def test_discover_devices(udn, wemo_class):
     mock_entry.udn = udn
     mock_device = mock.create_autospec(wemo_class)
 
-    with mock.patch("pywemo.discovery.ssdp") as mock_ssdp, mock.patch(
-        f"pywemo.discovery.{wemo_class.__name__}", return_value=mock_device
+    with (
+        mock.patch("pywemo.discovery.ssdp") as mock_ssdp,
+        mock.patch(
+            f"pywemo.discovery.{wemo_class.__name__}", return_value=mock_device
+        ),
     ):
         mock_ssdp.scan.return_value = [mock_entry]
         devices = discovery.discover_devices()
@@ -75,9 +78,10 @@ def test_device_from_description_returns_none():
             is None
         )
 
-    with mock.patch("requests.get"), mock.patch(
-        "pywemo.discovery.DeviceDescription"
-    ) as mock_description:
+    with (
+        mock.patch("requests.get"),
+        mock.patch("pywemo.discovery.DeviceDescription") as mock_description,
+    ):
         mock_description.from_xml.side_effect = exceptions.InvalidSchemaError
         assert (
             discovery.device_from_description("http://127.0.0.1/setup.xml")
@@ -187,9 +191,10 @@ def test_setup_url_for_address(
         kwargs["side_effect"] = gaierror
     else:
         kwargs["return_value"] = "127.0.0.1"
-    with mock.patch.object(
-        discovery, "gethostbyname", **kwargs
-    ), mock.patch.object(discovery, "probe_wemo", return_value=port):
+    with (
+        mock.patch.object(discovery, "gethostbyname", **kwargs),
+        mock.patch.object(discovery, "probe_wemo", return_value=port),
+    ):
         url = discovery.setup_url_for_address(host=host, port=port)
     if port:
         assert url.endswith(f":{port}/setup.xml")

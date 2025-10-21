@@ -7,6 +7,7 @@ mainly to document the local changes made after running generateDS. Putting
 the local changes in this script makes the builds repeatable and hopefully
 allows for easier upgrading to future versions of generateDS.
 """
+
 from __future__ import annotations
 
 import concurrent.futures

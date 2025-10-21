@@ -115,10 +115,7 @@ MOCK_SERVICE_RETURN_VALUES = {
     "deviceevent": {
         "GetAttributes": {
             "attributeList": (
-                "<attribute>"
-                "<name>Switch</name>"
-                "<value>1</value>"
-                "</attribute>"
+                "<attribute><name>Switch</name><value>1</value></attribute>"
             )
         }
     },

@@ -65,8 +65,9 @@ def test_service():
 
 
 def test_services_parse_string_raises():
-    with mock.patch(SERVICE_PARSER) as mock_parser, pytest.raises(
-        InvalidSchemaError
+    with (
+        mock.patch(SERVICE_PARSER) as mock_parser,
+        pytest.raises(InvalidSchemaError),
     ):
         mock_parser.parseString.side_effect = Exception
         xsd_types.ServiceDescription.from_xml(b"")
@@ -176,8 +177,9 @@ def test_device_missing_required_fields(exclude):
     xsd_device = device_parser.DeviceType(**args)
     root = device_parser.root(device=xsd_device)
 
-    with mock.patch(DEVICE_PARSER) as mock_parser, pytest.raises(
-        InvalidSchemaError
+    with (
+        mock.patch(DEVICE_PARSER) as mock_parser,
+        pytest.raises(InvalidSchemaError),
     ):
         mock_parser.parseString.return_value = root
         xsd_types.DeviceDescription.from_xml(b"")
@@ -206,8 +208,9 @@ def test_device_missing_optional_fields():
 def test_device_missing_device():
     root = device_parser.root()
 
-    with mock.patch(DEVICE_PARSER) as mock_parser, pytest.raises(
-        InvalidSchemaError
+    with (
+        mock.patch(DEVICE_PARSER) as mock_parser,
+        pytest.raises(InvalidSchemaError),
     ):
         mock_parser.parseString.return_value = root
         xsd_types.DeviceDescription.from_xml(b"")
@@ -218,16 +221,18 @@ def test_device_wrong_manufacturer():
     xsd_device = device_parser.DeviceType(**args)
     root = device_parser.root(device=xsd_device)
 
-    with mock.patch(DEVICE_PARSER) as mock_parser, pytest.raises(
-        InvalidSchemaError
+    with (
+        mock.patch(DEVICE_PARSER) as mock_parser,
+        pytest.raises(InvalidSchemaError),
     ):
         mock_parser.parseString.return_value = root
         xsd_types.DeviceDescription.from_xml(b"")
 
 
 def test_device_parser_raises():
-    with mock.patch(DEVICE_PARSER) as mock_parser, pytest.raises(
-        InvalidSchemaError
+    with (
+        mock.patch(DEVICE_PARSER) as mock_parser,
+        pytest.raises(InvalidSchemaError),
     ):
         mock_parser.parseString.side_effect = Exception
         xsd_types.DeviceDescription.from_xml(b"")

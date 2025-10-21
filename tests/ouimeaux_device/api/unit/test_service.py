@@ -300,10 +300,13 @@ class TestService:
         device = mock.create_autospec(WeMoDevice)
         device.session = mock.create_autospec(svc.Session)
 
-        with mock.patch(
-            "pywemo.ouimeaux_device.api.service.ServiceDescription.from_xml",
-            side_effect=InvalidSchemaError,
-        ), pytest.raises(InvalidSchemaError):
+        with (
+            mock.patch(
+                "pywemo.ouimeaux_device.api.service.ServiceDescription.from_xml",
+                side_effect=InvalidSchemaError,
+            ),
+            pytest.raises(InvalidSchemaError),
+        ):
             svc.Service(device, self._service_type)
 
 

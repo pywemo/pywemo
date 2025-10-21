@@ -257,16 +257,18 @@ def test_rules_db_from_device(temp_file_name, sqldb):
             def StoreRules(**kwargs):
                 store_rules.append(kwargs)
 
-    with patch(
-        "urllib3.PoolManager.request", return_value=mock_response
-    ) as mock_request:
-        with rules_db.rules_db_from_device(Device) as db:
-            mock_request.assert_called_once_with(
-                method="GET", url="http://localhost/rules.db"
-            )
-            # Make a modification to trigger StoreRules.
-            assert len(db._rules) == 1
-            db._rules[501].State = 1
+    with (
+        patch(
+            "urllib3.PoolManager.request", return_value=mock_response
+        ) as mock_request,
+        rules_db.rules_db_from_device(Device) as db,
+    ):
+        mock_request.assert_called_once_with(
+            method="GET", url="http://localhost/rules.db"
+        )
+        # Make a modification to trigger StoreRules.
+        assert len(db._rules) == 1
+        db._rules[501].State = 1
 
     assert len(store_rules) == 1
     assert store_rules[0]["ruleDbVersion"] == 2
@@ -312,12 +314,15 @@ def test_rules_db_from_device_raises_http_exception():
         "ruleDbVersion": 1,
         "ruleDbPath": "http://localhost/",
     }
-    with patch(
-        "urllib3.PoolManager.request", side_effect=urllib3.exceptions.HTTPError
+    with (
+        patch(
+            "urllib3.PoolManager.request",
+            side_effect=urllib3.exceptions.HTTPError,
+        ),
+        pytest.raises(HTTPException),
+        rules_db.rules_db_from_device(device),
     ):
-        with pytest.raises(HTTPException):
-            with rules_db.rules_db_from_device(device):
-                pass
+        pass
 
 
 def test_sqlite_errors_raised():
@@ -337,9 +342,11 @@ def test_sqlite_errors_raised():
                     "ruleDbPath": "http://localhost/rules.db",
                 }
 
-    with patch(
-        "urllib3.PoolManager.request", return_value=mock_response
-    ) as mock_request:
-        with pytest.raises(RulesDbQueryError):
-            with rules_db.rules_db_from_device(Device) as db:
-                raise sqlite3.OperationalError("test")
+    with (
+        patch(
+            "urllib3.PoolManager.request", return_value=mock_response
+        ) as mock_request,
+        pytest.raises(RulesDbQueryError),
+    ):
+        with rules_db.rules_db_from_device(Device) as db:
+            raise sqlite3.OperationalError("test")

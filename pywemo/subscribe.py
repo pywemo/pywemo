@@ -4,21 +4,24 @@ Example usage:
 
 ```python
 import pywemo
+
 # The SubscriptionRegistry maintains push subscriptions to each endpoint
 # of a device.
 registry = pywemo.SubscriptionRegistry()
 registry.start()
 
-device = ... # See example of discovering devices in the pywemo module.
+device = ...  # See example of discovering devices in the pywemo module.
 
 # Start subscribing to push notifications of state changes.
 registry.register(device)
+
 
 def push_notification(device, event, params):
     '''Notify device of state change and get new device state.'''
     processed_update = device.subscription_update(event, params)
     state = device.get_state(force_update=not processed_update)
     print(f"Device state: {state}")
+
 
 # Register a callback to receive state push notifications.
 registry.on(device, None, push_notification)
@@ -465,9 +468,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         if self.path.endswith("/upnp/control/basicevent1"):
             sender_ip, _ = self.client_address
             outer = self.server.outer
-            for (
-                device
-            ) in outer._subscriptions:  # pylint: disable=protected-access
+            for device in outer._subscriptions:  # pylint: disable=protected-access
                 if device.host != sender_ip:
                     continue
                 doc = self._get_xml_from_http_body()

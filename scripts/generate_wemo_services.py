@@ -12,6 +12,7 @@ Usage:
   scripts/generate_wemo_services.py > \
       pywemo/ouimeaux_device/api/wemo_services.pyi
 """
+
 from __future__ import annotations
 
 import collections

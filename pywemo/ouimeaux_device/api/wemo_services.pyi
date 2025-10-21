@@ -239,5 +239,4 @@ class WeMoAllActionsMixin(
     Service_rules,
     Service_smartsetup,
     Service_timesync,
-):
-    ...
+): ...

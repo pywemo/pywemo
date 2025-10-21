@@ -504,7 +504,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         if encryption_method not in supported_encryptions:
             raise SetupException(
                 f"Encryption {encryption_method} not currently supported.  "
-                f'Supported encryptions are: {",".join(supported_encryptions)}'
+                f"Supported encryptions are: {','.join(supported_encryptions)}"
             )
 
         # try to connect the device to the selected network
