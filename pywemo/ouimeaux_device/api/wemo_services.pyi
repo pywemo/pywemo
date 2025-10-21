@@ -10,7 +10,9 @@ To regenerate this file, run:
 
 from typing import Callable
 
-UPnPMethod = Callable[..., dict[str, str]]
+from typing_extensions import TypeAlias
+
+UPnPMethod: TypeAlias = Callable[..., dict[str, str]]
 
 class Service_WiFiSetup:
     CloseSetup: UPnPMethod
@@ -238,4 +240,4 @@ class WeMoAllActionsMixin(
     Service_smartsetup,
     Service_timesync,
 ):
-    pass
+    ...

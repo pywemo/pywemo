@@ -11,8 +11,9 @@ controlled by a long press.
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
 from enum import Enum
-from typing import Iterable, no_type_check
+from typing import no_type_check
 
 from .rules_db import RuleDevicesRow, RulesDb, RulesRow, rules_db_from_device
 from .service import RequiredService, RequiredServicesMixin

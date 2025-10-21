@@ -10,12 +10,12 @@ from .api.unit import long_press_helpers
 class Base:
     """Tests that run for each LightSwitch model."""
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_on(self, lightswitch):
         lightswitch.on()
         assert lightswitch.get_state(force_update=True) == 1
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_off(self, lightswitch):
         lightswitch.off()
         assert lightswitch.get_state(force_update=True) == 0
@@ -24,7 +24,7 @@ class Base:
 class Test_F7C030(Base, long_press_helpers.TestLongPress):
     """Tests for the WeMo F7C030 LightSwitch."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def lightswitch(self, vcr):
         with vcr.use_cassette("WeMo_WW_2.00.11408.PVT-OWRT-LS"):
             return device_from_uuid_and_location(
@@ -38,7 +38,7 @@ class Test_F7C030(Base, long_press_helpers.TestLongPress):
 class Test_WLS040(Base, long_press_helpers.TestLongPress):
     """Tests for the WeMo WLS040 LightSwitch."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def lightswitch(self, vcr):
         with vcr.use_cassette("WeMo_WW_2.00.11563.PVT-OWRT-LIGHTV2-WLS040"):
             return device_from_uuid_and_location(
@@ -52,7 +52,7 @@ class Test_WLS040(Base, long_press_helpers.TestLongPress):
 class Test_WLS0403(Base, long_press_helpers.TestLongPress):
     """Tests for the WeMo WLS0403 three-wey LightSwitch."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def lightswitch(self, vcr):
         with vcr.use_cassette("WeMo_WW_2.00.11563.PVT-OWRT-LIGHTV2-WLS0403"):
             return device_from_uuid_and_location(
@@ -66,7 +66,7 @@ class Test_WLS0403(Base, long_press_helpers.TestLongPress):
 class Test_NoLongPress(Base):
     """Tests for the WeMo WeMo_WW_2.00.2263.PVT firmware."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def lightswitch(self, vcr):
         with vcr.use_cassette("WeMo_WW_2.00.2263.PVT"):
             return device_from_uuid_and_location(

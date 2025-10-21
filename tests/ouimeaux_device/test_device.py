@@ -4,8 +4,8 @@ import base64
 import itertools
 import logging
 import shutil
-from unittest import mock
 from subprocess import CalledProcessError
+from unittest import mock
 
 import pytest
 import requests
@@ -185,12 +185,12 @@ def mocked_requests_get(*args, url=None, **kwargs):
 
     if url == "http://192.168.1.100:49158/setup.xml":
         return MockUrllib3Response(RESPONSE_SETUP.encode("utf-8"), 200)
-    elif url.endswith(".xml"):
+    if url.endswith(".xml"):
         return MockUrllib3Response(EMPTY_SERVICE.encode(), 200)
     return MockUrllib3Response(None, 404)
 
 
-@pytest.fixture()
+@pytest.fixture
 @mock.patch("urllib3.PoolManager.request", side_effect=mocked_requests_get)
 def device(mock_get):
     """Return a Device as created by some actual XML."""
@@ -532,7 +532,7 @@ class TestDevice:
         def get_urllib3_resp(url, *args, **kwargs):
             if url == f"http://{device.host}:{new_port}/setup.xml":
                 return MockUrllib3Response(RESPONSE_SETUP.encode("utf-8"), 200)
-            elif url.endswith(".xml"):
+            if url.endswith(".xml"):
                 return MockUrllib3Response(EMPTY_SERVICE.encode(), 200)
             return MockUrllib3Response(None, 404)
 
@@ -560,7 +560,7 @@ class TestDevice:
         def get_urllib3_resp(url, *args, **kwargs):
             if url == f"http://{device.host}:{device.port}/setup.xml":
                 return MockUrllib3Response(new_response.encode("utf-8"), 200)
-            elif url.endswith(".xml"):
+            if url.endswith(".xml"):
                 return MockUrllib3Response(EMPTY_SERVICE.encode(), 200)
             return MockUrllib3Response(None, 404)
 

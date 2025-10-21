@@ -11,7 +11,7 @@ import urllib3
 
 from pywemo.exceptions import HTTPException, RulesDbQueryError
 from pywemo.ouimeaux_device.api import rules_db
-from pywemo.ouimeaux_device.api.service import REQUESTS_TIMEOUT, Session
+from pywemo.ouimeaux_device.api.service import Session
 
 MOCK_NAME = "WemoDeviceName"
 MOCK_UDN = "WemoDeviceUDN"
@@ -19,13 +19,13 @@ MOCK_TARGET_UDN = "WemoTargetUDN"
 MOCK_RULE_TYPE = "RuleType"
 
 
-@pytest.fixture()
+@pytest.fixture
 def temp_file_name():
     with tempfile.TemporaryDirectory(prefix="wemorules_") as temp_dir:
         yield os.path.join(temp_dir, "rules.db")
 
 
-@pytest.fixture()
+@pytest.fixture
 def sqldb(temp_file_name):
     rules_db._create_empty_db(temp_file_name)
     try:
@@ -40,7 +40,7 @@ def test_create_empty_db(sqldb):
     statements = set(
         line for line in sqldb.iterdump() if line.startswith("CREATE TABLE")
     )
-    assert statements == set(  # noqa: E501
+    assert statements == set(
         [
             # https://github.com/pywemo/pywemo/issues/61#issuecomment-748693894
             "CREATE TABLE RULES(RuleID PRIMARY KEY, Name TEXT NOT NULL, Type TEXT NOT NULL, RuleOrder INTEGER, StartDate TEXT, EndDate TEXT, State TEXT, Sync INTEGER);",

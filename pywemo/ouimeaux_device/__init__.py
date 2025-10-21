@@ -7,7 +7,8 @@ import logging
 import subprocess
 import threading
 import time
-from typing import Any, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 import requests
 
@@ -134,8 +135,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         ]
 
     def _reconnect_with_device_by_discovery(self) -> None:
-        """
-        Scan network to find the device again.
+        """Scan network to find the device again.
 
         Wemos tend to change their port number from time to time.
         Whenever requests throws an error, we will try to find the device again
@@ -261,7 +261,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             Set to True to clear wifi information ("Change Wi-Fi" in the Wemo
             app), which does not clear the rules, name, etc.
 
-        Notes
+        Notes:
         -----
         Setting both to true is equivalent to a "Factory Restore" from the app.
 
@@ -273,6 +273,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         ReSetup action below were consistent.  These could potentially change
         in a future firmware revision or may be different for other untested
         devices.
+
         """
         try:
             action = self.basicevent.ReSetup
@@ -416,10 +417,11 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             as possible, but not too quick to overload the device with
             requests.  It must be less than or equal to half of the `timeout`.
 
-        Notes
+        Notes:
         -----
         The timeout applies to each connection attempt, so the total wait time
         will be approximately `timeout * connection_attempts`.
+
         """
         try:
             return self._setup(*args, **kwargs)

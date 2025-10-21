@@ -56,7 +56,7 @@ def run_generate_ds(xsd_path: str) -> str:
             ],
             check=True,
         )
-        with open(py_path, "r", encoding="utf-8") as py_file:
+        with open(py_path, encoding="utf-8") as py_file:
             output = py_file.read()
     # Remove paths related to running generateDS.py.
     output = output.replace(os.path.join(scripts_dir, ""), "")

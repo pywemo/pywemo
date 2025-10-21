@@ -137,7 +137,6 @@ try:
 except ModulenotfoundExp_:
 
     class GdsCollector_(object):
-
         def __init__(self, messages=None):
             if messages is None:
                 self.messages = []
@@ -437,8 +436,7 @@ except ModulenotfoundExp_ as exp:
                 0,
             ):
                 raise_parse_error(
-                    node,
-                    "Requires boolean value " "(one of True, 1, False, 0)",
+                    node, "Requires boolean value (one of True, 1, False, 0)"
                 )
             return input_data
 

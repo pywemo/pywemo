@@ -14,7 +14,7 @@ MOCK_CALLBACK_ADDRESS = f"{MOCK_IP_ADDRESS}:{MOCK_CALLBACK_PORT}"
 MOCK_DATE = "Tue, 20 Jun 2023 16:16:15 GMT"
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_interface_addresses():
     """Mock for util.interface_addresses."""
     addresses = ["127.0.0.1"]
@@ -22,7 +22,7 @@ def mock_interface_addresses():
         yield addresses
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_get_callback_address():
     """Mock for util.get_ip_address."""
     with mock.patch(
@@ -31,7 +31,7 @@ def mock_get_callback_address():
         yield MOCK_CALLBACK_ADDRESS
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_socket():
     """Mock socket instance returned from socket.socket."""
     sock = mock.create_autospec(socket.socket, instance=True)
@@ -39,7 +39,7 @@ def mock_socket():
         yield sock
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_select():
     """Queue for delivering return values from select.select.
 
@@ -56,7 +56,7 @@ def mock_select():
         yield return_queue
 
 
-@pytest.fixture()
+@pytest.fixture
 def discovery_responder(
     mock_select,
     mock_socket,

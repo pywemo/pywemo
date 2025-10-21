@@ -37,7 +37,7 @@ class DatabaseRow:
         values = []
         for name in self.FIELDS.keys():
             if hasattr(self, name):
-                values.append(f"{name}={repr(getattr(self, name))}")
+                values.append(f"{name}={getattr(self, name)!r}")
         class_name = self.__class__.__name__
         values_str = ", ".join(values)
         return f"{class_name}({values_str})"
@@ -159,6 +159,7 @@ class SQLType:
               the database cursor and convert it to a Python type.
             sql_type: The sqlite field type.
             not_null: Whether or not the sqlite field can be null.
+
         """
         self.type_constructor = type_constructor
         self._sql_type = (

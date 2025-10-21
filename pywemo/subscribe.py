@@ -198,6 +198,7 @@ class Subscription:
 
         Raises:
             requests.RequestException on error.
+
         """
         try:
             response = self._subscribe()
@@ -282,6 +283,7 @@ class Subscription:
 
         Returns:
             The duration of the subscription in seconds.
+
         """
         self.subscription_id = headers.get("SID", self.subscription_id)
         if timeout_header := headers.get("TIMEOUT", None):
@@ -337,7 +339,7 @@ def _start_server(port: int | None) -> HTTPServer:
         start_port = 8989
         ports_to_check = 128
 
-    for offset in range(0, ports_to_check):
+    for offset in range(ports_to_check):
         port = start_port + offset
         try:
             return HTTPServer(("", port), RequestHandler)

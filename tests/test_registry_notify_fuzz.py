@@ -11,6 +11,7 @@ from tests import atheris_stub as atheris
 
 with atheris.instrument_imports():
     from lxml import etree
+
     import pywemo
 
 import pytest

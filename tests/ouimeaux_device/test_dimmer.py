@@ -13,17 +13,17 @@ from .api.unit import long_press_helpers
 class Base:
     """Tests that run for each Dimmer model."""
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_on(self, dimmer):
         dimmer.on()
         assert dimmer.get_state(force_update=True) == 1
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_off(self, dimmer):
         dimmer.off()
         assert dimmer.get_state(force_update=True) == 0
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     @pytest.mark.parametrize(
         "brightness,expected_state,expected_brightness",
         [(100, 1, 100), (0, 0, 100), (45, 1, 45)],
@@ -35,7 +35,7 @@ class Base:
         assert dimmer.get_state(force_update=True) == expected_state
         assert dimmer.get_brightness() == expected_brightness
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_brightness_on_startup(self, dimmer):
         dimmer.on()
         assert dimmer.get_brightness() != 0
@@ -54,7 +54,7 @@ class Base:
 class Test_PVT_OWRT_Dimmer_v1(Base, long_press_helpers.TestLongPress):
     """Tests for the WeMo Dimmer, hardware version v1."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def dimmer(self, vcr):
         with vcr.use_cassette("WeMo_WW_2.00.11453.PVT-OWRT-Dimmer"):
             return device_from_uuid_and_location(
@@ -68,7 +68,7 @@ class Test_PVT_OWRT_Dimmer_v1(Base, long_press_helpers.TestLongPress):
 class Test_PVT_RTOS_Dimmer_v2(Base):
     """Tests for the WeMo Dimmer, hardware version v2."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def dimmer(self, vcr):
         with vcr.use_cassette("WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2"):
             return device_from_uuid_and_location(
@@ -76,7 +76,7 @@ class Test_PVT_RTOS_Dimmer_v2(Base):
                 "http://192.168.1.100:49153/setup.xml",
             )
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_is_subscribed(self, dimmer, subscription_registry):
         subscription_registry.register(dimmer)
         path = list(subscription_registry._subscription_paths)[0]

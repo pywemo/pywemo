@@ -9,13 +9,13 @@ from hypothesis import strategies as st
 from pywemo.ouimeaux_device.crockpot import CrockPot, CrockPotMode
 
 
-@pytest.fixture()
+@pytest.fixture
 def crockpot(vcr):
     with vcr.use_cassette("crockpot_setup.yaml"):
         return CrockPot("http://192.168.1.100:49153/setup.xml")
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_on(crockpot):
     crockpot.on()
 
@@ -23,7 +23,7 @@ def test_on(crockpot):
     assert crockpot.mode_string == "High"
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_off(crockpot):
     crockpot.off()
 
