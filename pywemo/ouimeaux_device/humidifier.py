@@ -182,6 +182,7 @@ class Humidifier(AttributeDevice):
 
         Args:
           state: An int index of the FanMode IntEnum.
+
         """
         self.set_fan_mode(FanMode(state))
 

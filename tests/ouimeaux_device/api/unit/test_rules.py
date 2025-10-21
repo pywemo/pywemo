@@ -11,7 +11,7 @@ import urllib3
 
 from pywemo.exceptions import HTTPException, RulesDbQueryError
 from pywemo.ouimeaux_device.api import rules_db
-from pywemo.ouimeaux_device.api.service import REQUESTS_TIMEOUT, Session
+from pywemo.ouimeaux_device.api.service import Session
 
 MOCK_NAME = "WemoDeviceName"
 MOCK_UDN = "WemoDeviceUDN"
@@ -19,13 +19,13 @@ MOCK_TARGET_UDN = "WemoTargetUDN"
 MOCK_RULE_TYPE = "RuleType"
 
 
-@pytest.fixture()
+@pytest.fixture
 def temp_file_name():
     with tempfile.TemporaryDirectory(prefix="wemorules_") as temp_dir:
         yield os.path.join(temp_dir, "rules.db")
 
 
-@pytest.fixture()
+@pytest.fixture
 def sqldb(temp_file_name):
     rules_db._create_empty_db(temp_file_name)
     try:
@@ -40,7 +40,6 @@ def test_create_empty_db(sqldb):
     statements = set(
         line for line in sqldb.iterdump() if line.startswith("CREATE TABLE")
     )
-    # flake8: noqa: E501 (long lines)
     assert statements == set(
         [
             # https://github.com/pywemo/pywemo/issues/61#issuecomment-748693894
@@ -258,16 +257,18 @@ def test_rules_db_from_device(temp_file_name, sqldb):
             def StoreRules(**kwargs):
                 store_rules.append(kwargs)
 
-    with patch(
-        "urllib3.PoolManager.request", return_value=mock_response
-    ) as mock_request:
-        with rules_db.rules_db_from_device(Device) as db:
-            mock_request.assert_called_once_with(
-                method="GET", url="http://localhost/rules.db"
-            )
-            # Make a modification to trigger StoreRules.
-            assert len(db._rules) == 1
-            db._rules[501].State = 1
+    with (
+        patch(
+            "urllib3.PoolManager.request", return_value=mock_response
+        ) as mock_request,
+        rules_db.rules_db_from_device(Device) as db,
+    ):
+        mock_request.assert_called_once_with(
+            method="GET", url="http://localhost/rules.db"
+        )
+        # Make a modification to trigger StoreRules.
+        assert len(db._rules) == 1
+        db._rules[501].State = 1
 
     assert len(store_rules) == 1
     assert store_rules[0]["ruleDbVersion"] == 2
@@ -313,12 +314,15 @@ def test_rules_db_from_device_raises_http_exception():
         "ruleDbVersion": 1,
         "ruleDbPath": "http://localhost/",
     }
-    with patch(
-        "urllib3.PoolManager.request", side_effect=urllib3.exceptions.HTTPError
+    with (
+        patch(
+            "urllib3.PoolManager.request",
+            side_effect=urllib3.exceptions.HTTPError,
+        ),
+        pytest.raises(HTTPException),
+        rules_db.rules_db_from_device(device),
     ):
-        with pytest.raises(HTTPException):
-            with rules_db.rules_db_from_device(device):
-                pass
+        pass
 
 
 def test_sqlite_errors_raised():
@@ -338,9 +342,11 @@ def test_sqlite_errors_raised():
                     "ruleDbPath": "http://localhost/rules.db",
                 }
 
-    with patch(
-        "urllib3.PoolManager.request", return_value=mock_response
-    ) as mock_request:
-        with pytest.raises(RulesDbQueryError):
-            with rules_db.rules_db_from_device(Device) as db:
-                raise sqlite3.OperationalError("test")
+    with (
+        patch(
+            "urllib3.PoolManager.request", return_value=mock_response
+        ) as mock_request,
+        pytest.raises(RulesDbQueryError),
+    ):
+        with rules_db.rules_db_from_device(Device) as db:
+            raise sqlite3.OperationalError("test")

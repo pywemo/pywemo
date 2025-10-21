@@ -7,19 +7,19 @@ from typing import Tuple
 # Define usable ranges as bulbs either ignore or behave unexpectedly
 # when it is sent a value is outside of the range.
 TemperatureRange = Tuple[int, int]
-TEMPERATURE_PROFILES: dict[str, TemperatureRange] = dict(
-    (model, temp)
+TEMPERATURE_PROFILES: dict[str, TemperatureRange] = {
+    model: temp
     for models, temp in (
         # Lightify RGBW, 1900-6500K
         (["LIGHTIFY A19 RGBW"], (151, 555)),
     )
     for model in models
-)
+}
 
 ColorXY = Tuple[float, float]
 ColorGamut = Tuple[ColorXY, ColorXY, ColorXY]
-COLOR_PROFILES: dict[str, ColorGamut] = dict(
-    (model, gamut)
+COLOR_PROFILES: dict[str, ColorGamut] = {
+    model: gamut
     for models, gamut in (
         # Lightify RGBW, 1900-6500K
         # https://flow-morewithless.blogspot.com/2015/01/osram-lightify-color-gamut-and-spectrum.html
@@ -29,7 +29,7 @@ COLOR_PROFILES: dict[str, ColorGamut] = dict(
         ),
     )
     for model in models
-)
+}
 
 
 def get_profiles(model: str) -> tuple[TemperatureRange, ColorGamut]:

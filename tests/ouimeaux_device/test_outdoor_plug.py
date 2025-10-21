@@ -8,12 +8,12 @@ from pywemo.discovery import device_from_uuid_and_location
 class Base:
     """Tests that run for each OutdoorPlug model."""
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_on(self, outdoor_plug):
         outdoor_plug.on()
         assert outdoor_plug.get_state(force_update=True) == 1
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_off(self, outdoor_plug):
         outdoor_plug.off()
         assert outdoor_plug.get_state(force_update=True) == 0

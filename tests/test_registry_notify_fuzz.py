@@ -5,12 +5,13 @@ from __future__ import annotations
 import contextlib
 import string
 import sys
-import unittest.mock as mock
+from unittest import mock
 
 from tests import atheris_stub as atheris
 
 with atheris.instrument_imports():
     from lxml import etree
+
     import pywemo
 
 import pytest
@@ -114,10 +115,7 @@ MOCK_SERVICE_RETURN_VALUES = {
     "deviceevent": {
         "GetAttributes": {
             "attributeList": (
-                "<attribute>"
-                "<name>Switch</name>"
-                "<value>1</value>"
-                "</attribute>"
+                "<attribute><name>Switch</name><value>1</value></attribute>"
             )
         }
     },

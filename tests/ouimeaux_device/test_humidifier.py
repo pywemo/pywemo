@@ -16,7 +16,7 @@ def humidifier(vcr):
         return Humidifier("http://192.168.1.100:49153/setup.xml")
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_on(humidifier):
     humidifier.on()
 
@@ -25,7 +25,7 @@ def test_on(humidifier):
     assert humidifier.get_state() == 1
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_off(humidifier):
     humidifier.off()
 
@@ -34,7 +34,7 @@ def test_off(humidifier):
     assert humidifier.get_state() == 0
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_desired_humidity(humidifier):
     humidifier.on()
     humidifier.set_humidity(DesiredHumidity.FiftyFivePercent)
@@ -43,7 +43,7 @@ def test_desired_humidity(humidifier):
     assert humidifier.desired_humidity_percent == "55"
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_set_fan_mode_and_humidity(humidifier):
     humidifier.set_fan_mode_and_humidity(
         FanMode.Medium, DesiredHumidity.FortyFivePercent
@@ -64,7 +64,7 @@ def test_set_fan_mode_and_humidity(humidifier):
         humidifier.set_fan_mode_and_humidity(desired_humidity=99)
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_reset_filter_life(humidifier):
     assert humidifier.filter_life_percent == pytest.approx(59.62)
 

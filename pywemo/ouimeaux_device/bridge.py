@@ -5,8 +5,9 @@ from __future__ import annotations
 import io
 import time
 import warnings
+from collections.abc import Iterable
 from html import escape
-from typing import Any, Iterable, TypedDict
+from typing import Any, TypedDict
 
 from lxml import etree as et
 
@@ -269,7 +270,7 @@ class LinkedDevice:  # pylint: disable=too-many-instance-attributes
                 )
             except ValueError as err:
                 raise ValueError(
-                    f"Invalid value for {capability}: {repr(value)}"
+                    f"Invalid value for {capability}: {value!r}"
                 ) from err
 
         # unreachable devices have empty strings for all capability values
@@ -295,7 +296,7 @@ class LinkedDevice:  # pylint: disable=too-many-instance-attributes
         if (color_control := status.get("colorcontrol")) is not None:
             if len(color_control) < 2:
                 raise ValueError(
-                    f"Too few values for colorcontrol: {repr(color_control)}"
+                    f"Too few values for colorcontrol: {color_control!r}"
                 )
             color_x, color_y = float(color_control[0]), float(color_control[1])
             color_x, color_y = color_x / 65535.0, color_y / 65535.0

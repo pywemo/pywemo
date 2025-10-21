@@ -1,6 +1,10 @@
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[project]
+name = "pywemo"
+requires-python = ">=3.9.0"
 
 [tool.poetry]
 name = "pywemo"
@@ -8,12 +12,9 @@ version = "1.4.0"
 description = "Lightweight Python module to discover and control WeMo devices"
 authors = ["Eric Severance <pywemo@esev.com>"]
 license = "MIT"
-
-readme = 'README.rst'
-
+readme = "README.rst"
 repository = "https://github.com/pywemo/pywemo"
 homepage = "https://github.com/pywemo/pywemo"
-
 keywords = ['wemo', 'api']
 
 [tool.poetry.dependencies]
@@ -24,23 +25,17 @@ urllib3 = ">=2.0.2"
 lxml = ">=4.6"
 
 [tool.poetry.group.dev.dependencies]
-# toml is used by multiple tools to read this pyproject.toml file
-toml = ">=0.10"
-# formatters
-black = "25.9.0"
-isort = ">=5.6.4,<7.0.0"
+# formatter and linter
+ruff = "0.14.1"
 # linters/code analysis
-flake8 = ">=6,<8"
-flake8-docstrings = ">=1.3.0"
-flake8-bugbear = ">=20.11.1"
 pylint = ">=2.17.3,<4.0.0"
 rstcheck = ">=3.3.1,<7.0.0"
 mypy = "^1.2.0"
-# testing and code coverage
 lxml-stubs = ">=0.4,<0.6"
+types-requests = ">=2.0"
+# testing and code coverage
 pytest = ">=7.3.1,<9.0.0"
 pytest-vcr = "1.0.2"
-types-requests = ">=2.0"
 coverage = "^7.2.4"
 hypothesis = "^6.75.3"
 # version of generateDS used to create device.py and service.py in .../api/xsd
@@ -57,18 +52,204 @@ poetry = ">=1.2.0"
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.8"
 
+[tool.ruff]
+line-length = 79
+cache-dir = ".cache/ruff"
+force-exclude = true
+extend-exclude = ["pywemo/ouimeaux_device/api/xsd"]
+
+[tool.ruff.lint]
+# Ruff is actively developed, so select all rules so that when ruff is updated,
+# any news rules are automatically included and can be selectively excluded in
+# the ignore list
+select = ["ALL"]
+ignore = [
+  # recommended rules to disable when using ruff formatter
+  # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+  "W191",
+  "E111",
+  "E114",
+  "E117",
+  "D206",
+  "D300",
+  "Q000",
+  "Q001",
+  "Q002",
+  "Q003",
+  "COM812",
+  "COM819",
+  "ISC001",
+  "ISC002",
+  'E501',
+  # other exclusions below here
+  "D203",    # incompatible with D211
+  "D213",    # incompatible with D212
+  #
+  # TODO: remove these below and update code to follow rules or selectively
+  #       ignore these rules (these are added here temporarily to get ruff
+  #       passing during incorporation of ruff)
+  # NOTE: some of these have unsafe autofixes available, which are often
+  #       safe in practice, so consider them first
+  #
+  'A002',
+  'ANN001',
+  'ANN002',
+  'ANN003',
+  'ANN201',
+  'ANN202',
+  'ANN204',
+  'ANN206',
+  'ANN401',
+  'ARG002',
+  'ARG003',
+  'B018',
+  'BLE001',
+  'C401',
+  'C402',
+  'C405',
+  'C406',
+  'C408',
+  'D417',
+  'DTZ005',
+  'DTZ006',
+  'DTZ901',
+  'EM101',
+  'EM102',
+  'ERA001',
+  'F841',
+  'FA100',
+  'FBT001',
+  'FBT002',
+  'FBT003',
+  'FIX002',
+  'FLY002',
+  'N801',
+  'N802',
+  'N806',
+  'N815',
+  'N818',
+  'PERF203',
+  'PERF401',
+  'PGH003',
+  'PGH004',
+  'PLC0415',
+  'PLR0911',
+  'PLR0912',
+  'PLR0913',
+  'PLR0915',
+  'PLR2004',
+  'PLW1641',
+  'PLW2901',
+  'PT006',
+  'PT011',
+  'PT012',
+  'PT018',
+  'PTH118',
+  'PTH119',
+  'PTH123',
+  'PYI021',
+  'RET503',
+  'RET504',
+  'RUF005',
+  'RUF012',
+  'RUF015',
+  'RUF018',
+  'RUF046',
+  'RUF059',
+  'S101',
+  'S110',
+  'S113',
+  'S603',
+  'S607',
+  'S608',
+  'SIM105',
+  'SIM108',
+  'SIM117',
+  'SIM118',
+  'SLF001',
+  'T201',
+  'T203',
+  'TC002',
+  'TC003',
+  'TD002',
+  'TD003',
+  'TID252',
+  'TRY003',
+  'TRY300',
+  'TRY400',
+  'TRY401',
+  'UP006',
+  'UP031',
+  'UP035',
+]
+unfixable = [
+  "ERA001",  # do not automatically remove commented out code
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"scripts/*.py" = ["T201"]
+"tests/*" = [
+  # entire rule set ignores
+  "ANN",      # do not require type hints
+  "ARG",      # some args are intentionally not used
+  # individual ignores
+  "D102",     # do not require doc strings
+  "D103",     # do not require doc strings
+  "D107",     # do not require doc strings
+  "S101",     # allow assert
+  "SLF001",   # allow private access
+  "N802",     # all uppercase names are intentional for some test functions
+  "PLR2004",  # HTTP responses are hard coded in tests
+]
+
+# [tool.ruff.lint.isort]
+# if isort rules are used, beware to read this first:
+# https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+
+[tool.ruff.lint.mccabe]
+max-complexity = 20
+
+[tool.ruff.format]
+quote-style = "double"
+docstring-code-format = true
+
+[tool.pytest]
+[tool.pytest.ini_options]
+minversion = "6.2"
+cache_dir = ".cache/pytest"
+
 [tool.coverage]
-  [tool.coverage.run]
-  branch = true
-  data_file = ".cache/coverage"
-  omit = [
-    ".venv/*",
-    "*/tests/*",
-    "*/xsd/device.py",
-    "*/xsd/service.py",
-  ]
-  [tool.coverage.lcov]
-  output = ".cache/coverage.lcov"
+[tool.coverage.run]
+branch = true
+data_file = ".cache/coverage"
+omit = [
+  ".venv/*",
+  "*/tests/*",
+  "*/xsd/device.py",
+  "*/xsd/service.py",
+]
+[tool.coverage.lcov]
+output = ".cache/coverage.lcov"
+
+[tool.mypy]
+cache_dir = ".cache/mypy/"
+strict = true
+warn_incomplete_stub = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = ["vcr"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+  "pywemo.ouimeaux_device.api.db_orm",
+  "pywemo.ouimeaux_device.api.rules_db",
+  "pywemo.ouimeaux_device.api.xsd.*",
+  "tests.*",
+]
+ignore_errors = true
 
 [tool.deptry]
 extend_exclude = ["scripts", ".poetry"]
@@ -83,77 +264,23 @@ DEP001 = [
   "generatedssupersuper"
 ]
 
-[tool.pytest]
-  [tool.pytest.ini_options]
-  minversion = "6.2"
-  cache_dir = ".cache/pytest"
-
-[tool.black]
-line-length = 79
-include = '\.pyi?$'
-force-exclude = '''
-(
-  /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | \.venv*
-    | \venv*
-    | _build
-    | buck-out
-    | build
-    | dist
-  )/
-)
-'''
-
-[tool.isort]
-profile = "black"
-line_length = 79
-src_paths = ["pywemo", "tests"]
-skip_glob = "*/xsd/*"
-
-[tool.mypy]
-cache_dir = ".cache/mypy/"
-strict = true
-warn_incomplete_stub = true
-warn_unreachable = true
-
-[[tool.mypy.overrides]]
-module = [
-  "vcr",
-  "lxml",  # TODO: use either lxml-stubs or types-lxml (maybe more complete?)
-]
-ignore_missing_imports = true
-
-[[tool.mypy.overrides]]
-module = [
-  "pywemo.ouimeaux_device.api.db_orm",
-  "pywemo.ouimeaux_device.api.rules_db",
-  "pywemo.ouimeaux_device.api.xsd.*",
-  "tests.*",
-]
-ignore_errors = true
-
 [tool.pylint]
-  [tool.pylint.master]
-  jobs = 0
-  max-line-length = 79
-  ignore-paths = "^tests/"
-  extension-pkg-whitelist = "lxml"
-  max-parents = 15
+[tool.pylint.master]
+jobs = 0
+max-line-length = 79
+ignore-paths = "^tests/"
+extension-pkg-whitelist = "lxml"
+max-parents = 15
 
-  [tool.pylint.typecheck]
-  generated-members = [
-    # can switch to qualified names instead when this is merged:
-    # https://github.com/PyCQA/pylint/pull/3634
-    "self.deviceevent",
-    "self.basicevent",
-    "self.bridge",
-    "self.insight",
-  ]
+[tool.pylint.typecheck]
+generated-members = [
+  # can switch to qualified names instead when this is merged:
+  # https://github.com/PyCQA/pylint/pull/3634
+  "self.deviceevent",
+  "self.basicevent",
+  "self.bridge",
+  "self.insight",
+]
 
-  [tool.pylint.reports]
-  reports = "no"
+[tool.pylint.reports]
+reports = "no"

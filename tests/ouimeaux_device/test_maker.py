@@ -8,12 +8,12 @@ from pywemo import Maker
 class Test_Maker:
     """Tests that run the Maker."""
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_on(self, maker):
         maker.on()
         assert maker.get_state(force_update=True) == 1
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_off(self, maker):
         maker.off()
         assert maker.get_state(force_update=True) == 0

@@ -29,20 +29,20 @@ def group(bridge):
     return group
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_light_turn_on(light):
     light.turn_on(level=120)
     assert light.get_state(force_update=True)["onoff"] == 1
     assert light.get_state()["level"] == 120
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_light_turn_off(light):
     light.turn_off()
     assert light.get_state(force_update=True)["onoff"] == 0
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_light_color_fade(light):
     light.set_color((0.701, 0.299), 5, False)
 
@@ -50,38 +50,38 @@ def test_light_color_fade(light):
     assert color_xy == pytest.approx((0.701, 0.299), rel=1e-3)
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_light_color_temperature(light):
     light.set_temperature(kelvin=5000)
     assert light.get_state(force_update=True)["temperature_kelvin"] == 5000
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_light_start_ramp(light):
     light.start_ramp("1", 100)
     light.get_state(force_update=True)
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_group_turn_on(group):
     group.turn_on()
     assert group.get_state(force_update=True)["onoff"] == 1
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_group_turn_off(group):
     group.turn_off()
     assert group.get_state(force_update=True)["onoff"] == 0
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_group_toggle(group):
     orig_onoff = group.get_state()["onoff"]
     group.toggle()
     assert group.get_state(force_update=True)["onoff"] != orig_onoff
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_bridge_getdevicestatus(bridge):
     status = bridge.bridge_getdevicestatus(LIGHT_ID)
     expected = b"".join(
@@ -102,7 +102,7 @@ def test_bridge_getdevicestatus(bridge):
     assert et.tostring(status) == expected
 
 
-@pytest.mark.vcr()
+@pytest.mark.vcr
 def test_bridge_unavailable_light(bridge, light):
     assert light.get_state()["available"] is True
     bridge.bridge_update(force_update=True)

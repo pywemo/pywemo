@@ -1,3 +1,4 @@
+fail_fast: true
 repos:
   - repo: local
     hooks:
@@ -32,27 +33,19 @@ repos:
         types: [file]
         files: ^(pyproject.toml|poetry.lock|scripts/generate_ds.py|pywemo/ouimeaux_device/api/xsd/.*)$
 
-      - id: isort
-        name: isort
+      - id: ruff-check
+        name: ruff-check
         language: system
-        entry: isort
-        args: ['--filter-files']
-        require_serial: true
-        types_or: [cython, pyi, python]
-
-      - id: black
-        name: black
-        language: system
-        entry: black
+        entry: ruff check --force-exclude --fix
         require_serial: true
         types_or: [python, pyi]
 
-      - id: flake8
-        name: flake8
+      - id: ruff-format
+        name: ruff-format
         language: system
-        entry: flake8
+        entry: ruff format --force-exclude
         require_serial: true
-        types: [python]
+        types_or: [python, pyi]
 
       - id: pylint
         name: pylint

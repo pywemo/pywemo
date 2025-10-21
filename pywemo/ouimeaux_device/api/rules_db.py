@@ -8,8 +8,9 @@ import os
 import sqlite3
 import tempfile
 import zipfile
+from collections.abc import Mapping
 from types import MappingProxyType
-from typing import FrozenSet, List, Mapping, Optional, Tuple
+from typing import FrozenSet, List, Optional, Tuple
 
 from pywemo.exceptions import HTTPNotOkException, RulesDbQueryError
 

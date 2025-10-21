@@ -152,8 +152,7 @@ def scan(  # pylint: disable=too-many-branches,too-many-locals
     max_entries: int | None = None,
     match_udn: str | None = None,
 ) -> list[UPNPEntry]:
-    """
-    Send a message over the network to discover upnp devices.
+    """Send a message over the network to discover upnp devices.
 
     Inspired by Crimsdings ChromeCast code
     https://github.com/crimsdings/  [ChromeCast repository since removed]
@@ -205,9 +204,7 @@ def scan(  # pylint: disable=too-many-branches,too-many-locals
 
                 # Search for devices
                 if entry not in entries:
-                    if match_udn is None:
-                        entries.append(entry)
-                    elif match_udn == entry.udn:
+                    if match_udn is None or match_udn == entry.udn:
                         entries.append(entry)
 
                     # Return if we've found the max number of devices
@@ -245,6 +242,7 @@ class DiscoveryResponder:
 
         Args:
             callback_port: The port for the SubscriptionRegistry HTTP server.
+
         """
         self.callback_port = callback_port
         self._thread: threading.Thread | None = None

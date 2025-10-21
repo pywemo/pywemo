@@ -17,21 +17,21 @@ class Test_Insight:
         with vcr.use_cassette("WeMo_WW_2.00.11408.PVT-OWRT-Insight.yaml"):
             return Insight("http://192.168.1.100:49153/setup.xml")
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_on(self, insight):
         """Turn on the insight switch."""
         insight.on()
         assert insight.get_state() == 8
         assert insight.standby_state == StandbyState.STANDBY
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_off(self, insight):
         """Turn off the insight switch."""
         insight.off()
         assert insight.get_state() == 0
         assert insight.standby_state == StandbyState.OFF
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_insight_params(self, insight):
         insight.update_insight_params()
         assert insight.today_kwh == pytest.approx(0.0194118)
@@ -52,7 +52,7 @@ class Test_Insight:
         assert insight.today_on_time == 300
         assert insight.standby_state == StandbyState.OFF
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_subscribe(self, insight, subscription_registry):
         subscription_registry.register(insight)
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import unittest.mock as mock
+from unittest import mock
 
 import pytest
 import urllib3
@@ -27,9 +27,9 @@ original_fromstring = et.fromstring
 MOCK_RESPONSE = (
     b'<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"'
     b' s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">'
-    b'<s:Body>\n<u:GetInsightParamsResponse xmlns:u="urn:Belkin:service:metainfo:1">'  # noqa: E501
-    b"\r\n<InsightParams>0|1604849509|85|1315|27628|1209600|772|0|21689183|386799026.000000|8000"  # noqa: E501
-    b"</InsightParams>\r\n</u:GetInsightParamsResponse>\r\n</s:Body> </s:Envelope>"  # noqa: E501
+    b'<s:Body>\n<u:GetInsightParamsResponse xmlns:u="urn:Belkin:service:metainfo:1">'
+    b"\r\n<InsightParams>0|1604849509|85|1315|27628|1209600|772|0|21689183|386799026.000000|8000"
+    b"</InsightParams>\r\n</u:GetInsightParamsResponse>\r\n</s:Body> </s:Envelope>"
 )
 
 
@@ -300,10 +300,13 @@ class TestService:
         device = mock.create_autospec(WeMoDevice)
         device.session = mock.create_autospec(svc.Session)
 
-        with mock.patch(
-            "pywemo.ouimeaux_device.api.service.ServiceDescription.from_xml",
-            side_effect=InvalidSchemaError,
-        ), pytest.raises(InvalidSchemaError):
+        with (
+            mock.patch(
+                "pywemo.ouimeaux_device.api.service.ServiceDescription.from_xml",
+                side_effect=InvalidSchemaError,
+            ),
+            pytest.raises(InvalidSchemaError),
+        ):
             svc.Service(device, self._service_type)
 
 
