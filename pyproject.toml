@@ -44,7 +44,7 @@ generateDS = "2.44.3"
 deptry = ">=0.11,<0.24"
 pre-commit = ">=2.10,<5.0"
 # docs
-pdoc = ">=13.1.1,<15.0.0"
+pdoc = ">=13.1.1,<16.0.0"
 
 [tool.poetry.group.bootstrap.dependencies]
 poetry = ">=1.2.0"
