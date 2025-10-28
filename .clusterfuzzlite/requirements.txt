@@ -22,9 +22,9 @@ macholib==1.16.2 ; python_full_version >= "3.8.1" and python_version < "3.12" an
 pefile==2023.2.7 ; python_full_version >= "3.8.1" and python_version < "3.12" and sys_platform == "win32" \
     --hash=sha256:82e6114004b3d6911c77c3953e3838654b04511b8b66e8583db70c65998017dc \
     --hash=sha256:da185cd2af68c08a6cd4481f7325ed600a88f6a813bad9dea07ab3ef73d8d8d6
-pip==25.2 ; python_full_version >= "3.8.1" and python_version < "3.12" \
-    --hash=sha256:578283f006390f85bb6282dffb876454593d637f5d1be494b5202ce4877e71f2 \
-    --hash=sha256:6d67a2b4e7f14d8b31b8b52648866fa717f45a1eb70e83002f4331d07e953717
+pip==25.3 ; python_full_version >= "3.8.1" and python_version < "3.12" \
+    --hash=sha256:8d0538dbbd7babbd207f261ed969c65de439f6bc9e5dbd3b3b9a77f25d95f343 \
+    --hash=sha256:9655943313a94722b7774661c21049070f6bbb0a1516bf02f7c8d5d9201514cd
 pyinstaller-hooks-contrib==2023.3 ; python_full_version >= "3.8.1" and python_version < "3.12" \
     --hash=sha256:062ad7a1746e1cfc24d3a8c4be4e606fced3b123bda7d419f14fcf7507804b07 \
     --hash=sha256:bb39e1038e3e0972420455e0b39cd9dce73f3d80acaf4bf2b3615fea766ff370
