@@ -12,12 +12,15 @@ Usage:
   scripts/generate_wemo_services.py > \
       pywemo/ouimeaux_device/api/wemo_services.pyi
 """
+
 from __future__ import annotations
 
 import collections
-from typing import Iterable, cast
+from collections.abc import Iterable
+from typing import cast
 
 import vcr
+
 from pywemo.ouimeaux_device.api.xsd_types import (
     DeviceDescription,
     ServiceDescription,
@@ -71,7 +74,7 @@ def get_response_for_url_endswith(
         if request.url.endswith(ending)
     ][0]
     response = cassette.responses_of(request)[0]
-    return cast(bytes, response["body"]["string"])
+    return cast("bytes", response["body"]["string"])
 
 
 def update_services_from_cassette(cassette_file_name: str) -> None:
@@ -101,7 +104,7 @@ def output_service_as_class(service_name: str, actions: Iterable[str]) -> None:
     print(f"class {class_name(service_name)}:")
     for action in sorted(actions):
         print(f"    {action}: UPnPMethod")
-    print("")
+    print()
 
 
 def generate() -> None:
@@ -129,7 +132,7 @@ def generate() -> None:
     print("class WeMoServiceTypesMixin:")
     for service_name in sorted_services:
         print(f"    {service_name}: {class_name(service_name)}")
-    print("")
+    print()
 
     # When instantiating a Service class, each of the services actions are
     # added as fields on the instance. WeMoAllActionsMixin is intended to be a

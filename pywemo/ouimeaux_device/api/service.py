@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Iterable
+from typing import TYPE_CHECKING, Any
 from urllib.parse import urljoin, urlparse
 
 import urllib3
@@ -38,7 +39,7 @@ REQUEST_TEMPLATE = """
 </u:{action}>
 </s:Body>
 </s:Envelope>
-"""  # noqa: E501
+"""
 
 
 class Session:
@@ -112,6 +113,7 @@ class Session:
         Raises:
             HTTPNotOkException: when the response code is not 200.
             HTTPException: for any urllib3 exception.
+
         """
         if retries is None:
             retries = self.retries
@@ -279,7 +281,7 @@ class Action:
 class Service(WeMoAllActionsMixin):
     """Representation of a service for a WeMo device."""
 
-    def __init__(self, device: "Device", service: ServiceProperties) -> None:
+    def __init__(self, device: Device, service: ServiceProperties) -> None:
         """Create an instance of a Service."""
         self.device = device
         self._config = service

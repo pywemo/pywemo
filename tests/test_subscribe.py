@@ -2,8 +2,8 @@
 
 import threading
 import time
-import unittest.mock as mock
 from http.server import HTTPServer
+from unittest import mock
 
 import pytest
 import requests
@@ -157,7 +157,7 @@ class Test_RequestHandler:
 <BinaryState>0</BinaryState>
 </u:SetBinaryState>
 </s:Body>
-</s:Envelope>""",  # noqa: E501
+</s:Envelope>""",
         )
         assert response.status_code == 200
         assert response.content == subscribe.SOAP_ACTION_RESPONSE[
@@ -349,7 +349,7 @@ class Test_Subscription:
         with pytest.raises(requests.ReadTimeout):
             subscription.maintain()
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_maintain_bad_status_code(self, subscription):
         with pytest.raises(requests.HTTPError):
             subscription.maintain()
@@ -400,7 +400,7 @@ class Test_SubscriptionRegistry:
         subscription_registry._sched.enter(0, 100, ready.set)
         ready.wait()
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_register_unregister(self, device, subscription_registry):
         """Test that the device can be registered and unregistered."""
         subscription_registry.register(device)

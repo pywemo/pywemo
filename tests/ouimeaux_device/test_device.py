@@ -4,8 +4,8 @@ import base64
 import itertools
 import logging
 import shutil
-import unittest.mock as mock
 from subprocess import CalledProcessError
+from unittest import mock
 
 import pytest
 import requests
@@ -185,7 +185,7 @@ def mocked_requests_get(*args, url=None, **kwargs):
 
     if url == "http://192.168.1.100:49158/setup.xml":
         return MockUrllib3Response(RESPONSE_SETUP.encode("utf-8"), 200)
-    elif url.endswith(".xml"):
+    if url.endswith(".xml"):
         return MockUrllib3Response(EMPTY_SERVICE.encode(), 200)
     return MockUrllib3Response(None, 404)
 
@@ -208,8 +208,9 @@ def device(mock_get):
 @pytest.fixture(autouse=True)
 def lightspeed():
     """Skip sleeps in the code and auto-increment time.time calls."""
-    with mock.patch("time.sleep", return_value=None), mock.patch(
-        "time.time", side_effect=itertools.count(0, 20)
+    with (
+        mock.patch("time.sleep", return_value=None),
+        mock.patch("time.time", side_effect=itertools.count(0, 20)),
     ):
         yield
 
@@ -532,7 +533,7 @@ class TestDevice:
         def get_urllib3_resp(url, *args, **kwargs):
             if url == f"http://{device.host}:{new_port}/setup.xml":
                 return MockUrllib3Response(RESPONSE_SETUP.encode("utf-8"), 200)
-            elif url.endswith(".xml"):
+            if url.endswith(".xml"):
                 return MockUrllib3Response(EMPTY_SERVICE.encode(), 200)
             return MockUrllib3Response(None, 404)
 
@@ -560,7 +561,7 @@ class TestDevice:
         def get_urllib3_resp(url, *args, **kwargs):
             if url == f"http://{device.host}:{device.port}/setup.xml":
                 return MockUrllib3Response(new_response.encode("utf-8"), 200)
-            elif url.endswith(".xml"):
+            if url.endswith(".xml"):
                 return MockUrllib3Response(EMPTY_SERVICE.encode(), 200)
             return MockUrllib3Response(None, 404)
 
@@ -573,12 +574,13 @@ class TestDevice:
 
         requests_get.side_effect = get_resp
 
-        with mock.patch.object(
-            device, "_reconnect_with_device_by_discovery"
-        ), mock.patch(
-            "pywemo.ouimeaux_device.api.service.Session.url",
-            new_callable=mock.PropertyMock,
-        ) as url_mock:
+        with (
+            mock.patch.object(device, "_reconnect_with_device_by_discovery"),
+            mock.patch(
+                "pywemo.ouimeaux_device.api.service.Session.url",
+                new_callable=mock.PropertyMock,
+            ) as url_mock,
+        ):
             device.reconnect_with_device()
             url_mock.assert_not_called()
 

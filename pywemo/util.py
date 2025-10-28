@@ -11,8 +11,7 @@ import ifaddr
 
 
 def interface_addresses() -> list[str]:
-    """
-    Return local address for broadcast/multicast.
+    """Return local address for broadcast/multicast.
 
     Return local address of any network associated with a local interface
     that has broadcast (and probably multicast) capability.

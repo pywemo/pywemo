@@ -10,12 +10,12 @@ from .api.unit import long_press_helpers
 class Base:
     """Tests that run for each LightSwitch model."""
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_on(self, lightswitch):
         lightswitch.on()
         assert lightswitch.get_state(force_update=True) == 1
 
-    @pytest.mark.vcr()
+    @pytest.mark.vcr
     def test_turn_off(self, lightswitch):
         lightswitch.off()
         assert lightswitch.get_state(force_update=True) == 0

@@ -7,6 +7,7 @@ mainly to document the local changes made after running generateDS. Putting
 the local changes in this script makes the builds repeatable and hopefully
 allows for easier upgrading to future versions of generateDS.
 """
+
 from __future__ import annotations
 
 import concurrent.futures
@@ -25,7 +26,7 @@ def generate_module(xsd_path: str) -> None:
     module = remove_python_version(module)
     module = remove_six_import(module)
     module = disable_code_analyzers(module)
-    module = format_with_black(module)
+    module = format_with_ruff(module)
 
     # Read the existing module
     existing_path = xsd_path.replace(".xsd", ".py")
@@ -56,7 +57,7 @@ def run_generate_ds(xsd_path: str) -> str:
             ],
             check=True,
         )
-        with open(py_path, "r", encoding="utf-8") as py_file:
+        with open(py_path, encoding="utf-8") as py_file:
             output = py_file.read()
     # Remove paths related to running generateDS.py.
     output = output.replace(os.path.join(scripts_dir, ""), "")
@@ -99,8 +100,6 @@ def disable_code_analyzers(module: str) -> str:
     generated file to disable code analyzers.
     """
     disabling_lines = [
-        "# flake8: noqa",
-        "# isort: skip_file",
         "# mypy: ignore-errors",
         "# pylint: skip-file",
     ]
@@ -112,14 +111,14 @@ def disable_code_analyzers(module: str) -> str:
     )
 
 
-def format_with_black(module: str) -> str:
-    """Format the module using black.
+def format_with_ruff(module: str) -> str:
+    """Format the module using ruff.
 
     This is done as a way to avoid small changes due to whitespace or
     formatting between versions of generateDS.
     """
     process = subprocess.run(
-        ["black", "-"],
+        ["ruff", "format", "-"],
         check=True,
         stdout=subprocess.PIPE,
         text=True,
