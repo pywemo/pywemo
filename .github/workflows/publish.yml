@@ -58,7 +58,7 @@ jobs:
           sha256sum * | tee "pywemo-${PYWEMO_VERSION}.sha256sum.txt"
           echo "hashes=$(sha256sum * | base64 -w0)" | tee -a "$GITHUB_OUTPUT"
       - name: Archive hashes
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           if-no-files-found: error
           name: hashes
@@ -147,7 +147,7 @@ jobs:
             }
             await fsp.writeFile(
               '${{github.workspace}}/release/release-notes.md', body);
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           if-no-files-found: error
           name: release
