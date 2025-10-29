@@ -10,14 +10,13 @@ from unittest import mock
 from tests import atheris_stub as atheris
 
 with atheris.instrument_imports():
-    from lxml import etree
-
     import pywemo
 
 import pytest
 import requests
 from hypothesis import example, given
 from hypothesis import strategies as st
+from lxml import etree
 
 from tests.ouimeaux_device.test_device import mocked_requests_get
 
