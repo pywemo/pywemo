@@ -3,23 +3,21 @@
 cd "$SRC/pywemo"
 source "./scripts/common.sh"
 enterVenv
-# Upgrade pip first.
-pip install \
-  --require-hashes \
-  --no-deps \
-  --only-binary :all: \
-  -c .clusterfuzzlite/requirements.txt \
-  pip
-# Install fuzzer dependencies.
+
+# upgrade pip
+pip install --upgrade pip
+
+# install fuzzer dependencies
 pip install \
   --require-hashes \
   --no-deps \
   --only-binary :all: \
   -r ./.clusterfuzzlite/requirements.txt
-# Install pyWeMo dependencies.
+
+# install pyWeMo dependencies
 poetryInstall
 
-# Use pyinstaller to build fuzzers.
+# use pyinstaller to build fuzzers
 for fuzzer in $(find . -name '*_fuzz.py'); do
   fuzzer_basename=$(basename -s .py $fuzzer)
   fuzzer_package=${fuzzer_basename}.pkg
