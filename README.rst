@@ -109,7 +109,7 @@ If you have issues connecting, here are several things worth trying:
 - Bring the WeMo as close to the access point as possible.  Some devices seem to require a very strong signal for setup, even if they will work normally with a weaker one.
 - WeMo devices can only connect to 2.4GHz wifi connections and some devices have an issue connecting if the 2.4Ghz and 5Ghz SSID are the same.
 - If issues persist, consider performing a full factory reset and power cycle on the device before trying again.
-- Consider of enabled firewall rules may block the WeMo from connecting to the intended AP.
+- Consider that enabled firewall rules may block the WeMo from connecting to the intended AP.
 
 Firmware Warning
 ----------------
@@ -136,38 +136,38 @@ Product Status
 --------------
 This is a list of known products and the pyWeMo status of each, for both setup and regular use.
 This list was only recently started, in November of 2025 in response to Belkin ending WeMo support.
-Any entry with ? is unreported since this table was added.
+Any entry with N/A is unreported since this table was added.
 If you have any of these decvices and use them with PyWeMo, please let us know so that we can complete this list.
 
 =========  =======================================  ===========================  ===================  ========================================
 SKU's      Description                              PyWeMo Object                PyWeMo Setup Status  Known Working Firmware(s)
 =========  =======================================  ===========================  ===================  ========================================
-F7C031     Wemo Link                                pywemo.Bridge                ?                    ?
-F7C046     Wemo Humidifier                          pywemo.Humidifier            ?                    ?
-F7C045     Wemo CrockPot                            pywemo.CrockPot              ?                    ?
-F7C048     Wemo Heater B                            ?                            ?                    ?
-F7C049     Wemo Air Purifier                        ?                            ?                    ?
-F7C047     Wemo Heater A                            ?                            ?                    ?
-F7C050     Wemo Coffee Maker (Mr. Coffee)           pywemo.CoffeeMaker           ?                    ?
-F8J007     Wi-Fi Baby Monitor                       ?                            ?                    ?
-F5Z0489    Wemo LED Lighting Bundle                 ?                            ?                    ?
-F7C028     Wemo Motion Sensor                       pywemo.Motion                ?                    ?
-F5Z0340    Wemo Switch + Motion Sensor              ?                            ?                    ?
+F7C031     Wemo Link                                pywemo.Bridge                N/A                  N/A
+F7C046     Wemo Humidifier                          pywemo.Humidifier            N/A                  N/A
+F7C045     Wemo CrockPot                            pywemo.CrockPot              N/A                  N/A
+F7C048     Wemo Heater B                            N/A                          N/A                  N/A
+F7C049     Wemo Air Purifier                        N/A                          N/A                  N/A
+F7C047     Wemo Heater A                            N/A                          N/A                  N/A
+F7C050     Wemo Coffee Maker (Mr. Coffee)           pywemo.CoffeeMaker           N/A                  N/A
+F8J007     Wi-Fi Baby Monitor                       N/A                          N/A                  N/A
+F5Z0489    Wemo LED Lighting Bundle                 N/A                          N/A                  N/A
+F7C028     Wemo Motion Sensor                       pywemo.Motion                N/A                  N/A
+F5Z0340    Wemo Switch + Motion Sensor              N/A                          N/A                  N/A
 F7C043     Wemo Maker Module                        pywemo.Maker                 Works                WeMo_WW_2.00.11423.PVT-OWRT-Maker
-F7C033     Wemo Zigbee Bulb, E27                    ?                            ?                    ?
-F7C061     Wemo Insight v2                          ?                            ?                    ?
-F7C027     Wemo Switch                              pywemo.Switch                ?                    ?
-F7C062     Wemo Light Switch v2                     ?                            ?                    ?
+F7C033     Wemo Zigbee Bulb, E27                    N/A                          N/A                  N/A
+F7C061     Wemo Insight v2                          N/A                          N/A                  N/A
+F7C027     Wemo Switch                              pywemo.Switch                N/A                  N/A
+F7C062     Wemo Light Switch v2                     N/A                          N/A                  N/A
 F7C029     Wemo Insight                             pywemo.Insight               Works                WeMo_WW_2.00.11483.PVT-OWRT-Insight
 F7C029V2*  Wemo Insight V2                          pywemo.Insight               Works                WeMo_WW_2.00.10062.PVT-OWRT-InsightV2
-WLS0403    Wemo Smart Light Switch 3-Way            pywemo.LightSwitchLongPress  ?                    ?
-WSP070     Wemo Mini Smart Plug                     ?                            ?                    ?
-WDS060     Wemo Wi-Fi Smart Light Switch w/ Dimmer  pywemo.DimmerV2              ?                    WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2
-WLS040     Wemo Smart Light Switch                  pywemo.LightSwitchLongPress  ?                    ?
-F7C064     Wemo HomeKit                             ?                            ?                    ?
+WLS0403    Wemo Smart Light Switch 3-Way            pywemo.LightSwitchLongPress  N/A                  N/A
+WSP070     Wemo Mini Smart Plug                     N/A                          N/A                  N/A
+WDS060     Wemo Wi-Fi Smart Light Switch w/ Dimmer  pywemo.DimmerV2              N/A                  WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2
+WLS040     Wemo Smart Light Switch                  pywemo.LightSwitchLongPress  N/A                  N/A
+F7C064     Wemo HomeKit                             N/A                          N/A                  N/A
 F7C059     Wemo Dimmer Light Switch                 pywemo.DimmerLongPress       Works                WeMo_WW_2.00.11453.PVT-OWRT-Dimmer
 F7C063     Wemo Mini Plugin Switch                  pywemo.Switch                Works                WeMo_WW_2.00.11452.PVT-OWRT-SNSV2
-F7C030     Wemo Light Switch                        pywemo.LightSwitchLongPress  ?                    ?
+F7C030     Wemo Light Switch                        pywemo.LightSwitchLongPress  N/A                  N/A
 WSP090     Wemo Outdoor Plug                        pywemo.OutdoorPlug           Works                WEMO_WW_1.00.20081401.PVT-RTOS-OutdoorV1
 WSP080     Wemo Mini Smart Plug                     pywemo.Switch                Works                WEMO_WW_4.00.20101902.PVT-RTOS-SNSV4
 =========  =======================================  ===========================  ===================  ========================================
