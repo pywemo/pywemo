@@ -9,9 +9,8 @@ pip install --upgrade pip
 
 # install fuzzer dependencies
 pip install \
-  --require-hashes \
-  --no-deps \
   --only-binary :all:
+  pyinstaller atheris
 
 # install pyWeMo dependencies
 poetryInstall
