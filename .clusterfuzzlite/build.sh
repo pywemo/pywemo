@@ -11,8 +11,7 @@ pip install --upgrade pip
 pip install \
   --require-hashes \
   --no-deps \
-  --only-binary :all: \
-  -r ./.clusterfuzzlite/requirements.txt
+  --only-binary :all:
 
 # install pyWeMo dependencies
 poetryInstall
