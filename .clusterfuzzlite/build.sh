@@ -8,7 +8,7 @@ enterVenv
 pip install --upgrade pip
 
 # install fuzzer dependencies
-pip install pyinstaller atheris
+pip install pyinstaller==6.16.0 atheris==2.3.0
 
 # install pyWeMo dependencies
 poetryInstall
