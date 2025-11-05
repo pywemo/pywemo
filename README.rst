@@ -145,38 +145,38 @@ If you have any of these decvices and use them with PyWeMo, please let us know i
 This list is mostly from the Belkin article mentioned above, but it may not be a complete list of all products.
 SKU's with an asterisk at the end, like F7C029V2*, are not listed in the article.
 
-=========  =======================================  ===========================  ===================  ========================================
-SKU's      Description                              PyWeMo Object                PyWeMo Setup Status  Known Working Firmware(s)
-=========  =======================================  ===========================  ===================  ========================================
-F7C031     Wemo Link                                pywemo.Bridge                N/A                  N/A
-F7C046     Wemo Humidifier                          pywemo.Humidifier            N/A                  N/A
-F7C045     Wemo CrockPot                            pywemo.CrockPot              N/A                  N/A
-F7C048     Wemo Heater B                            N/A                          N/A                  N/A
-F7C049     Wemo Air Purifier                        N/A                          N/A                  N/A
-F7C047     Wemo Heater A                            N/A                          N/A                  N/A
-F7C050     Wemo Coffee Maker (Mr. Coffee)           pywemo.CoffeeMaker           N/A                  N/A
-F8J007     Wi-Fi Baby Monitor                       N/A                          N/A                  N/A
-F5Z0489    Wemo LED Lighting Bundle                 N/A                          N/A                  N/A
-F7C028     Wemo Motion Sensor                       pywemo.Motion                N/A                  N/A
-F5Z0340    Wemo Switch + Motion Sensor              N/A                          N/A                  N/A
-F7C043     Wemo Maker Module                        pywemo.Maker                 Works                WeMo_WW_2.00.11423.PVT-OWRT-Maker
-F7C033     Wemo Zigbee Bulb, E27                    N/A                          N/A                  N/A
-F7C061     Wemo Insight v2                          N/A                          N/A                  N/A
-F7C027     Wemo Switch                              pywemo.Switch                N/A                  N/A
-F7C062     Wemo Light Switch v2                     N/A                          N/A                  N/A
-F7C029     Wemo Insight                             pywemo.Insight               Works                WeMo_WW_2.00.11483.PVT-OWRT-Insight
-F7C029V2*  Wemo Insight V2                          pywemo.Insight               Works                WeMo_WW_2.00.10062.PVT-OWRT-InsightV2
-WLS0403    Wemo Smart Light Switch 3-Way            pywemo.LightSwitchLongPress  N/A                  N/A
-WSP070     Wemo Mini Smart Plug                     N/A                          N/A                  N/A
-WDS060     Wemo Wi-Fi Smart Light Switch w/ Dimmer  pywemo.DimmerV2              N/A                  WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2
-WLS040     Wemo Smart Light Switch                  pywemo.LightSwitchLongPress  N/A                  N/A
-F7C064     Wemo HomeKit                             N/A                          N/A                  N/A
-F7C059     Wemo Dimmer Light Switch                 pywemo.DimmerLongPress       Works                WeMo_WW_2.00.11453.PVT-OWRT-Dimmer
-F7C063     Wemo Mini Plugin Switch                  pywemo.Switch                Works                WeMo_WW_2.00.11452.PVT-OWRT-SNSV2
-F7C030     Wemo Light Switch                        pywemo.LightSwitchLongPress  Works                WeMo_WW_2.00.11408.PVT-OWRT-LS
-WSP090     Wemo Outdoor Plug                        pywemo.OutdoorPlug           Works                WEMO_WW_1.00.20081401.PVT-RTOS-OutdoorV1
-WSP080     Wemo Mini Smart Plug                     pywemo.Switch                Works                WEMO_WW_4.00.20101902.PVT-RTOS-SNSV4
-=========  =======================================  ===========================  ===================  ========================================
+=========  =======================================  ====================  ===================  ========================================
+SKU's      Description                              PyWeMo Object         PyWeMo Setup Status  Known Working Firmware(s)
+=========  =======================================  ====================  ===================  ========================================
+F7C031     Wemo Link                                Bridge                N/A                  N/A
+F7C046     Wemo Humidifier                          Humidifier            N/A                  N/A
+F7C045     Wemo CrockPot                            CrockPot              N/A                  N/A
+F7C048     Wemo Heater B                            N/A                   N/A                  N/A
+F7C049     Wemo Air Purifier                        N/A                   N/A                  N/A
+F7C047     Wemo Heater A                            N/A                   N/A                  N/A
+F7C050     Wemo Coffee Maker (Mr. Coffee)           CoffeeMaker           N/A                  N/A
+F8J007     Wi-Fi Baby Monitor                       N/A                   N/A                  N/A
+F5Z0489    Wemo LED Lighting Bundle                 N/A                   N/A                  N/A
+F7C028     Wemo Motion Sensor                       Motion                N/A                  N/A
+F5Z0340    Wemo Switch + Motion Sensor              N/A                   N/A                  N/A
+F7C043     Wemo Maker Module                        Maker                 Works                WeMo_WW_2.00.11423.PVT-OWRT-Maker
+F7C033     Wemo Zigbee Bulb, E27                    N/A                   N/A                  N/A
+F7C061     Wemo Insight v2                          N/A                   N/A                  N/A
+F7C027     Wemo Switch                              Switch                N/A                  N/A
+F7C062     Wemo Light Switch v2                     N/A                   N/A                  N/A
+F7C029     Wemo Insight                             Insight               Works                WeMo_WW_2.00.11483.PVT-OWRT-Insight
+F7C029V2*  Wemo Insight V2                          Insight               Works                WeMo_WW_2.00.10062.PVT-OWRT-InsightV2
+WLS0403    Wemo Smart Light Switch 3-Way            LightSwitchLongPress  N/A                  N/A
+WSP070     Wemo Mini Smart Plug                     N/A                   N/A                  N/A
+WDS060     Wemo Wi-Fi Smart Light Switch w/ Dimmer  DimmerV2              N/A                  WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2
+WLS040     Wemo Smart Light Switch                  LightSwitchLongPress  N/A                  N/A
+F7C064     Wemo HomeKit                             N/A                   N/A                  N/A
+F7C059     Wemo Dimmer Light Switch                 DimmerLongPress       Works                WeMo_WW_2.00.11453.PVT-OWRT-Dimmer
+F7C063     Wemo Mini Plugin Switch                  Switch                Works                WeMo_WW_2.00.11452.PVT-OWRT-SNSV2
+F7C030     Wemo Light Switch                        LightSwitchLongPress  Works                WeMo_WW_2.00.11408.PVT-OWRT-LS
+WSP090     Wemo Outdoor Plug                        OutdoorPlug           Works                WEMO_WW_1.00.20081401.PVT-RTOS-OutdoorV1
+WSP080     Wemo Mini Smart Plug                     Switch                Works                WEMO_WW_4.00.20101902.PVT-RTOS-SNSV4
+=========  =======================================  ====================  ===================  ========================================
 
 Developing
 ----------
