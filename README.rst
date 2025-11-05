@@ -98,7 +98,7 @@ Once done, pass the desired SSID and password (WPA2/AES encryption only) to the 
 
 A few important notes:
 
-- Not all devices are currently supported for setup.
+- Not all devices are known to work with the pywemo setup method.
 - For a WeMo without internet access, see `this guide <https://github.com/pywemo/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 - If connecting to an open network, the password argument is ignored and you can provide anything, e.g. ``password=None``.
 - If connecting to a WPA2/AES/TKIPAES-encrypted network, OpenSSL is used to encrypt the password by the ``pywemo`` library.
@@ -110,6 +110,7 @@ If you have issues connecting, here are several things worth trying:
 - WeMo devices can only connect to 2.4GHz wifi connections and some devices have an issue connecting if the 2.4Ghz and 5Ghz SSID are the same.
 - If issues persist, consider performing a full factory reset and power cycle on the device before trying again.
 - Consider that enabled firewall rules may block the WeMo from connecting to the intended AP.
+- See `this pywemo issue <https://github.com/pywemo/pywemo/issues/773>`_ before opening a new issue if setup does not work for your device.
 
 Firmware Warning
 ----------------
@@ -122,22 +123,26 @@ Thus it would be prudent to upgrade firmware cautiously and preferably only afte
 
 Belkin Ends Support for WeMo
 ----------------------------
-Note that Belkin is officially ending WeMo support on January 31 2026.
+Note that Belkin is officially ending WeMo support on January 31, 2026.
 After this date, the Belkin app will no longer work, including the required cloud access to use the current products.
-Unfortunately, this also means that you cannot connect a device to your network with the Belkin app either.
-Some products can be setup and reset with PyWeMo, as discussed above.
+This also means that you cannot use the Belkin app to connect a device to your network after this date either.
+See `this link <https://www.belkin.com/support-article/?articleNum=335419>`_ for more details from Belkin.
 
-Note that this will **not** affect pyWeMo, which will continue to work as it currently does;
-PyWeMo does not rely on the cloud connection for anything, including setup (connecting the device to your wifi access point).
+The good news is that this change will **not** affect pywemo, which will continue to work as it currently does;
+pywemo does not rely on the cloud connection for anything, including setup.
+Many products can be setup and reset with pywemo, as discussed above.
 
-See `this link <https://www.belkin.com/support-article/?articleNum=335419>` for more details from Belkin and the pyWeMo status below.
+Please see `this pywemo issue <https://github.com/pywemo/pywemo/issues/773>`_ to document the status of the various products and to update the table below on product status.
 
 Product Status
 --------------
-This is a list of known products and the pyWeMo status of each, for both setup and regular use.
-This list was only recently started, in November of 2025 in response to Belkin ending WeMo support.
+This is a list of known products and the pywemo status of each, including for setup.
+This list was started in November of 2025 in response to Belkin ending WeMo support.
 Any entry with N/A is unreported since this table was added.
-If you have any of these decvices and use them with PyWeMo, please let us know so that we can complete this list.
+If you have any of these decvices and use them with PyWeMo, please let us know in `this pywemo issue <https://github.com/pywemo/pywemo/issues/773>`_ so that we can complete this list.
+
+This list is mostly from the Belkin article mentioned above, but it may not be a complete list of all products.
+SKU's with an asterisk at the end, like F7C029V2*, are not listed in the article.
 
 =========  =======================================  ===========================  ===================  ========================================
 SKU's      Description                              PyWeMo Object                PyWeMo Setup Status  Known Working Firmware(s)
@@ -167,15 +172,10 @@ WLS040     Wemo Smart Light Switch                  pywemo.LightSwitchLongPress 
 F7C064     Wemo HomeKit                             N/A                          N/A                  N/A
 F7C059     Wemo Dimmer Light Switch                 pywemo.DimmerLongPress       Works                WeMo_WW_2.00.11453.PVT-OWRT-Dimmer
 F7C063     Wemo Mini Plugin Switch                  pywemo.Switch                Works                WeMo_WW_2.00.11452.PVT-OWRT-SNSV2
-F7C030     Wemo Light Switch                        pywemo.LightSwitchLongPress  N/A                  N/A
+F7C030     Wemo Light Switch                        pywemo.LightSwitchLongPress  Works                WeMo_WW_2.00.11408.PVT-OWRT-LS
 WSP090     Wemo Outdoor Plug                        pywemo.OutdoorPlug           Works                WEMO_WW_1.00.20081401.PVT-RTOS-OutdoorV1
 WSP080     Wemo Mini Smart Plug                     pywemo.Switch                Works                WEMO_WW_4.00.20101902.PVT-RTOS-SNSV4
 =========  =======================================  ===========================  ===================  ========================================
-
-The list above is mostly from the Belkin article mentioned above, but it may not be complete.
-SKU's with an asterisk at the end, like F7C029V2*, are not directly listed in the article.
-
-At least one of the 3 SKU's for pywemo.LightSwitchLongPress does work, including setup, for firmware WeMo_WW_2.00.11408.PVT-OWRT-LS (but it is in the wall, so not sure which SKU it is).
 
 Developing
 ----------
