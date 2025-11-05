@@ -106,6 +106,7 @@ A few important notes:
 
 If you have issues connecting, here are several things worth trying:
 
+- Try again!  WeMo devices sometimes just fail to connect and repeating the exact same steps may subsequently work.
 - Bring the WeMo as close to the access point as possible.  Some devices seem to require a very strong signal for setup, even if they will work normally with a weaker one.
 - WeMo devices can only connect to 2.4GHz wifi connections and some devices have an issue connecting if the 2.4Ghz and 5Ghz SSID are the same.
 - If issues persist, consider performing a full factory reset and power cycle on the device before trying again.
