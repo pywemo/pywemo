@@ -297,13 +297,13 @@ class TestDevice:
     @pytest.mark.parametrize(
         "method, add_lengths, is_salted_prefix",
         [
-            # TODO: enable these
-            # --> (1, True, True),
-            # --> (1, True, False),
+            (1, True, True),
+            (1, True, False),
             (2, False, True),
             (2, False, False),
-            (3, True, True),
-            (3, True, False),
+            # TODO: get the expected results for these tests
+            # --> (3, True, True),
+            # --> (3, True, False),
         ],
     )
     @mock.patch("subprocess.run")
@@ -317,12 +317,12 @@ class TestDevice:
             "b3{8t;80dIN{ra83eC1s?M70?683@2Yf" if method == 2 else ""
         )
         stdout = {
+            1: b"I\x08\xfb\x9fh\x80\t\xd1\x99\x9cskl\xb3;\xdb",
             2: b"\xc7\xf7\x9f\xd7 \x8dL\xe3nS\xe6S\xdd\xce$\x02",
-            3: b"I\x08\xfb\x9fh\x80\t\xd1\x99\x9cskl\xb3;\xdb",
         }
         expected = {
+            1: "SQj7n2iACdGZnHNrbLM72w==1808",
             2: "x/ef1yCNTONuU+ZT3c4kAg==",
-            3: "SQj7n2iACdGZnHNrbLM72w==1808",
         }
 
         def check_args(args, **kwargs):
@@ -344,8 +344,8 @@ class TestDevice:
     @pytest.mark.parametrize(
         "method, add_lengths, expected",
         [
+            (1, True, "SQj7n2iACdGZnHNrbLM72w==1808"),
             (2, False, "x/ef1yCNTONuU+ZT3c4kAg=="),
-            (3, True, "SQj7n2iACdGZnHNrbLM72w==1808"),
         ],
     )
     @pytest.mark.skipif(
@@ -380,7 +380,7 @@ class TestDevice:
             encrypted = Device.encrypt_aes128(
                 password=password,
                 wemo_metadata=wemo_metadata,
-                method=2 if is_rtos else 3,
+                method=2 if is_rtos else 1,
                 add_lengths=not is_rtos,
             )
         except SetupException:

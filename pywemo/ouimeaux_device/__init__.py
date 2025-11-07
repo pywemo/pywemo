@@ -337,6 +337,13 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             add_lengths,
         )
         if method == 1:
+            # the original method
+            keydata = mac[:6] + serial + mac[6:12]
+        elif method == 2:
+            # rtos=1 (or maybe new_algo=1)
+            keydata = mac[:6] + serial + mac[6:12]
+            keydata += "b3{8t;80dIN{ra83eC1s?M70?683@2Yf"
+        elif method == 3:
             # binaryOption = 1
             characters = "".join(
                 [
@@ -368,13 +375,6 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             keydata = (
                 mac[:3] + mac[9:12] + serial + extra + mac[6:9] + mac[3:6]
             )
-        elif method == 2:
-            # new_algo = 1
-            keydata = mac[:6] + serial + mac[6:12]
-            keydata += "b3{8t;80dIN{ra83eC1s?M70?683@2Yf"
-        elif method == 3:
-            # the original method
-            keydata = mac[:6] + serial + mac[6:12]
         else:
             raise SetupException(f"{method=} must be 1, 2, or 3")
 
@@ -608,11 +608,11 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                 is_rtos = self._config_any.get("rtos", "0") == "1"
 
                 if self._config_any.get("binaryOption", "0") == "1":
-                    method = 1
+                    method = 3
                 elif is_rtos:
                     method = 2
                 else:
-                    method = 3
+                    method = 1
                 LOG.debug(
                     "Automatically detected encryption method=%s", method
                 )
