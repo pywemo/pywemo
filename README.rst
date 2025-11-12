@@ -162,7 +162,7 @@ F5Z0340    Wemo Switch + Motion Sensor              N/A                   N/A   
 F7C043     Wemo Maker Module                        Maker                 Works                WeMo_WW_2.00.11423.PVT-OWRT-Maker
 F7C033     Wemo Zigbee Bulb, E27                    N/A                   N/A                  N/A
 F7C061     Wemo Insight v2                          N/A                   N/A                  N/A
-F7C027     Wemo Switch                              Switch                N/A                  N/A
+F7C027     Wemo Switch                              Switch                Not yet working      N/A
 F7C062     Wemo Light Switch v2                     N/A                   N/A                  N/A
 F7C029     Wemo Insight                             Insight               Works                WeMo_WW_2.00.11483.PVT-OWRT-Insight
 F7C029V2*  Wemo Insight V2                          Insight               Works                WeMo_WW_2.00.10062.PVT-OWRT-InsightV2
