@@ -123,7 +123,7 @@ If you have issues connecting, here are several things worth trying:
     device.setup(ssid='wifi', password='secret', _encrypt_method=1, _add_password_lengths=True)
     device.setup(ssid='wifi', password='secret', _encrypt_method=2, _add_password_lengths=False)
     device.setup(ssid='wifi', password='secret', _encrypt_method=3, _add_password_lengths=True)
-    # Only the top 3 should be valid, but go ahead and try these lower 3 too...
+    # only the top 3 should be valid, but go ahead and try these lower 3 too...
     device.setup(ssid='wifi', password='secret', _encrypt_method=1, _add_password_lengths=False)
     device.setup(ssid='wifi', password='secret', _encrypt_method=2, _add_password_lengths=True)
     device.setup(ssid='wifi', password='secret', _encrypt_method=3, _add_password_lengths=False)
