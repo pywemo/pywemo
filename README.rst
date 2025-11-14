@@ -111,7 +111,7 @@ If you have issues connecting, here are several things worth trying:
 - WeMo devices can only connect to 2.4GHz wifi connections and some devices have an issue connecting if the 2.4Ghz and 5Ghz SSID are the same.
 - If issues persist, consider performing a full factory reset and power cycle on the device before trying again.
 - Consider that enabled firewall rules may block the WeMo from connecting to the intended AP.
-- See `this pywemo issue <https://github.com/pywemo/pywemo/issues/773>`_ before opening a new issue if setup does not work for your device.
+- See `this pywemo issue`_ before opening a new issue if setup does not work for your device.
 
 Firmware Warning
 ----------------
@@ -133,14 +133,14 @@ The good news is that this change will **not** affect pywemo, which will continu
 pywemo does not rely on the cloud connection for anything, including setup.
 Many products can be setup and reset with pywemo, as discussed above.
 
-Please see `this pywemo issue <https://github.com/pywemo/pywemo/issues/773>`_ to document the status of the various products and to update the table below on product status.
+Please see `this pywemo issue`_ to document the status of the various products and to update the table below on product status.
 
 Product Status
 --------------
 This is a list of known products and the pywemo status of each, including for setup.
 This list was started in November of 2025 in response to Belkin ending WeMo support.
 Any entry with N/A is unreported since this table was added.
-If you have any of these decvices and use them with PyWeMo, please let us know in `this pywemo issue <https://github.com/pywemo/pywemo/issues/773>`_ so that we can complete this list.
+If you have any of these decvices and use them with PyWeMo, please let us know in `this pywemo issue`_ so that we can complete this list.
 
 This list is mostly from the Belkin article mentioned above, but it may not be a complete list of all products.
 SKU's with an asterisk at the end, like F7C029V2*, are not listed in the article.
@@ -205,6 +205,7 @@ License
 All contents of the pywemo/ouimeaux_device directory are licensed under a BSD 3-Clause license. The full text of that license is maintained within the pywemo/ouimeaux_device/LICENSE file.
 The rest of pyWeMo is released under the MIT license. See the top-level LICENSE file for more details.
 
+.. _this pywemo issue: https://github.com/pywemo/pywemo/issues/773
 
 .. |Build Badge| image:: https://github.com/pywemo/pywemo/workflows/Build/badge.svg
     :target: https://github.com/pywemo/pywemo/actions?query=workflow%3ABuild
