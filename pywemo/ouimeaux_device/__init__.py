@@ -444,8 +444,8 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         timeout: float = 20.0,
         connection_attempts: int = 1,
         status_delay: float = 1.0,
-        encrypt_method: int | None = None,
-        add_lengths: bool | None = None,
+        _encrypt_method: int | None = None,
+        _add_password_lengths: bool | None = None,
     ) -> tuple[str, str]:
         """Connect Wemo to wifi network.
 
@@ -472,14 +472,14 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             status of the device.  Generally should prefer this to be as short
             as possible, but not too quick to overload the device with
             requests.  It must be less than or equal to half of the `timeout`.
-          encrypt_method (int | None, optional):
+          _encrypt_method (int | None, optional):
             Override the pywemo detection for which of the 3 encryption methods
             to use.  If set, must be 1, 2, or 3.  The default, None, will use
             the automatically detected method.  This should generally be left
             as the default value.
-          add_lengths (bool | None, optional):
+          _add_password_lengths (bool | None, optional):
             Override the pywemo detection for whether to add the password
-            lengths to the encrypted password.  Similar to the encrypt_method,
+            lengths to the encrypted password.  Similar to _encrypt_method,
             this should generally be left as the default None value.
 
         Notes:
@@ -495,8 +495,8 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                 timeout=timeout,
                 connection_attempts=connection_attempts,
                 status_delay=status_delay,
-                encrypt_method=encrypt_method,
-                add_lengths=add_lengths,
+                _encrypt_method=_encrypt_method,
+                _add_password_lengths=_add_password_lengths,
             )
         except (UnknownService, AttributeError, KeyError) as exc:
             #    Exception       | Reason to catch it
@@ -534,8 +534,8 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         timeout: float,
         connection_attempts: int,
         status_delay: float,
-        encrypt_method: int | None,
-        add_lengths: bool | None,
+        _encrypt_method: int | None,
+        _add_password_lengths: bool | None,
     ) -> tuple[str, str]:
         """Connect Wemo to wifi network.
 
@@ -600,16 +600,18 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             # get the meta information of the device and encrypt the password
             meta_info = self.get_service("metainfo").GetMetaInfo()["MetaInfo"]
 
-            if encrypt_method is None:
-                # investigation appears to indicate that method 2 should be
-                # used based on new_algo, but in practice it seems that it is
-                # actually based on rtos - not exactly sure why the discrepancy
-                _use_new_algo = self._config_any.get("new_algo", "0") == "1"
-                is_rtos = self._config_any.get("rtos", "0") == "1"
+            if _encrypt_method is None:
+                # investigation of the android APK indicates this logic:
+                # --> if self._config_any.get('binaryOption', "0") == "1":
+                # -->     method = 3
+                # --> elif self._config_any.get('new_algo', "0") == "1":
+                # -->     method = 2
+                # --> else:
+                # -->     method = 1
 
-                if self._config_any.get("binaryOption", "0") == "1":
-                    method = 3
-                elif is_rtos:
+                # however, this works correctly more often than the logic above
+                is_rtos = self._config_any.get("rtos", "0") == "1"
+                if is_rtos:
                     method = 2
                 else:
                     method = 1
@@ -617,15 +619,18 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                     "Automatically detected encryption method=%s", method
                 )
             else:
-                method = encrypt_method
+                method = _encrypt_method
 
-            if add_lengths is None:
+            if _add_password_lengths is None:
                 # by default, add the lengths for methods 1 and 3, but not 2
                 add_lengths = method in (1, 3)
                 LOG.debug(
-                    "Automatically detected encryption add_lengths=%s",
+                    "Automatically detected encryption add password lengths="
+                    "%s",
                     add_lengths,
                 )
+            else:
+                add_lengths = _add_password_lengths
 
             encrypted_password = self.encrypt_aes128(
                 password, meta_info, method, add_lengths
