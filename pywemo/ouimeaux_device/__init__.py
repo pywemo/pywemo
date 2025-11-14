@@ -608,6 +608,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                 # -->     method = 2
                 # --> else:
                 # -->     method = 1
+                # --> add_lengths = True  # for all 3 methods
 
                 # however, this works correctly more often than the logic above
                 is_rtos = self._config_any.get("rtos", "0") == "1"
