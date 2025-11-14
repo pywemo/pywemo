@@ -94,7 +94,7 @@ Device setup is through the ``setup`` method, which has two required arguments: 
 The user must first connect to the devices locally broadcast access point, which typically starts with "WeMo.", and then discover the device there.
 Once done, pass the desired SSID and password (WPA2/AES encryption only) to the ``setup`` method to connect it to your Wi-Fi network.
 
-``device.setup(ssid='wifi_name', password='special_secret')``
+``device.setup(ssid='wifi', password='secret')``
 
 A few important notes:
 
@@ -120,13 +120,13 @@ If you have issues connecting, here are several things worth trying:
 
 .. code-block:: python
 
-    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=1, _add_password_lengths=True)
-    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=2, _add_password_lengths=False)
-    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=3, _add_password_lengths=True)
+    device.setup(ssid='wifi', password='secret', _encrypt_method=1, _add_password_lengths=True)
+    device.setup(ssid='wifi', password='secret', _encrypt_method=2, _add_password_lengths=False)
+    device.setup(ssid='wifi', password='secret', _encrypt_method=3, _add_password_lengths=True)
     # Only the top 3 should be valid, but go ahead and try these lower 3 too...
-    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=1, _add_password_lengths=False)
-    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=2, _add_password_lengths=True)
-    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=3, _add_password_lengths=False)
+    device.setup(ssid='wifi', password='secret', _encrypt_method=1, _add_password_lengths=False)
+    device.setup(ssid='wifi', password='secret', _encrypt_method=2, _add_password_lengths=True)
+    device.setup(ssid='wifi', password='secret', _encrypt_method=3, _add_password_lengths=False)
 
 Search for your device on `this pywemo issue`_ before opening a new issue if setup does not work for your device.
 
