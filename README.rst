@@ -118,15 +118,15 @@ If you have issues connecting, here are several things worth trying:
   Thus, you may want to try forcing each of the 6 possible combinations as shown below.
   If one of these other methods work, but now the automatic detection, then be sure to add a comment to the `this pywemo issue`_.
 
-    .. code-block:: python
+.. code-block:: python
 
-        device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=1, _add_password_lengths=True)
-        device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=2, _add_password_lengths=False)
-        device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=3, _add_password_lengths=True)
-        # Only the top 3 should be valid, but go ahead and try these lower 3 too...
-        device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=1, _add_password_lengths=False)
-        device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=2, _add_password_lengths=True)
-        device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=3, _add_password_lengths=False)
+    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=1, _add_password_lengths=True)
+    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=2, _add_password_lengths=False)
+    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=3, _add_password_lengths=True)
+    # Only the top 3 should be valid, but go ahead and try these lower 3 too...
+    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=1, _add_password_lengths=False)
+    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=2, _add_password_lengths=True)
+    device.setup(ssid='wifi_name', password='special_secret', _encrypt_method=3, _add_password_lengths=False)
 
 Search for your device on `this pywemo issue`_ before opening a new issue if setup does not work for your device.
 
