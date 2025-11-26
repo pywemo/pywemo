@@ -19,6 +19,7 @@ from ..exceptions import (
     ResetException,
     SetupException,
     ShortPassword,
+    SOAPFault,
     UnknownService,
 )
 from ..util import MetaInfo
@@ -314,23 +315,68 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
     @staticmethod
     def encrypt_aes128(
-        password: str, wemo_metadata: str, is_rtos: bool
+        password: str, wemo_metadata: str, method: int, add_lengths: bool
     ) -> str:
         """Encrypt a password using OpenSSL.
 
         Function borrows heavily from Vadim Kantorov's "wemosetup" script:
         https://github.com/vadimkantorov/wemosetup
         """
+        # pylint: disable=too-many-branches, too-many-locals
         if not password:
             raise SetupException("password required for AES")
 
         # Wemo uses some meta information for salt and iv
         meta_info = MetaInfo.from_meta_info(wemo_metadata)
-        keydata = (
-            meta_info.mac[:6] + meta_info.serial_number + meta_info.mac[6:12]
+        mac = meta_info.mac
+        serial = meta_info.serial_number
+
+        LOG.debug(
+            "Using encryption method=%s and add_lengths=%s",
+            method,
+            add_lengths,
         )
-        if is_rtos:
+        if method == 1:
+            # the original method
+            keydata = mac[:6] + serial + mac[6:12]
+        elif method == 2:
+            # rtos=1 (or maybe new_algo=1)
+            keydata = mac[:6] + serial + mac[6:12]
             keydata += "b3{8t;80dIN{ra83eC1s?M70?683@2Yf"
+        elif method == 3:
+            # binaryOption = 1
+            characters = "".join(
+                [
+                    "Onboard",
+                    "$",
+                    "Application",
+                    "@",
+                    "Device",
+                    "&",
+                    "Information",
+                    "#",
+                    "Wemo",
+                ]
+            )
+            mixed = ""
+            for i, char in enumerate(characters):
+                if i % 2:
+                    mixed = mixed + char
+                else:
+                    mixed = char + mixed
+            extra = base64.b64encode(mixed.encode()).decode()[:32]
+
+            # the above transformation results in the following strings, but
+            # the calculation above is left for posterity
+            # --> characters = "Onboard$Application@Device&Information#Wemo"
+            # --> mixed = 'oe#otmon&cvDniaipAdabOnor$plcto@eieIfrainWm'
+            # --> extra = 'b2Ujb3Rtb24mY3ZEbmlhaXBBZGFiT25v'
+
+            keydata = (
+                mac[:3] + mac[9:12] + serial + extra + mac[6:9] + mac[3:6]
+            )
+        else:
+            raise SetupException(f"{method=} must be 1, 2, or 3")
 
         salt, initialization_vector = keydata[:8], keydata[:16]
         if len(salt) != 8 or len(initialization_vector) != 16:
@@ -385,12 +431,22 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
                 f"{len_original} (and {len_encrypted} after encryption)."
             )
 
-        if not is_rtos:
+        if add_lengths:
             encrypted_password += f"{len_encrypted:#04x}"[2:]
             encrypted_password += f"{len_original:#04x}"[2:]
         return encrypted_password
 
-    def setup(self, *args: Any, **kwargs: Any) -> tuple[str, str]:
+    def setup(
+        self,
+        ssid: str,
+        password: str,
+        *,
+        timeout: float = 20.0,
+        connection_attempts: int = 1,
+        status_delay: float = 1.0,
+        _encrypt_method: int | None = None,
+        _add_password_lengths: bool | None = None,
+    ) -> tuple[str, str]:
         """Connect Wemo to wifi network.
 
         This function should be used and will capture several potential
@@ -416,6 +472,15 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             status of the device.  Generally should prefer this to be as short
             as possible, but not too quick to overload the device with
             requests.  It must be less than or equal to half of the `timeout`.
+          _encrypt_method (int | None, optional):
+            Override the pywemo detection for which of the 3 encryption methods
+            to use.  If set, must be 1, 2, or 3.  The default, None, will use
+            the automatically detected method.  This should generally be left
+            as the default value.
+          _add_password_lengths (bool | None, optional):
+            Override the pywemo detection for whether to add the password
+            lengths to the encrypted password.  Similar to _encrypt_method,
+            this should generally be left as the default None value.
 
         Notes:
         -----
@@ -424,7 +489,15 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
         """
         try:
-            return self._setup(*args, **kwargs)
+            return self._setup(
+                ssid=ssid,
+                password=password,
+                timeout=timeout,
+                connection_attempts=connection_attempts,
+                status_delay=status_delay,
+                _encrypt_method=_encrypt_method,
+                _add_password_lengths=_add_password_lengths,
+            )
         except (UnknownService, AttributeError, KeyError) as exc:
             #    Exception       | Reason to catch it
             #    --------------------------------------------------------------
@@ -452,14 +525,17 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             ) from exc
 
     def _setup(  # noqa: C901
-        # pylint: disable=too-many-arguments,too-many-branches,too-many-locals
-        # pylint: disable=too-many-statements,too-many-positional-arguments
+        # pylint: disable=too-many-branches, too-many-locals
+        # pylint: disable=too-many-statements, too-many-positional-arguments
         self,
         ssid: str,
         password: str,
-        timeout: float = 20.0,
-        connection_attempts: int = 1,
-        status_delay: float = 1.0,
+        *,
+        timeout: float,
+        connection_attempts: int,
+        status_delay: float,
+        _encrypt_method: int | None,
+        _add_password_lengths: bool | None,
     ) -> tuple[str, str]:
         """Connect Wemo to wifi network.
 
@@ -470,6 +546,14 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         timeout = max(timeout, 20.0)
         status_delay = min(status_delay, timeout / 2.0)
         connection_attempts = int(max(1, connection_attempts))
+        LOG.debug(
+            "Trying to connect to AP %s with timeout=%s, "
+            "connection_attempts=%s, and status_delay=%s",
+            ssid,
+            timeout,
+            connection_attempts,
+            status_delay,
+        )
 
         # find all access points that the device can see, and select the one
         # matching the desired SSID
@@ -515,9 +599,42 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         else:
             # get the meta information of the device and encrypt the password
             meta_info = self.get_service("metainfo").GetMetaInfo()["MetaInfo"]
-            is_rtos = self._config_any.get("rtos", "0") == "1"
+
+            if _encrypt_method is None:
+                # investigation of the android APK indicates this logic:
+                # --> if self._config_any.get('binaryOption', "0") == "1":
+                # -->     method = 3
+                # --> elif self._config_any.get('new_algo', "0") == "1":
+                # -->     method = 2
+                # --> else:
+                # -->     method = 1
+                # --> add_lengths = True  # for all 3 methods
+
+                # however, this works correctly more often than the logic above
+                is_rtos = self._config_any.get("rtos", "0") == "1"
+                if is_rtos:
+                    method = 2
+                else:
+                    method = 1
+                LOG.debug(
+                    "Automatically detected encryption method=%s", method
+                )
+            else:
+                method = _encrypt_method
+
+            if _add_password_lengths is None:
+                # by default, add the lengths for methods 1 and 3, but not 2
+                add_lengths = method in (1, 3)
+                LOG.debug(
+                    "Automatically detected encryption add password lengths="
+                    "%s",
+                    add_lengths,
+                )
+            else:
+                add_lengths = _add_password_lengths
+
             encrypted_password = self.encrypt_aes128(
-                password, meta_info, is_rtos
+                password, meta_info, method, add_lengths
             )
 
         # optionally make multiple connection attempts
@@ -588,7 +705,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
         try:
             result = wifisetup.CloseSetup()
-        except AttributeError:
+        except (AttributeError, SOAPFault):
             # if CloseSetup doesn't exist, it may still work
             result = {"status": "CloseSetup action not available"}
 
@@ -612,7 +729,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         if status == "1" and close_status == "success":
             try:
                 self.basicevent.SetSetupDoneStatus()
-            except AttributeError:
+            except (AttributeError, SOAPFault):
                 LOG.debug(
                     "SetSetupDoneStatus not available (some devices do not "
                     "have this method)"

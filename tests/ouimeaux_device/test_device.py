@@ -284,37 +284,45 @@ class TestDevice:
     def test_encryption_no_openssl(self, mock_run, device):
         """Test device encryption (openssl not found/not installed)."""
         with pytest.raises(SetupException):
-            assert device.encrypt_aes128("password", self.METAINFO, False)
+            assert device.encrypt_aes128("password", self.METAINFO, 3, True)
         assert mock_run.call_count == 1
 
     @mock.patch("subprocess.run", side_effect=CalledProcessError(-1, "error"))
     def test_encryption_openssl_error(self, mock_run, device):
         """Test device encryption (error in openssl)."""
         with pytest.raises(SetupException):
-            assert device.encrypt_aes128("password", self.METAINFO, False)
+            assert device.encrypt_aes128("password", self.METAINFO, 3, True)
         assert mock_run.call_count == 1
 
     @pytest.mark.parametrize(
-        "is_rtos, is_salted_prefix",
-        [(False, True), (False, False), (True, True), (True, False)],
+        "method, add_lengths, is_salted_prefix",
+        [
+            (1, True, True),
+            (1, True, False),
+            (2, False, True),
+            (2, False, False),
+            # TODO: get the expected results for these tests
+            # --> (3, True, True),
+            # --> (3, True, False),
+        ],
     )
     @mock.patch("subprocess.run")
     def test_encryption_successful(
-        self, mock_run, is_rtos, is_salted_prefix, device
+        self, mock_run, method, add_lengths, is_salted_prefix, device
     ):
         """Test device encryption (good result)."""
         salt = "5858585858583132"
         iv = "58585858585831323334353641313233"
         password = "pass:XXXXXX123456A1234567XXXXXX" + (
-            "b3{8t;80dIN{ra83eC1s?M70?683@2Yf" if is_rtos else ""
+            "b3{8t;80dIN{ra83eC1s?M70?683@2Yf" if method == 2 else ""
         )
         stdout = {
-            False: b"I\x08\xfb\x9fh\x80\t\xd1\x99\x9cskl\xb3;\xdb",
-            True: b"\xc7\xf7\x9f\xd7 \x8dL\xe3nS\xe6S\xdd\xce$\x02",
+            1: b"I\x08\xfb\x9fh\x80\t\xd1\x99\x9cskl\xb3;\xdb",
+            2: b"\xc7\xf7\x9f\xd7 \x8dL\xe3nS\xe6S\xdd\xce$\x02",
         }
         expected = {
-            False: "SQj7n2iACdGZnHNrbLM72w==1808",
-            True: "x/ef1yCNTONuU+ZT3c4kAg==",
+            1: "SQj7n2iACdGZnHNrbLM72w==1808",
+            2: "x/ef1yCNTONuU+ZT3c4kAg==",
         }
 
         def check_args(args, **kwargs):
@@ -322,28 +330,34 @@ class TestDevice:
             assert args[args.index("-iv") + 1] == iv
             assert args[args.index("-pass") + 1] == password
             prefix = b"Salted__XXXXXX12" if is_salted_prefix else b""
-            return mock.Mock(stdout=prefix + stdout[is_rtos])
+            return mock.Mock(stdout=prefix + stdout[method])
 
         mock_run.side_effect = check_args
         assert (
-            device.encrypt_aes128("password", self.METAINFO, is_rtos)
-            == expected[is_rtos]
+            device.encrypt_aes128(
+                "password", self.METAINFO, method, add_lengths
+            )
+            == expected[method]
         )
         assert mock_run.call_count == 1
 
     @pytest.mark.parametrize(
-        "is_rtos, expected",
+        "method, add_lengths, expected",
         [
-            (False, "SQj7n2iACdGZnHNrbLM72w==1808"),
-            (True, "x/ef1yCNTONuU+ZT3c4kAg=="),
+            (1, True, "SQj7n2iACdGZnHNrbLM72w==1808"),
+            (2, False, "x/ef1yCNTONuU+ZT3c4kAg=="),
         ],
     )
     @pytest.mark.skipif(
         not shutil.which("openssl"), reason="The openssl binary was not found"
     )
-    def test_encryption_with_openssl(self, is_rtos, expected, device):
+    def test_encryption_with_openssl(
+        self, method, add_lengths, expected, device
+    ):
         """Test encryption using the OpenSSL binary (if it exists)."""
-        actual = device.encrypt_aes128("password", self.METAINFO, is_rtos)
+        actual = device.encrypt_aes128(
+            "password", self.METAINFO, method, add_lengths
+        )
         assert expected == actual
 
     @pytest.mark.skipif(
@@ -364,7 +378,10 @@ class TestDevice:
         wemo_metadata = "|".join([mac, serial, "", "", "", ""])
         try:
             encrypted = Device.encrypt_aes128(
-                password=password, wemo_metadata=wemo_metadata, is_rtos=is_rtos
+                password=password,
+                wemo_metadata=wemo_metadata,
+                method=2 if is_rtos else 1,
+                add_lengths=not is_rtos,
             )
         except SetupException:
             pass

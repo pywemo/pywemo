@@ -271,6 +271,7 @@ max-line-length = 79
 ignore-paths = "^tests/"
 extension-pkg-whitelist = "lxml"
 max-parents = 15
+max-args = 8
 
 [tool.pylint.typecheck]
 generated-members = [

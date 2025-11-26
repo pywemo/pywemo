@@ -92,26 +92,43 @@ Setup
 
 Device setup is through the ``setup`` method, which has two required arguments: ``ssid`` and ``password``.
 The user must first connect to the devices locally broadcast access point, which typically starts with "WeMo.", and then discover the device there.
-Once done, pass the desired SSID and password (WPA2/AES encryption only) to the ``setup`` method to connect it to your wifi network.
+Once done, pass the desired SSID and password (WPA2/AES encryption only) to the ``setup`` method to connect it to your Wi-Fi network.
 
-``device.setup(ssid='wifi_name', password='special_secret')``
+``device.setup(ssid='wifi', password='secret')``
 
 A few important notes:
 
-- Not all devices are known to work with the pywemo setup method.
-- For a WeMo without internet access, see `this guide <https://github.com/pywemo/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 - If connecting to an open network, the password argument is ignored and you can provide anything, e.g. ``password=None``.
 - If connecting to a WPA2/AES/TKIPAES-encrypted network, OpenSSL is used to encrypt the password by the ``pywemo`` library.
   It must be installed and available on your ``PATH`` via calling ``openssl`` from a terminal or command prompt.
+- For a WeMo without internet access, see `this guide <https://github.com/pywemo/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 
 If you have issues connecting, here are several things worth trying:
 
-- Try again!  WeMo devices sometimes just fail to connect and repeating the exact same steps may subsequently work.
-- Bring the WeMo as close to the access point as possible.  Some devices seem to require a very strong signal for setup, even if they will work normally with a weaker one.
-- WeMo devices can only connect to 2.4GHz wifi connections and some devices have an issue connecting if the 2.4Ghz and 5Ghz SSID are the same.
+- Try again!
+  WeMo devices sometimes just fail to connect and repeating the exact same steps may subsequently work.
+- Bring the WeMo as close to the access point as possible.
+  Some devices seem to require a very strong signal for setup, even if they will work normally with a weaker one.
+- WeMo devices can only connect to 2.4GHz Wi-Fi and sometimes have trouble connecting if the 2.4Ghz and 5Ghz SSID are the same.
 - If issues persist, consider performing a full factory reset and power cycle on the device before trying again.
-- Consider that enabled firewall rules may block the WeMo from connecting to the intended AP.
-- See `this pywemo issue`_ before opening a new issue if setup does not work for your device.
+- Enabled firewall rules may block the WeMo from connecting to the intended AP.
+- Based on various differences in models and firmware, pywemo contains 3 different methods for encrypting the Wi-Fi password when sending it to the WeMo device.
+  In addition to the encryption, WeMo devices sometimes expect the get password lengths appended to the end of the password.
+  There is logic in pywemo that attempts to select the appropriate options for each device, but it maybe not be correct for all devices and firmware.
+  Thus, you may want to try forcing each of the 6 possible combinations as shown below.
+  If one of these other methods work, but now the automatic detection, then be sure to add a comment to the `this pywemo issue`_.
+
+.. code-block:: python
+
+    device.setup(ssid='wifi', password='secret', _encrypt_method=1, _add_password_lengths=True)
+    device.setup(ssid='wifi', password='secret', _encrypt_method=2, _add_password_lengths=False)
+    device.setup(ssid='wifi', password='secret', _encrypt_method=3, _add_password_lengths=True)
+    # only the top 3 should be valid, but go ahead and try these lower 3 too...
+    device.setup(ssid='wifi', password='secret', _encrypt_method=1, _add_password_lengths=False)
+    device.setup(ssid='wifi', password='secret', _encrypt_method=2, _add_password_lengths=True)
+    device.setup(ssid='wifi', password='secret', _encrypt_method=3, _add_password_lengths=False)
+
+Search for your device on `this pywemo issue`_ before opening a new issue if setup does not work for your device.
 
 Firmware Warning
 ----------------
