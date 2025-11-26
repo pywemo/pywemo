@@ -129,7 +129,7 @@ jobs:
           cat ./hashes/*.sha256sum.txt >> "$GITHUB_ENV"
           echo "$EOF" >> "$GITHUB_ENV"
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: pywemo_checkout
       - name: Update release text
