@@ -578,7 +578,14 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         # get some information about the access point
         columns = selected_ap.split("|")
         channel = columns[1].strip()
-        auth_mode, encryption_method = columns[-1].strip().split("/")
+        auth_string = columns[-1].strip()
+        if auth_string == "Unknown":
+            raise SetupException(
+                f"Wemo reports AP {ssid} with 'Unknown' authorization mode. "
+                "AP may be using an unsupported authorization mode (ex WPA3)"
+            )
+
+        auth_mode, encryption_method = auth_string.split("/")
         LOG.debug("AP channel: %s", channel)
         LOG.debug("AP authorization mode(s): %s", auth_mode)
         LOG.debug("AP encryption method: %s", encryption_method)
