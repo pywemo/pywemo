@@ -99,8 +99,6 @@ Once done, pass the desired SSID and password (WPA2/AES encryption only) to the 
 A few important notes:
 
 - If connecting to an open network, the password argument is ignored and you can provide anything, e.g. ``password=None``.
-- If connecting to a WPA2/AES/TKIPAES-encrypted network, OpenSSL is used to encrypt the password by the ``pywemo`` library.
-  It must be installed and available on your ``PATH`` via calling ``openssl`` from a terminal or command prompt.
 - For a WeMo without internet access, see `this guide <https://github.com/pywemo/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 
 If you have issues connecting, here are several things worth trying:
