@@ -283,6 +283,7 @@ class TestDevice:
         [
             (1, True, "SQj7n2iACdGZnHNrbLM72w==1808"),
             (2, False, "x/ef1yCNTONuU+ZT3c4kAg=="),
+            (3, False, "0wyEoTUUR5lTmfKTiXW3oA=="),
         ],
     )
     def test_encryption(self, method, add_lengths, expected, device):
