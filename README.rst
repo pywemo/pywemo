@@ -116,7 +116,7 @@ If you have issues connecting, here are several things worth trying:
   In addition to the encryption, WeMo devices sometimes expect the get password lengths appended to the end of the password.
   There is logic in pywemo that attempts to select the appropriate options for each device, but it maybe not be correct for all devices and firmware.
   Thus, you may want to try forcing each of the 6 possible combinations as shown below.
-  If one of these other methods work, but now the automatic detection, then be sure to add a comment to the `this pywemo issue`_.
+  If one of these other methods work, but not the automatic detection, then be sure to add a comment to `this pywemo issue`_.
 
 .. code-block:: python
 
