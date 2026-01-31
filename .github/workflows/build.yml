@@ -26,12 +26,12 @@ jobs:
       max-parallel: 5  # Set equal to the number of Linux tests.
       matrix:
         os: ['ubuntu-latest']
-        python-version: ['3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
         include:
           - os: windows-latest
-            python-version: '3.10'
+            python-version: '3.14'
           - os: macos-latest
-            python-version: '3.10'
+            python-version: '3.14'
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -115,7 +115,7 @@ jobs:
           persist-credentials: false
       - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          name: coverage-ubuntu-latest-3.10
+          name: coverage-ubuntu-latest-3.14
       - uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
         with:
           path-to-lcov: coverage.lcov
