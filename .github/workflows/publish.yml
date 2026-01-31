@@ -120,7 +120,7 @@ jobs:
             ./${DIST_ARTIFACT}/* \
             ./hashes/* \
             "./${PROVENANCE_NAME}/${PROVENANCE_NAME}" \
-            ./signing-artifacts-sigstore/*/*.sigstore \
+            ./signing-artifacts-sigstore/*/*.sigstore.json \
             ./release/
       - name: Add SHA256SUM environment variable
         run: |
