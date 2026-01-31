@@ -318,7 +318,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
     def encrypt_aes128(
         password: str, wemo_metadata: str, method: int, add_lengths: bool
     ) -> str:
-        """Encrypt a password using OpenSSL.
+        """Encrypt a password using Cryptography.
 
         Function borrows heavily from Vadim Kantorov's "wemosetup" script:
         https://github.com/vadimkantorov/wemosetup
@@ -431,9 +431,8 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             SSID to connect the device to.
           password (str):
             Password for the indicated SSID.  This password will be encrypted
-            with OpenSSL and then sent to the device.  To connect to an open,
-            unsecured network, pass anything for the password as it will be
-            ignored.
+            and then sent to the device.  To connect to an open, unsecured
+            network, pass anything for the password as it will be ignored.
           timeout (float, optional):
             Number of seconds to wait and poll a device to see if it has
             successfully connected to the network.  The minimum value allows is
