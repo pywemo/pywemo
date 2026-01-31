@@ -252,7 +252,11 @@ class LinkedDevice:  # pylint: disable=too-many-instance-attributes
             )
             if current_state := get_first_text(self._VALUES_TAGS):
                 self._update_values(
-                    zip(self.capabilities, current_state.split(","))
+                    zip(
+                        self.capabilities,
+                        current_state.split(","),
+                        strict=True,
+                    )
                 )
 
     def _update_values(self, values: Iterable[tuple[str, str]]) -> None:

@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "pywemo"
-requires-python = ">=3.9.0"
+requires-python = ">=3.10.0"
 
 [tool.poetry]
 name = "pywemo"
@@ -18,7 +18,7 @@ homepage = "https://github.com/pywemo/pywemo"
 keywords = ['wemo', 'api']
 
 [tool.poetry.dependencies]
-python = "^3.9.0"
+python = "^3.10.0"
 ifaddr = ">=0.1.0"
 requests = ">=2.0"
 urllib3 = ">=2.0.2"
