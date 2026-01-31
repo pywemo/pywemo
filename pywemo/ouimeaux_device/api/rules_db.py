@@ -10,7 +10,7 @@ import tempfile
 import zipfile
 from collections.abc import Mapping
 from types import MappingProxyType
-from typing import FrozenSet, List, Optional, Tuple
+from typing import FrozenSet, List, Tuple
 
 from pywemo.exceptions import HTTPNotOkException, RulesDbQueryError
 
@@ -274,8 +274,8 @@ class RulesDb:
     def rules_for_device(
         self,
         *,
-        device_udn: Optional[str] = None,
-        rule_type: Optional[str] = None,
+        device_udn: str | None = None,
+        rule_type: str | None = None,
     ) -> List[Tuple[RulesRow, RuleDevicesRow]]:
         """Fetch the current rules for a particular device."""
         if device_udn is None:
@@ -306,7 +306,7 @@ class RulesDb:
         rule: RulesRow,
         device_id: str,
         *,
-        device_index: Optional[int] = None,
+        device_index: int | None = None,
     ):
         """Add a new target DeviceID to the rule."""
         if device_index is None:

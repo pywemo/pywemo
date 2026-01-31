@@ -43,9 +43,9 @@ def get_profiles(model: str) -> tuple[TemperatureRange, ColorGamut]:
 def is_same_side(p1: ColorXY, p2: ColorXY, a: ColorXY, b: ColorXY) -> bool:
     """Test if points p1 and p2 lie on the same side of line a-b."""
     # pylint: disable=invalid-name
-    vector_ab = [y - x for x, y in zip(a, b)]
-    vector_ap1 = [y - x for x, y in zip(a, p1)]
-    vector_ap2 = [y - x for x, y in zip(a, p2)]
+    vector_ab = [y - x for x, y in zip(a, b, strict=True)]
+    vector_ap1 = [y - x for x, y in zip(a, p1, strict=True)]
+    vector_ap2 = [y - x for x, y in zip(a, p2, strict=True)]
     cross_vab_ap1 = vector_ab[0] * vector_ap1[1] - vector_ab[1] * vector_ap1[0]
     cross_vab_ap2 = vector_ab[0] * vector_ap2[1] - vector_ab[1] * vector_ap2[0]
     return (cross_vab_ap1 * cross_vab_ap2) >= 0
@@ -54,10 +54,10 @@ def is_same_side(p1: ColorXY, p2: ColorXY, a: ColorXY, b: ColorXY) -> bool:
 def closest_point(p: ColorXY, a: ColorXY, b: ColorXY) -> ColorXY:
     """Test if points p1 and p2 lie on the same side of line a-b."""
     # pylint: disable=invalid-name
-    vector_ab = [y - x for x, y in zip(a, b)]
-    vector_ap = [y - x for x, y in zip(a, p)]
-    dot_ap_ab = sum(x * y for x, y in zip(vector_ap, vector_ab))
-    dot_ab_ab = sum(x * y for x, y in zip(vector_ab, vector_ab))
+    vector_ab = [y - x for x, y in zip(a, b, strict=True)]
+    vector_ap = [y - x for x, y in zip(a, p, strict=True)]
+    dot_ap_ab = sum(x * y for x, y in zip(vector_ap, vector_ab, strict=True))
+    dot_ab_ab = sum(x * y for x, y in zip(vector_ab, vector_ab, strict=True))
     t = max(0.0, min(dot_ap_ab / dot_ab_ab, 1.0))
     return a[0] + vector_ab[0] * t, a[1] + vector_ab[1] * t
 
