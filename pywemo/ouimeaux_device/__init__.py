@@ -32,6 +32,7 @@ from .api.service import (
     Session,
 )
 from .api.wemo_services import WeMoServiceTypesMixin
+from .api.wifi_setup import encrypt_password
 from .api.xsd_types import DeviceDescription
 
 LOG = logging.getLogger(__name__)
@@ -382,39 +383,12 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         if len(salt) != 8 or len(initialization_vector) != 16:
             LOG.warning("device meta information may not be supported")
 
-        # call OpenSSL to encrypt the data
         try:
-            openssl = subprocess.run(
-                [
-                    "openssl",
-                    "enc",
-                    "-aes-128-cbc",
-                    "-md",
-                    "md5",
-                    "-S",
-                    salt.encode("utf-8").hex(),
-                    "-iv",
-                    initialization_vector.encode("utf-8").hex(),
-                    "-pass",
-                    "pass:" + keydata,
-                ],
-                check=True,
-                capture_output=True,
-                input=password.encode("utf-8"),
+            encrypted_password = encrypt_password(
+                password, keydata, salt, initialization_vector
             )
-        except FileNotFoundError as exc:
-            raise SetupException(
-                "openssl command failed (openssl not installed / not on path?)"
-            ) from exc
-        except subprocess.CalledProcessError as exc:
-            raise SetupException("openssl command failed") from exc
-
-        output = openssl.stdout
-        if output.startswith(b"Salted__"):
-            # remove 16byte magic and salt prefix inserted by OpenSSL, which
-            # is of the form "Salted__XXXXXXXX" before the actual password
-            output = output[16:]
-        encrypted_password = base64.b64encode(output).decode()
+        except ValueError as exc:
+            raise SetupException("Password encryption failed") from exc
 
         # the last 4 digits that wemo expects is xxyy, where:
         #     xx: length of the encrypted password as hexadecimal
