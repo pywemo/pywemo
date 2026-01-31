@@ -99,7 +99,7 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v7
       - name: Sign the release
-        uses: sigstore/gh-action-sigstore-python@v3
+        uses: sigstore/gh-action-sigstore-python@v3.2.0
         with:
           inputs: ./${{env.DIST_ARTIFACT}}/* ./hashes/*
           upload-signing-artifacts: true
