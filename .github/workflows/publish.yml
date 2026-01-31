@@ -103,6 +103,7 @@ jobs:
         with:
           inputs: ./${{env.DIST_ARTIFACT}}/* ./hashes/*
           upload-signing-artifacts: true
+          release-signing-artifacts: false
 
   assets:
     name: Create release assets
