@@ -26,7 +26,7 @@ jobs:
       max-parallel: 5  # Set equal to the number of Linux tests.
       matrix:
         os: ['ubuntu-latest']
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.10', '3.11', '3.12']
         include:
           - os: windows-latest
             python-version: '3.9'
