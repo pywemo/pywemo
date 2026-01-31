@@ -34,14 +34,14 @@ Verify with [`sigstore-python`](https://github.com/sigstore/sigstore-python/):
 ```bash
 # Download the release wheel and .sigstore file.
 wget https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/pywemo-${GITHUB_REF_NAME}-py3-none-any.whl
-wget https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/pywemo-${GITHUB_REF_NAME}-py3-none-any.whl.sigstore
+wget https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/pywemo-${GITHUB_REF_NAME}-py3-none-any.whl.sigstore.json
 
 # Install sigstore: https://github.com/sigstore/sigstore-python#installation
 python -m pip install sigstore
 
 # Verify that the wheel was built from this release.
 python -m sigstore verify github \
-    --bundle pywemo-${GITHUB_REF_NAME}-py3-none-any.whl.sigstore \
+    --bundle pywemo-${GITHUB_REF_NAME}-py3-none-any.whl.sigstore.json \
     --cert-identity https://github.com/${GITHUB_WORKFLOW_REF} \
     --sha ${GITHUB_SHA} \
     pywemo-${GITHUB_REF_NAME}-py3-none-any.whl
