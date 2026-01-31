@@ -16,9 +16,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
-        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           # NOTE: We use 3.10+ typing syntax via future, which pdoc only
           # understands if it's actually run with Python 3.10 or newer.
