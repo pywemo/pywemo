@@ -128,7 +128,7 @@ If you have issues connecting, here are several things worth trying:
 
 Belkin Ends Support for WeMo
 ----------------------------
-Note that Belkin is officially ending WeMo support on January 31, 2026.
+Belkin is officially ending WeMo support on January 31, 2026.
 After this date, the Belkin app will no longer work, including the required cloud access to use the current products.
 This likely means that you cannot use the Belkin app to connect a device to your network after this date either.
 See `this link <https://www.belkin.com/support-article/?articleNum=335419>`_ for more details from Belkin.
