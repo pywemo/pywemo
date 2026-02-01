@@ -59,10 +59,9 @@ After connecting, if the ``pywemo.discover_devices()`` doesn't work, you can get
     >>> device.setup(ssid='MY SSID', password='MY NETWORK PASSWORD')
     ('1', 'success')
 
-Testing new products
---------------------
+Unknown Products
+----------------
 If both methods above are not successful, then ``pywemo`` may not support your WeMo product yet.
-This may be particularly true if it is a new WeMo product.
 To test this, you can use a debug flag, ``pywemo.discover_devices(debug=True)`` or ``pywemo.discovery.device_from_description(url, debug=True)``.
 If an ``UnsupportedDevice`` is found, then it is highly likely that the product can be added to ``pywemo``.
 This ``UnsupportedDevice`` will allow manual interaction, but please open an issue to get first class support for the device.
@@ -89,7 +88,6 @@ Method in ``pywemo``                     Clears             Name in WeMo App
 
 Setup
 ~~~~~
-
 Device setup is through the ``setup`` method, which has two required arguments: ``ssid`` and ``password``.
 The user must first connect to the devices locally broadcast access point, which typically starts with "WeMo.", and then discover the device there.
 Once done, pass the desired SSID and password (WPA2/AES encryption only) to the ``setup`` method to connect it to your Wi-Fi network.
@@ -123,19 +121,10 @@ If you have issues connecting, here are several things worth trying:
     device.setup(ssid='wifi', password='secret', _encrypt_method=1, _add_password_lengths=True)
     device.setup(ssid='wifi', password='secret', _encrypt_method=2, _add_password_lengths=False)
     device.setup(ssid='wifi', password='secret', _encrypt_method=3, _add_password_lengths=True)
-    # only the top 3 should be valid, but go ahead and try these lower 3 too...
+    # bottom three may not be valid, but try them too
     device.setup(ssid='wifi', password='secret', _encrypt_method=1, _add_password_lengths=False)
     device.setup(ssid='wifi', password='secret', _encrypt_method=2, _add_password_lengths=True)
     device.setup(ssid='wifi', password='secret', _encrypt_method=3, _add_password_lengths=False)
-
-Firmware Warning
-----------------
-Starting in May of 2020, Belkin started requiring users to create an account and login to the app (Android app version 1.25).
-In addition to the account, most of the app functionality now requires a connection to the cloud (internet access), even for simple actions such as toggling a switch.
-All of the commands that go through the cloud are encrypted and cannot be easily inspected.
-This raises the possibility that Belkin could, in the future, update WeMo device firmware and make breaking API changes that can no longer be deciphered.
-If this happens, ``pywemo`` may no longer function on that device.
-Thus it would be prudent to upgrade firmware cautiously and preferably only after confirming that breaking API changes have not been introduced.
 
 Belkin Ends Support for WeMo
 ----------------------------
