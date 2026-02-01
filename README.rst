@@ -150,7 +150,7 @@ Many products can be setup and reset with pywemo, as discussed above.
 
 Product Status
 --------------
-`This pywemo wiki page` includes a table of all known WeMo products and the status within pywemo, including whether setup (connecting to a new network) works or not.
+`This pywemo wiki page`_ includes a table of all known WeMo products and the status within pywemo, including whether setup (connecting to a new network) works or not.
 
 Developing
 ----------
