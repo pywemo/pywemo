@@ -619,7 +619,8 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
 
                 # however, this works correctly more often than the logic above
                 is_rtos = self._config_any.get("rtos", "0") == "1"
-                if is_rtos:
+                is_iot = self._config_any.get("iot", "0") == "1"
+                if is_rtos and not is_iot:
                     method = 2
                 else:
                     method = 1
