@@ -3,8 +3,6 @@
 import base64
 import itertools
 import logging
-import shutil
-from subprocess import CalledProcessError
 from unittest import mock
 
 import pytest
@@ -280,89 +278,21 @@ class TestDevice:
         assert device.basicevent.ReSetup.call_count == 1
         assert device.basicevent.ReSetup.call_args_list == [({"Reset": 2},)]
 
-    @mock.patch("subprocess.run", side_effect=FileNotFoundError)
-    def test_encryption_no_openssl(self, mock_run, device):
-        """Test device encryption (openssl not found/not installed)."""
-        with pytest.raises(SetupException):
-            assert device.encrypt_aes128("password", self.METAINFO, 3, True)
-        assert mock_run.call_count == 1
-
-    @mock.patch("subprocess.run", side_effect=CalledProcessError(-1, "error"))
-    def test_encryption_openssl_error(self, mock_run, device):
-        """Test device encryption (error in openssl)."""
-        with pytest.raises(SetupException):
-            assert device.encrypt_aes128("password", self.METAINFO, 3, True)
-        assert mock_run.call_count == 1
-
-    @pytest.mark.parametrize(
-        "method, add_lengths, is_salted_prefix",
-        [
-            (1, True, True),
-            (1, True, False),
-            (2, False, True),
-            (2, False, False),
-            # TODO: get the expected results for these tests
-            # --> (3, True, True),
-            # --> (3, True, False),
-        ],
-    )
-    @mock.patch("subprocess.run")
-    def test_encryption_successful(
-        self, mock_run, method, add_lengths, is_salted_prefix, device
-    ):
-        """Test device encryption (good result)."""
-        salt = "5858585858583132"
-        iv = "58585858585831323334353641313233"
-        password = "pass:XXXXXX123456A1234567XXXXXX" + (
-            "b3{8t;80dIN{ra83eC1s?M70?683@2Yf" if method == 2 else ""
-        )
-        stdout = {
-            1: b"I\x08\xfb\x9fh\x80\t\xd1\x99\x9cskl\xb3;\xdb",
-            2: b"\xc7\xf7\x9f\xd7 \x8dL\xe3nS\xe6S\xdd\xce$\x02",
-        }
-        expected = {
-            1: "SQj7n2iACdGZnHNrbLM72w==1808",
-            2: "x/ef1yCNTONuU+ZT3c4kAg==",
-        }
-
-        def check_args(args, **kwargs):
-            assert args[args.index("-S") + 1] == salt
-            assert args[args.index("-iv") + 1] == iv
-            assert args[args.index("-pass") + 1] == password
-            prefix = b"Salted__XXXXXX12" if is_salted_prefix else b""
-            return mock.Mock(stdout=prefix + stdout[method])
-
-        mock_run.side_effect = check_args
-        assert (
-            device.encrypt_aes128(
-                "password", self.METAINFO, method, add_lengths
-            )
-            == expected[method]
-        )
-        assert mock_run.call_count == 1
-
     @pytest.mark.parametrize(
         "method, add_lengths, expected",
         [
             (1, True, "SQj7n2iACdGZnHNrbLM72w==1808"),
             (2, False, "x/ef1yCNTONuU+ZT3c4kAg=="),
+            (3, False, "0wyEoTUUR5lTmfKTiXW3oA=="),
         ],
     )
-    @pytest.mark.skipif(
-        not shutil.which("openssl"), reason="The openssl binary was not found"
-    )
-    def test_encryption_with_openssl(
-        self, method, add_lengths, expected, device
-    ):
-        """Test encryption using the OpenSSL binary (if it exists)."""
+    def test_encryption(self, method, add_lengths, expected, device):
+        """Test encryption for the WiFi password."""
         actual = device.encrypt_aes128(
             "password", self.METAINFO, method, add_lengths
         )
         assert expected == actual
 
-    @pytest.mark.skipif(
-        not shutil.which("openssl"), reason="The openssl binary was not found"
-    )
     @given(
         password=st.text(),
         mac=st.text(),
