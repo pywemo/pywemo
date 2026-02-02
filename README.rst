@@ -59,10 +59,9 @@ After connecting, if the ``pywemo.discover_devices()`` doesn't work, you can get
     >>> device.setup(ssid='MY SSID', password='MY NETWORK PASSWORD')
     ('1', 'success')
 
-Testing new products
---------------------
+Unknown Products
+----------------
 If both methods above are not successful, then ``pywemo`` may not support your WeMo product yet.
-This may be particularly true if it is a new WeMo product.
 To test this, you can use a debug flag, ``pywemo.discover_devices(debug=True)`` or ``pywemo.discovery.device_from_description(url, debug=True)``.
 If an ``UnsupportedDevice`` is found, then it is highly likely that the product can be added to ``pywemo``.
 This ``UnsupportedDevice`` will allow manual interaction, but please open an issue to get first class support for the device.
@@ -89,7 +88,6 @@ Method in ``pywemo``                     Clears             Name in WeMo App
 
 Setup
 ~~~~~
-
 Device setup is through the ``setup`` method, which has two required arguments: ``ssid`` and ``password``.
 The user must first connect to the devices locally broadcast access point, which typically starts with "WeMo.", and then discover the device there.
 Once done, pass the desired SSID and password (WPA2/AES encryption only) to the ``setup`` method to connect it to your Wi-Fi network.
@@ -103,6 +101,8 @@ A few important notes:
   It must be installed and available on your ``PATH`` via calling ``openssl`` from a terminal or command prompt.
 - For a WeMo without internet access, see `this guide <https://github.com/pywemo/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 
+Setup Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~
 If you have issues connecting, here are several things worth trying:
 
 - Try again!
@@ -112,6 +112,7 @@ If you have issues connecting, here are several things worth trying:
 - WeMo devices can only connect to 2.4GHz Wi-Fi and sometimes have trouble connecting if the 2.4Ghz and 5Ghz SSID are the same.
 - If issues persist, consider performing a full factory reset and power cycle on the device before trying again.
 - Enabled firewall rules may block the WeMo from connecting to the intended AP.
+- One user indicated that switching the 2.4Ghz channel bandwidth from 40Mhz to 20Mhz (not verified, and this was regarding the Belkin app, not pywemo).
 - Based on various differences in models and firmware, pywemo contains 3 different methods for encrypting the Wi-Fi password when sending it to the WeMo device.
   In addition to the encryption, WeMo devices sometimes expect the get password lengths appended to the end of the password.
   There is logic in pywemo that attempts to select the appropriate options for each device, but it maybe not be correct for all devices and firmware.
@@ -123,77 +124,25 @@ If you have issues connecting, here are several things worth trying:
     device.setup(ssid='wifi', password='secret', _encrypt_method=1, _add_password_lengths=True)
     device.setup(ssid='wifi', password='secret', _encrypt_method=2, _add_password_lengths=False)
     device.setup(ssid='wifi', password='secret', _encrypt_method=3, _add_password_lengths=True)
-    # only the top 3 should be valid, but go ahead and try these lower 3 too...
+    # bottom three may not be valid, but try them too
     device.setup(ssid='wifi', password='secret', _encrypt_method=1, _add_password_lengths=False)
     device.setup(ssid='wifi', password='secret', _encrypt_method=2, _add_password_lengths=True)
     device.setup(ssid='wifi', password='secret', _encrypt_method=3, _add_password_lengths=False)
 
-Search for your device on `this pywemo issue`_ before opening a new issue if setup does not work for your device.
-
-Firmware Warning
-----------------
-Starting in May of 2020, Belkin started requiring users to create an account and login to the app (Android app version 1.25).
-In addition to the account, most of the app functionality now requires a connection to the cloud (internet access), even for simple actions such as toggling a switch.
-All of the commands that go through the cloud are encrypted and cannot be easily inspected.
-This raises the possibility that Belkin could, in the future, update WeMo device firmware and make breaking API changes that can no longer be deciphered.
-If this happens, ``pywemo`` may no longer function on that device.
-Thus it would be prudent to upgrade firmware cautiously and preferably only after confirming that breaking API changes have not been introduced.
-
 Belkin Ends Support for WeMo
 ----------------------------
-Note that Belkin is officially ending WeMo support on January 31, 2026.
+Belkin is officially ending WeMo support on January 31, 2026.
 After this date, the Belkin app will no longer work, including the required cloud access to use the current products.
-This also means that you cannot use the Belkin app to connect a device to your network after this date either.
+This likely means that you cannot use the Belkin app to connect a device to your network after this date either.
 See `this link <https://www.belkin.com/support-article/?articleNum=335419>`_ for more details from Belkin.
 
 The good news is that this change will **not** affect pywemo, which will continue to work as it currently does;
-pywemo does not rely on the cloud connection for anything, including setup.
+pywemo does not rely on the cloud connection for anything, including setup (connecting to a new AP).
 Many products can be setup and reset with pywemo, as discussed above.
-
-Please see `this pywemo issue`_ to document the status of the various products and to update the table below on product status.
 
 Product Status
 --------------
-This is a list of known products and the pywemo status of each, including for setup.
-This list was started in November of 2025 in response to Belkin ending WeMo support.
-Any entry with N/A is unreported since this table was added.
-If you have any of these decvices and use them with PyWeMo, please let us know in `this pywemo issue`_ so that we can complete this list.
-
-This list is mostly from the Belkin article mentioned above, but it may not be a complete list of all products.
-SKU's with an asterisk at the end, like F7C029V2*, are not listed in the article.
-
-=========  =======================================  ====================  ===================  ========================================
-SKU's      Description                              PyWeMo Object         PyWeMo Setup Status  Known Working Firmware(s)
-=========  =======================================  ====================  ===================  ========================================
-F7C031     Wemo Link                                Bridge                N/A                  N/A
-F7C046     Wemo Humidifier                          Humidifier            N/A                  N/A
-F7C045     Wemo CrockPot                            CrockPot              N/A                  N/A
-F7C048     Wemo Heater B                            N/A                   N/A                  N/A
-F7C049     Wemo Air Purifier                        N/A                   N/A                  N/A
-F7C047     Wemo Heater A                            N/A                   N/A                  N/A
-F7C050     Wemo Coffee Maker (Mr. Coffee)           CoffeeMaker           N/A                  N/A
-F8J007     Wi-Fi Baby Monitor                       N/A                   N/A                  N/A
-F5Z0489    Wemo LED Lighting Bundle                 N/A                   N/A                  N/A
-F7C028     Wemo Motion Sensor                       Motion                N/A                  N/A
-F5Z0340    Wemo Switch + Motion Sensor              N/A                   N/A                  N/A
-F7C043     Wemo Maker Module                        Maker                 Works                WeMo_WW_2.00.11423.PVT-OWRT-Maker
-F7C033     Wemo Zigbee Bulb, E27                    N/A                   N/A                  N/A
-F7C061     Wemo Insight v2                          N/A                   N/A                  N/A
-F7C027     Wemo Switch                              Switch                Works                WeMo_WW_2.00.11851.PVT-OWRT-SNS
-F7C062     Wemo Light Switch v2                     N/A                   N/A                  N/A
-F7C029     Wemo Insight                             Insight               Works                WeMo_WW_2.00.11483.PVT-OWRT-Insight
-F7C029V2*  Wemo Insight V2                          Insight               Works                WeMo_WW_2.00.10062.PVT-OWRT-InsightV2
-WLS0403    Wemo Smart Light Switch 3-Way            LightSwitchLongPress  N/A                  N/A
-WSP070     Wemo Mini Smart Plug                     N/A                   N/A                  N/A
-WDS060     Wemo Wi-Fi Smart Light Switch w/ Dimmer  DimmerV2              N/A                  WEMO_WW_2.00.20110904.PVT-RTOS-DimmerV2
-WLS040     Wemo Smart Light Switch                  LightSwitchLongPress  N/A                  N/A
-F7C064     Wemo HomeKit                             N/A                   N/A                  N/A
-F7C059     Wemo Dimmer Light Switch                 DimmerLongPress       Works                WeMo_WW_2.00.11453.PVT-OWRT-Dimmer
-F7C063     Wemo Mini Plugin Switch                  Switch                Works                WeMo_WW_2.00.11452.PVT-OWRT-SNSV2
-F7C030     Wemo Light Switch                        LightSwitchLongPress  Works                WeMo_WW_2.00.11408.PVT-OWRT-LS
-WSP090     Wemo Outdoor Plug                        OutdoorPlug           Works                WEMO_WW_1.00.20081401.PVT-RTOS-OutdoorV1
-WSP080     Wemo Mini Smart Plug                     Switch                Works                WEMO_WW_4.00.20101902.PVT-RTOS-SNSV4
-=========  =======================================  ====================  ===================  ========================================
+`This pywemo wiki page`_ includes a table of all known WeMo products and the status within pywemo, including whether setup (connecting to a new network) works or not.
 
 Developing
 ----------
@@ -223,6 +172,7 @@ All contents of the pywemo/ouimeaux_device directory are licensed under a BSD 3-
 The rest of pyWeMo is released under the MIT license. See the top-level LICENSE file for more details.
 
 .. _this pywemo issue: https://github.com/pywemo/pywemo/issues/773
+.. _This pywemo wiki page: https://github.com/pywemo/pywemo/wiki/Device-Status-Registry
 
 .. |Build Badge| image:: https://github.com/pywemo/pywemo/workflows/Build/badge.svg
     :target: https://github.com/pywemo/pywemo/actions?query=workflow%3ABuild
