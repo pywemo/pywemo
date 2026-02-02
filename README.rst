@@ -101,6 +101,8 @@ A few important notes:
   It must be installed and available on your ``PATH`` via calling ``openssl`` from a terminal or command prompt.
 - For a WeMo without internet access, see `this guide <https://github.com/pywemo/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 
+Setup Troubleshooting
+~~~~~~~~~~~~~~~~~~~~~
 If you have issues connecting, here are several things worth trying:
 
 - Try again!
@@ -110,6 +112,7 @@ If you have issues connecting, here are several things worth trying:
 - WeMo devices can only connect to 2.4GHz Wi-Fi and sometimes have trouble connecting if the 2.4Ghz and 5Ghz SSID are the same.
 - If issues persist, consider performing a full factory reset and power cycle on the device before trying again.
 - Enabled firewall rules may block the WeMo from connecting to the intended AP.
+- One user indicated that switching the 2.4Ghz channel bandwidth from 40Mhz to 20Mhz (not verified, and this was regarding the Belkin app, not pywemo).
 - Based on various differences in models and firmware, pywemo contains 3 different methods for encrypting the Wi-Fi password when sending it to the WeMo device.
   In addition to the encryption, WeMo devices sometimes expect the get password lengths appended to the end of the password.
   There is logic in pywemo that attempts to select the appropriate options for each device, but it maybe not be correct for all devices and firmware.
