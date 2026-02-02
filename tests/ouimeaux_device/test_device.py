@@ -287,7 +287,7 @@ class TestDevice:
         ],
     )
     def test_encryption(self, method, add_lengths, expected, device):
-        """Test encryption using the OpenSSL binary (if it exists)."""
+        """Test encryption for the WiFi password."""
         actual = device.encrypt_aes128(
             "password", self.METAINFO, method, add_lengths
         )
