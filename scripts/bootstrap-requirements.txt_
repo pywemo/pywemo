@@ -13,7 +13,7 @@ cachecontrol==0.14.4 ; python_version >= "3.10" and python_full_version < "4.0.0
 certifi==2026.1.4 ; python_version >= "3.10" and python_full_version < "4.0.0" \
     --hash=sha256:9943707519e4add1115f44c2bc244f782c0249876bf51b6599fee1ffbedd685c \
     --hash=sha256:ac726dd470482006e014ad384921ed6438c457018f4b3d204aea4281258b2120
-cffi==2.0.0 ; python_version >= "3.10" and python_full_version < "4.0.0" and (platform_python_implementation != "PyPy" or sys_platform == "darwin") and (sys_platform == "linux" or sys_platform == "darwin") \
+cffi==2.0.0 ; python_version >= "3.10" and python_full_version < "4.0.0" and (platform_python_implementation != "PyPy" or sys_platform == "darwin") \
     --hash=sha256:00bdf7acc5f795150faa6957054fbbca2439db2f775ce831222b66f192f03beb \
     --hash=sha256:07b271772c100085dd28b74fa0cd81c8fb1a3ba18b21e03d7c27f3436a10606b \
     --hash=sha256:087067fa8953339c723661eda6b54bc98c5625757ea62e95eb4898ad5e776e9f \
@@ -221,7 +221,7 @@ colorama==0.4.6 ; python_version >= "3.10" and python_full_version < "4.0.0" and
 crashtest==0.4.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:80d7b1f316ebfbd429f648076d6275c877ba30ba48979de4191714a75266f0ce \
     --hash=sha256:8d23eac5fa660409f57472e3851dab7ac18aba459a8d19cbbba86d3d5aecd2a5
-cryptography==46.0.4 ; python_version >= "3.10" and python_full_version < "4.0.0" and sys_platform == "linux" \
+cryptography==46.0.4 ; python_version >= "3.10" and python_full_version < "4.0.0" \
     --hash=sha256:01df4f50f314fbe7009f54046e908d1754f19d0c6d3070df1e6268c5a4af09fa \
     --hash=sha256:0563655cb3c6d05fb2afe693340bc050c30f9f34e15763361cf08e94749401fc \
     --hash=sha256:078e5f06bd2fa5aea5a324f2a09f914b1484f1d0c2a4d6a8a28c74e72f65f2da \
@@ -424,13 +424,13 @@ pkginfo==1.12.1.2 ; python_version >= "3.10" and python_full_version < "4.0.0" \
 platformdirs==4.5.1 ; python_version >= "3.10" and python_full_version < "4.0.0" \
     --hash=sha256:61d5cdcc6065745cdd94f0f878977f8de9437be93de97c1c12f853c9c0cdcbda \
     --hash=sha256:d03afa3963c806a9bed9d5125c8f4cb2fdaf74a55ab60e5d59b3fde758104d31
-poetry-core==2.3.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:f6da8f021fe380d8c9716085f4dcc5d26a5120a2452e077196333892af5de307 \
-    --hash=sha256:fc42f3854e346e4b96fb2b38d29e6873ec2ed25fbd7b8f1afba06613a966eaef
-poetry==2.3.1 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:1067f3a500b57b348a7b7a2ec0ee8e09dce65164a21926b1f6713481d94e8ee4 \
-    --hash=sha256:423cbccfe3533155ce9f49e929780a1386e564b2d97d2380664ea388cfe1191c
-pycparser==3.0 ; python_version >= "3.10" and python_full_version < "4.0.0" and (platform_python_implementation != "PyPy" or sys_platform == "darwin") and implementation_name != "PyPy" and (sys_platform == "linux" or sys_platform == "darwin") \
+poetry-core==2.3.1 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:96f791d5d7d4e040f3983d76779425cf9532690e2756a24fd5ca0f86af19ef82 \
+    --hash=sha256:db1cf63b782570deb38bfba61e2304a553eef0740dc17959a50cc0f5115ee634
+poetry==2.3.2 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:4b64412c61b4de2c7268ffebbde7d564b655a37d29c2cd82bf1b52f15c8066b4 \
+    --hash=sha256:6e81526ae99a4f07f75174600bfe8b73e74c786dc18c9d1ce1800dd6f807414b
+pycparser==3.0 ; python_version >= "3.10" and python_full_version < "4.0.0" and (platform_python_implementation != "PyPy" or sys_platform == "darwin") and implementation_name != "PyPy" \
     --hash=sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29 \
     --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992
 pyproject-hooks==1.2.0 ; python_version >= "3.10" and python_full_version < "4.0.0" \
