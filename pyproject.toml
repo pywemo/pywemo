@@ -6,6 +6,12 @@ build-backend = "poetry.core.masonry.api"
 name = "pywemo"
 requires-python = ">=3.10.0"
 
+[project.urls]
+homepage = "https://github.com/pywemo/pywemo"
+documentation = "https://pywemo.github.io/pywemo/"
+releasenotes = "https://github.com/pywemo/pywemo/releases"
+github = "https://github.com/pywemo/pywemo"
+
 [tool.poetry]
 name = "pywemo"
 version = "2.1.1"
