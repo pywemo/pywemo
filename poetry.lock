@@ -866,14 +866,14 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "hypothesis"
-version = "6.151.4"
+version = "6.151.5"
 description = "The property-based testing library for Python"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "hypothesis-6.151.4-py3-none-any.whl", hash = "sha256:a1cf7e0fdaa296d697a68ff3c0b3912c0050f07aa37e7d2ff33a966749d1d9b4"},
-    {file = "hypothesis-6.151.4.tar.gz", hash = "sha256:658a62da1c3ccb36746ac2f7dc4bb1a6e76bd314e0dc54c4e1aaba2503d5545c"},
+    {file = "hypothesis-6.151.5-py3-none-any.whl", hash = "sha256:c0e15c91fa0e67bc0295551ef5041bebad42753b7977a610cd7a6ec1ad04ef13"},
+    {file = "hypothesis-6.151.5.tar.gz", hash = "sha256:ae3a0622f9693e6b19c697777c2c266c02801f9769ab7c2c37b7ec83d4743783"},
 ]
 
 [package.dependencies]
