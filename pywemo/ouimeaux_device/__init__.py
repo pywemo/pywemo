@@ -188,7 +188,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
         #   1
         # In both formats, the first integer value indicates the state.
         # 0 if off, 1 if on,
-        return {"state": params.split("|")[0]}
+        return {"state": params.split("|", maxsplit=1)[0]}
 
     def update_binary_state(self) -> None:
         """Update the cached copy of the basic state response."""
