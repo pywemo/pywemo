@@ -112,7 +112,8 @@ class Bridge(Device):
                     DevUDN=plugin_udn, ReqListType="PAIRED_LIST"
                 )
 
-            if not (end_devices_xml := end_devices.get("DeviceLists")):
+            end_devices_xml = end_devices.get("DeviceLists")
+            if not end_devices_xml or end_devices_xml == "0":
                 return self.lights, self.groups
 
             end_device_list = et.fromstring(
