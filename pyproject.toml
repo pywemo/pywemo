@@ -14,7 +14,7 @@ github = "https://github.com/pywemo/pywemo"
 
 [tool.poetry]
 name = "pywemo"
-version = "2.1.1"
+version = "2.1.2"
 description = "Lightweight Python module to discover and control WeMo devices"
 authors = ["Eric Severance <pywemo@esev.com>"]
 license = "MIT"
