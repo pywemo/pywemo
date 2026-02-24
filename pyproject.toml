@@ -33,7 +33,7 @@ lxml = ">=4.6"
 
 [tool.poetry.group.dev.dependencies]
 # formatter and linter
-ruff = "0.15.1"
+ruff = "0.15.2"
 # linters/code analysis
 pylint = ">=4.0.0"
 rstcheck = ">=3.3.1,<7.0.0"
