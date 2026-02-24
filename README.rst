@@ -24,9 +24,9 @@ In that case, you can use the device with an IP or hostname:
 .. code-block:: python
 
     >>> import pywemo
-    >>> url = pywemo.setup_url_for_address("192.168.1.192")
+    >>> url = pywemo.setup_url_for_address("10.22.22.1")
     >>> print(url)
-    http://192.168.1.192:49153/setup.xml
+    http://10.22.22.1:49153/setup.xml
     >>> device = pywemo.discovery.device_from_description(url)
     >>> print(device)
     <WeMo Maker "Hi Fi Systemline Sensor">
@@ -88,7 +88,7 @@ Device setup is through the ``setup`` method, which has two required arguments: 
 The user must first connect to the devices locally broadcast access point, which typically starts with "WeMo.", and then discover the device there.
 Once done, pass the desired SSID and password (WPA2/AES encryption only) to the ``setup`` method to connect it to your Wi-Fi network.
 
-``device.setup(ssid='wifi', password='secret')``
+``device[0].setup(ssid='wifi', password='secret')``
 
 A few important notes:
 
