@@ -1,5 +1,4 @@
 """Module to discover WeMo devices."""
-
 from __future__ import annotations
 
 import logging
@@ -22,6 +21,7 @@ from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
 from .ouimeaux_device.crockpot import CrockPot
 from .ouimeaux_device.dimmer import Dimmer, DimmerLongPress, DimmerV2
+from .ouimeaux_device.heater import Heater
 from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.insight import Insight
 from .ouimeaux_device.lightswitch import LightSwitch, LightSwitchLongPress
@@ -29,6 +29,7 @@ from .ouimeaux_device.maker import Maker
 from .ouimeaux_device.motion import Motion
 from .ouimeaux_device.outdoor_plug import OutdoorPlug
 from .ouimeaux_device.switch import Switch
+
 
 LOG = logging.getLogger(__name__)
 _uuid_seen = set()  # See _call_once_per_uuid.
@@ -119,6 +120,12 @@ def device_from_uuid_and_location(  # noqa: C901
             return Humidifier(location)
         if uuid.startswith("uuid:OutdoorPlug"):
             return OutdoorPlug(location)
+        if uuid.startswith("uuid:Heater"):
+            return Heater(location)
+        if uuid.startswith("uuid:HeaterA"):
+            return Heater(location)
+        if uuid.startswith("uuid:HeaterB"):
+            return Heater(location)
     except (InvalidSchemaError, MissingServiceError) as err:
         _call_once_per_uuid(
             uuid,

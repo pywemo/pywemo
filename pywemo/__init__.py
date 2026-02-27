@@ -1,8 +1,7 @@
 r"""Lightweight Python module to discover and control WeMo devices.
-
 .. include:: README.md
 """
-
+# flake8: noqa F401
 from .discovery import (
     device_from_description,
     discover_devices,
@@ -18,6 +17,14 @@ from .ouimeaux_device.bridge import Light as BridgeLight
 from .ouimeaux_device.coffeemaker import CoffeeMaker, CoffeeMakerMode
 from .ouimeaux_device.crockpot import CrockPot, CrockPotMode
 from .ouimeaux_device.dimmer import Dimmer, DimmerLongPress, DimmerV2
+from .ouimeaux_device.heater import (
+    AutoOffTime,
+    Heater,
+    Mode as HeaterMode,
+    SetTemperature,
+    Temperature as HeaterTemperature,
+    TimeRemaining,
+)
 from .ouimeaux_device.humidifier import (
     DesiredHumidity,
     FanMode,
