@@ -13,7 +13,7 @@ from pywemo.ouimeaux_device.heater import Heater, Mode, Temperature
 @pytest.fixture
 def heater(vcr):
     with vcr.use_cassette("heater_setup.yaml"):
-        return Heater("http://192.168.0.54:49153/setup.xml")
+        return Heater("http://192.168.1.100:49153/setup.xml")
 
 
 @pytest.mark.vcr

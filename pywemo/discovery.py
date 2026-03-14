@@ -120,11 +120,11 @@ def device_from_uuid_and_location(  # noqa: C901
             return Humidifier(location)
         if uuid.startswith("uuid:OutdoorPlug"):
             return OutdoorPlug(location)
-        if uuid.startswith("uuid:Heater"):
-            return Heater(location)
         if uuid.startswith("uuid:HeaterA"):
             return Heater(location)
         if uuid.startswith("uuid:HeaterB"):
+            return Heater(location)
+        if uuid.startswith("uuid:Heater"):
             return Heater(location)
     except (InvalidSchemaError, MissingServiceError) as err:
         _call_once_per_uuid(
