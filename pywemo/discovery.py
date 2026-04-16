@@ -22,6 +22,7 @@ from .ouimeaux_device.bridge import Bridge
 from .ouimeaux_device.coffeemaker import CoffeeMaker
 from .ouimeaux_device.crockpot import CrockPot
 from .ouimeaux_device.dimmer import Dimmer, DimmerLongPress, DimmerV2
+from .ouimeaux_device.heater import Heater
 from .ouimeaux_device.humidifier import Humidifier
 from .ouimeaux_device.insight import Insight
 from .ouimeaux_device.lightswitch import LightSwitch, LightSwitchLongPress
@@ -119,6 +120,12 @@ def device_from_uuid_and_location(  # noqa: C901
             return Humidifier(location)
         if uuid.startswith("uuid:OutdoorPlug"):
             return OutdoorPlug(location)
+        if uuid.startswith("uuid:HeaterA"):
+            return Heater(location)
+        if uuid.startswith("uuid:HeaterB"):
+            return Heater(location)
+        if uuid.startswith("uuid:Heater"):
+            return Heater(location)
     except (InvalidSchemaError, MissingServiceError) as err:
         _call_once_per_uuid(
             uuid,
