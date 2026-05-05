@@ -214,7 +214,7 @@ files = [
     {file = "cffi-2.0.0-cp39-cp39-win_amd64.whl", hash = "sha256:b882b3df248017dba09d6b16defe9b5c407fe32fc7c65a9c69798e6175601be9"},
     {file = "cffi-2.0.0.tar.gz", hash = "sha256:44d1b5909021139fe36001ae048dbdde8214afa20200eda0f64c068cac5d5529"},
 ]
-markers = {main = "platform_python_implementation != \"PyPy\"", bootstrap = "sys_platform == \"darwin\" or platform_python_implementation != \"PyPy\""}
+markers = {main = "platform_python_implementation != \"PyPy\"", bootstrap = "platform_python_implementation != \"PyPy\" or sys_platform == \"darwin\""}
 
 [package.dependencies]
 pycparser = {version = "*", markers = "implementation_name != \"PyPy\""}
@@ -972,14 +972,14 @@ files = [
 
 [[package]]
 name = "installer"
-version = "0.7.0"
+version = "1.0.0"
 description = "A library for installing Python wheels."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.10"
 groups = ["bootstrap"]
 files = [
-    {file = "installer-0.7.0-py3-none-any.whl", hash = "sha256:05d1933f0a5ba7d8d6296bb6d5018e7c94fa473ceb10cf198a92ccea19c27b53"},
-    {file = "installer-0.7.0.tar.gz", hash = "sha256:a26d3e3116289bb08216e0d0f7d925fcef0b0194eedfa0c944bcaaa106c4b631"},
+    {file = "installer-1.0.0-py3-none-any.whl", hash = "sha256:7b46327ded20d8544bfe2d8561618bbcd12d88e7e3645333af1ed141d8bc1bfe"},
+    {file = "installer-1.0.0.tar.gz", hash = "sha256:c6d691331621cf3fec4822f5c6f83cab3705f79b316225dc454127411677c71f"},
 ]
 
 [[package]]
@@ -1858,14 +1858,14 @@ testing = ["coverage", "pytest", "pytest-benchmark"]
 
 [[package]]
 name = "poetry"
-version = "2.3.4"
+version = "2.4.0"
 description = "Python dependency management and packaging made easy."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["bootstrap"]
 files = [
-    {file = "poetry-2.3.4-py3-none-any.whl", hash = "sha256:2755806ed8a9f31340ea1b5f0e507da54c96437647ebf2873b6ca349be04e231"},
-    {file = "poetry-2.3.4.tar.gz", hash = "sha256:b293572d366569360c79d7caa6980c9b404d2b89530ed451a5b4570d248de3af"},
+    {file = "poetry-2.4.0-py3-none-any.whl", hash = "sha256:02e2120e22d3264e320d386b7e6f13996aa9f4caf573188c1bf417252ffe5218"},
+    {file = "poetry-2.4.0.tar.gz", hash = "sha256:5e343ed7e71cdf1c7b5b5a7c6194a8b85e1700d3ae905ef0d22f6d021b49f2bc"},
 ]
 
 [package.dependencies]
@@ -1874,14 +1874,14 @@ cachecontrol = {version = ">=0.14.0,<0.15.0", extras = ["filecache"]}
 cleo = ">=2.1.0,<3.0.0"
 dulwich = ">=0.25.0,<2"
 fastjsonschema = ">=2.18.0,<3.0.0"
-findpython = ">=0.6.2,<0.8.0"
-installer = ">=0.7.0,<0.8.0"
+findpython = ">=0.6.2,<0.9.0"
+installer = ">=1.0.0,<2.0.0"
 keyring = ">=25.1.0,<26.0.0"
 packaging = ">=24.2"
 pbs-installer = {version = ">=2025.6.10", extras = ["download", "install"]}
 pkginfo = ">=1.12,<2.0"
 platformdirs = ">=3.0.0,<5"
-poetry-core = "2.3.2"
+poetry-core = "2.4.0"
 pyproject-hooks = ">=1.0.0,<2.0.0"
 requests = ">=2.26,<3.0"
 requests-toolbelt = ">=1.0.0,<2.0.0"
@@ -1894,14 +1894,14 @@ xattr = {version = ">=1.0.0,<2.0.0", markers = "sys_platform == \"darwin\""}
 
 [[package]]
 name = "poetry-core"
-version = "2.3.2"
+version = "2.4.0"
 description = "Poetry PEP 517 Build Backend"
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["bootstrap"]
 files = [
-    {file = "poetry_core-2.3.2-py3-none-any.whl", hash = "sha256:23df641b64f87fbb4ce1873c1915a4d4bb1b7d808c596e4307edc073e68d7234"},
-    {file = "poetry_core-2.3.2.tar.gz", hash = "sha256:20cb71be27b774628da9f384effd9183dfceb53bcef84063248a8672aa47031f"},
+    {file = "poetry_core-2.4.0-py3-none-any.whl", hash = "sha256:4305848477da00272bebd3f615bbec87f64bd117cdb858ab660b626a06a9d96c"},
+    {file = "poetry_core-2.4.0.tar.gz", hash = "sha256:4e8c7496cf797998ffc493f2e23eba4b038c894c08eadacdcdf688945de6b43a"},
 ]
 
 [[package]]
@@ -1934,7 +1934,7 @@ files = [
     {file = "pycparser-3.0-py3-none-any.whl", hash = "sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992"},
     {file = "pycparser-3.0.tar.gz", hash = "sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29"},
 ]
-markers = {main = "implementation_name != \"PyPy\" and platform_python_implementation != \"PyPy\"", bootstrap = "sys_platform == \"darwin\" and implementation_name != \"PyPy\" or platform_python_implementation != \"PyPy\" and implementation_name != \"PyPy\""}
+markers = {main = "platform_python_implementation != \"PyPy\" and implementation_name != \"PyPy\"", bootstrap = "(platform_python_implementation != \"PyPy\" or sys_platform == \"darwin\") and implementation_name != \"PyPy\""}
 
 [[package]]
 name = "pydantic"
