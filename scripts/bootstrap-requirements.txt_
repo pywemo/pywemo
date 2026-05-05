@@ -13,7 +13,7 @@ cachecontrol==0.14.4 ; python_version >= "3.10" and python_full_version < "4.0.0
 certifi==2026.1.4 ; python_version >= "3.10" and python_full_version < "4.0.0" \
     --hash=sha256:9943707519e4add1115f44c2bc244f782c0249876bf51b6599fee1ffbedd685c \
     --hash=sha256:ac726dd470482006e014ad384921ed6438c457018f4b3d204aea4281258b2120
-cffi==2.0.0 ; python_version >= "3.10" and python_full_version < "4.0.0" and (platform_python_implementation != "PyPy" or sys_platform == "darwin") \
+cffi==2.0.0 ; python_version >= "3.10" and python_full_version < "4.0.0" and (sys_platform == "darwin" or platform_python_implementation != "PyPy") \
     --hash=sha256:00bdf7acc5f795150faa6957054fbbca2439db2f775ce831222b66f192f03beb \
     --hash=sha256:07b271772c100085dd28b74fa0cd81c8fb1a3ba18b21e03d7c27f3436a10606b \
     --hash=sha256:087067fa8953339c723661eda6b54bc98c5625757ea62e95eb4898ad5e776e9f \
@@ -430,7 +430,7 @@ poetry-core==2.3.2 ; python_version >= "3.10" and python_version < "4.0" \
 poetry==2.3.4 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:2755806ed8a9f31340ea1b5f0e507da54c96437647ebf2873b6ca349be04e231 \
     --hash=sha256:b293572d366569360c79d7caa6980c9b404d2b89530ed451a5b4570d248de3af
-pycparser==3.0 ; python_version >= "3.10" and python_full_version < "4.0.0" and (platform_python_implementation != "PyPy" or sys_platform == "darwin") and implementation_name != "PyPy" \
+pycparser==3.0 ; python_version >= "3.10" and python_full_version < "4.0.0" and (sys_platform == "darwin" or platform_python_implementation != "PyPy") and implementation_name != "PyPy" \
     --hash=sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29 \
     --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992
 pyproject-hooks==1.2.0 ; python_version >= "3.10" and python_full_version < "4.0.0" \
