@@ -1858,14 +1858,14 @@ testing = ["coverage", "pytest", "pytest-benchmark"]
 
 [[package]]
 name = "poetry"
-version = "2.4.0"
+version = "2.4.1"
 description = "Python dependency management and packaging made easy."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["bootstrap"]
 files = [
-    {file = "poetry-2.4.0-py3-none-any.whl", hash = "sha256:02e2120e22d3264e320d386b7e6f13996aa9f4caf573188c1bf417252ffe5218"},
-    {file = "poetry-2.4.0.tar.gz", hash = "sha256:5e343ed7e71cdf1c7b5b5a7c6194a8b85e1700d3ae905ef0d22f6d021b49f2bc"},
+    {file = "poetry-2.4.1-py3-none-any.whl", hash = "sha256:a91f13279a3c9add0d12c5ca5c7cb173622930a5c8272fee68c751cb5c72f951"},
+    {file = "poetry-2.4.1.tar.gz", hash = "sha256:189399b80347ecf908244b2564a7b1d92b648fa1fe2a204888f94a472fec0cac"},
 ]
 
 [package.dependencies]
@@ -1875,7 +1875,7 @@ cleo = ">=2.1.0,<3.0.0"
 dulwich = ">=0.25.0,<2"
 fastjsonschema = ">=2.18.0,<3.0.0"
 findpython = ">=0.6.2,<0.9.0"
-installer = ">=1.0.0,<2.0.0"
+installer = ">=0.7.0,<2.0.0"
 keyring = ">=25.1.0,<26.0.0"
 packaging = ">=24.2"
 pbs-installer = {version = ">=2025.6.10", extras = ["download", "install"]}
