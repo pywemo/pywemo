@@ -31,7 +31,9 @@ from .ouimeaux_device.outdoor_plug import OutdoorPlug
 from .ouimeaux_device.switch import Switch
 
 LOG = logging.getLogger(__name__)
-_uuid_seen = set()  # See _call_once_per_uuid.
+
+# see _call_once_per_uuid for use of _uuid_seen
+_uuid_seen: set[tuple[str, Callable[..., Any]]] = set()
 
 
 def _call_once_per_uuid(
