@@ -12,7 +12,8 @@ How to use
     >>> print(devices)
     [<WeMo Insight "AC Insight">]
 
-    >>> devices[0].toggle()
+    >>> device = devices[0]
+    >>> device.toggle()
 
 For advanced usage, the ``device.explain()`` method will print all known actions that the device reports to PyWeMo.
 
