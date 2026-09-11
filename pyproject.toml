@@ -5,23 +5,20 @@ build-backend = "poetry.core.masonry.api"
 [project]
 name = "pywemo"
 requires-python = ">=3.10.0"
+version = "2.1.2"
+description = "Lightweight Python module to discover and control WeMo devices"
+authors = [
+  {name = "Eric Severance", email = "pywemo@esev.com"},
+]
+license = "MIT"
+readme = "README.rst"
+keywords = ['wemo', 'api']
 
 [project.urls]
 homepage = "https://github.com/pywemo/pywemo"
 documentation = "https://pywemo.github.io/pywemo/"
 releasenotes = "https://github.com/pywemo/pywemo/releases"
 github = "https://github.com/pywemo/pywemo"
-
-[tool.poetry]
-name = "pywemo"
-version = "2.1.2"
-description = "Lightweight Python module to discover and control WeMo devices"
-authors = ["Eric Severance <pywemo@esev.com>"]
-license = "MIT"
-readme = "README.rst"
-repository = "https://github.com/pywemo/pywemo"
-homepage = "https://github.com/pywemo/pywemo"
-keywords = ['wemo', 'api']
 
 [tool.poetry.dependencies]
 python = "^3.10.0"
@@ -88,9 +85,15 @@ ignore = [
   "ISC001",
   "ISC002",
   'E501',
+  #
   # other exclusions below here
+  #
   "D203",    # incompatible with D211
   "D213",    # incompatible with D212
+  #
+  # intentional ignores below here (don't want to follow the rule)
+  #
+  "CPY001",  # copyright notice in every file
   #
   # TODO: remove these below and update code to follow rules or selectively
   #       ignore these rules (these are added here temporarily to get ruff
