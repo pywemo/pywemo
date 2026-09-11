@@ -144,7 +144,7 @@ class Test_Maker:
             ),
         ],
     )
-    def test_subscription_update(
+    def test_subscription_update(  # noqa: PLR0917
         self,
         update,
         has_sensor,
