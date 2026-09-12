@@ -88,19 +88,29 @@ class Heater(AttributeDevice):
 
     @property
     def current_temperature(self) -> float:
-        """Return the current temperature in current units."""
-        # Device returns temperature in the display unit (respects TempUnit)
-        return float(self._attributes.get("Temperature", 0))
+        """Return the current temperature in Celsius.
+
+        Note: Device may return in either unit depending on state.
+        Values > 50 are Fahrenheit (room temp in C is always < 50).
+        """
+        raw_value = float(self._attributes.get("Temperature", 0))
+        if raw_value > 50:
+            return round(self._fahrenheit_to_celsius(raw_value), 1)
+        return raw_value
 
     @property
     def target_temperature(self) -> float:
-        """Return the target temperature in current units."""
-        # Device always returns SetTemperature in Fahrenheit internally,
-        # regardless of TempUnit setting. Convert to display unit here.
+        """Return the target temperature in Celsius.
+
+        Note: Device may return SetTemperature in either Fahrenheit
+        or Celsius depending on device state and firmware. Values
+        > 50 are always Fahrenheit (max Celsius target is 29).
+        This heuristic matches the homebridge-wemo approach.
+        """
         raw_value = float(self._attributes.get("SetTemperature", 0))
-        if self.temperature_unit == Temperature.Celsius:
+        if raw_value > 50:
             return round(self._fahrenheit_to_celsius(raw_value), 1)
-        return raw_value
+        return round(raw_value, 1)
 
     def set_target_temperature(self, temperature: float) -> None:
         """Set the target temperature.
