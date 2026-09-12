@@ -99,7 +99,7 @@ class Heater(AttributeDevice):
         # regardless of TempUnit setting. Convert to display unit here.
         raw_value = float(self._attributes.get("SetTemperature", 0))
         if self.temperature_unit == Temperature.Celsius:
-            return round(self._fahrenheit_to_celsius(raw_value))
+            return round(self._fahrenheit_to_celsius(raw_value), 1)
         return raw_value
 
     def set_target_temperature(self, temperature: float) -> None:

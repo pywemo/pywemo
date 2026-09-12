@@ -98,17 +98,15 @@ def test_set_target_temperature_celsius(heater):
 
 @pytest.mark.vcr
 def test_set_target_temperature_rounds(heater):
-    """Test that target temperature is rounded to whole degree."""
+    """Test that target temperature preserves one decimal."""
     heater.set_mode(Mode.Eco)
 
     # Set temperature with decimal
     heater.set_target_temperature(21.7)
 
-    # Device rounds internally - should return a whole number or the rounded value
     target = heater.target_temperature
     assert isinstance(target, float)
-    # Accept either 21.7 (device doesn't round) or 22.0 (device rounds)
-    assert target in [21.0, 22.0, 21.7]  # Device behavior may vary
+    assert target == 21.7
 
 
 @pytest.mark.vcr
