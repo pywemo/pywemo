@@ -284,3 +284,44 @@ def test_complete_workflow(heater):
     # 6. Return to Eco mode
     heater.set_mode(Mode.Eco)
     assert heater.mode == Mode.Eco
+
+
+@pytest.mark.vcr
+def test_temperature_precision_celsius(heater):
+    """Test temperature precision through C->F->C round trip.
+
+    Hardware testing (firmware WeMo_WW_2.00.11423.PVT-OWRT-Smart) reveals:
+    - Device stores temperatures as integer Fahrenheit internally
+    - TempUnit is read-only (always 0/Celsius) on this firmware
+    - Setting 22.123456789°C converts to 71.822°F, device stores as
+      integer 71°F, then returns 22.0°C (integer Celsius)
+    """
+    heater.set_mode(Mode.Eco)
+    heater.set_temperature_unit(Temperature.Celsius)
+
+    heater.set_target_temperature(22.123456789)
+
+    target = heater.target_temperature
+    assert isinstance(target, float)
+    # Device stores integer F: 22.123°C -> 71.822°F -> 71°F -> 22.0°C
+    assert target == 22.0
+
+
+@pytest.mark.vcr
+def test_temperature_precision_fahrenheit_response(heater):
+    """Test precision when device returns raw Fahrenheit value.
+
+    Hardware testing shows GetAttributes sometimes returns the raw
+    Fahrenheit value before the device converts to Celsius internally.
+    The >50 heuristic correctly handles this:
+    71.0 > 50 -> (71.0 - 32) * 5/9 = 21.7°C
+    """
+    heater.set_mode(Mode.Eco)
+    heater.set_temperature_unit(Temperature.Celsius)
+
+    heater.set_target_temperature(22.123456789)
+
+    target = heater.target_temperature
+    assert isinstance(target, float)
+    # Device returned raw F (71.0); >50 heuristic: (71-32)*5/9 = 21.7°C
+    assert target == 21.7
