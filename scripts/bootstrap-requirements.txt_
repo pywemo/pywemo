@@ -606,9 +606,9 @@ platformdirs==4.11.3 ; python_version >= "3.10" and python_full_version < "4.0.0
 poetry-core==2.4.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:4305848477da00272bebd3f615bbec87f64bd117cdb858ab660b626a06a9d96c \
     --hash=sha256:4e8c7496cf797998ffc493f2e23eba4b038c894c08eadacdcdf688945de6b43a
-poetry==2.4.2 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:a506d6ff7fcc54a3472b2618145b8e4a1ef8d76d52836d41b813fa1b36083a08 \
-    --hash=sha256:e547fa69196fc109ee0900e233222732b08b8732c4345252a34d68968c0498f2
+poetry==2.4.3 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:79ce90140d0dcded93bab2df97fdd26b433f6949d834b4ac7bb1951aaca65c2f \
+    --hash=sha256:f5687e723512332ffe2469f81624d8c9ecbe69c16eb84889decbd85ecfc282e7
 pycparser==3.0 ; python_version >= "3.10" and python_full_version < "4.0.0" and (sys_platform == "linux" or sys_platform == "darwin") and implementation_name != "PyPy" and (platform_python_implementation != "PyPy" or sys_platform == "darwin") \
     --hash=sha256:600f49d217304a5902ac3c37e1281c9fe94e4d0489de643a9504c5cdfdfc6b29 \
     --hash=sha256:b727414169a36b7d524c1c3e31839a521725078d7b2ff038656844266160a992
