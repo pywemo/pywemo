@@ -287,41 +287,71 @@ def test_complete_workflow(heater):
 
 
 @pytest.mark.vcr
-def test_temperature_precision_celsius(heater):
-    """Test temperature precision through C->F->C round trip.
+def test_precision_many_decimals(heater):
+    """Test that many decimal digits are reduced to integer precision.
 
-    Hardware testing (firmware WeMo_WW_2.00.11423.PVT-OWRT-Smart) reveals:
-    - Device stores temperatures as integer Fahrenheit internally
-    - TempUnit is read-only (always 0/Celsius) on this firmware
-    - Setting 22.123456789°C converts to 71.822°F, device stores as
-      integer 71°F, then returns 22.0°C (integer Celsius)
+    22.123456789°C -> 71.822°F sent -> device stores 71°F -> returns 22.0°C.
+    Hardware: firmware WeMo_WW_2.00.11423.PVT-OWRT-Smart, HeaterA.
     """
     heater.set_mode(Mode.Eco)
     heater.set_temperature_unit(Temperature.Celsius)
-
     heater.set_target_temperature(22.123456789)
 
-    target = heater.target_temperature
-    assert isinstance(target, float)
-    # Device stores integer F: 22.123°C -> 71.822°F -> 71°F -> 22.0°C
-    assert target == 22.0
+    assert heater.target_temperature == 22.0
 
 
 @pytest.mark.vcr
-def test_temperature_precision_fahrenheit_response(heater):
-    """Test precision when device returns raw Fahrenheit value.
+def test_precision_half_degree(heater):
+    """Test that half-degree is lost in Fahrenheit truncation.
 
-    Hardware testing shows GetAttributes sometimes returns the raw
-    Fahrenheit value before the device converts to Celsius internally.
-    The >50 heuristic correctly handles this:
-    71.0 > 50 -> (71.0 - 32) * 5/9 = 21.7°C
+    22.5°C -> 72.5°F sent -> device stores 72°F (truncates, does NOT
+    round to 73) -> returns 22.0°C. The 0.5°C is lost.
     """
     heater.set_mode(Mode.Eco)
     heater.set_temperature_unit(Temperature.Celsius)
+    heater.set_target_temperature(22.5)
 
-    heater.set_target_temperature(22.123456789)
+    assert heater.target_temperature == 22.0
 
-    target = heater.target_temperature
-    assert isinstance(target, float)
-    # Device returned raw F (71.0); >50 heuristic: (71-32)*5/9 = 21.7°C
-    assert target == 21.7
+
+@pytest.mark.vcr
+def test_precision_whole_degree_23(heater):
+    """Test that whole degrees survive the C->F->C round trip.
+
+    23.0°C -> 73.4°F sent -> device stores 73°F -> returns 23.0°C.
+    """
+    heater.set_mode(Mode.Eco)
+    heater.set_temperature_unit(Temperature.Celsius)
+    heater.set_target_temperature(23.0)
+
+    assert heater.target_temperature == 23.0
+
+
+@pytest.mark.vcr
+def test_precision_whole_degree_24(heater):
+    """Test another whole degree surviving the round trip.
+
+    24.0°C -> 75.2°F sent -> device stores 75°F -> returns 24.0°C.
+    """
+    heater.set_mode(Mode.Eco)
+    heater.set_temperature_unit(Temperature.Celsius)
+    heater.set_target_temperature(24.0)
+
+    assert heater.target_temperature == 24.0
+
+
+@pytest.mark.vcr
+def test_precision_fahrenheit_return(heater):
+    """Test >50 heuristic when device returns raw Fahrenheit.
+
+    Same 24.0°C input as test_precision_whole_degree_24, but the VCR
+    cassette captures the timing-dependent case where GetAttributes
+    returns the raw Fahrenheit value (75.0) instead of the converted
+    Celsius (24.0). The >50 heuristic converts it:
+    75.0 > 50 -> (75 - 32) * 5/9 = 23.9°C.
+    """
+    heater.set_mode(Mode.Eco)
+    heater.set_temperature_unit(Temperature.Celsius)
+    heater.set_target_temperature(24.0)
+
+    assert heater.target_temperature == 23.9
