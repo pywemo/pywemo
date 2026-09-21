@@ -25,7 +25,7 @@ python = "^3.10.0"
 cryptography = ">=3.4"
 ifaddr = ">=0.1.0"
 requests = ">=2.0"
-urllib3 = ">=2.0.2"
+urllib3 = ">=2.8.0"
 lxml = ">=4.6"
 
 [tool.poetry.group.dev.dependencies]
