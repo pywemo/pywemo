@@ -40,7 +40,7 @@ types-requests = ">=2.33.0.20260906"
 # testing and code coverage
 pytest = ">=7.3.1,<10.0.0"
 pytest-vcr = "1.0.2"
-coverage = "^7.2.4"
+coverage = "^7.16.1"
 hypothesis = "^6.168.0"
 # version of generateDS used to create device.py and service.py in .../api/xsd
 generateDS = "2.44.3"
