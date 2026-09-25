@@ -135,7 +135,10 @@ class Heater(AttributeDevice):
         if self.temperature_unit == Temperature.Celsius:
             temp_fahrenheit = self._celsius_to_fahrenheit(temp_value)
         else:
-            temp_fahrenheit = temp_value
+            # Already in Fahrenheit — round to integer since the device
+            # truncates (floors) decimal F values. Rounding first ensures
+            # e.g. 72.9°F becomes 73°F, not 72°F.
+            temp_fahrenheit = float(round(temp_value))
 
         # Send to device (always in Fahrenheit).
         # _set_attributes updates _attributes["SetTemperature"]
