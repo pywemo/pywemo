@@ -135,22 +135,6 @@ def test_temperature_unit_celsius(heater):
 
 
 @pytest.mark.vcr
-def test_set_temperature_unit(heater):
-    """Test temperature unit property."""
-    # Just verify we can read the current temperature unit
-    unit = heater.temperature_unit
-    assert unit in [Temperature.Celsius, Temperature.Fahrenheit]
-
-    # Verify the string representation matches
-    if unit == Temperature.Celsius:
-        assert heater.temperature_unit_string == "C"
-    else:
-        assert heater.temperature_unit_string == "F"
-
-    # Note: Changing temperature unit via API may not be supported by device firmware
-
-
-@pytest.mark.vcr
 def test_heating_status(heater):
     """Test heating status property."""
     # Set to High mode - should be heating
@@ -215,8 +199,7 @@ def test_get_state_force_update(heater):
 @pytest.mark.vcr
 def test_temperature_range(heater):
     """Test get_temperature_range method."""
-    # In Celsius mode
-    heater.set_temperature_unit(Temperature.Celsius)
+    # Device is in Celsius mode (TempUnit=0, read-only via API)
     min_temp, max_temp = heater.get_temperature_range()
 
     assert min_temp == 16
@@ -253,7 +236,6 @@ def test_temperature_celsius_to_fahrenheit_conversion(heater):
     """Test that Celsius temperatures are converted to Fahrenheit for API."""
     # This test verifies the critical fix for Celsius mode
     heater.set_mode(Mode.Eco)
-    heater.set_temperature_unit(Temperature.Celsius)
 
     # Set 22°C (should convert to ~72°F for API)
     heater.set_target_temperature(22.0)
@@ -299,7 +281,6 @@ def test_precision_many_decimals(heater):
     Hardware: firmware WeMo_WW_2.00.11423.PVT-OWRT-Smart, HeaterA.
     """
     heater.set_mode(Mode.Eco)
-    heater.set_temperature_unit(Temperature.Celsius)
     heater.set_target_temperature(22.123456789)
 
     assert heater.target_temperature == 22.0
@@ -313,7 +294,6 @@ def test_precision_half_degree(heater):
     round to 73) -> returns 22.0°C. The 0.5°C is lost.
     """
     heater.set_mode(Mode.Eco)
-    heater.set_temperature_unit(Temperature.Celsius)
     heater.set_target_temperature(22.5)
 
     assert heater.target_temperature == 22.0
@@ -326,7 +306,6 @@ def test_precision_whole_degree_23(heater):
     23.0°C -> 73.4°F sent -> device stores 73°F -> returns 23.0°C.
     """
     heater.set_mode(Mode.Eco)
-    heater.set_temperature_unit(Temperature.Celsius)
     heater.set_target_temperature(23.0)
 
     assert heater.target_temperature == 23.0
@@ -339,7 +318,6 @@ def test_precision_whole_degree_24(heater):
     24.0°C -> 75.2°F sent -> device stores 75°F -> returns 24.0°C.
     """
     heater.set_mode(Mode.Eco)
-    heater.set_temperature_unit(Temperature.Celsius)
     heater.set_target_temperature(24.0)
 
     assert heater.target_temperature == 24.0
@@ -357,7 +335,6 @@ def test_precision_fahrenheit_return(heater):
     With round-to-integer, both C and F return paths give the same result.
     """
     heater.set_mode(Mode.Eco)
-    heater.set_temperature_unit(Temperature.Celsius)
     heater.set_target_temperature(24.0)
 
     assert heater.target_temperature == 24.0

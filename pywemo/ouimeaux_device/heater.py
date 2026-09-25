@@ -55,7 +55,15 @@ class _Attributes(TypedDict, total=False):
 
 
 class Heater(AttributeDevice):
-    """Representation of a WeMo Heater device."""
+    """Representation of a WeMo Heater device.
+
+    Note: The TempUnit attribute is read-only via the API. SetAttributes
+    with TempUnit returns HTTP 200 but GetAttributes always returns the
+    original value. The display unit can only be changed physically on
+    the device. Because of this, set_temperature_unit() is intentionally
+    not exposed. The >50 heuristic in target_temperature and
+    current_temperature handles both C and F returns transparently.
+    """
 
     _state_property = "mode"
     _attributes: _Attributes
@@ -178,25 +186,6 @@ class Heater(AttributeDevice):
     def temperature_unit_string(self) -> str:
         """Return temperature unit as string."""
         return "C" if self.temperature_unit == Temperature.Celsius else "F"
-
-    def set_temperature_unit(self, unit: str | int) -> None:
-        """Set the temperature unit.
-
-        Args:
-            unit: Temperature enum value, int (0=F, 1=C), or string ('F', 'C')
-
-        Notes:
-            This only changes the DISPLAY unit. The API always uses Fahrenheit
-            internally.
-
-        """
-        if isinstance(unit, str):
-            unit = (
-                Temperature.Celsius
-                if unit.upper() == "C"
-                else Temperature.Fahrenheit
-            )
-        self._set_attributes(("TempUnit", int(unit)))
 
     @property
     def auto_off_time(self) -> int:
