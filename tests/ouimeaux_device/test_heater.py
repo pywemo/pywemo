@@ -98,7 +98,12 @@ def test_set_target_temperature_celsius(heater):
 
 @pytest.mark.vcr
 def test_set_target_temperature_rounds(heater):
-    """Test that target temperature preserves one decimal."""
+    """Test that target temperature rounds to whole degrees.
+
+    The device stores integer Fahrenheit internally, so fractional
+    Celsius input is rounded: 21.7°C -> 71.06°F -> stores 71°F ->
+    returns 21.7°C (device conversion) -> round(21.7, 0) = 22.0°C.
+    """
     heater.set_mode(Mode.Eco)
 
     # Set temperature with decimal
@@ -106,7 +111,7 @@ def test_set_target_temperature_rounds(heater):
 
     target = heater.target_temperature
     assert isinstance(target, float)
-    assert target == 21.7
+    assert target == 22.0
 
 
 @pytest.mark.vcr
@@ -348,10 +353,11 @@ def test_precision_fahrenheit_return(heater):
     cassette captures the timing-dependent case where GetAttributes
     returns the raw Fahrenheit value (75.0) instead of the converted
     Celsius (24.0). The >50 heuristic converts it:
-    75.0 > 50 -> (75 - 32) * 5/9 = 23.9°C.
+    75.0 > 50 -> (75 - 32) * 5/9 = 23.89°C -> round(23.89, 0) = 24.0°C.
+    With round-to-integer, both C and F return paths give the same result.
     """
     heater.set_mode(Mode.Eco)
     heater.set_temperature_unit(Temperature.Celsius)
     heater.set_target_temperature(24.0)
 
-    assert heater.target_temperature == 23.9
+    assert heater.target_temperature == 24.0

@@ -95,7 +95,7 @@ class Heater(AttributeDevice):
         """
         raw_value = float(self._attributes.get("Temperature", 0))
         if raw_value > 50:
-            return round(self._fahrenheit_to_celsius(raw_value), 1)
+            return float(round(self._fahrenheit_to_celsius(raw_value)))
         return raw_value
 
     @property
@@ -109,8 +109,8 @@ class Heater(AttributeDevice):
         """
         raw_value = float(self._attributes.get("SetTemperature", 0))
         if raw_value > 50:
-            return round(self._fahrenheit_to_celsius(raw_value), 1)
-        return round(raw_value, 1)
+            return float(round(self._fahrenheit_to_celsius(raw_value)))
+        return float(round(raw_value))
 
     def set_target_temperature(self, temperature: float) -> None:
         """Set the target temperature.
