@@ -1,15 +1,18 @@
 """Provision visible open WeMo setup networks sequentially on Windows."""
 
+# Standalone checkout script, not a package module.
+# ruff: noqa: INP001
+
 import argparse
 import getpass
 import json
-from pathlib import Path
 import re
 import subprocess
 import tempfile
 import time
 import uuid
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 import setup_wifi
 
@@ -17,8 +20,11 @@ import setup_wifi
 def wlan(*args):
     """Invoke netsh without shell interpolation of SSIDs or profile names."""
     result = subprocess.run(
-        ["netsh", "wlan", *args], capture_output=True, text=True,
-        check=True, timeout=20,
+        ["netsh", "wlan", *args],
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=20,
     )
     return result.stdout
 
@@ -28,8 +34,10 @@ def connected():
     output = wlan("show", "interfaces")
     names = re.findall(r"^\s*SSID\s*:\s*(.+?)\s*$", output, re.MULTILINE)
     profiles = re.findall(r"^\s*Profile\s*:\s*(.+?)\s*$", output, re.MULTILINE)
-    return (names[0] if len(names) == 1 else None,
-            profiles[0] if len(profiles) == 1 else None)
+    return (
+        names[0] if len(names) == 1 else None,
+        profiles[0] if len(profiles) == 1 else None,
+    )
 
 
 def scan():
@@ -40,8 +48,13 @@ def scan():
         name = block.splitlines()[0].strip()
         auth = re.search(r"(?m)^\s*Authentication\s*:\s*(.+)$", block)
         encryption = re.search(r"(?m)^\s*Encryption\s*:\s*(.+)$", block)
-        if (name.casefold().startswith("wemo.") and auth and encryption
-                and auth[1].strip() == "Open" and encryption[1].strip() == "None"):
+        if (
+            name.casefold().startswith("wemo.")
+            and auth
+            and encryption
+            and auth[1].strip() == "Open"
+            and encryption[1].strip() == "None"
+        ):
             networks.append(name)
     return sorted(set(networks))
 
@@ -61,10 +74,12 @@ def profile_xml(name, ssid):
     ns = "http://www.microsoft.com/networking/WLAN/profile/v1"
     ET.register_namespace("", ns)
     root = ET.Element(f"{{{ns}}}WLANProfile")
+
     def add(parent, tag, value=None):
         element = ET.SubElement(parent, f"{{{ns}}}{tag}")
         element.text = value
         return element
+
     add(root, "name", name)
     config = add(root, "SSIDConfig")
     network = add(config, "SSID")
@@ -81,14 +96,23 @@ def profile_xml(name, ssid):
 
 
 def main():
+    """Provision the scan snapshot and restore the saved home connection."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--config", type=Path, default=setup_wifi.ROOT / "wemo-setup.json")
-    parser.add_argument("--list", action="store_true", help="List candidates without changing connections")
+    parser.add_argument(
+        "--config", type=Path, default=setup_wifi.ROOT / "wemo-setup.json"
+    )
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        help="List candidates without changing connections",
+    )
     args = parser.parse_args()
     results = []
     original_ssid, original_profile = connected()
     if not original_ssid or not original_profile:
-        parser.error("Start connected to your home Wi-Fi with a saved Windows profile.")
+        parser.error(
+            "Start connected to your home Wi-Fi with a saved Windows profile."
+        )
     candidates = scan()
     # Take one snapshot so failed devices are not retried indefinitely.
     print(f"Visible open WeMo setup networks: {candidates}", flush=True)
@@ -99,8 +123,12 @@ def main():
     if not isinstance(ssid, str) or not ssid.strip():
         parser.error("Config requires a nonempty ssid.")
     if original_ssid != ssid:
-        parser.error("Start on the target home Wi-Fi so its saved profile can be restored.")
-    password = config.get("password") or getpass.getpass(f"Password for {ssid}: ")
+        parser.error(
+            "Start on the target home Wi-Fi so its saved profile can be restored."
+        )
+    password = config.get("password") or getpass.getpass(
+        f"Password for {ssid}: "
+    )
     if not isinstance(password, str):
         parser.error("Password must be a string.")
     try:
@@ -110,22 +138,39 @@ def main():
             try:
                 with tempfile.TemporaryDirectory() as directory:
                     path = Path(directory) / "profile.xml"
-                    path.write_text(profile_xml(profile, network), encoding="utf-8")
+                    path.write_text(
+                        profile_xml(profile, network), encoding="utf-8"
+                    )
                     wlan("add", "profile", f"filename={path}", "user=current")
                 print(f"Connecting computer to {network}...", flush=True)
                 wlan("connect", f"name={profile}", f"ssid={network}")
                 wait_for(network)
                 # Allow DHCP to assign the setup network's address and gateway.
                 time.sleep(3)
-                code = setup_wifi.main(["--config", str(args.config)], supplied_password=password)
-                results.append((network, "setup reported success" if code == 0 else "failed or uncertain"))
+                code = setup_wifi.main(
+                    ["--config", str(args.config)], supplied_password=password
+                )
+                results.append(
+                    (
+                        network,
+                        "setup reported success"
+                        if code == 0
+                        else "failed or uncertain",
+                    )
+                )
             except Exception as exc:
-                print(f"{network}: {type(exc).__name__}; continuing", flush=True)
+                print(
+                    f"{network}: {type(exc).__name__}; continuing", flush=True
+                )
                 results.append((network, "failed or uncertain"))
             finally:
                 # Delete temporary profiles even if restoring home Wi-Fi fails.
                 try:
-                    wlan("connect", f"name={original_profile}", f"ssid={original_ssid}")
+                    wlan(
+                        "connect",
+                        f"name={original_profile}",
+                        f"ssid={original_ssid}",
+                    )
                     wait_for(original_ssid)
                 finally:
                     wlan("delete", "profile", f"name={profile}")
@@ -134,8 +179,14 @@ def main():
         print("Batch results:", flush=True)
         for network, result in results:
             print(f"  {network}: {result}")
-        print("Run home-network discovery to verify devices, including uncertain results.")
-    return 0 if all(result == "setup reported success" for _, result in results) else 1
+        print(
+            "Run home-network discovery to verify devices, including uncertain results."
+        )
+    return (
+        0
+        if all(result == "setup reported success" for _, result in results)
+        else 1
+    )
 
 
 if __name__ == "__main__":
