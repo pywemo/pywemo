@@ -96,6 +96,61 @@ A few important notes:
 - If connecting to an open network, the password argument is ignored and you can provide anything, e.g. ``password=None``.
 - For a WeMo without internet access, see `this guide <https://github.com/pywemo/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 
+Windows Setup Scripts
+~~~~~~~~~~~~~~~~~~~~~
+These checkout-local scripts use an existing Python environment with pywemo's
+dependencies installed. No internet connection is needed during provisioning.
+Run the commands from the repository root in PowerShell.
+
+Copy ``wemo-setup.example.json`` to ``wemo-setup.json`` and set ``ssid`` to your
+2.4 GHz WPA2/AES network name. Set ``password`` or leave it empty for a hidden
+prompt. The local configuration is ignored by Git; it stores any saved password
+in plaintext, so do not share it.
+
+For one device, connect Windows to its open ``WeMo.*`` setup network, then run:
+
+.. code-block:: powershell
+
+    .\.venv\Scripts\python.exe scripts\setup_wifi.py
+
+The script checks the connected SSID, detects its gateway, identifies the device,
+lists its visible networks, and attempts Wi-Fi setup. Failed attempts try the
+remaining password-encoding combinations. Logs include the encoding used and
+exception causes. If the setup endpoint disappears, the outcome is uncertain:
+reconnect to home Wi-Fi and verify discovery before retrying.
+
+Additional single-device options:
+
+.. code-block:: powershell
+
+    .\.venv\Scripts\python.exe scripts\setup_wifi.py --diagnose
+    .\.venv\Scripts\python.exe scripts\setup_wifi.py --ip 10.22.22.1
+    .\.venv\Scripts\python.exe scripts\setup_wifi.py --encrypt-method 3 --password-lengths yes
+    .\.venv\Scripts\python.exe scripts\setup_wifi.py --factory-reset
+
+Diagnostics do not change settings. Factory reset requires typing ``RESET`` and
+erases the identified device's name, rules and Wi-Fi settings.
+
+For a batch, start connected to the configured home network with a saved Windows
+Wi-Fi profile. Put the intended devices into setup mode, then run:
+
+.. code-block:: powershell
+
+    .\.venv\Scripts\python.exe scripts\setup_all_wifi.py --list
+    .\.venv\Scripts\python.exe scripts\setup_all_wifi.py
+
+The batch scans visible open ``WeMo.*`` networks once, connects to each in turn,
+runs the same setup logic, and restores the home connection between devices.
+It asks for the password once if absent from the config. Temporary open-network
+profiles are removed after use. It does not reset devices. Only run where all
+visible WeMo setup devices are ones you intend to configure. Devices outside
+Wi-Fi range or absent from the initial scan need another run.
+
+These scripts currently require English Windows ``netsh`` output, one connected
+Wi-Fi adapter, and Windows permission to scan/connect Wi-Fi (including location
+access where required). Setup success is the device's reported result, not
+independent home-network discovery verification.
+
 Setup Troubleshooting
 ~~~~~~~~~~~~~~~~~~~~~
 If you have issues connecting, here are several things worth trying:

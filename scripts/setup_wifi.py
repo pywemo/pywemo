@@ -17,6 +17,7 @@ import pywemo
 
 
 def report_failure(exc, password=""):
+    """Show chained errors without repeating exceptions or exposing the password."""
     seen = set()
     while exc is not None and id(exc) not in seen:
         seen.add(id(exc))
@@ -28,10 +29,12 @@ def report_failure(exc, password=""):
 
 
 def connect_with_fallback(device, ssid, password, method, lengths, explicit=False):
+    """Try firmware-specific password encodings, stopping when status is uncertain."""
     candidates = [(method, lengths)]
     if not explicit:
         candidates += [(1, True), (2, False), (3, True), (1, False), (2, True), (3, False)]
     candidates = list(dict.fromkeys(candidates))
+    # Explicit CLI overrides select one attempt; automatic mode tries each pair once.
     for index, (encoding, append_lengths) in enumerate(candidates, 1):
         print(
             f"Attempt {index}/{len(candidates)}: SSID={ssid}; "
@@ -70,6 +73,7 @@ def connect_with_fallback(device, ssid, password, method, lengths, explicit=Fals
 
 
 def check_setup_network():
+    """Prevent gateway probing on a home network or unrelated access point."""
     result = subprocess.run(
         ["netsh", "wlan", "show", "interfaces"],
         capture_output=True, text=True, check=True, timeout=20,
@@ -84,6 +88,7 @@ def check_setup_network():
 
 
 def detect_gateway():
+    """Read the active Wi-Fi gateway rather than assuming a fixed setup address."""
     command = (
         "Get-NetIPConfiguration | Where-Object { "
         "$_.NetAdapter.Status -eq 'Up' -and "
@@ -102,7 +107,7 @@ def detect_gateway():
     return gateways[0]
 
 
-def main():
+def main(argv=None, supplied_password=None):
     logging.basicConfig(
         level=logging.WARNING,
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
@@ -117,7 +122,7 @@ def main():
     modes.add_argument("--factory-reset", action="store_true", help="Erase device name, rules and Wi-Fi, then reboot")
     parser.add_argument("--encrypt-method", type=int, choices=(1, 2, 3))
     parser.add_argument("--password-lengths", choices=("yes", "no"))
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     try:
         check_setup_network()
         host = args.ip or detect_gateway()
@@ -165,6 +170,7 @@ def main():
             fields = match.split("|")
             print(f"Target network: {fields[0]}; channel: {fields[1]}; security: {fields[-1]}")
         flags = getattr(device, "_config_any", {})
+        # Match the library's firmware heuristic for the first encoding attempt.
         is_rtos = flags.get("rtos", "0") == "1"
         is_iot = flags.get("iot", "0") == "1"
         method = args.encrypt_method or (2 if is_rtos and not is_iot else 1)
@@ -174,7 +180,7 @@ def main():
         if args.diagnose:
             print("Diagnostics complete; no Wi-Fi settings changed.")
             return 0
-        password = config.get("password")
+        password = supplied_password or config.get("password")
         if not password:
             password = getpass.getpass(f"Password for {ssid}: ")
         if not isinstance(password, str):
