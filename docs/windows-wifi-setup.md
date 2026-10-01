@@ -172,6 +172,107 @@ settings:
 The generic network recommendations remain in the
 [README troubleshooting section](../README.rst#setup-troubleshooting).
 
+### HTTPNotOkException: Received status 500 for WiFiSetup1
+
+Observed log excerpts (the device name, address and port vary):
+
+```text
+HTTPNotOkException('Received status 500 for http://10.22.22.1:49152/upnp/control/WiFiSetup1')
+Error communicating with Her Office light after 3 attempts. Giving up.
+SetupException: pywemo lost device <WeMo LightSwitchLongPress "Her Office light"> and was unable to reconnect. Setup status is uncertain, re-probing and checking is required.
+ActionException: Error communicating with Her Office light after 3 attempts. Giving up.
+```
+
+The device's Wi-Fi setup service rejected a request. HTTP 500 alone does not
+identify the cause or prove that the device disconnected. In our LightSwitch
+run, the setup endpoint remained reachable and Forest was visible with
+`WPA2PSK/AES`. Method 1 with appended password lengths failed; **method 3 with
+appended password lengths reported success**:
+
+```text
+Attempt 3/6: SSID=Forest; encrypt_method=3; password_lengths=True
+Setup result: ('1', 'success')
+```
+
+Run normal setup to use automatic fallback, or select the observed working pair:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\setup_wifi.py --encrypt-method 3 --password-lengths yes
+```
+
+This is a confirmed workaround for that device/firmware, not a universal fix.
+If the endpoint disappears, reconnect to home Wi-Fi and verify discovery before
+retrying. The script does not parse a detailed SOAP fault from this HTTP 500,
+so the underlying device error was not established.
+
+### APNotFound: AP with SSID Forest not found
+
+Observed messages:
+
+```text
+Error: WeMo cannot see Forest. Check 2.4 GHz coverage and SSID.
+APNotFound: AP with SSID Forest not found. Try again.
+```
+
+The configured SSID was absent from that scan's parsed results. Run `--diagnose`
+to print the networks the device reports. Verify the exact SSID, 2.4 GHz signal
+and broadcast settings. The config cannot make the device see a network.
+
+In our runs, a subsequent scan found Forest on channels 6 and 11 with
+`WPA2PSK/AES`. The diagnostic parser was also changed to avoid dropping the first
+scan line; we did not establish whether that change or a refreshed scan resolved
+the initial missing-network message. A later method-2 attempt also encountered
+`APNotFound`, while the following method-3 scan found Forest and succeeded.
+That means method 2's encryption was not actually tested in that attempt.
+
+### ReadTimeoutError: Read timed out during Wi-Fi setup
+
+Observed warning excerpt:
+
+```text
+Retrying ... after connection broken by 'ReadTimeoutError("HTTPConnectionPool(host='10.22.22.1', port=49152): Read timed out. (read timeout=3.0)")': /upnp/control/WiFiSetup1
+```
+
+An individual request timed out; wait for the final setup result. In our second
+LightSwitch run, this warning was followed by a successful connection in
+8.27 seconds using method 1 with appended password lengths:
+
+```text
+Setup result: ('1', 'success')
+WeMo.Light.454: setup reported success
+```
+
+Do not reset a device solely because of this warning. If no success follows,
+check home-network discovery; a timeout can leave the outcome uncertain.
+
+### Setup URL is None in manual Python setup
+
+Earlier manual setup printed:
+
+```text
+>>> print(url)
+None
+```
+
+One confirmed input mistake was `gateway = input("10.22.22.1")`: the address is
+only the prompt text. Pressing Enter without entering a value assigns an empty
+string. Assign the actual gateway directly, or type it at the prompt.
+
+Another check returned no endpoint while Windows was still connected to home
+Wi-Fi rather than the device's setup network. Check the connection first.
+The scripts now validate the setup SSID and detect its gateway automatically.
+`None` by itself does not distinguish a wrong address from an unreachable device.
+
+### Older device addresses time out after a subnet change
+
+An earlier connectivity check returned `unreachable: timed out` for the old
+`192.168.0.x` addresses while Windows was on `192.168.1.x`. After changing router
+address ranges, use discovery to locate current addresses instead of reusing
+the old ones. If a device is already reset, provision it through its setup Wi-Fi.
+A changed IP range alone does not require factory reset.
+
+### Optional Commands
+
 Override a gateway only when automatic detection fails, using the actual setup
 network gateway shown by `ipconfig`:
 
