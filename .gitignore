@@ -104,6 +104,7 @@ desktop.ini
 
 # Secrets
 .lokalise_token
+/wemo-setup.json
 
 # monkeytype
 monkeytype.sqlite3
