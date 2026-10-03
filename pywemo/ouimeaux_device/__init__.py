@@ -361,7 +361,7 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             )
             mixed = ""
             for i, char in enumerate(characters):
-                if i % 2:
+                if i % 2 == 0:
                     mixed = mixed + char
                 else:
                     mixed = char + mixed
@@ -370,8 +370,8 @@ class Device(DeviceDescription, RequiredServicesMixin, WeMoServiceTypesMixin):
             # the above transformation results in the following strings, but
             # the calculation above is left for posterity
             # --> characters = "Onboard$Application@Device&Information#Wemo"
-            # --> mixed = 'oe#otmon&cvDniaipAdabOnor$plcto@eieIfrainWm'
-            # --> extra = 'b2Ujb3Rtb24mY3ZEbmlhaXBBZGFiT25v'
+            # --> mixed = 'mWniarfIeie@otclp$ronObadApiainDvc&nomto#eo'
+            # --> extra = 'bVduaWFyZkllaWVAb3RjbHAkcm9uT2Jh'
 
             keydata = (
                 mac[:3] + mac[9:12] + serial + extra + mac[6:9] + mac[3:6]
