@@ -32,7 +32,7 @@ lxml = ">=4.6"
 # formatter and linter
 ruff = "0.16.10"
 # linters/code analysis
-pylint = ">=4.0.9"
+pylint = ">=4.1.2"
 rstcheck = ">=3.3.1,<7.0.0"
 mypy = ">=1.2,<3.0"
 lxml-stubs = ">=0.4,<0.6"
