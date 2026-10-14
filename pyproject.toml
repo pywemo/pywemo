@@ -22,7 +22,7 @@ github = "https://github.com/pywemo/pywemo"
 
 [tool.poetry.dependencies]
 python = "^3.10.0"
-cryptography = ">=3.4"
+cryptography = ">=50.0.2"
 ifaddr = ">=0.1.0"
 requests = ">=2.0"
 urllib3 = ">=2.8.0"
