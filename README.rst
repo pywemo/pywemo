@@ -96,6 +96,13 @@ A few important notes:
 - If connecting to an open network, the password argument is ignored and you can provide anything, e.g. ``password=None``.
 - For a WeMo without internet access, see `this guide <https://github.com/pywemo/pywemo/wiki/WeMo-Cloud#disconnecting-from-the-cloud>`_ to stop any blinking lights.
 
+Windows Setup Scripts
+~~~~~~~~~~~~~~~~~~~~~
+See the `Windows Wi-Fi setup guide <docs/windows-wifi-setup.md>`_ for environment
+installation, putting devices in setup mode, testing one device, and provisioning
+the remaining devices automatically. The guide includes a workflow diagram,
+local credentials configuration, diagnostics, and reset instructions.
+
 Setup Troubleshooting
 ~~~~~~~~~~~~~~~~~~~~~
 If you have issues connecting, here are several things worth trying:
