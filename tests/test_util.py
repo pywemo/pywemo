@@ -1,6 +1,6 @@
 """Tests for pywemo.util."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -92,7 +92,7 @@ def test_ext_meta_info():
             hour=10,
             minute=16,
             second=58,
-            tzinfo=timezone.utc,
+            tzinfo=UTC,
         ),
         home_id="123456",
         remote_access_enabled=True,

@@ -4,8 +4,15 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "pywemo"
-requires-python = ">=3.10.0"
 version = "2.1.2"
+requires-python = ">=3.11,<4.0"
+dependencies = [
+  "cryptography>=50.0.2",
+  "ifaddr>=0.1.0",
+  "requests>=2.0",
+  "urllib3>=2.8.0",
+  "lxml>=4.6",
+]
 description = "Lightweight Python module to discover and control WeMo devices"
 authors = [
   {name = "Eric Severance", email = "pywemo@esev.com"},
@@ -20,38 +27,51 @@ documentation = "https://pywemo.github.io/pywemo/"
 releasenotes = "https://github.com/pywemo/pywemo/releases"
 github = "https://github.com/pywemo/pywemo"
 
-[tool.poetry.dependencies]
-python = "^3.10.0"
-cryptography = ">=50.0.2"
-ifaddr = ">=0.1.0"
-requests = ">=2.0"
-urllib3 = ">=2.8.0"
-lxml = ">=4.6"
-
-[tool.poetry.group.dev.dependencies]
-# formatter and linter
-ruff = "0.17.4"
-# linters/code analysis
-pylint = ">=4.1.3"
-rstcheck = ">=3.3.1,<7.0.0"
-mypy = ">=2.4.1,<3.0"
-lxml-stubs = ">=0.4,<0.6"
-types-requests = ">=2.33.0.20261030"
-# testing and code coverage
-pytest = ">=9.2.0,<10.0.0"
-pytest-vcr = "1.0.2"
-coverage = "^7.16.2"
-hypothesis = "^6.168.5"
+[dependency-groups]
+format = [
+  "ruff==0.17.4",
+]
+analysis = [
+  { include-group = "format" },
+  "pylint>=4.1.3",
+  "rstcheck>=6.3.1",
+  "mypy>=2.4.1",
+  "lxml-stubs>=0.5.1",
+  "types-requests>=2.33.0.20261030",
+]
+test = [
+  "pytest>=9.2.0",
+  "pytest-vcr>=1.0.2",
+  "coverage>=7.17.2",
+  "hypothesis>=6.170.15",
+]
+docs = [
+  "pdoc>=16.0.0",
+]
 # version of generateDS used to create device.py and service.py in .../api/xsd
-generateDS = "2.44.3"
-# other
-deptry = ">=0.11,<0.26"
-pre-commit = ">=2.10,<5.0"
-# docs
-pdoc = ">=13.1.1,<17.0.0"
+generateDS = [
+  "generateDS==2.44.3",
+]
+other = [
+  "deptry>=0.25.1",
+  "pre-commit>=4.7.0",
+]
+dev = [
+    { include-group = "analysis" },
+    { include-group = "test" },
+    { include-group = "docs" },
+    { include-group = "generateDS" },
+    { include-group = "other" },
+]
+bootstrap = [
+    "poetry>=2.5.1",
+]
 
-[tool.poetry.group.bootstrap.dependencies]
-poetry = ">=2.5.1"
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.bootstrap]
+optional = true
 
 [tool.poetry.requires-plugins]
 poetry-plugin-export = ">=1.8"

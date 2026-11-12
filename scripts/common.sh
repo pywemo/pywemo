@@ -59,5 +59,5 @@ function poetryInstall() {
 
   echo
   echo "===Installing dependencies==="
-  poetry install
+  poetry install --with=dev
 }

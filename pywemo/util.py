@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import socket
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import ifaddr
 
@@ -132,7 +132,7 @@ class ExtMetaInfo:  # pylint: disable=too-many-instance-attributes
             last_auth_value=int(values[3]),
             uptime=timedelta(hours=hours, minutes=minutes, seconds=seconds),
             firmware_update_state=int(values[5]),
-            utc_time=datetime.fromtimestamp(int(values[6]), timezone.utc),
+            utc_time=datetime.fromtimestamp(int(values[6]), UTC),
             home_id=values[7],
             remote_access_enabled=bool(int(values[8])),
             model_name=values[9],
