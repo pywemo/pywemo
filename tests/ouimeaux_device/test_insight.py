@@ -44,8 +44,8 @@ class Test_Insight:
         assert insight.today_on_time == 300
         assert insight.on_for == 231
         assert insight.total_on_time == 183183
-        assert insight.last_change.astimezone(dt.timezone.utc) == (
-            dt.datetime(2021, 1, 25, 0, 2, 4, tzinfo=dt.timezone.utc)
+        assert insight.last_change.astimezone(dt.UTC) == (
+            dt.datetime(2021, 1, 25, 0, 2, 4, tzinfo=dt.UTC)
         )
         assert insight.today_on_time == 300
         assert insight.standby_state == StandbyState.OFF
@@ -87,8 +87,8 @@ class Test_Insight:
         assert insight.today_on_time == 0
         assert insight.on_for == 2607
         assert insight.total_on_time == 12416
-        assert insight.last_change.astimezone(dt.timezone.utc) == (
-            dt.datetime(2021, 1, 20, 1, 11, 18, tzinfo=dt.timezone.utc)
+        assert insight.last_change.astimezone(dt.UTC) == (
+            dt.datetime(2021, 1, 20, 1, 11, 18, tzinfo=dt.UTC)
         )
         assert insight.today_on_time == 0
         assert insight.standby_state == StandbyState.STANDBY
