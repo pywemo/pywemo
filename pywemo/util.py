@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import ipaddress
 import os
 import socket
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
-import ifaddr
+import psutil
 
 
 def interface_addresses() -> list[str]:
@@ -17,15 +18,30 @@ def interface_addresses() -> list[str]:
     that has broadcast (and probably multicast) capability.
     """
     addresses = []
+    stats = psutil.net_if_stats()
 
-    for iface in ifaddr.get_adapters():
-        for addr in iface.ips:
-            if not (addr.is_IPv4 and isinstance(addr.ip, str)):
-                continue
-            if addr.ip == "127.0.0.1":
+    for iface_name, addrs in psutil.net_if_addrs().items():
+        # skip interfaces that are down or are loopback devices
+        iface_stat = stats.get(iface_name)
+        if iface_stat and (
+            not iface_stat.isup or "loopback" in iface_stat.flags.lower()
+        ):
+            continue
+
+        for addr in addrs:
+            # skip if not IPv4
+            if addr.family != socket.AF_INET:
                 continue
 
-            addresses.append(addr.ip)
+            # skip loopback (in case the interface check above doesn't work)
+            if ipaddress.ip_address(addr.address).is_loopback:
+                continue
+
+            # skip if it does not support broadcast
+            if not addr.broadcast:
+                continue
+
+            addresses.append(addr.address)
 
     return addresses
 
