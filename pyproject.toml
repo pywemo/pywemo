@@ -8,10 +8,10 @@ version = "2.1.2"
 requires-python = ">=3.11,<4.0"
 dependencies = [
   "cryptography>=50.0.2",
-  "ifaddr>=0.1.0",
-  "requests>=2.0",
+  "psutil>=7.2.2",
+  "requests>=2.34.2",
   "urllib3>=2.8.0",
-  "lxml>=4.6",
+  "lxml>=6.1.3",
 ]
 description = "Lightweight Python module to discover and control WeMo devices"
 authors = [
@@ -38,6 +38,7 @@ analysis = [
   "mypy>=2.4.1",
   "lxml-stubs>=0.5.1",
   "types-requests>=2.33.0.20261030",
+  "types-psutil>=7.2.2.20261111",
 ]
 test = [
   "pytest>=9.2.0",
