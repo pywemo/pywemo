@@ -93,11 +93,26 @@ def device_from_uuid_and_location(  # noqa: C901
         if uuid.startswith("uuid:Lightswitch-1_0"):
             if not location.endswith("/setup.xml"):
                 return LightSwitch(location)
-            return LightSwitchLongPress(location)
+            try:
+                return LightSwitchLongPress(location)
+            except MissingServiceError:
+                # some older devices may not actually be long press devices
+                # and the check on setup.xml above doesn't work
+                return LightSwitch(location)
         if uuid.startswith("uuid:Lightswitch-2_0"):
-            return LightSwitchLongPress(location)
+            try:
+                return LightSwitchLongPress(location)
+            except MissingServiceError:
+                # if rules are missing for some reason, at least try to work
+                # as a regular light switch
+                return LightSwitch(location)
         if uuid.startswith("uuid:Lightswitch-3_0"):
-            return LightSwitchLongPress(location)
+            try:
+                return LightSwitchLongPress(location)
+            except MissingServiceError:
+                # if rules are missing for some reason, at least try to work
+                # as a regular light switch
+                return LightSwitch(location)
         if uuid.startswith("uuid:Lightswitch"):
             return LightSwitch(location)
         if uuid.startswith("uuid:Dimmer-1_0"):
